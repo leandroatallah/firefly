@@ -38,7 +38,6 @@ func Setup() {
 	p := physics.NewPlayer()
 
 	game := NewGame(p)
-	// TODO: Use a method to add (setter)
 	game.AddBoundaries(
 		wallTop,
 		wallLeft,

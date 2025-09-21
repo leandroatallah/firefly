@@ -29,7 +29,7 @@ func NewObstacleRect(element Rect, collisionList []*CollisionArea) *ObstacleRect
 	}
 }
 
-// Object methods
+// Body methods
 func (o *ObstacleRect) Position() (minX, minY, maxX, maxY int) {
 	return o.PhysicsBody.Position()
 }
@@ -40,6 +40,9 @@ func (o *ObstacleRect) DrawCollisionBox(screen *ebiten.Image) {
 
 func (o *ObstacleRect) CollisionPosition() []image.Rectangle {
 	return o.PhysicsBody.CollisionPosition()
+}
+func (o *ObstacleRect) IsColliding(boundaries []Body) bool {
+	return o.PhysicsBody.IsColliding(boundaries)
 }
 
 func (c *ObstacleRect) Draw(screen *ebiten.Image) {

@@ -3,11 +3,12 @@ package physics
 import (
 	"image"
 	"log"
-	"math"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/leandroatallah/firefly/internal/config"
+	"github.com/leandroatallah/firefly/internal/input"
+	"github.com/leandroatallah/firefly/internal/screenutil"
 )
 
 const (
@@ -35,30 +36,6 @@ type Player struct {
 	state   PlayerState
 }
 
-// TODO: Move this function to elsewhere
-func getCenterOfScreenPosition(width, height int) (int, int) {
-	x := config.ScreenWidth/2 - width/2
-	y := config.ScreenHeight/2 - height/2
-	return x, y
-}
-
-// TODO: Move this function to elsewhere
-// TODO: Search for an alternative approach to reduce exponential
-func checkRectIntersect(obj1, obj2 Body) bool {
-	rects1 := obj1.CollisionPosition()
-	rects2 := obj2.CollisionPosition()
-
-	for _, r1 := range rects1 {
-		for _, r2 := range rects2 {
-			if r1.Overlaps(r2) {
-				return true
-			}
-		}
-	}
-
-	return false
-}
-
 // TOOD: Move to a factory in Game module
 func NewPlayer() *Player {
 	sprites := make(map[PlayerState]*ebiten.Image)
@@ -73,7 +50,7 @@ func NewPlayer() *Player {
 		log.Fatal(err)
 	}
 
-	x, y := getCenterOfScreenPosition(frameWidth, frameHeight)
+	x, y := screenutil.GetCenterOfScreenPosition(frameWidth, frameHeight)
 
 	playerElement := NewRect(x, y, frameWidth, frameHeight)
 	collisionArea := NewRect(x+2, y+3, frameWidth-5, frameHeight-6)
@@ -85,7 +62,7 @@ func NewPlayer() *Player {
 	}
 }
 
-// Object methods
+// Body methods
 func (p *Player) Position() (minX, minY, maxX, maxY int) {
 	return p.PhysicsBody.Position()
 }
@@ -97,44 +74,12 @@ func (p *Player) DrawCollisionBox(screen *ebiten.Image) {
 func (p *Player) CollisionPosition() []image.Rectangle {
 	return p.PhysicsBody.CollisionPosition()
 }
-
-// updatePosition applies movement to player and collision areas
-func (p *Player) updatePosition(velocity int, isXAxis bool) {
-	if isXAxis {
-		p.x16 += velocity
-		for _, c := range p.collisionList {
-			c.x16 += velocity
-		}
-	} else {
-		p.y16 += velocity
-		for _, c := range p.collisionList {
-			c.y16 += velocity
-		}
-	}
-}
-
-// TODO: Move to the correct struct
 func (p *Player) IsColliding(boundaries []Body) bool {
-	for _, b := range boundaries {
-		if checkRectIntersect(p, b.(Body)) {
-			return true
-		}
-	}
-	return false
+	return p.PhysicsBody.IsColliding(boundaries)
 }
 
-// TODO: Move to the correct struct
-func (p *Player) applyValidMovement(velocity int, isXAxis bool, boundaries []Body) {
-	if velocity == 0 {
-		return
-	}
-
-	p.updatePosition(velocity, isXAxis)
-
-	isValid := !p.IsColliding(boundaries)
-	if !isValid {
-		p.updatePosition(-velocity, isXAxis)
-	}
+func (p *Player) ApplyValidMovement(velocity int, isXAxis bool, boundaries []Body) {
+	p.PhysicsBody.ApplyValidMovement(velocity, isXAxis, boundaries)
 }
 
 func (p *Player) Update(boundaries []Body) error {
@@ -142,8 +87,8 @@ func (p *Player) Update(boundaries []Body) error {
 
 	p.HandleInput()
 
-	p.applyValidMovement(p.vx16, true, boundaries)
-	p.applyValidMovement(p.vy16, false, boundaries)
+	p.ApplyValidMovement(p.vx16, true, boundaries)
+	p.ApplyValidMovement(p.vy16, false, boundaries)
 
 	isWalking := p.vx16 != 0 || p.vy16 != 0
 	if isWalking {
@@ -186,35 +131,18 @@ func (p *Player) Draw(screen *ebiten.Image) {
 	screen.DrawImage(img.SubImage(image.Rect(sx, sy, sx+p.width, sy+p.height)).(*ebiten.Image), op)
 }
 
-// TODO: Move it to elsewhere
-func isSomeKeyPressed(keys ...ebiten.Key) bool {
-	for _, k := range keys {
-		if ebiten.IsKeyPressed(k) {
-			return true
-		}
-	}
-	return false
-}
-
-func normalizeMoveOffset(move int, normalize bool) int {
-	if normalize {
-		return int(float64(move*config.Unit) / math.Sqrt2 / config.Unit)
-	}
-	return move
-}
-
 func (p *Player) HandleInput() {
 	xMove, yMove := 0, 0
-	if isSomeKeyPressed(ebiten.KeyA, ebiten.KeyLeft) {
+	if input.IsSomeKeyPressed(ebiten.KeyA, ebiten.KeyLeft) {
 		xMove = -playerXMove
 	}
-	if isSomeKeyPressed(ebiten.KeyD, ebiten.KeyRight) {
+	if input.IsSomeKeyPressed(ebiten.KeyD, ebiten.KeyRight) {
 		xMove = playerXMove
 	}
-	if isSomeKeyPressed(ebiten.KeyW, ebiten.KeyUp) {
+	if input.IsSomeKeyPressed(ebiten.KeyW, ebiten.KeyUp) {
 		yMove = -playerYMove
 	}
-	if isSomeKeyPressed(ebiten.KeyS, ebiten.KeyDown) {
+	if input.IsSomeKeyPressed(ebiten.KeyS, ebiten.KeyDown) {
 		yMove = playerYMove
 	}
 
