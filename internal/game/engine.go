@@ -5,15 +5,15 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/config"
-	"github.com/leandroatallah/firefly/internal/object"
+	"github.com/leandroatallah/firefly/internal/physics"
 )
 
 type Game struct {
-	player     *object.Player
-	boundaries []object.Object
+	player     *physics.Player
+	boundaries []physics.Body
 }
 
-func NewGame(player *object.Player) *Game {
+func NewGame(player *physics.Player) *Game {
 	return &Game{player: player}
 }
 
@@ -26,7 +26,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	screen.Fill(color.RGBA{0xcc, 0xcc, 0xdd, 0xff})
 
 	for _, b := range g.boundaries {
-		b.(object.Obstacle).Draw(screen)
+		b.(physics.Obstacle).Draw(screen)
 	}
 
 	g.player.Draw(screen)
@@ -36,7 +36,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	return config.ScreenWidth, config.ScreenHeight
 }
 
-func (g *Game) AddBoundaries(boundaries ...object.Object) {
+func (g *Game) AddBoundaries(boundaries ...physics.Body) {
 	for _, o := range boundaries {
 		g.boundaries = append(g.boundaries, o)
 	}

@@ -1,4 +1,4 @@
-package object
+package physics
 
 import (
 	"image"
@@ -9,40 +9,39 @@ import (
 	"github.com/leandroatallah/firefly/internal/config"
 )
 
-type Object interface {
+type Body interface {
 	Position() (minX, minY, maxX, maxY int)
 	DrawCollisionBox(screen *ebiten.Image)
 	CollisionPosition() []image.Rectangle
 }
 
-// TODO: Rename
-type BaseObject struct {
-	Element
+type PhysicsBody struct {
+	Rect
 	vx16 int
 	vy16 int
 	// TODO: Convert to a list
 	collisionList []*CollisionArea
 }
 
-func NewBaseObject(element Element, collisionList []*CollisionArea) BaseObject {
-	return BaseObject{Element: element, collisionList: collisionList}
+func NewPhysicsBody(element Rect, collisionList []*CollisionArea) PhysicsBody {
+	return PhysicsBody{Rect: element, collisionList: collisionList}
 }
 
-func (b *BaseObject) Move() {
+func (b *PhysicsBody) Move() {
 	panic("You should implement this method in derivated structs")
 }
 
 // TODO: Implement ease in movement
-func (b *BaseObject) MoveY(distance int) {
+func (b *PhysicsBody) MoveY(distance int) {
 	b.vy16 += distance * config.Unit
 }
 
 // TODO: Implement ease in movement
-func (b *BaseObject) MoveX(distance int) {
+func (b *PhysicsBody) MoveX(distance int) {
 	b.vx16 += distance * config.Unit
 }
 
-func (b *BaseObject) Position() (minX, minY, maxX, maxY int) {
+func (b *PhysicsBody) Position() (minX, minY, maxX, maxY int) {
 	minX = b.x16 / config.Unit
 	minY = b.y16 / config.Unit
 	maxX = minX + b.width
@@ -50,7 +49,7 @@ func (b *BaseObject) Position() (minX, minY, maxX, maxY int) {
 	return
 }
 
-func (b *BaseObject) DrawCollisionBox(screen *ebiten.Image) {
+func (b *PhysicsBody) DrawCollisionBox(screen *ebiten.Image) {
 	for _, c := range b.CollisionPosition() {
 		minX := c.Min.X
 		minY := c.Min.Y
@@ -70,12 +69,10 @@ func (b *BaseObject) DrawCollisionBox(screen *ebiten.Image) {
 	}
 }
 
-func (b *BaseObject) CollisionPosition() []image.Rectangle {
+func (b *PhysicsBody) CollisionPosition() []image.Rectangle {
 	res := []image.Rectangle{}
 	for _, c := range b.collisionList {
-		minX, minY, maxX, maxY := c.Position()
-		rect := image.Rect(minX, minY, maxX, maxY)
-		res = append(res, rect)
+		res = append(res, c.Position())
 	}
 	return res
 }

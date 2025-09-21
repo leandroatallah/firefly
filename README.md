@@ -1,6 +1,6 @@
 # firefly
 
-A simple game made with Ebiten.
+A simple game made with Ebitengine (formerly known as Ebiten).
 
 ## Folder Structure
 
@@ -8,8 +8,7 @@ A simple game made with Ebiten.
 .
 ├── README.md
 ├── assets
-│   ├── default-idle.png
-│   └── default-walk.png
+│   └── ...
 ├── cmd
 │   └── game
 │       └── main.go
@@ -21,11 +20,10 @@ A simple game made with Ebiten.
     ├── game
     │   ├── engine.go
     │   └── setup.go
-    └── object
-        ├── base.go
+    └── physics
+        ├── body.go
         ├── collision.go
-        ├── element.go
+        ├── shape.go
         ├── obstacle.go
         └── player.go
 ```
-

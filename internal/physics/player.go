@@ -1,4 +1,4 @@
-package object
+package physics
 
 import (
 	"image"
@@ -29,7 +29,7 @@ const (
 )
 
 type Player struct {
-	BaseObject
+	PhysicsBody
 	count   int
 	sprites map[PlayerState]*ebiten.Image
 	state   PlayerState
@@ -44,7 +44,7 @@ func getCenterOfScreenPosition(width, height int) (int, int) {
 
 // TODO: Move this function to elsewhere
 // TODO: Search for an alternative approach to reduce exponential
-func checkRectIntersect(obj1, obj2 Object) bool {
+func checkRectIntersect(obj1, obj2 Body) bool {
 	rects1 := obj1.CollisionPosition()
 	rects2 := obj2.CollisionPosition()
 
@@ -75,27 +75,27 @@ func NewPlayer() *Player {
 
 	x, y := getCenterOfScreenPosition(frameWidth, frameHeight)
 
-	playerElement := NewElement(x, y, frameWidth, frameHeight)
-	collisionArea := NewElement(x+2, y+3, frameWidth-5, frameHeight-6)
+	playerElement := NewRect(x, y, frameWidth, frameHeight)
+	collisionArea := NewRect(x+2, y+3, frameWidth-5, frameHeight-6)
 	collisionList := []*CollisionArea{&CollisionArea{collisionArea}}
 
 	return &Player{
-		BaseObject: NewBaseObject(playerElement, collisionList),
-		sprites:    sprites,
+		PhysicsBody: NewPhysicsBody(playerElement, collisionList),
+		sprites:     sprites,
 	}
 }
 
 // Object methods
 func (p *Player) Position() (minX, minY, maxX, maxY int) {
-	return p.BaseObject.Position()
+	return p.PhysicsBody.Position()
 }
 
 func (p *Player) DrawCollisionBox(screen *ebiten.Image) {
-	p.BaseObject.DrawCollisionBox(screen)
+	p.PhysicsBody.DrawCollisionBox(screen)
 }
 
 func (p *Player) CollisionPosition() []image.Rectangle {
-	return p.BaseObject.CollisionPosition()
+	return p.PhysicsBody.CollisionPosition()
 }
 
 // updatePosition applies movement to player and collision areas
@@ -114,9 +114,9 @@ func (p *Player) updatePosition(velocity int, isXAxis bool) {
 }
 
 // TODO: Move to the correct struct
-func (p *Player) IsColliding(boundaries []Object) bool {
+func (p *Player) IsColliding(boundaries []Body) bool {
 	for _, b := range boundaries {
-		if checkRectIntersect(p, b.(Object)) {
+		if checkRectIntersect(p, b.(Body)) {
 			return true
 		}
 	}
@@ -124,7 +124,7 @@ func (p *Player) IsColliding(boundaries []Object) bool {
 }
 
 // TODO: Move to the correct struct
-func (p *Player) applyValidMovement(velocity int, isXAxis bool, boundaries []Object) {
+func (p *Player) applyValidMovement(velocity int, isXAxis bool, boundaries []Body) {
 	if velocity == 0 {
 		return
 	}
@@ -137,7 +137,7 @@ func (p *Player) applyValidMovement(velocity int, isXAxis bool, boundaries []Obj
 	}
 }
 
-func (p *Player) Update(boundaries []Object) error {
+func (p *Player) Update(boundaries []Body) error {
 	p.count++
 
 	p.HandleInput()

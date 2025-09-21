@@ -1,4 +1,4 @@
-package object
+package physics
 
 import (
 	"image"
@@ -14,15 +14,15 @@ type Obstacle interface {
 }
 
 type ObstacleRect struct {
-	BaseObject
+	PhysicsBody
 }
 
-func NewObstacleRect(element Element, collisionList []*CollisionArea) *ObstacleRect {
+func NewObstacleRect(element Rect, collisionList []*CollisionArea) *ObstacleRect {
 	if len(collisionList) == 0 {
 		collisionList = []*CollisionArea{elementToCollisionArea(element)}
 	}
 	return &ObstacleRect{
-		BaseObject: NewBaseObject(
+		PhysicsBody: NewPhysicsBody(
 			element,
 			collisionList,
 		),
@@ -31,15 +31,15 @@ func NewObstacleRect(element Element, collisionList []*CollisionArea) *ObstacleR
 
 // Object methods
 func (o *ObstacleRect) Position() (minX, minY, maxX, maxY int) {
-	return o.BaseObject.Position()
+	return o.PhysicsBody.Position()
 }
 
 func (o *ObstacleRect) DrawCollisionBox(screen *ebiten.Image) {
-	o.BaseObject.DrawCollisionBox(screen)
+	o.PhysicsBody.DrawCollisionBox(screen)
 }
 
 func (o *ObstacleRect) CollisionPosition() []image.Rectangle {
-	return o.BaseObject.CollisionPosition()
+	return o.PhysicsBody.CollisionPosition()
 }
 
 func (c *ObstacleRect) Draw(screen *ebiten.Image) {
@@ -55,5 +55,5 @@ func (c *ObstacleRect) Draw(screen *ebiten.Image) {
 }
 
 type ObstacleCircle struct {
-	BaseObject
+	PhysicsBody
 }
