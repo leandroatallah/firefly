@@ -4,7 +4,7 @@ A simple game made with Ebitengine (formerly known as Ebiten).
 
 ## Folder Structure
 
-```
+```text
 .
 ├── README.md
 ├── assets

@@ -36,7 +36,6 @@ type Player struct {
 	state   PlayerState
 }
 
-// TOOD: Move to a factory in Game module
 func NewPlayer() *Player {
 	sprites := make(map[PlayerState]*ebiten.Image)
 	var err error

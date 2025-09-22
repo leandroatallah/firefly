@@ -4,7 +4,6 @@
 
 ### 1. Game State Management
 
-- Add scene system (menu, playing, paused, game over)
 - Implement scene transitions and lifecycle management
 - Replace hardcoded game loop with state machine
 
