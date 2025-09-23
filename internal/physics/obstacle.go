@@ -10,6 +10,7 @@ import (
 )
 
 type Obstacle interface {
+	Body
 	Draw(screen *ebiten.Image)
 	DrawCollisionBox(screen *ebiten.Image)
 }

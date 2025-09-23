@@ -1,8 +1,9 @@
 package scene
 
 import (
+	"log"
+
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/leandroatallah/firefly/internal/config"
 	"github.com/leandroatallah/firefly/internal/physics"
 )
 
@@ -16,6 +17,7 @@ func (s *SandboxScene) Update() error {
 		s.player.Update(s.boundaries)
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyEscape) {
+		// TODO: Should use the factory here. How?
 		s.nextScene = &MenuScene{}
 	}
 
@@ -36,23 +38,25 @@ func (s *SandboxScene) OnStart() {
 
 	s.player = physics.NewPlayer()
 
+	obstacleFactory := physics.NewDefaultObstacleFactory()
+
 	// Boundaries
-	wallTop := physics.NewObstacleRect(
-		physics.NewRect(0, 0, config.ScreenWidth, wallWidth),
-	).AddCollision(
-		physics.NewCollisionArea(
-			physics.NewRect(0, 0, config.ScreenWidth, wallWidth),
-		),
-	)
-	wallLeft := physics.NewObstacleRect(
-		physics.NewRect(0, 0, wallWidth, config.ScreenHeight),
-	).AddCollision()
-	wallRight := physics.NewObstacleRect(
-		physics.NewRect(config.ScreenWidth-wallWidth, 0, wallWidth, config.ScreenHeight),
-	).AddCollision()
-	wallDown := physics.NewObstacleRect(
-		physics.NewRect(0, config.ScreenHeight-wallWidth, config.ScreenWidth, wallWidth),
-	).AddCollision()
+	wallTop, err := obstacleFactory.Create(physics.ObstacleWallTop)
+	if err != nil {
+		log.Fatal(err)
+	}
+	wallLeft, err := obstacleFactory.Create(physics.ObstacleWallLeft)
+	if err != nil {
+		log.Fatal(err)
+	}
+	wallRight, err := obstacleFactory.Create(physics.ObstacleWallRight)
+	if err != nil {
+		log.Fatal(err)
+	}
+	wallDown, err := obstacleFactory.Create(physics.ObstacleWallDown)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	// Enemies
 	enemyRect := physics.NewObstacleRect(
