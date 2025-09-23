@@ -17,8 +17,7 @@ func (s *SandboxScene) Update() error {
 		s.player.Update(s.boundaries)
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyEscape) {
-		// TODO: Should use the factory here. How?
-		s.nextScene = &MenuScene{}
+		s.Manager.GoToScene(SceneMenu)
 	}
 
 	return nil

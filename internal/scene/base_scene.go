@@ -12,13 +12,13 @@ type Scene interface {
 	Update() error
 	OnStart()
 	OnFinish()
-	Next() Scene
+	SetManager(manager *SceneManager)
 }
 
 type BaseScene struct {
 	boundaries []physics.Body
 	count      int
-	nextScene  Scene
+	Manager    *SceneManager
 }
 
 func NewScene() *BaseScene {
@@ -51,6 +51,6 @@ func (s *BaseScene) AddBoundaries(boundaries ...physics.Body) {
 	}
 }
 
-func (s *BaseScene) Next() Scene {
-	return s.nextScene
+func (s *BaseScene) SetManager(manager *SceneManager) {
+	s.Manager = manager
 }

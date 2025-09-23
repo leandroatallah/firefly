@@ -13,17 +13,15 @@ func Setup() {
 	ebiten.SetWindowTitle("2D Boilerplate")
 
 	// Scenes
-	sceneFactory := scene.NewDefaultSceneFactory()
 	sceneManager := scene.NewSceneManager()
-	menuScene, err := sceneFactory.Create(scene.SceneMenu)
-	if err != nil {
-		log.Fatal(err)
-	}
+	sceneFactory := scene.NewDefaultSceneFactory()
+
+	sceneManager.SetFactory(sceneFactory)
+	sceneFactory.SetManager(sceneManager)
 
 	game := NewGame(sceneManager)
 
-	// TODO: Should the possible scenes be create here, like routes address?
-	game.sceneManager.GoTo(menuScene)
+	game.sceneManager.GoToScene(scene.SceneMenu)
 
 	if err := ebiten.RunGame(game); err != nil {
 		log.Fatal(err)

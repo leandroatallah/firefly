@@ -20,7 +20,7 @@ func (s *MenuScene) Draw(screen *ebiten.Image) {
 
 func (s *MenuScene) Update() error {
 	if ebiten.IsKeyPressed(ebiten.KeyEnter) {
-		s.nextScene = &SandboxScene{}
+		s.Manager.GoToScene(SceneSandbox)
 	}
 	return nil
 }
