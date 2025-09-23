@@ -1,16 +1,16 @@
 package physics
 
 type CollisionArea struct {
-	Rect
+	Shape
 }
 
-func NewCollisionArea(element Rect) *CollisionArea {
+func NewCollisionArea(element Shape) *CollisionArea {
 	return &CollisionArea{
-		Rect: element,
+		Shape: element,
 	}
 }
 
-func elementToCollisionArea(element Rect) *CollisionArea {
+func rectToCollisionArea(element Shape) *CollisionArea {
 	rect := element.Position()
 	width := rect.Max.X - rect.Min.X
 	height := rect.Max.Y - rect.Min.Y

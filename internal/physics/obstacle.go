@@ -11,22 +11,23 @@ import (
 
 type Obstacle interface {
 	Draw(screen *ebiten.Image)
+	DrawCollisionBox(screen *ebiten.Image)
 }
 
 type ObstacleRect struct {
 	PhysicsBody
 }
 
-func NewObstacleRect(element Rect, collisionList []*CollisionArea) *ObstacleRect {
-	if len(collisionList) == 0 {
-		collisionList = []*CollisionArea{elementToCollisionArea(element)}
+func NewObstacleRect(rect *Rect) *ObstacleRect {
+	return &ObstacleRect{PhysicsBody: *NewPhysicsBody(rect)}
+}
+
+func (o *ObstacleRect) AddCollision(list ...*CollisionArea) *ObstacleRect {
+	if len(list) == 0 {
+		list = []*CollisionArea{rectToCollisionArea(o.Shape)}
 	}
-	return &ObstacleRect{
-		PhysicsBody: NewPhysicsBody(
-			element,
-			collisionList,
-		),
-	}
+	o.PhysicsBody.AddCollision(list...)
+	return o
 }
 
 // Body methods
@@ -45,13 +46,14 @@ func (o *ObstacleRect) IsColliding(boundaries []Body) bool {
 	return o.PhysicsBody.IsColliding(boundaries)
 }
 
-func (c *ObstacleRect) Draw(screen *ebiten.Image) {
+func (o *ObstacleRect) Draw(screen *ebiten.Image) {
+	rect := o.Shape.(*Rect)
 	vector.DrawFilledRect(
 		screen,
-		float32(c.x16)/config.Unit,
-		float32(c.y16)/config.Unit,
-		float32(c.width),
-		float32(c.height),
+		float32(rect.x16)/config.Unit,
+		float32(rect.y16)/config.Unit,
+		float32(rect.width),
+		float32(rect.height),
 		color.RGBA{0xff, 0, 0, 0xff},
 		false,
 	)

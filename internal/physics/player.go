@@ -52,11 +52,11 @@ func NewPlayer() *Player {
 	x, y := screenutil.GetCenterOfScreenPosition(frameWidth, frameHeight)
 
 	playerElement := NewRect(x, y, frameWidth, frameHeight)
-	collisionArea := NewRect(x+2, y+3, frameWidth-5, frameHeight-6)
-	collisionList := []*CollisionArea{&CollisionArea{collisionArea}}
+	collisionRect := NewRect(x+2, y+3, frameWidth-5, frameHeight-6)
+	collisionArea := &CollisionArea{Shape: collisionRect}
 
 	return &Player{
-		PhysicsBody: NewPhysicsBody(playerElement, collisionList),
+		PhysicsBody: *NewPhysicsBody(playerElement).AddCollision(collisionArea),
 		sprites:     sprites,
 	}
 }
@@ -117,17 +117,26 @@ func (p *Player) Update(boundaries []Body) error {
 }
 
 func (p *Player) Draw(screen *ebiten.Image) {
+	body := p.Shape.(*Rect)
 	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Translate(float64(p.x16)/config.Unit, float64(p.y16)/config.Unit)
+	op.GeoM.Translate(
+		float64(body.x16)/config.Unit,
+		float64(body.y16)/config.Unit,
+	)
 
 	// Animation frame rate
 	img := p.sprites[p.state]
 	playerWidth := img.Bounds().Dx()
-	frameCount := playerWidth / p.width
+	frameCount := playerWidth / body.width
 	i := (p.count / frameRate) % frameCount
-	sx, sy := frameOX+i*p.width, frameOY
+	sx, sy := frameOX+i*body.width, frameOY
 
-	screen.DrawImage(img.SubImage(image.Rect(sx, sy, sx+p.width, sy+p.height)).(*ebiten.Image), op)
+	screen.DrawImage(
+		img.SubImage(
+			image.Rect(sx, sy, sx+body.width, sy+body.height),
+		).(*ebiten.Image),
+		op,
+	)
 }
 
 func (p *Player) HandleInput() {

@@ -10,23 +10,31 @@ import (
 	"github.com/leandroatallah/firefly/internal/config"
 )
 
+// Movable is a Shape but with movement
+type Movable interface {
+	// TODO: Make all Position return the same data type
+	Position() (minX, minY, maxX, maxY int)
+	ApplyValidMovement(velocity int, isXAxis bool, boundaries []Body)
+}
+
+// Body is a Shape but with collision
 type Body interface {
+	// TODO: Make all Position return the same data type
 	Position() (minX, minY, maxX, maxY int)
 	DrawCollisionBox(screen *ebiten.Image)
 	CollisionPosition() []image.Rectangle
 	IsColliding(boundaries []Body) bool
-	ApplyValidMovement(velocity int, isXAxis bool, boundaries []Body)
 }
 
 type PhysicsBody struct {
-	Rect
+	Shape
 	vx16          int
 	vy16          int
 	collisionList []*CollisionArea
 }
 
-func NewPhysicsBody(element Rect, collisionList []*CollisionArea) PhysicsBody {
-	return PhysicsBody{Rect: element, collisionList: collisionList}
+func NewPhysicsBody(shape Shape) *PhysicsBody {
+	return &PhysicsBody{Shape: shape}
 }
 
 func (b *PhysicsBody) Move() {
@@ -44,10 +52,15 @@ func (b *PhysicsBody) MoveX(distance int) {
 }
 
 func (b *PhysicsBody) Position() (minX, minY, maxX, maxY int) {
-	minX = b.x16 / config.Unit
-	minY = b.y16 / config.Unit
-	maxX = minX + b.width
-	maxY = minY + b.height
+	// TODO: Replace switch with "polymorphism"
+	switch b.Shape.(type) {
+	case *Rect:
+		rect := b.Shape.(*Rect)
+		minX = rect.x16 / config.Unit
+		minY = rect.y16 / config.Unit
+		maxX = minX + rect.width
+		maxY = minY + rect.height
+	}
 	return
 }
 
@@ -69,6 +82,13 @@ func (b *PhysicsBody) DrawCollisionBox(screen *ebiten.Image) {
 			float32(minX)+1, float32(minY)+1, width-2, height-2,
 			color.RGBA{0, 0xff, 0, 0xff}, false)
 	}
+}
+
+func (b *PhysicsBody) AddCollision(list ...*CollisionArea) *PhysicsBody {
+	for _, i := range list {
+		b.collisionList = append(b.collisionList, i)
+	}
+	return b
 }
 
 func (b *PhysicsBody) CollisionPosition() []image.Rectangle {
@@ -105,15 +125,20 @@ func (b *PhysicsBody) IsColliding(boundaries []Body) bool {
 }
 
 func (b *PhysicsBody) updatePosition(velocity int, isXAxis bool) {
-	if isXAxis {
-		b.x16 += velocity
-		for _, c := range b.collisionList {
-			c.x16 += velocity
-		}
-	} else {
-		b.y16 += velocity
-		for _, c := range b.collisionList {
-			c.y16 += velocity
+	// TODO: Replace switch with "polymorphism"
+	switch b.Shape.(type) {
+	case *Rect:
+		rect := b.Shape.(*Rect)
+		if isXAxis {
+			rect.x16 += velocity
+			for _, c := range b.collisionList {
+				c.Shape.(*Rect).x16 += velocity
+			}
+		} else {
+			rect.y16 += velocity
+			for _, c := range b.collisionList {
+				c.Shape.(*Rect).y16 += velocity
+			}
 		}
 	}
 }
