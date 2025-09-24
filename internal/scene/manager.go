@@ -4,15 +4,17 @@ import (
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/audio"
 	"github.com/leandroatallah/firefly/internal/transition"
 )
 
 type SceneManager struct {
-	current Scene
-	factory SceneFactory
-
+	current      Scene
+	factory      SceneFactory
 	nextScene    Scene
 	transitioner transition.Transition
+	audioContext *audio.Context
+	audioStream  map[string][]byte
 }
 
 func NewSceneManager() *SceneManager {
@@ -60,6 +62,7 @@ func (m *SceneManager) SetFactory(factory SceneFactory) {
 	m.factory = factory
 }
 
+// TODO: Comment the difference of GoTo and GoToScene
 func (m *SceneManager) GoToScene(sceneType SceneType, sceneTransition transition.Transition) {
 	scene, err := m.factory.Create(sceneType)
 	if err != nil {
@@ -76,4 +79,24 @@ func (m *SceneManager) GoToScene(sceneType SceneType, sceneTransition transition
 	} else {
 		m.GoTo(scene)
 	}
+}
+
+func (m *SceneManager) SetAudioContext(ctx *audio.Context) {
+	m.audioContext = ctx
+}
+
+func (m *SceneManager) AudioContext() *audio.Context {
+	return m.audioContext
+}
+
+func (m *SceneManager) SetAudioStream(stream map[string][]byte) {
+	m.audioStream = stream
+}
+
+func (m *SceneManager) GetAudioData(path string) []byte {
+	item, exists := m.audioStream[path]
+	if !exists {
+		log.Fatal("Sound item was not founded")
+	}
+	return item
 }

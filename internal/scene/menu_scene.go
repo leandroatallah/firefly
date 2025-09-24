@@ -1,12 +1,15 @@
 package scene
 
 import (
-	"fmt"
 	"image/color"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/config"
 	"github.com/leandroatallah/firefly/internal/transition"
+)
+
+const (
+	kickBackBG = "assets/kick_backOGG.ogg"
 )
 
 type MenuScene struct {
@@ -26,8 +29,11 @@ func (s *MenuScene) Update() error {
 	return nil
 }
 
-func (s *MenuScene) OnStart() {}
+func (s *MenuScene) OnStart() {
+	s.SetAudioStream([]string{kickBackBG})
+	s.PlayAudio(kickBackBG)
+}
 
 func (s *MenuScene) OnFinish() {
-	fmt.Println("Finish Menu Scence")
+	s.PauseAudio(kickBackBG)
 }
