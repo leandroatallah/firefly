@@ -30,6 +30,8 @@ type PhysicsBody struct {
 	Shape
 	vx16          int
 	vy16          int
+	accelerationX int
+	accelerationY int
 	collisionList []*CollisionArea
 }
 
@@ -41,14 +43,12 @@ func (b *PhysicsBody) Move() {
 	panic("You should implement this method in derivated structs")
 }
 
-// TODO: Implement ease in movement
-func (b *PhysicsBody) MoveY(distance int) {
-	b.vy16 += distance * config.Unit
+func (b *PhysicsBody) MoveX(distance int) {
+	b.accelerationX = distance * config.Unit
 }
 
-// TODO: Implement ease in movement
-func (b *PhysicsBody) MoveX(distance int) {
-	b.vx16 += distance * config.Unit
+func (b *PhysicsBody) MoveY(distance int) {
+	b.accelerationY = distance * config.Unit
 }
 
 func (b *PhysicsBody) Position() (minX, minY, maxX, maxY int) {
@@ -124,35 +124,35 @@ func (b *PhysicsBody) IsColliding(boundaries []Body) bool {
 	return false
 }
 
-func (b *PhysicsBody) updatePosition(velocity int, isXAxis bool) {
+func (b *PhysicsBody) updatePosition(distance int, isXAxis bool) {
 	// TODO: Replace switch with "polymorphism"
 	switch b.Shape.(type) {
 	case *Rect:
 		rect := b.Shape.(*Rect)
 		if isXAxis {
-			rect.x16 += velocity
+			rect.x16 += distance
 			for _, c := range b.collisionList {
-				c.Shape.(*Rect).x16 += velocity
+				c.Shape.(*Rect).x16 += distance
 			}
 		} else {
-			rect.y16 += velocity
+			rect.y16 += distance
 			for _, c := range b.collisionList {
-				c.Shape.(*Rect).y16 += velocity
+				c.Shape.(*Rect).y16 += distance
 			}
 		}
 	}
 }
 
-func (b *PhysicsBody) ApplyValidMovement(velocity int, isXAxis bool, boundaries []Body) {
-	if velocity == 0 {
+func (b *PhysicsBody) ApplyValidMovement(distance int, isXAxis bool, boundaries []Body) {
+	if distance == 0 {
 		return
 	}
 
-	b.updatePosition(velocity, isXAxis)
+	b.updatePosition(distance, isXAxis)
 
 	isValid := !b.IsColliding(boundaries)
 	if !isValid {
-		b.updatePosition(-velocity, isXAxis)
+		b.updatePosition(-distance, isXAxis)
 	}
 }
 
