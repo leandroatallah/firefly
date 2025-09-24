@@ -1,8 +1,11 @@
 package game
 
 import (
+	"log"
+	"os"
+	"strings"
+
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/audio"
 	"github.com/leandroatallah/firefly/internal/audioplayer"
 	"github.com/leandroatallah/firefly/internal/config"
 	"github.com/leandroatallah/firefly/internal/scene"
@@ -39,17 +42,43 @@ func (g *Game) ChangeState(state GameState) *Game {
 	return g
 }
 
-func (g *Game) SetSceneManager(manager *scene.SceneManager) *Game {
-	g.sceneManager = manager
+func (g *Game) SetSceneManager() *Game {
+	sceneManager := scene.NewSceneManager()
+	sceneFactory := scene.NewDefaultSceneFactory()
+
+	sceneManager.SetFactory(sceneFactory)
+	sceneFactory.SetManager(sceneManager)
+
+	g.sceneManager = sceneManager
 	return g
 }
 
-func (g *Game) SetAudioContext(ctx *audio.Context) *Game {
+func (g *Game) SetAudioContext() *Game {
+	ctx := audioplayer.NewContext()
 	g.sceneManager.SetAudioContext(ctx)
 	return g
 }
 
-func (g *Game) SetAudioAssets(items []*audioplayer.AudioItem) *Game {
+func (g *Game) LoadAudioAssets() []*audioplayer.AudioItem {
+	audioAssets := []*audioplayer.AudioItem{}
+	files, err := os.ReadDir("assets")
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, file := range files {
+		if !file.IsDir() && strings.HasSuffix(file.Name(), ".ogg") {
+			audioItem, err := audioplayer.LoadAudio("assets/" + file.Name())
+			if err != nil {
+				log.Fatal(err)
+			}
+			audioAssets = append(audioAssets, audioItem)
+		}
+	}
+	return audioAssets
+}
+
+func (g *Game) SetAudioAssets() *Game {
+	items := g.LoadAudioAssets()
 	stream := make(map[string][]byte)
 	for _, i := range items {
 		stream[i.Name()] = i.Data()
