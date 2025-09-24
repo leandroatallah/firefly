@@ -1,7 +1,7 @@
 package config
 
 const (
-	ScreenWidth  = 320
-	ScreenHeight = 240
+	ScreenWidth  = 480
+	ScreenHeight = 360
 	Unit         = 16
 )
