@@ -17,7 +17,7 @@ func (s *SandboxScene) Update() error {
 		s.player.Update(s.boundaries)
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyEscape) {
-		s.Manager.GoToScene(SceneMenu)
+		s.Manager.GoToScene(SceneMenu, nil)
 	}
 
 	return nil

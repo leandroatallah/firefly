@@ -6,6 +6,7 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/config"
+	"github.com/leandroatallah/firefly/internal/transition"
 )
 
 type MenuScene struct {
@@ -20,7 +21,7 @@ func (s *MenuScene) Draw(screen *ebiten.Image) {
 
 func (s *MenuScene) Update() error {
 	if ebiten.IsKeyPressed(ebiten.KeyEnter) {
-		s.Manager.GoToScene(SceneSandbox)
+		s.Manager.GoToScene(SceneSandbox, transition.NewFader())
 	}
 	return nil
 }

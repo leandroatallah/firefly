@@ -4,7 +4,6 @@
 
 ### 1. Game State Management
 
-- Implement scene transitions and lifecycle management
 - Replace hardcoded game loop with state machine
 
 ### 2. Audio System
