@@ -66,6 +66,7 @@ func (g *Game) LoadAudioAssets() []*audioplayer.AudioItem {
 		log.Fatal(err)
 	}
 	for _, file := range files {
+		// TODO: Extend to WAV and MP3 format
 		if !file.IsDir() && strings.HasSuffix(file.Name(), ".ogg") {
 			audioItem, err := audioplayer.LoadAudio("assets/" + file.Name())
 			if err != nil {

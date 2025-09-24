@@ -61,8 +61,10 @@ func (s *BaseScene) SetManager(manager *SceneManager) {
 }
 
 // Audio methods
-func (s *BaseScene) SetAudioStream(list []string) {
-	s.audioPlayerStream = make(map[string]*audio.Player)
+func (s *BaseScene) AddAudioStream(list ...string) {
+	if len(s.audioPlayerStream) == 0 {
+		s.audioPlayerStream = make(map[string]*audio.Player)
+	}
 	for _, item := range list {
 		player := s.NewAudioPlayer(item)
 		s.audioPlayerStream[item] = player

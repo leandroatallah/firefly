@@ -14,8 +14,6 @@ const (
 	frequency  = 440
 )
 
-
-
 type AudioItem struct {
 	name string
 	data []byte
@@ -58,6 +56,7 @@ func NewAudioPlayer(ctx *audio.Context, file []byte) (*audio.Player, error) {
 		Length() int64
 	}
 
+	// TODO: Extend to WAV and MP3 format
 	s, err := vorbis.DecodeF32(bytes.NewReader(file))
 	if err != nil {
 		return nil, err

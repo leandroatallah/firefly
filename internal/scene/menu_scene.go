@@ -30,7 +30,7 @@ func (s *MenuScene) Update() error {
 }
 
 func (s *MenuScene) OnStart() {
-	s.SetAudioStream([]string{kickBackBG})
+	s.AddAudioStream(kickBackBG)
 	s.PlayAudio(kickBackBG)
 }
 

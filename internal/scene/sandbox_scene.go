@@ -3,14 +3,21 @@ package scene
 import (
 	"image/color"
 	"log"
+	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/physics"
 )
 
+const (
+	jab8         = "assets/jab8.ogg"
+	sketchbookBG = "assets/Sketchbook 2024-06-19.ogg"
+)
+
 type SandboxScene struct {
 	BaseScene
-	player *physics.Player
+	player       *physics.Player
+	isPlayingJab bool
 }
 
 func (s *SandboxScene) Update() error {
@@ -19,6 +26,15 @@ func (s *SandboxScene) Update() error {
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyEscape) {
 		s.Manager.GoToScene(SceneMenu, nil)
+	}
+	if ebiten.IsKeyPressed(ebiten.KeySpace) && !s.isPlayingJab {
+		s.PlayAudio(jab8)
+		s.isPlayingJab = true
+		go func() {
+			time.Sleep(200 * time.Millisecond)
+			s.AddAudioStream(jab8)
+			s.isPlayingJab = false
+		}()
 	}
 
 	return nil
@@ -35,6 +51,12 @@ func (s *SandboxScene) Draw(screen *ebiten.Image) {
 }
 
 func (s *SandboxScene) OnStart() {
+	s.AddAudioStream(sketchbookBG, jab8)
+	go func() {
+		time.Sleep(1 * time.Second)
+		s.PlayAudio(sketchbookBG)
+	}()
+
 	const wallWidth = 20
 
 	s.player = physics.NewPlayer()
@@ -73,4 +95,6 @@ func (s *SandboxScene) OnStart() {
 	)
 }
 
-func (s *SandboxScene) OnFinish() {}
+func (s *SandboxScene) OnFinish() {
+	s.PauseAudio(sketchbookBG)
+}
