@@ -4,7 +4,7 @@
 
 ### 1. Game State Management
 
-- Replace hardcoded game loop with state machine
+...
 
 ### 2. Audio System
 

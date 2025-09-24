@@ -10,6 +10,7 @@ import (
 
 type Game struct {
 	sceneManager *scene.SceneManager
+	state        GameState
 }
 
 func NewGame(sceneManager *scene.SceneManager) *Game {
@@ -29,4 +30,12 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	return config.ScreenWidth, config.ScreenHeight
+}
+
+func (g *Game) ChangeState(state GameState) {
+	state.SetContext(g)
+	g.state = state
+	if g.state != nil {
+		g.state.OnStart()
+	}
 }

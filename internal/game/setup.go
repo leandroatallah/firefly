@@ -21,7 +21,9 @@ func Setup() {
 
 	game := NewGame(sceneManager)
 
-	game.sceneManager.GoToScene(scene.SceneMenu, nil)
+	if state, err := NewGameState(MainMenu); err == nil {
+		game.ChangeState(state)
+	}
 
 	if err := ebiten.RunGame(game); err != nil {
 		log.Fatal(err)
