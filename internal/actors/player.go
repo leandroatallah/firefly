@@ -1,11 +1,12 @@
-package physics
+package actors
 
 import (
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/leandroatallah/firefly/internal/systems/input"
 	"github.com/leandroatallah/firefly/internal/core/screenutil"
+	"github.com/leandroatallah/firefly/internal/systems/input"
+	"github.com/leandroatallah/firefly/internal/systems/physics"
 )
 
 const (
@@ -40,8 +41,8 @@ func NewPlayer() *Player {
 	character := NewCharacter(sprites)
 
 	x, y := screenutil.GetCenterOfScreenPosition(frameWidth, frameHeight)
-	bodyRect := NewRect(x, y, frameWidth, frameHeight)
-	collisionRect := NewRect(x+2, y+3, frameWidth-5, frameHeight-6)
+	bodyRect := physics.NewRect(x, y, frameWidth, frameHeight)
+	collisionRect := physics.NewRect(x+2, y+3, frameWidth-5, frameHeight-6)
 
 	player := &Player{Character: character}
 	player.SetBody(bodyRect)
@@ -51,15 +52,15 @@ func NewPlayer() *Player {
 }
 
 // Character Methods
-func (p *Player) SetBody(rect *Rect) ActorEntity {
+func (p *Player) SetBody(rect *physics.Rect) ActorEntity {
 	return p.Character.SetBody(rect)
 }
 
-func (p *Player) SetCollisionArea(rect *Rect) ActorEntity {
+func (p *Player) SetCollisionArea(rect *physics.Rect) ActorEntity {
 	return p.Character.SetCollisionArea(rect)
 }
 
-func (p *Player) Update(boundaries []Body) error {
+func (p *Player) Update(boundaries []physics.Body) error {
 	return p.Character.Update(boundaries, p.HandleMovement)
 }
 

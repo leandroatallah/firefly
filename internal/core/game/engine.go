@@ -6,9 +6,9 @@ import (
 	"strings"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/leandroatallah/firefly/internal/systems/audiomanager"
 	"github.com/leandroatallah/firefly/internal/config"
 	"github.com/leandroatallah/firefly/internal/core/scene"
+	"github.com/leandroatallah/firefly/internal/systems/audiomanager"
 )
 
 type Game struct {
@@ -34,7 +34,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	return config.ScreenWidth, config.ScreenHeight
 }
 
-func (g *Game) ChangeState(state GameState) *Game {
+func (g *Game) SetState(state GameState) *Game {
 	state.SetContext(g)
 	g.state = state
 	if g.state != nil {

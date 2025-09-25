@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/leandroatallah/firefly/internal/actors"
 	"github.com/leandroatallah/firefly/internal/systems/physics"
 )
 
@@ -16,7 +17,7 @@ const (
 
 type SandboxScene struct {
 	BaseScene
-	player       *physics.Player
+	player       *actors.Player
 	isPlayingJab bool
 }
 
@@ -58,7 +59,7 @@ func (s *SandboxScene) OnStart() {
 
 	const wallWidth = 20
 
-	s.player = physics.NewPlayer()
+	s.player = actors.NewPlayer()
 
 	obstacleFactory := physics.NewDefaultObstacleFactory()
 

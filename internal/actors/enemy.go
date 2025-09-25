@@ -1,6 +1,9 @@
-package physics
+package actors
 
-import "github.com/hajimehoshi/ebiten/v2"
+import (
+	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/leandroatallah/firefly/internal/systems/physics"
+)
 
 type BaseEnemy struct {
 	Character
@@ -11,15 +14,15 @@ func NewBaseEnemy() *BaseEnemy {
 }
 
 // Character Methods
-func (e *BaseEnemy) SetBody(rect *Rect) ActorEntity {
+func (e *BaseEnemy) SetBody(rect *physics.Rect) ActorEntity {
 	return e.Character.SetBody(rect)
 }
 
-func (e *BaseEnemy) SetCollisionArea(rect *Rect) ActorEntity {
+func (e *BaseEnemy) SetCollisionArea(rect *physics.Rect) ActorEntity {
 	return e.Character.SetCollisionArea(rect)
 }
 
-func (e *BaseEnemy) Update(boundaries []Body) error {
+func (e *BaseEnemy) Update(boundaries []physics.Body) error {
 	return e.Character.Update(boundaries, e.HandleMovement)
 }
 

@@ -3,6 +3,7 @@ package physics
 import (
 	"image"
 	"image/color"
+	"math"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/vector"
@@ -153,4 +154,73 @@ func (b *PhysicsBody) ApplyValidMovement(distance int, isXAxis bool, boundaries 
 	if !isValid {
 		b.updatePosition(-distance, isXAxis)
 	}
+}
+
+func (b *PhysicsBody) CheckMovementDirectionX() (isLeft, isRight bool) {
+	if b.accelerationX > 0 {
+		isRight = true
+	}
+	if b.accelerationX < 0 {
+		isLeft = true
+	}
+	return
+}
+
+func (b *PhysicsBody) UpdateMovement(boundaries []Body) {
+
+	// Apply physics to player's position based on the velocity from previous frame.
+	// This is a simple Euler integration step: position += velocity * deltaTime (where deltaTime=1 frame).
+	b.ApplyValidMovement(b.vx16, true, boundaries)
+	b.ApplyValidMovement(b.vy16, false, boundaries)
+
+	// Convert the raw input acceleration into a scaled and normalized vector.
+	scaledAccX, scaledAccY := smoothDiagonalMovement(b.accelerationX, b.accelerationY)
+
+	b.vx16 = increaseVelocity(b.vx16, scaledAccX)
+	b.vy16 = increaseVelocity(b.vy16, scaledAccY)
+
+	// Cap the magnitude of the velocity vector to enforce a maximum speed.
+	// This is crucial for preventing faster movement on diagonals.
+	// We need to check if the velocity magnitude `sqrt(vx² + vy²)` exceeds `speedMax16²`.
+	// To avoid a costly square root, we can compare the squared values:
+	speedMax16 := 3 * config.Unit
+	// Use int64 for squared values to prevent potential overflow.
+	velSq := int64(b.vx16)*int64(b.vx16) + int64(b.vy16)*int64(b.vy16)
+	maxSq := int64(speedMax16) * int64(speedMax16)
+
+	if velSq > maxSq {
+		// If the speed is too high, we need to scale the velocity vector down.
+		// The scaling factor is `scale = speedMax16 / current_speed`.
+		// `current_speed` is `sqrt(velSq)`.
+		// So, `scale = speedMax16 / sqrt(velSq)`.
+		scale := float64(speedMax16) / math.Sqrt(float64(velSq))
+		b.vx16 = int(float64(b.vx16) * scale)
+		b.vy16 = int(float64(b.vy16) * scale)
+	}
+
+	// Add Hook here to handle state change
+
+	// Reset frame-specific acceleration.
+	// It will be recalculated on the next frame from input.
+	b.accelerationX, b.accelerationY = 0, 0
+
+	// Apply friction to slow the player down when there is no input.
+	b.vx16 = reduceVelocity(b.vx16)
+	b.vy16 = reduceVelocity(b.vy16)
+
+}
+
+type BodyState int
+
+const (
+	Idle BodyState = iota
+	Walk
+)
+
+func (b *PhysicsBody) CurrentBodyState() BodyState {
+	isWalking := b.vx16 != 0 || b.vy16 != 0
+	if isWalking {
+		return Walk
+	}
+	return Idle
 }

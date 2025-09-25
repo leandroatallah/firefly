@@ -19,7 +19,7 @@ func Setup() {
 	game := NewGame().
 		SetSceneManager().
 		SetAudioManager().
-		ChangeState(state)
+		SetState(state)
 
 	if err := ebiten.RunGame(game); err != nil {
 		log.Fatal(err)

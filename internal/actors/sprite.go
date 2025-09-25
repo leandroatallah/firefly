@@ -1,4 +1,4 @@
-package physics
+package actors
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
@@ -11,15 +11,15 @@ type SpriteEntity struct {
 	isMirrored bool
 }
 
-type SpriteMap map[CharacterState]*ebiten.Image
+type SpriteMap map[ActorStateEnum]*ebiten.Image
 
 func NewSpriteEntity(sprites SpriteMap) SpriteEntity {
 	return SpriteEntity{sprites: sprites}
 }
 
-type spriteAssets map[CharacterState]string
+type spriteAssets map[ActorStateEnum]string
 
-func (s spriteAssets) addSprite(state CharacterState, path string) spriteAssets {
+func (s spriteAssets) addSprite(state ActorStateEnum, path string) spriteAssets {
 	if len(s) == 0 {
 		s = make(spriteAssets)
 	}
@@ -28,7 +28,7 @@ func (s spriteAssets) addSprite(state CharacterState, path string) spriteAssets 
 }
 
 func loadSprites(list spriteAssets) (SpriteMap, error) {
-	res := make(map[CharacterState]*ebiten.Image)
+	res := make(map[ActorStateEnum]*ebiten.Image)
 	var err error
 
 	for state, path := range list {
@@ -39,4 +39,8 @@ func loadSprites(list spriteAssets) (SpriteMap, error) {
 	}
 
 	return res, nil
+}
+
+func (s *SpriteEntity) SetIsMirrored(value bool) {
+	s.isMirrored = value
 }
