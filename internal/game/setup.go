@@ -18,8 +18,7 @@ func Setup() {
 
 	game := NewGame().
 		SetSceneManager().
-		SetAudioContext().
-		SetAudioAssets().
+		SetAudioManager().
 		ChangeState(state)
 
 	if err := ebiten.RunGame(game); err != nil {

@@ -28,11 +28,10 @@ func (s *SandboxScene) Update() error {
 		s.Manager.GoToScene(SceneMenu, nil)
 	}
 	if ebiten.IsKeyPressed(ebiten.KeySpace) && !s.isPlayingJab {
-		s.PlayAudio(jab8)
+		s.audiomanager.PlaySound(jab8)
 		s.isPlayingJab = true
 		go func() {
 			time.Sleep(200 * time.Millisecond)
-			s.AddAudioStream(jab8)
 			s.isPlayingJab = false
 		}()
 	}
@@ -51,10 +50,10 @@ func (s *SandboxScene) Draw(screen *ebiten.Image) {
 }
 
 func (s *SandboxScene) OnStart() {
-	s.AddAudioStream(sketchbookBG, jab8)
+	s.audiomanager = s.Manager.audioManager
 	go func() {
 		time.Sleep(1 * time.Second)
-		s.PlayAudio(sketchbookBG)
+		s.audiomanager.PlaySound(sketchbookBG)
 	}()
 
 	const wallWidth = 20
@@ -96,5 +95,5 @@ func (s *SandboxScene) OnStart() {
 }
 
 func (s *SandboxScene) OnFinish() {
-	s.PauseAudio(sketchbookBG)
+	s.audiomanager.PauseMusic(sketchbookBG)
 }

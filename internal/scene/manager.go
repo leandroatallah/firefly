@@ -4,7 +4,7 @@ import (
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/audio"
+	"github.com/leandroatallah/firefly/internal/audiomanager"
 	"github.com/leandroatallah/firefly/internal/transition"
 )
 
@@ -13,8 +13,7 @@ type SceneManager struct {
 	factory      SceneFactory
 	nextScene    Scene
 	transitioner transition.Transition
-	audioContext *audio.Context
-	audioStream  map[string][]byte
+	audioManager *audiomanager.AudioManager
 }
 
 func NewSceneManager() *SceneManager {
@@ -81,22 +80,10 @@ func (m *SceneManager) GoToScene(sceneType SceneType, sceneTransition transition
 	}
 }
 
-func (m *SceneManager) SetAudioContext(ctx *audio.Context) {
-	m.audioContext = ctx
+func (m *SceneManager) SetAudioManager(am *audiomanager.AudioManager) {
+	m.audioManager = am
 }
 
-func (m *SceneManager) AudioContext() *audio.Context {
-	return m.audioContext
-}
-
-func (m *SceneManager) SetAudioStream(stream map[string][]byte) {
-	m.audioStream = stream
-}
-
-func (m *SceneManager) GetAudioData(path string) []byte {
-	item, exists := m.audioStream[path]
-	if !exists {
-		log.Fatal("Sound item was not founded")
-	}
-	return item
+func (m *SceneManager) AudioManager() *audiomanager.AudioManager {
+	return m.audioManager
 }

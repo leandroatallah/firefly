@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/leandroatallah/firefly/internal/audioplayer"
+	"github.com/leandroatallah/firefly/internal/audiomanager"
 	"github.com/leandroatallah/firefly/internal/config"
 	"github.com/leandroatallah/firefly/internal/scene"
 )
@@ -14,6 +14,7 @@ import (
 type Game struct {
 	sceneManager *scene.SceneManager
 	state        GameState
+	audioManager *audiomanager.AudioManager
 }
 
 func NewGame() *Game {
@@ -53,37 +54,25 @@ func (g *Game) SetSceneManager() *Game {
 	return g
 }
 
-func (g *Game) SetAudioContext() *Game {
-	ctx := audioplayer.NewContext()
-	g.sceneManager.SetAudioContext(ctx)
+func (g *Game) SetAudioManager() *Game {
+	g.audioManager = audiomanager.NewAudioManager()
+	g.loadAudioAssets()
+	g.sceneManager.SetAudioManager(g.audioManager)
 	return g
 }
 
-func (g *Game) LoadAudioAssets() []*audioplayer.AudioItem {
-	audioAssets := []*audioplayer.AudioItem{}
+func (g *Game) loadAudioAssets() {
 	files, err := os.ReadDir("assets")
 	if err != nil {
 		log.Fatal(err)
 	}
 	for _, file := range files {
-		// TODO: Extend to WAV and MP3 format
-		if !file.IsDir() && strings.HasSuffix(file.Name(), ".ogg") {
-			audioItem, err := audioplayer.LoadAudio("assets/" + file.Name())
+		if !file.IsDir() && (strings.HasSuffix(file.Name(), ".ogg") || strings.HasSuffix(file.Name(), ".wav")) {
+			audioItem, err := g.audioManager.Load("assets/" + file.Name())
 			if err != nil {
 				log.Fatal(err)
 			}
-			audioAssets = append(audioAssets, audioItem)
+			g.audioManager.Add(audioItem.Name(), audioItem.Data())
 		}
 	}
-	return audioAssets
-}
-
-func (g *Game) SetAudioAssets() *Game {
-	items := g.LoadAudioAssets()
-	stream := make(map[string][]byte)
-	for _, i := range items {
-		stream[i.Name()] = i.Data()
-	}
-	g.sceneManager.SetAudioStream(stream)
-	return g
 }

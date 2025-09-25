@@ -8,9 +8,7 @@
 
 ### 2. Audio System
 
-- Implement sound effects and background music
-- Add audio asset loading and management
-- Create audio configuration system
+...
 
 ### 3. Enemy AI System
 

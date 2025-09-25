@@ -30,10 +30,10 @@ func (s *MenuScene) Update() error {
 }
 
 func (s *MenuScene) OnStart() {
-	s.AddAudioStream(kickBackBG)
-	s.PlayAudio(kickBackBG)
+	s.audiomanager = s.Manager.AudioManager()
+	s.audiomanager.PlayMusic(kickBackBG)
 }
 
 func (s *MenuScene) OnFinish() {
-	s.PauseAudio(kickBackBG)
+	s.audiomanager.PauseMusic(kickBackBG)
 }
