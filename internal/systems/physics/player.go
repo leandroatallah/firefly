@@ -4,8 +4,8 @@ import (
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/leandroatallah/firefly/internal/input"
-	"github.com/leandroatallah/firefly/internal/screenutil"
+	"github.com/leandroatallah/firefly/internal/systems/input"
+	"github.com/leandroatallah/firefly/internal/core/screenutil"
 )
 
 const (

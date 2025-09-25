@@ -1,7 +1,7 @@
 package game
 
 import (
-	"github.com/leandroatallah/firefly/internal/scene"
+	"github.com/leandroatallah/firefly/internal/core/scene"
 )
 
 type MainMenuState struct {

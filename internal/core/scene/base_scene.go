@@ -4,8 +4,8 @@ package scene
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/leandroatallah/firefly/internal/audiomanager"
-	"github.com/leandroatallah/firefly/internal/physics"
+	"github.com/leandroatallah/firefly/internal/systems/audiomanager"
+	"github.com/leandroatallah/firefly/internal/systems/physics"
 )
 
 type Scene interface {

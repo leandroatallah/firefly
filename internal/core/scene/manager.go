@@ -4,8 +4,8 @@ import (
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/leandroatallah/firefly/internal/audiomanager"
-	"github.com/leandroatallah/firefly/internal/transition"
+	"github.com/leandroatallah/firefly/internal/systems/audiomanager"
+	"github.com/leandroatallah/firefly/internal/core/transition"
 )
 
 type SceneManager struct {

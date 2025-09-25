@@ -5,7 +5,7 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/config"
-	"github.com/leandroatallah/firefly/internal/transition"
+	"github.com/leandroatallah/firefly/internal/core/transition"
 )
 
 const (

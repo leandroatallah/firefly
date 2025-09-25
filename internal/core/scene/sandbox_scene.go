@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/leandroatallah/firefly/internal/physics"
+	"github.com/leandroatallah/firefly/internal/systems/physics"
 )
 
 const (
