@@ -3,7 +3,6 @@ package physics
 import (
 	"image"
 	"image/color"
-	"math"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/vector"
@@ -154,11 +153,4 @@ func (b *PhysicsBody) ApplyValidMovement(distance int, isXAxis bool, boundaries 
 	if !isValid {
 		b.updatePosition(-distance, isXAxis)
 	}
-}
-
-func normalizeMoveOffset(move int, normalize bool) int {
-	if normalize {
-		return int(float64(move*config.Unit) / math.Sqrt2 / config.Unit)
-	}
-	return move
 }
