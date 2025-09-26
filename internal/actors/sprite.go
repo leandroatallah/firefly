@@ -17,17 +17,17 @@ func NewSpriteEntity(sprites SpriteMap) SpriteEntity {
 	return SpriteEntity{sprites: sprites}
 }
 
-type spriteAssets map[ActorStateEnum]string
+type SpriteAssets map[ActorStateEnum]string
 
-func (s spriteAssets) addSprite(state ActorStateEnum, path string) spriteAssets {
+func (s SpriteAssets) AddSprite(state ActorStateEnum, path string) SpriteAssets {
 	if len(s) == 0 {
-		s = make(spriteAssets)
+		s = make(SpriteAssets)
 	}
 	s[state] = path
 	return s
 }
 
-func loadSprites(list spriteAssets) (SpriteMap, error) {
+func LoadSprites(list SpriteAssets) (SpriteMap, error) {
 	res := make(map[ActorStateEnum]*ebiten.Image)
 	var err error
 

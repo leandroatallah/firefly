@@ -28,12 +28,12 @@ func NewPlayer() *Player {
 		frameHeight = 32
 	)
 
-	var assets spriteAssets
+	var assets SpriteAssets
 	assets = assets.
-		addSprite(Idle, "assets/default-idle.png").
-		addSprite(Walk, "assets/default-walk.png")
+		AddSprite(Idle, "assets/default-idle.png").
+		AddSprite(Walk, "assets/default-walk.png")
 
-	sprites, err := loadSprites(assets)
+	sprites, err := LoadSprites(assets)
 	if err != nil {
 		log.Fatal(err)
 	}

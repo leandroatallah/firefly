@@ -7,6 +7,7 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/actors"
+	"github.com/leandroatallah/firefly/internal/actors/enemies"
 	"github.com/leandroatallah/firefly/internal/systems/physics"
 )
 
@@ -34,7 +35,7 @@ func (s *SandboxScene) Update() error {
 
 	// Key events
 	if ebiten.IsKeyPressed(ebiten.KeyEscape) {
-		s.Manager.GoToScene(SceneMenu, nil)
+		s.Manager.NavigateTo(SceneMenu, nil)
 	}
 	if ebiten.IsKeyPressed(ebiten.KeySpace) && !s.isPlayingJab {
 		s.audiomanager.PlaySound(jab8)
@@ -57,8 +58,8 @@ func (s *SandboxScene) Draw(screen *ebiten.Image) {
 	for _, b := range s.boundaries {
 		// TODO: Fix it
 		switch b.(type) {
-		case *actors.BlueEnemy:
-			b.(*actors.BlueEnemy).Draw(screen)
+		case *enemies.BlueEnemy:
+			b.(*enemies.BlueEnemy).Draw(screen)
 		default:
 			b.(physics.Obstacle).Draw(screen)
 		}
@@ -76,8 +77,8 @@ func (s *SandboxScene) OnStart() {
 	const wallWidth = 20
 
 	s.player = actors.NewPlayer()
-	enemyFactory := actors.NewDefaultEnemyFactory()
-	blueEnemy, err := enemyFactory.Create(actors.BlueEnemyType)
+	enemyFactory := enemies.NewEnemyFactory()
+	blueEnemy, err := enemyFactory.Create(enemies.BlueEnemyType)
 	if err != nil {
 		log.Fatal(err)
 	}

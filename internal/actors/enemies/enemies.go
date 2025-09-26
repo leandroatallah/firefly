@@ -1,12 +1,13 @@
-package actors
+package enemies
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/leandroatallah/firefly/internal/actors"
 	"github.com/leandroatallah/firefly/internal/systems/physics"
 )
 
 type BaseEnemy struct {
-	Character
+	actors.Character
 }
 
 func NewBaseEnemy() *BaseEnemy {
@@ -14,11 +15,11 @@ func NewBaseEnemy() *BaseEnemy {
 }
 
 // Character Methods
-func (e *BaseEnemy) SetBody(rect *physics.Rect) ActorEntity {
+func (e *BaseEnemy) SetBody(rect *physics.Rect) actors.ActorEntity {
 	return e.Character.SetBody(rect)
 }
 
-func (e *BaseEnemy) SetCollisionArea(rect *physics.Rect) ActorEntity {
+func (e *BaseEnemy) SetCollisionArea(rect *physics.Rect) actors.ActorEntity {
 	return e.Character.SetCollisionArea(rect)
 }
 

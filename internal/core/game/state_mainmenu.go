@@ -13,6 +13,6 @@ func NewMainMenuState() *MainMenuState {
 }
 
 func (s *MainMenuState) OnStart() {
-	s.game.sceneManager.GoToScene(scene.SceneMenu, nil)
+	s.game.sceneManager.NavigateTo(scene.SceneMenu, nil)
 
 }

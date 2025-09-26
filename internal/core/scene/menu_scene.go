@@ -24,7 +24,7 @@ func (s *MenuScene) Draw(screen *ebiten.Image) {
 
 func (s *MenuScene) Update() error {
 	if ebiten.IsKeyPressed(ebiten.KeyEnter) {
-		s.Manager.GoToScene(SceneSandbox, transition.NewFader())
+		s.Manager.NavigateTo(SceneSandbox, transition.NewFader())
 	}
 	return nil
 }

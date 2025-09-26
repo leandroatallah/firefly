@@ -1,42 +1,17 @@
-package actors
+package enemies
 
 import (
-	"fmt"
 	"log"
+	"math/rand/v2"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/leandroatallah/firefly/internal/actors"
 	"github.com/leandroatallah/firefly/internal/systems/physics"
 )
 
-// TODO: Should it be a Actor factory?
-type EnemyFactory interface {
-	Create(enemyType EnemyType) (ActorEntity, error)
-}
-
-type EnemyType int
-
-const (
-	BlueEnemyType EnemyType = iota
-)
-
-type DefaultEnemyFactory struct{}
-
-func NewDefaultEnemyFactory() *DefaultEnemyFactory {
-	return &DefaultEnemyFactory{}
-}
-
-func (f *DefaultEnemyFactory) Create(enemyType EnemyType) (ActorEntity, error) {
-	switch enemyType {
-	case BlueEnemyType:
-		return NewBlueEnemy(), nil
-	default:
-		return nil, fmt.Errorf("unknown enemy type")
-	}
-}
-
-// Blue Enemy
 type BlueEnemy struct {
-	Character
+	actors.Character
+	count int
 }
 
 func NewBlueEnemy() *BlueEnemy {
@@ -45,16 +20,16 @@ func NewBlueEnemy() *BlueEnemy {
 		frameHeight = 32
 	)
 
-	var assets spriteAssets
-	assets = assets.addSprite(Idle, "assets/blue-enemy.png").
-		addSprite(Walk, "assets/blue-enemy.png")
+	var assets actors.SpriteAssets
+	assets = assets.AddSprite(actors.Idle, "assets/blue-enemy.png").
+		AddSprite(actors.Walk, "assets/blue-enemy.png")
 
-	sprites, err := loadSprites(assets)
+	sprites, err := actors.LoadSprites(assets)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	character := NewCharacter(sprites)
+	character := actors.NewCharacter(sprites)
 
 	// TODO: How to define the initial position?
 	x, y := 30, 30
@@ -71,15 +46,16 @@ func NewBlueEnemy() *BlueEnemy {
 }
 
 // Blue Enemy - Character Methods
-func (e *BlueEnemy) SetBody(rect *physics.Rect) ActorEntity {
+func (e *BlueEnemy) SetBody(rect *physics.Rect) actors.ActorEntity {
 	return e.Character.SetBody(rect)
 }
 
-func (e *BlueEnemy) SetCollisionArea(rect *physics.Rect) ActorEntity {
+func (e *BlueEnemy) SetCollisionArea(rect *physics.Rect) actors.ActorEntity {
 	return e.Character.SetCollisionArea(rect)
 }
 
 func (e *BlueEnemy) Update(boundaries []physics.Body) error {
+	e.count++
 	return e.Character.Update(boundaries)
 }
 
@@ -88,5 +64,16 @@ func (e *BlueEnemy) Draw(screen *ebiten.Image) {
 }
 
 func (e *BlueEnemy) HandleMovement() {
-	e.OnMoveDown()
+	if e.count%60 != 0 {
+		return
+	}
+	a := []func(){
+		e.OnMoveLeft,
+		e.OnMoveRight,
+		e.OnMoveUp,
+		e.OnMoveDown,
+	}
+
+	i := rand.IntN(4)
+	a[i]()
 }

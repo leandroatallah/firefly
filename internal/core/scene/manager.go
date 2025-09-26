@@ -4,8 +4,8 @@ import (
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/leandroatallah/firefly/internal/systems/audiomanager"
 	"github.com/leandroatallah/firefly/internal/core/transition"
+	"github.com/leandroatallah/firefly/internal/systems/audiomanager"
 )
 
 type SceneManager struct {
@@ -45,7 +45,7 @@ func (m *SceneManager) Draw(screen *ebiten.Image) {
 	}
 }
 
-func (m *SceneManager) GoTo(scene Scene) {
+func (m *SceneManager) SwitchTo(scene Scene) {
 	if m.current != nil {
 		m.current.OnFinish()
 	}
@@ -61,8 +61,7 @@ func (m *SceneManager) SetFactory(factory SceneFactory) {
 	m.factory = factory
 }
 
-// TODO: Comment the difference of GoTo and GoToScene
-func (m *SceneManager) GoToScene(sceneType SceneType, sceneTransition transition.Transition) {
+func (m *SceneManager) NavigateTo(sceneType SceneType, sceneTransition transition.Transition) {
 	scene, err := m.factory.Create(sceneType)
 	if err != nil {
 		log.Fatalf("Error creating scene: %v", err)
@@ -72,11 +71,11 @@ func (m *SceneManager) GoToScene(sceneType SceneType, sceneTransition transition
 		m.transitioner = sceneTransition
 		m.nextScene = scene
 		m.transitioner.StartTransition(func() {
-			m.GoTo(m.nextScene)
+			m.SwitchTo(m.nextScene)
 			m.nextScene = nil
 		})
 	} else {
-		m.GoTo(scene)
+		m.SwitchTo(scene)
 	}
 }
 

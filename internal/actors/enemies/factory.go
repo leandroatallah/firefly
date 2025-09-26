@@ -1,0 +1,28 @@
+package enemies
+
+import (
+	"fmt"
+
+	"github.com/leandroatallah/firefly/internal/actors"
+)
+
+type EnemyType int
+
+const (
+	BlueEnemyType EnemyType = iota
+)
+
+type EnemyFactory struct{}
+
+func NewEnemyFactory() *EnemyFactory {
+	return &EnemyFactory{}
+}
+
+func (f *EnemyFactory) Create(enemyType EnemyType) (actors.ActorEntity, error) {
+	switch enemyType {
+	case BlueEnemyType:
+		return NewBlueEnemy(), nil
+	default:
+		return nil, fmt.Errorf("unknown enemy type")
+	}
+}
