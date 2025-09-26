@@ -5,6 +5,7 @@ import (
 	"image/color"
 	"math"
 
+	"github.com/google/uuid"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/vector"
 	"github.com/leandroatallah/firefly/internal/config"
@@ -20,6 +21,7 @@ type Movable interface {
 // Body is a Shape but with collision
 type Body interface {
 	// TODO: Make all Position return the same data type
+	ID() string
 	Position() (minX, minY, maxX, maxY int)
 	DrawCollisionBox(screen *ebiten.Image)
 	CollisionPosition() []image.Rectangle
@@ -28,6 +30,7 @@ type Body interface {
 
 type PhysicsBody struct {
 	Shape
+	id            string
 	vx16          int
 	vy16          int
 	accelerationX int
@@ -36,7 +39,10 @@ type PhysicsBody struct {
 }
 
 func NewPhysicsBody(shape Shape) *PhysicsBody {
-	return &PhysicsBody{Shape: shape}
+	return &PhysicsBody{
+		Shape: shape,
+		id:    uuid.New().String(),
+	}
 }
 
 func (b *PhysicsBody) Move() {
@@ -115,9 +121,13 @@ func (b *PhysicsBody) checkRectIntersect(obj1, obj2 Body) bool {
 	return false
 }
 
+func (b *PhysicsBody) ID() string {
+	return b.id
+}
+
 func (b *PhysicsBody) IsColliding(boundaries []Body) bool {
 	for _, o := range boundaries {
-		if b.checkRectIntersect(b, o.(Body)) {
+		if b.ID() != o.ID() && b.checkRectIntersect(b, o.(Body)) {
 			return true
 		}
 	}

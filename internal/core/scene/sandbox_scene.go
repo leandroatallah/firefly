@@ -25,6 +25,14 @@ func (s *SandboxScene) Update() error {
 	if s.player != nil {
 		s.player.Update(s.boundaries)
 	}
+	for _, i := range s.boundaries {
+		actor, ok := i.(actors.ActorEntity)
+		if ok {
+			actor.Update(s.boundaries)
+		}
+	}
+
+	// Key events
 	if ebiten.IsKeyPressed(ebiten.KeyEscape) {
 		s.Manager.GoToScene(SceneMenu, nil)
 	}
@@ -42,11 +50,18 @@ func (s *SandboxScene) Update() error {
 
 func (s *SandboxScene) Draw(screen *ebiten.Image) {
 	screen.Fill(color.RGBA{0xcc, 0xcc, 0xdd, 0xff})
-	s.player.Draw(screen)
+	if s.player != nil {
+		s.player.Draw(screen)
+	}
 
 	for _, b := range s.boundaries {
-		b.(physics.Obstacle).Draw(screen)
-		b.(physics.Obstacle).DrawCollisionBox(screen)
+		// TODO: Fix it
+		switch b.(type) {
+		case *actors.BlueEnemy:
+			b.(*actors.BlueEnemy).Draw(screen)
+		default:
+			b.(physics.Obstacle).Draw(screen)
+		}
 	}
 }
 
@@ -54,12 +69,18 @@ func (s *SandboxScene) OnStart() {
 	s.audiomanager = s.Manager.audioManager
 	go func() {
 		time.Sleep(1 * time.Second)
+		s.audiomanager.SetVolume(0)
 		s.audiomanager.PlaySound(sketchbookBG)
 	}()
 
 	const wallWidth = 20
 
 	s.player = actors.NewPlayer()
+	enemyFactory := actors.NewDefaultEnemyFactory()
+	blueEnemy, err := enemyFactory.Create(actors.BlueEnemyType)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	obstacleFactory := physics.NewDefaultObstacleFactory()
 
@@ -81,17 +102,18 @@ func (s *SandboxScene) OnStart() {
 		log.Fatal(err)
 	}
 
-	// Enemies
-	enemyRect := physics.NewObstacleRect(
+	box := physics.NewObstacleRect(
 		physics.NewRect(100, 100, 32, 32),
 	).AddCollision()
 
 	s.AddBoundaries(
+		// TODO: Should it be added here?
+		blueEnemy.(physics.Body),
 		wallTop,
 		wallLeft,
 		wallRight,
 		wallDown,
-		enemyRect,
+		box,
 	)
 }
 

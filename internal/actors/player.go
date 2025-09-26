@@ -44,9 +44,11 @@ func NewPlayer() *Player {
 	bodyRect := physics.NewRect(x, y, frameWidth, frameHeight)
 	collisionRect := physics.NewRect(x+2, y+3, frameWidth-5, frameHeight-6)
 
+	// TODO: Create a builder with director to automate this process
 	player := &Player{Character: character}
 	player.SetBody(bodyRect)
 	player.SetCollisionArea(collisionRect)
+	player.SetMovementFunc(player.HandleMovement)
 
 	return player
 }
@@ -61,7 +63,7 @@ func (p *Player) SetCollisionArea(rect *physics.Rect) ActorEntity {
 }
 
 func (p *Player) Update(boundaries []physics.Body) error {
-	return p.Character.Update(boundaries, p.HandleMovement)
+	return p.Character.Update(boundaries)
 }
 
 func (p *Player) Draw(screen *ebiten.Image) {

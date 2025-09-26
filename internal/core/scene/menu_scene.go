@@ -31,6 +31,7 @@ func (s *MenuScene) Update() error {
 
 func (s *MenuScene) OnStart() {
 	s.audiomanager = s.Manager.AudioManager()
+	s.audiomanager.SetVolume(0.1)
 	s.audiomanager.PlayMusic(kickBackBG)
 }
 

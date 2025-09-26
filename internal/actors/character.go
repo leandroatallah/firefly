@@ -13,13 +13,16 @@ type ActorEntity interface {
 	SetBody(rect *physics.Rect) ActorEntity
 	SetCollisionArea(rect *physics.Rect) ActorEntity
 	SetState(state ActorState)
+	SetMovementFunc(func())
+	Update(boundaries []physics.Body) error
 }
 
 type Character struct {
 	physics.PhysicsBody
 	SpriteEntity
-	count int
-	state ActorState
+	count        int
+	state        ActorState
+	movementFunc func()
 }
 
 func NewCharacter(sprites SpriteMap) Character {
@@ -48,6 +51,10 @@ func (c *Character) SetCollisionArea(rect *physics.Rect) ActorEntity {
 func (c *Character) SetState(state ActorState) {
 	c.state = state
 	c.state.OnStart()
+}
+
+func (c *Character) SetMovementFunc(cb func()) {
+	c.movementFunc = cb
 }
 
 // Body methods
@@ -92,11 +99,12 @@ var bodyToActorState = map[physics.BodyState]ActorStateEnum{
 	physics.Walk: Walk,
 }
 
-func (c *Character) Update(boundaries []physics.Body, handleMovement func()) error {
+func (c *Character) Update(boundaries []physics.Body) error {
 	c.count++
 
-	if handleMovement != nil {
-		handleMovement()
+	// Sub class movement handler
+	if c.movementFunc != nil {
+		c.movementFunc()
 	}
 
 	isLeft, isRight := c.CheckMovementDirectionX()
@@ -141,16 +149,15 @@ func (c *Character) Draw(screen *ebiten.Image) {
 		op.GeoM.Translate(float64(width), 0)
 	}
 
-	// Apply player movement
-	// TODO: Should remove config unit calc?
+	// Apply character movement
 	op.GeoM.Translate(
 		float64(minX*config.Unit)/config.Unit,
 		float64(minY*config.Unit)/config.Unit,
 	)
 
 	img := c.sprites[c.state.State()]
-	playerWidth := img.Bounds().Dx()
-	frameCount := playerWidth / width
+	characterWidth := img.Bounds().Dx()
+	frameCount := characterWidth / width
 	i := (c.count / frameRate) % frameCount
 	sx, sy := frameOX+i*width, frameOY
 
@@ -161,3 +168,5 @@ func (c *Character) Draw(screen *ebiten.Image) {
 		op,
 	)
 }
+
+func (c *Character) HandleMovement() {}

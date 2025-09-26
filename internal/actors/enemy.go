@@ -23,13 +23,11 @@ func (e *BaseEnemy) SetCollisionArea(rect *physics.Rect) ActorEntity {
 }
 
 func (e *BaseEnemy) Update(boundaries []physics.Body) error {
-	return e.Character.Update(boundaries, e.HandleMovement)
+	return e.Character.Update(boundaries)
 }
 
 func (e *BaseEnemy) Draw(screen *ebiten.Image) {
 	e.Character.Draw(screen)
 }
 
-func (e *BaseEnemy) HandleMovement() {
-	panic("Implement me")
-}
+func (e *BaseEnemy) HandleMovement() {}
