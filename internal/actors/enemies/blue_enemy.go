@@ -14,7 +14,7 @@ type BlueEnemy struct {
 	count int
 }
 
-func NewBlueEnemy() *BlueEnemy {
+func NewBlueEnemy(x, y int) *BlueEnemy {
 	const (
 		frameWidth  = 32
 		frameHeight = 32
@@ -31,8 +31,6 @@ func NewBlueEnemy() *BlueEnemy {
 
 	character := actors.NewCharacter(sprites)
 
-	// TODO: How to define the initial position?
-	x, y := 30, 30
 	bodyRect := physics.NewRect(x, y, frameWidth, frameHeight)
 	collisionRect := physics.NewRect(x, y, frameWidth, frameHeight)
 
@@ -64,6 +62,7 @@ func (e *BlueEnemy) Draw(screen *ebiten.Image) {
 }
 
 func (e *BlueEnemy) HandleMovement() {
+	// TODO: Implement patrol
 	if e.count%60 != 0 {
 		return
 	}

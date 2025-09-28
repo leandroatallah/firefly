@@ -20,9 +20,10 @@ type ActorEntity interface {
 type Character struct {
 	physics.PhysicsBody
 	SpriteEntity
-	count        int
-	state        ActorState
-	movementFunc func()
+	count         int
+	state         ActorState
+	movementState MovementStateEnum
+	movementFunc  func()
 }
 
 func NewCharacter(sprites SpriteMap) Character {
@@ -81,9 +82,25 @@ func (c *Character) ApplyValidMovement(distance int, isXAxis bool, boundaries []
 func (c *Character) OnMoveLeft() {
 	c.MoveX(-playerXMove)
 }
+func (c *Character) OnMoveUpLeft() {
+	c.MoveX(-playerXMove)
+	c.MoveY(-playerYMove)
+}
+func (c *Character) OnMoveDownLeft() {
+	c.MoveX(-playerXMove)
+	c.MoveY(playerYMove)
+}
 
 func (c *Character) OnMoveRight() {
 	c.MoveX(playerXMove)
+}
+func (c *Character) OnMoveUpRight() {
+	c.MoveX(playerXMove)
+	c.MoveY(-playerYMove)
+}
+func (c *Character) OnMoveDownRight() {
+	c.MoveX(playerXMove)
+	c.MoveY(playerYMove)
 }
 
 func (c *Character) OnMoveUp() {

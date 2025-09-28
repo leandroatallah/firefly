@@ -78,7 +78,7 @@ func (s *SandboxScene) OnStart() {
 
 	s.player = actors.NewPlayer()
 	enemyFactory := enemies.NewEnemyFactory()
-	blueEnemy, err := enemyFactory.Create(enemies.BlueEnemyType)
+	blueEnemy, err := enemyFactory.Create(enemies.BlueEnemyType, 60, 30)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -86,21 +86,18 @@ func (s *SandboxScene) OnStart() {
 	obstacleFactory := physics.NewDefaultObstacleFactory()
 
 	// Boundaries
-	wallTop, err := obstacleFactory.Create(physics.ObstacleWallTop)
-	if err != nil {
-		log.Fatal(err)
+	boundaries := []physics.ObstacleType{
+		physics.ObstacleWallTop,
+		physics.ObstacleWallLeft,
+		physics.ObstacleWallRight,
+		physics.ObstacleWallDown,
 	}
-	wallLeft, err := obstacleFactory.Create(physics.ObstacleWallLeft)
-	if err != nil {
-		log.Fatal(err)
-	}
-	wallRight, err := obstacleFactory.Create(physics.ObstacleWallRight)
-	if err != nil {
-		log.Fatal(err)
-	}
-	wallDown, err := obstacleFactory.Create(physics.ObstacleWallDown)
-	if err != nil {
-		log.Fatal(err)
+	for _, o := range boundaries {
+		b, err := obstacleFactory.Create(o)
+		if err != nil {
+			log.Fatal(err)
+		}
+		s.AddBoundaries(b)
 	}
 
 	box := physics.NewObstacleRect(
@@ -110,10 +107,6 @@ func (s *SandboxScene) OnStart() {
 	s.AddBoundaries(
 		// TODO: Should it be added here?
 		blueEnemy.(physics.Body),
-		wallTop,
-		wallLeft,
-		wallRight,
-		wallDown,
 		box,
 	)
 }

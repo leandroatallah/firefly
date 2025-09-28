@@ -18,10 +18,10 @@ func NewEnemyFactory() *EnemyFactory {
 	return &EnemyFactory{}
 }
 
-func (f *EnemyFactory) Create(enemyType EnemyType) (actors.ActorEntity, error) {
+func (f *EnemyFactory) Create(enemyType EnemyType, x, y int) (actors.ActorEntity, error) {
 	switch enemyType {
 	case BlueEnemyType:
-		return NewBlueEnemy(), nil
+		return NewBlueEnemy(x, y), nil
 	default:
 		return nil, fmt.Errorf("unknown enemy type")
 	}
