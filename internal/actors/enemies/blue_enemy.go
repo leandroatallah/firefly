@@ -2,7 +2,6 @@ package enemies
 
 import (
 	"log"
-	"math/rand/v2"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/actors"
@@ -35,10 +34,11 @@ func NewBlueEnemy(x, y int) *BlueEnemy {
 	collisionRect := physics.NewRect(x, y, frameWidth, frameHeight)
 
 	// TODO: Create a builder with director to automate this process
-	enemy := &BlueEnemy{Character: character}
+	enemy := &BlueEnemy{Character: *character}
 	enemy.SetBody(bodyRect)
+	// TODO: Move it to the right place (builder)
+	enemy.SetSpeedAndMaxSpeed(2, 2)
 	enemy.SetCollisionArea(collisionRect)
-	enemy.SetMovementFunc(enemy.HandleMovement)
 
 	return enemy
 }
@@ -54,25 +54,18 @@ func (e *BlueEnemy) SetCollisionArea(rect *physics.Rect) actors.ActorEntity {
 
 func (e *BlueEnemy) Update(boundaries []physics.Body) error {
 	e.count++
+
+	// Example of movement state change
+	if e.count > 200 {
+		e.SwitchMovementState(actors.Rand)
+	}
+	if e.count > 400 {
+		e.SwitchMovementState(actors.DumbChase)
+	}
+
 	return e.Character.Update(boundaries)
 }
 
 func (e *BlueEnemy) Draw(screen *ebiten.Image) {
 	e.Character.Draw(screen)
-}
-
-func (e *BlueEnemy) HandleMovement() {
-	// TODO: Implement patrol
-	if e.count%60 != 0 {
-		return
-	}
-	a := []func(){
-		e.OnMoveLeft,
-		e.OnMoveRight,
-		e.OnMoveUp,
-		e.OnMoveDown,
-	}
-
-	i := rand.IntN(4)
-	a[i]()
 }

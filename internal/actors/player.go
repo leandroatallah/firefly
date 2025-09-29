@@ -5,7 +5,6 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/core/screenutil"
-	"github.com/leandroatallah/firefly/internal/systems/input"
 	"github.com/leandroatallah/firefly/internal/systems/physics"
 )
 
@@ -13,9 +12,6 @@ const (
 	frameOX   = 0
 	frameOY   = 0
 	frameRate = 8
-
-	playerXMove = 2
-	playerYMove = 2
 )
 
 type Player struct {
@@ -45,10 +41,13 @@ func NewPlayer() *Player {
 	collisionRect := physics.NewRect(x+2, y+3, frameWidth-5, frameHeight-6)
 
 	// TODO: Create a builder with director to automate this process
-	player := &Player{Character: character}
+	player := &Player{Character: *character}
 	player.SetBody(bodyRect)
 	player.SetCollisionArea(collisionRect)
-	player.SetMovementFunc(player.HandleMovement)
+
+	// TODO: Move it to the right place (builder)
+	player.SetSpeedAndMaxSpeed(4, 4)
+	player.SetMovementState(Input, nil)
 
 	return player
 }
@@ -68,19 +67,4 @@ func (p *Player) Update(boundaries []physics.Body) error {
 
 func (p *Player) Draw(screen *ebiten.Image) {
 	p.Character.Draw(screen)
-}
-
-func (p *Player) HandleMovement() {
-	if input.IsSomeKeyPressed(ebiten.KeyA, ebiten.KeyLeft) {
-		p.OnMoveLeft()
-	}
-	if input.IsSomeKeyPressed(ebiten.KeyD, ebiten.KeyRight) {
-		p.OnMoveRight()
-	}
-	if input.IsSomeKeyPressed(ebiten.KeyW, ebiten.KeyUp) {
-		p.OnMoveUp()
-	}
-	if input.IsSomeKeyPressed(ebiten.KeyS, ebiten.KeyDown) {
-		p.OnMoveDown()
-	}
 }

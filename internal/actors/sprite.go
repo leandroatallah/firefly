@@ -7,8 +7,7 @@ import (
 
 // TODO: Should it be a package?
 type SpriteEntity struct {
-	sprites    SpriteMap
-	isMirrored bool
+	sprites SpriteMap
 }
 
 type SpriteMap map[ActorStateEnum]*ebiten.Image
@@ -39,8 +38,4 @@ func LoadSprites(list SpriteAssets) (SpriteMap, error) {
 	}
 
 	return res, nil
-}
-
-func (s *SpriteEntity) SetIsMirrored(value bool) {
-	s.isMirrored = value
 }

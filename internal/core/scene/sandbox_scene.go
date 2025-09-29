@@ -77,11 +77,14 @@ func (s *SandboxScene) OnStart() {
 	const wallWidth = 20
 
 	s.player = actors.NewPlayer()
+
+	// TODO: It should be a builder
 	enemyFactory := enemies.NewEnemyFactory()
 	blueEnemy, err := enemyFactory.Create(enemies.BlueEnemyType, 60, 30)
 	if err != nil {
 		log.Fatal(err)
 	}
+	blueEnemy.SetMovementState(actors.DumbChase, s.player)
 
 	obstacleFactory := physics.NewDefaultObstacleFactory()
 
@@ -97,12 +100,14 @@ func (s *SandboxScene) OnStart() {
 		if err != nil {
 			log.Fatal(err)
 		}
+		b.SetIsObstructive(true)
 		s.AddBoundaries(b)
 	}
 
 	box := physics.NewObstacleRect(
 		physics.NewRect(100, 100, 32, 32),
 	).AddCollision()
+	box.SetIsObstructive(true)
 
 	s.AddBoundaries(
 		// TODO: Should it be added here?

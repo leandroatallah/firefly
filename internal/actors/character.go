@@ -13,8 +13,22 @@ type ActorEntity interface {
 	SetBody(rect *physics.Rect) ActorEntity
 	SetCollisionArea(rect *physics.Rect) ActorEntity
 	SetState(state ActorState)
-	SetMovementFunc(func())
+	SetMovementState(state MovementStateEnum, target physics.Body)
+	SwitchMovementState(state MovementStateEnum)
+	MovementState() MovementState
 	Update(boundaries []physics.Body) error
+
+	Position() (minX, minY, maxX, maxY int)
+	Speed() int
+
+	OnMoveUp(distance int)
+	OnMoveDown(distance int)
+	OnMoveLeft(distance int)
+	OnMoveRight(distance int)
+	OnMoveUpLeft(distance int)
+	OnMoveUpRight(distance int)
+	OnMoveDownLeft(distance int)
+	OnMoveDownRight(distance int)
 }
 
 type Character struct {
@@ -22,14 +36,13 @@ type Character struct {
 	SpriteEntity
 	count         int
 	state         ActorState
-	movementState MovementStateEnum
-	movementFunc  func()
+	movementState MovementState
 }
 
-func NewCharacter(sprites SpriteMap) Character {
+func NewCharacter(sprites SpriteMap) *Character {
 	spriteEntity := NewSpriteEntity(sprites)
-	c := Character{SpriteEntity: spriteEntity}
-	state, err := NewActorState(&c, Idle)
+	c := &Character{SpriteEntity: spriteEntity}
+	state, err := NewActorState(c, Idle)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -54,13 +67,63 @@ func (c *Character) SetState(state ActorState) {
 	c.state.OnStart()
 }
 
-func (c *Character) SetMovementFunc(cb func()) {
-	c.movementFunc = cb
+func (c *Character) SetMovementState(state MovementStateEnum, target physics.Body) {
+	movementState, err := NewMovementState(c, state, target)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	c.movementState = movementState
+}
+func (c *Character) SwitchMovementState(state MovementStateEnum) {
+	target := c.MovementState().Target()
+	movementState, err := NewMovementState(c, state, target)
+	if err != nil {
+		log.Fatal(err)
+	}
+	c.movementState = movementState
+}
+
+func (c *Character) MovementState() MovementState {
+	return c.movementState
+}
+
+// Movement methods
+func (c *Character) OnMoveUp(distance int) {
+	c.PhysicsBody.OnMoveUp(distance)
+}
+func (c *Character) OnMoveDown(distance int) {
+	c.PhysicsBody.OnMoveDown(distance)
+}
+func (c *Character) OnMoveLeft(distance int) {
+	c.PhysicsBody.OnMoveLeft(distance)
+}
+func (c *Character) OnMoveRight(distance int) {
+	c.PhysicsBody.OnMoveRight(distance)
+}
+func (c *Character) OnMoveUpLeft(distance int) {
+	c.PhysicsBody.OnMoveUp(distance)
+	c.PhysicsBody.OnMoveLeft(distance)
+}
+func (c *Character) OnMoveUpRight(distance int) {
+	c.PhysicsBody.OnMoveUp(distance)
+	c.PhysicsBody.OnMoveRight(distance)
+}
+func (c *Character) OnMoveDownLeft(distance int) {
+	c.PhysicsBody.OnMoveDown(distance)
+	c.PhysicsBody.OnMoveLeft(distance)
+}
+func (c *Character) OnMoveDownRight(distance int) {
+	c.PhysicsBody.OnMoveDown(distance)
+	c.PhysicsBody.OnMoveRight(distance)
 }
 
 // Body methods
 func (c *Character) Position() (minX, minY, maxX, maxY int) {
 	return c.PhysicsBody.Position()
+}
+func (c *Character) Speed() int {
+	return c.PhysicsBody.Speed()
 }
 
 func (c *Character) DrawCollisionBox(screen *ebiten.Image) {
@@ -70,45 +133,12 @@ func (c *Character) DrawCollisionBox(screen *ebiten.Image) {
 func (c *Character) CollisionPosition() []image.Rectangle {
 	return c.PhysicsBody.CollisionPosition()
 }
-func (c *Character) IsColliding(boundaries []physics.Body) bool {
+func (c *Character) IsColliding(boundaries []physics.Body) (isTouching, isBlocking bool) {
 	return c.PhysicsBody.IsColliding(boundaries)
 }
 
 func (c *Character) ApplyValidMovement(distance int, isXAxis bool, boundaries []physics.Body) {
 	c.PhysicsBody.ApplyValidMovement(distance, isXAxis, boundaries)
-}
-
-// TODO: Should it be splitted from Character to Movable?
-func (c *Character) OnMoveLeft() {
-	c.MoveX(-playerXMove)
-}
-func (c *Character) OnMoveUpLeft() {
-	c.MoveX(-playerXMove)
-	c.MoveY(-playerYMove)
-}
-func (c *Character) OnMoveDownLeft() {
-	c.MoveX(-playerXMove)
-	c.MoveY(playerYMove)
-}
-
-func (c *Character) OnMoveRight() {
-	c.MoveX(playerXMove)
-}
-func (c *Character) OnMoveUpRight() {
-	c.MoveX(playerXMove)
-	c.MoveY(-playerYMove)
-}
-func (c *Character) OnMoveDownRight() {
-	c.MoveX(playerXMove)
-	c.MoveY(playerYMove)
-}
-
-func (c *Character) OnMoveUp() {
-	c.MoveY(-playerYMove)
-}
-
-func (c *Character) OnMoveDown() {
-	c.MoveY(playerYMove)
 }
 
 var bodyToActorState = map[physics.BodyState]ActorStateEnum{
@@ -119,20 +149,14 @@ var bodyToActorState = map[physics.BodyState]ActorStateEnum{
 func (c *Character) Update(boundaries []physics.Body) error {
 	c.count++
 
-	// Sub class movement handler
-	if c.movementFunc != nil {
-		c.movementFunc()
-	}
+	// Handle movement by Movement State - must happen BEFORE UpdateMovement
+	c.movementState.Move()
 
-	isLeft, isRight := c.CheckMovementDirectionX()
-	if isLeft {
-		c.SetIsMirrored(false)
-	}
-	if isRight {
-		c.SetIsMirrored(true)
-	}
-
+	// Update physics and apply movement
 	c.UpdateMovement(boundaries)
+
+	// Check movement direction for sprite mirroring
+	c.CheckMovementDirectionX()
 
 	c.handleState()
 
@@ -161,7 +185,8 @@ func (c *Character) Draw(screen *ebiten.Image) {
 
 	op := &ebiten.DrawImageOptions{}
 
-	if c.isMirrored {
+	fDirection := c.FaceDirection()
+	if fDirection == physics.FaceDirectionRight {
 		op.GeoM.Scale(-1, 1)
 		op.GeoM.Translate(float64(width), 0)
 	}

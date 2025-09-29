@@ -30,5 +30,3 @@ func (e *BaseEnemy) Update(boundaries []physics.Body) error {
 func (e *BaseEnemy) Draw(screen *ebiten.Image) {
 	e.Character.Draw(screen)
 }
-
-func (e *BaseEnemy) HandleMovement() {}
