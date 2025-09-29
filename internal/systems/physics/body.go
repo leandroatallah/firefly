@@ -22,12 +22,24 @@ type Movable interface {
 type Body interface {
 	// TODO: Make all Position return the same data type
 	ID() string
-	Position() (minX, minY, maxX, maxY int)
 	DrawCollisionBox(screen *ebiten.Image)
 	CollisionPosition() []image.Rectangle
-	IsColliding(boundaries []Body) bool
+	IsColliding(boundaries []Body) (isTouching, isBlocking bool)
+	IsObstructive() bool
+	SetIsObstructive(value bool)
+	Position() (minX, minY, maxX, maxY int)
+	SetSpeedAndMaxSpeed(speed, maxSpeed int)
+	Speed() int
 }
 
+type FacingDirectionEnum int
+
+const (
+	FaceDirectionLeft FacingDirectionEnum = iota
+	FaceDirectionRight
+)
+
+// TODO: Split into Movable struct
 type PhysicsBody struct {
 	Shape
 	id            string
@@ -35,6 +47,11 @@ type PhysicsBody struct {
 	vy16          int
 	accelerationX int
 	accelerationY int
+	speed         int
+	maxSpeed      int
+	faceDirection FacingDirectionEnum
+
+	isObstructive bool
 	collisionList []*CollisionArea
 }
 
@@ -57,6 +74,36 @@ func (b *PhysicsBody) MoveY(distance int) {
 	b.accelerationY = distance * config.Unit
 }
 
+// TODO: Should it be moved to Movable?
+func (b *PhysicsBody) OnMoveLeft(distance int) {
+	b.MoveX(-distance)
+}
+func (b *PhysicsBody) OnMoveUpLeft(distanceX, distanceY int) {
+	b.MoveX(-distanceX)
+	b.MoveY(-distanceY)
+}
+func (b *PhysicsBody) OnMoveDownLeft(distanceX, distanceY int) {
+	b.MoveX(-distanceX)
+	b.MoveY(distanceY)
+}
+func (b *PhysicsBody) OnMoveRight(distance int) {
+	b.MoveX(distance)
+}
+func (b *PhysicsBody) OnMoveUpRight(distanceX, distanceY int) {
+	b.MoveX(distanceX)
+	b.MoveY(-distanceY)
+}
+func (b *PhysicsBody) OnMoveDownRight(distanceX, distanceY int) {
+	b.MoveX(distanceX)
+	b.MoveY(distanceY)
+}
+func (b *PhysicsBody) OnMoveUp(distance int) {
+	b.MoveY(-distance)
+}
+func (b *PhysicsBody) OnMoveDown(distance int) {
+	b.MoveY(distance)
+}
+
 func (b *PhysicsBody) Position() (minX, minY, maxX, maxY int) {
 	// TODO: Replace switch with "polymorphism"
 	switch b.Shape.(type) {
@@ -68,6 +115,20 @@ func (b *PhysicsBody) Position() (minX, minY, maxX, maxY int) {
 		maxY = minY + rect.height
 	}
 	return
+}
+
+// TODO: Improve this method (split of find out a better approach)
+func (b *PhysicsBody) SetSpeedAndMaxSpeed(speed, maxSpeed int) {
+	b.speed = speed
+	b.maxSpeed = maxSpeed
+}
+
+func (b *PhysicsBody) Speed() int {
+	return b.speed
+}
+
+func (b *PhysicsBody) FaceDirection() FacingDirectionEnum {
+	return b.faceDirection
 }
 
 func (b *PhysicsBody) DrawCollisionBox(screen *ebiten.Image) {
@@ -105,6 +166,14 @@ func (b *PhysicsBody) CollisionPosition() []image.Rectangle {
 	return res
 }
 
+func (b *PhysicsBody) SetIsObstructive(value bool) {
+	b.isObstructive = value
+}
+
+func (b *PhysicsBody) IsObstructive() bool {
+	return b.isObstructive
+}
+
 // TODO: Needs to be updated when dealing with different shapes (e.g. circle)
 func (b *PhysicsBody) checkRectIntersect(obj1, obj2 Body) bool {
 	rects1 := obj1.CollisionPosition()
@@ -125,13 +194,17 @@ func (b *PhysicsBody) ID() string {
 	return b.id
 }
 
-func (b *PhysicsBody) IsColliding(boundaries []Body) bool {
+// TODO: Should return the collisions? If yes, collision need to become a struct
+func (b *PhysicsBody) IsColliding(boundaries []Body) (isTouching, isBlocking bool) {
 	for _, o := range boundaries {
 		if b.ID() != o.ID() && b.checkRectIntersect(b, o.(Body)) {
-			return true
+			if o.IsObstructive() {
+				return true, true
+			}
+			return true, false
 		}
 	}
-	return false
+	return false, false
 }
 
 func (b *PhysicsBody) updatePosition(distance int, isXAxis bool) {
@@ -160,24 +233,22 @@ func (b *PhysicsBody) ApplyValidMovement(distance int, isXAxis bool, boundaries 
 
 	b.updatePosition(distance, isXAxis)
 
-	isValid := !b.IsColliding(boundaries)
-	if !isValid {
+	_, isBlocking := b.IsColliding(boundaries)
+	if isBlocking {
 		b.updatePosition(-distance, isXAxis)
 	}
 }
 
-func (b *PhysicsBody) CheckMovementDirectionX() (isLeft, isRight bool) {
+func (b *PhysicsBody) CheckMovementDirectionX() {
 	if b.accelerationX > 0 {
-		isRight = true
+		b.faceDirection = FaceDirectionRight
 	}
 	if b.accelerationX < 0 {
-		isLeft = true
+		b.faceDirection = FaceDirectionLeft
 	}
-	return
 }
 
 func (b *PhysicsBody) UpdateMovement(boundaries []Body) {
-
 	// Apply physics to player's position based on the velocity from previous frame.
 	// This is a simple Euler integration step: position += velocity * deltaTime (where deltaTime=1 frame).
 	b.ApplyValidMovement(b.vx16, true, boundaries)
@@ -193,7 +264,7 @@ func (b *PhysicsBody) UpdateMovement(boundaries []Body) {
 	// This is crucial for preventing faster movement on diagonals.
 	// We need to check if the velocity magnitude `sqrt(vx² + vy²)` exceeds `speedMax16²`.
 	// To avoid a costly square root, we can compare the squared values:
-	speedMax16 := 3 * config.Unit
+	speedMax16 := b.maxSpeed * config.Unit
 	// Use int64 for squared values to prevent potential overflow.
 	velSq := int64(b.vx16)*int64(b.vx16) + int64(b.vy16)*int64(b.vy16)
 	maxSq := int64(speedMax16) * int64(speedMax16)
@@ -208,7 +279,7 @@ func (b *PhysicsBody) UpdateMovement(boundaries []Body) {
 		b.vy16 = int(float64(b.vy16) * scale)
 	}
 
-	// Add Hook here to handle state change
+	b.CheckMovementDirectionX()
 
 	// Reset frame-specific acceleration.
 	// It will be recalculated on the next frame from input.

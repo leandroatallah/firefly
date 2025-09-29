@@ -43,8 +43,16 @@ func (o *ObstacleRect) DrawCollisionBox(screen *ebiten.Image) {
 func (o *ObstacleRect) CollisionPosition() []image.Rectangle {
 	return o.PhysicsBody.CollisionPosition()
 }
-func (o *ObstacleRect) IsColliding(boundaries []Body) bool {
+func (o *ObstacleRect) IsColliding(boundaries []Body) (isTouching, isBlocking bool) {
 	return o.PhysicsBody.IsColliding(boundaries)
+}
+
+func (o *ObstacleRect) IsObstructive() bool {
+	return o.PhysicsBody.IsObstructive()
+}
+
+func (o *ObstacleRect) SetIsObstructive(value bool) {
+	o.PhysicsBody.SetIsObstructive(value)
 }
 
 func (o *ObstacleRect) Draw(screen *ebiten.Image) {
