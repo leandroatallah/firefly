@@ -76,9 +76,6 @@ type RandMovementState struct {
 }
 
 func (s *RandMovementState) Move() {
-	// if s..count%60 != 0 {
-	// 	return
-	// }
 	a := []func(){
 		func() { s.actor.OnMoveLeft(s.actor.Speed()) },
 		func() { s.actor.OnMoveRight(s.actor.Speed()) },
@@ -154,8 +151,54 @@ type AvoidMovementState struct {
 	BaseMovementState
 }
 
+func (s *AvoidMovementState) Move() {
+	p0x, p0y, p1x, p1y := s.actor.Position()
+	e0x, e0y, e1x, e1y := s.target.Position()
+	var up, down, left, right bool
+
+	if p1x < e0x {
+		left = true
+	} else if p0x > e1x {
+		right = true
+	}
+
+	if p1y < e0y {
+		up = true
+	} else if p0y > e1y {
+		down = true
+	}
+
+	if !up && !down && !left && !right {
+		return
+	}
+
+	speed := s.actor.Speed()
+
+	if up {
+		if left {
+			s.actor.OnMoveUpLeft(speed)
+		} else if right {
+			s.actor.OnMoveUpRight(speed)
+		} else {
+			s.actor.OnMoveUp(speed)
+		}
+	} else if down {
+		if left {
+			s.actor.OnMoveDownLeft(speed)
+		} else if right {
+			s.actor.OnMoveDownRight(speed)
+		} else {
+			s.actor.OnMoveDown(speed)
+		}
+	} else if left {
+		s.actor.OnMoveLeft(speed)
+	} else if right {
+		s.actor.OnMoveRight(speed)
+	}
+}
+
 // State factory method
-// TODO: It should be a method
+// TODO: Should it be a method?
 func NewMovementState(actor ActorEntity, state MovementStateEnum, target physics.Body) (MovementState, error) {
 	b := NewBaseMovementState(state, actor, target)
 
@@ -168,6 +211,8 @@ func NewMovementState(actor ActorEntity, state MovementStateEnum, target physics
 		return &ChaseMovementState{BaseMovementState: *b}, nil
 	case DumbChase:
 		return &DumbChaseMovementState{BaseMovementState: *b}, nil
+	case Avoid:
+		return &AvoidMovementState{BaseMovementState: *b}, nil
 	default:
 		return nil, fmt.Errorf("unknown movement state type")
 	}
