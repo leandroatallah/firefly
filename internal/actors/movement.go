@@ -98,53 +98,55 @@ type DumbChaseMovementState struct {
 }
 
 func (s *DumbChaseMovementState) Move() {
-	p0x, p0y, p1x, p1y := s.actor.Position()
-	e0x, e0y, e1x, e1y := s.target.Position()
-	var up, down, left, right bool
-
-	if p1x < e0x {
-		right = true
-	} else if p0x > e1x {
-		left = true
-	}
-
-	if p1y < e0y {
-		down = true
-	} else if p0y > e1y {
-		up = true
-	}
-
-	if !up && !down && !left && !right {
-		return
-	}
-
-	speed := s.actor.Speed()
-
-	if up {
-		if left {
-			s.actor.OnMoveUpLeft(speed)
-		} else if right {
-			s.actor.OnMoveUpRight(speed)
-		} else {
-			s.actor.OnMoveUp(speed)
-		}
-	} else if down {
-		if left {
-			s.actor.OnMoveDownLeft(speed)
-		} else if right {
-			s.actor.OnMoveDownRight(speed)
-		} else {
-			s.actor.OnMoveDown(speed)
-		}
-	} else if left {
-		s.actor.OnMoveLeft(speed)
-	} else if right {
-		s.actor.OnMoveRight(speed)
-	}
+	directions := calculateMovementDirections(s.actor, s.target, false)
+	executeMovement(s.actor, directions)
 }
 
 type PatrolMovementState struct {
 	BaseMovementState
+	waypoints            []Point
+	currentWaypointIndex int
+	reachedThreshold     float64
+	waitTime             int
+	waitCounter          int
+}
+
+type Point struct {
+	X, Y int
+}
+
+func (s *PatrolMovementState) Move() {}
+
+// reachedWaypoint checks if the actor is close enough to the target waypoint
+func (s *PatrolMovementState) reachedWaypoint(target Point) bool {
+	p0x, p0y, p1x, p1y := s.actor.Position()
+	actorCenterX := (p0x + p1x) / 2
+	actorCenterY := (p0y + p1y) / 2
+
+	// Calculate distance to waypoint
+	dx := actorCenterX - target.X
+	dy := actorCenterY - target.Y
+	distance := float64(dx*dx + dy*dy)
+
+	return distance <= s.reachedThreshold*s.reachedThreshold
+}
+
+// advanceToNextWaypoint moves to the next waypoint in the patrol route
+func (s *PatrolMovementState) advanceToNextWaypoint() {
+	s.currentWaypointIndex = (s.currentWaypointIndex + 1) % len(s.waypoints)
+}
+
+// SetWaypoints sets the patrol route waypoints
+func (s *PatrolMovementState) SetWaypoints(waypoints []Point) {
+	s.waypoints = waypoints
+	s.currentWaypointIndex = 0
+	s.waitCounter = 0
+}
+
+// SetPatrolConfig sets patrol behavior configuration
+func (s *PatrolMovementState) SetPatrolConfig(reachedThreshold float64, waitTime int) {
+	s.reachedThreshold = reachedThreshold
+	s.waitTime = waitTime
 }
 
 type AvoidMovementState struct {
@@ -152,48 +154,72 @@ type AvoidMovementState struct {
 }
 
 func (s *AvoidMovementState) Move() {
-	p0x, p0y, p1x, p1y := s.actor.Position()
-	e0x, e0y, e1x, e1y := s.target.Position()
+	directions := calculateMovementDirections(s.actor, s.target, true)
+	executeMovement(s.actor, directions)
+}
+
+// Movement utility functions
+type MovementDirections struct {
+	Up    bool
+	Down  bool
+	Left  bool
+	Right bool
+}
+
+// calculateMovementDirections determines which directions to move based on actor and target positions
+func calculateMovementDirections(actorPos, targetPos physics.Body, isAvoid bool) MovementDirections {
+	p0x, p0y, p1x, p1y := actorPos.Position()
+	e0x, e0y, e1x, e1y := targetPos.Position()
 	var up, down, left, right bool
 
+	// Check direction to chase destination
 	if p1x < e0x {
-		left = true
-	} else if p0x > e1x {
 		right = true
+	} else if p0x > e1x {
+		left = true
 	}
 
 	if p1y < e0y {
-		up = true
-	} else if p0y > e1y {
 		down = true
+	} else if p0y > e1y {
+		up = true
 	}
 
-	if !up && !down && !left && !right {
+	if isAvoid {
+		// Invert to  move away from target
+		up, down, left, right = !up, !down, !left, !right
+	}
+
+	return MovementDirections{Up: up, Down: down, Left: left, Right: right}
+}
+
+func executeMovement(actor ActorEntity, directions MovementDirections) {
+	if !directions.Up && !directions.Down && !directions.Left && !directions.Right {
 		return
 	}
 
-	speed := s.actor.Speed()
+	speed := actor.Speed()
 
-	if up {
-		if left {
-			s.actor.OnMoveUpLeft(speed)
-		} else if right {
-			s.actor.OnMoveUpRight(speed)
+	if directions.Up {
+		if directions.Left {
+			actor.OnMoveUpLeft(speed)
+		} else if directions.Right {
+			actor.OnMoveUpRight(speed)
 		} else {
-			s.actor.OnMoveUp(speed)
+			actor.OnMoveUp(speed)
 		}
-	} else if down {
-		if left {
-			s.actor.OnMoveDownLeft(speed)
-		} else if right {
-			s.actor.OnMoveDownRight(speed)
+	} else if directions.Down {
+		if directions.Left {
+			actor.OnMoveDownLeft(speed)
+		} else if directions.Right {
+			actor.OnMoveDownRight(speed)
 		} else {
-			s.actor.OnMoveDown(speed)
+			actor.OnMoveDown(speed)
 		}
-	} else if left {
-		s.actor.OnMoveLeft(speed)
-	} else if right {
-		s.actor.OnMoveRight(speed)
+	} else if directions.Left {
+		actor.OnMoveLeft(speed)
+	} else if directions.Right {
+		actor.OnMoveRight(speed)
 	}
 }
 
@@ -213,6 +239,17 @@ func NewMovementState(actor ActorEntity, state MovementStateEnum, target physics
 		return &DumbChaseMovementState{BaseMovementState: *b}, nil
 	case Avoid:
 		return &AvoidMovementState{BaseMovementState: *b}, nil
+	// case Patrol:
+	// 	// Create patrol state with default values
+	// 	patrolState := &PatrolMovementState{
+	// 		BaseMovementState:    *b,
+	// 		waypoints:            []Point{},
+	// 		currentWaypointIndex: 0,
+	// 		reachedThreshold:     5.0, // 5 units threshold
+	// 		waitTime:             30,  // 30 frames wait time
+	// 		waitCounter:          0,
+	// 	}
+	// 	return patrolState, nil
 	default:
 		return nil, fmt.Errorf("unknown movement state type")
 	}

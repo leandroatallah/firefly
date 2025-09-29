@@ -53,14 +53,6 @@ func NewPlayer() *Player {
 }
 
 // Character Methods
-func (p *Player) SetBody(rect *physics.Rect) ActorEntity {
-	return p.Character.SetBody(rect)
-}
-
-func (p *Player) SetCollisionArea(rect *physics.Rect) ActorEntity {
-	return p.Character.SetCollisionArea(rect)
-}
-
 func (p *Player) Update(boundaries []physics.Body) error {
 	return p.Character.Update(boundaries)
 }

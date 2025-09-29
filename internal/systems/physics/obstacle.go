@@ -1,7 +1,6 @@
 package physics
 
 import (
-	"image"
 	"image/color"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -31,30 +30,6 @@ func (o *ObstacleRect) AddCollision(list ...*CollisionArea) *ObstacleRect {
 	return o
 }
 
-// Body methods
-func (o *ObstacleRect) Position() (minX, minY, maxX, maxY int) {
-	return o.PhysicsBody.Position()
-}
-
-func (o *ObstacleRect) DrawCollisionBox(screen *ebiten.Image) {
-	o.PhysicsBody.DrawCollisionBox(screen)
-}
-
-func (o *ObstacleRect) CollisionPosition() []image.Rectangle {
-	return o.PhysicsBody.CollisionPosition()
-}
-func (o *ObstacleRect) IsColliding(boundaries []Body) (isTouching, isBlocking bool) {
-	return o.PhysicsBody.IsColliding(boundaries)
-}
-
-func (o *ObstacleRect) IsObstructive() bool {
-	return o.PhysicsBody.IsObstructive()
-}
-
-func (o *ObstacleRect) SetIsObstructive(value bool) {
-	o.PhysicsBody.SetIsObstructive(value)
-}
-
 func (o *ObstacleRect) Draw(screen *ebiten.Image) {
 	rect := o.Shape.(*Rect)
 	vector.DrawFilledRect(
@@ -66,8 +41,4 @@ func (o *ObstacleRect) Draw(screen *ebiten.Image) {
 		color.RGBA{0xff, 0, 0, 0xff},
 		false,
 	)
-}
-
-type ObstacleCircle struct {
-	PhysicsBody
 }

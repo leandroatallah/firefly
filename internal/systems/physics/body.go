@@ -30,6 +30,15 @@ type Body interface {
 	Position() (minX, minY, maxX, maxY int)
 	SetSpeedAndMaxSpeed(speed, maxSpeed int)
 	Speed() int
+
+	OnMoveUp(distance int)
+	OnMoveDown(distance int)
+	OnMoveLeft(distance int)
+	OnMoveRight(distance int)
+	OnMoveUpLeft(distance int)
+	OnMoveUpRight(distance int)
+	OnMoveDownLeft(distance int)
+	OnMoveDownRight(distance int)
 }
 
 type FacingDirectionEnum int
@@ -78,24 +87,24 @@ func (b *PhysicsBody) MoveY(distance int) {
 func (b *PhysicsBody) OnMoveLeft(distance int) {
 	b.MoveX(-distance)
 }
-func (b *PhysicsBody) OnMoveUpLeft(distanceX, distanceY int) {
-	b.MoveX(-distanceX)
-	b.MoveY(-distanceY)
+func (b *PhysicsBody) OnMoveUpLeft(distance int) {
+	b.MoveX(-distance)
+	b.MoveY(-distance)
 }
-func (b *PhysicsBody) OnMoveDownLeft(distanceX, distanceY int) {
-	b.MoveX(-distanceX)
-	b.MoveY(distanceY)
+func (b *PhysicsBody) OnMoveDownLeft(distance int) {
+	b.MoveX(-distance)
+	b.MoveY(distance)
 }
 func (b *PhysicsBody) OnMoveRight(distance int) {
 	b.MoveX(distance)
 }
-func (b *PhysicsBody) OnMoveUpRight(distanceX, distanceY int) {
-	b.MoveX(distanceX)
-	b.MoveY(-distanceY)
+func (b *PhysicsBody) OnMoveUpRight(distance int) {
+	b.MoveX(distance)
+	b.MoveY(-distance)
 }
-func (b *PhysicsBody) OnMoveDownRight(distanceX, distanceY int) {
-	b.MoveX(distanceX)
-	b.MoveY(distanceY)
+func (b *PhysicsBody) OnMoveDownRight(distance int) {
+	b.MoveX(distance)
+	b.MoveY(distance)
 }
 func (b *PhysicsBody) OnMoveUp(distance int) {
 	b.MoveY(-distance)

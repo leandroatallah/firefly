@@ -43,15 +43,7 @@ func NewBlueEnemy(x, y int) *BlueEnemy {
 	return enemy
 }
 
-// Blue Enemy - Character Methods
-func (e *BlueEnemy) SetBody(rect *physics.Rect) actors.ActorEntity {
-	return e.Character.SetBody(rect)
-}
-
-func (e *BlueEnemy) SetCollisionArea(rect *physics.Rect) actors.ActorEntity {
-	return e.Character.SetCollisionArea(rect)
-}
-
+// Character Methods
 func (e *BlueEnemy) Update(boundaries []physics.Body) error {
 	e.count++
 

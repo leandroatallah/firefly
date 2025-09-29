@@ -10,25 +10,15 @@ import (
 )
 
 type ActorEntity interface {
+	physics.Body
 	SetBody(rect *physics.Rect) ActorEntity
 	SetCollisionArea(rect *physics.Rect) ActorEntity
+	DrawCollisionBox(screen *ebiten.Image)
 	SetState(state ActorState)
 	SetMovementState(state MovementStateEnum, target physics.Body)
 	SwitchMovementState(state MovementStateEnum)
 	MovementState() MovementState
 	Update(boundaries []physics.Body) error
-
-	Position() (minX, minY, maxX, maxY int)
-	Speed() int
-
-	OnMoveUp(distance int)
-	OnMoveDown(distance int)
-	OnMoveLeft(distance int)
-	OnMoveRight(distance int)
-	OnMoveUpLeft(distance int)
-	OnMoveUpRight(distance int)
-	OnMoveDownLeft(distance int)
-	OnMoveDownRight(distance int)
 }
 
 type Character struct {
@@ -88,59 +78,8 @@ func (c *Character) MovementState() MovementState {
 	return c.movementState
 }
 
-// Movement methods
-func (c *Character) OnMoveUp(distance int) {
-	c.PhysicsBody.OnMoveUp(distance)
-}
-func (c *Character) OnMoveDown(distance int) {
-	c.PhysicsBody.OnMoveDown(distance)
-}
-func (c *Character) OnMoveLeft(distance int) {
-	c.PhysicsBody.OnMoveLeft(distance)
-}
-func (c *Character) OnMoveRight(distance int) {
-	c.PhysicsBody.OnMoveRight(distance)
-}
-func (c *Character) OnMoveUpLeft(distance int) {
-	c.PhysicsBody.OnMoveUp(distance)
-	c.PhysicsBody.OnMoveLeft(distance)
-}
-func (c *Character) OnMoveUpRight(distance int) {
-	c.PhysicsBody.OnMoveUp(distance)
-	c.PhysicsBody.OnMoveRight(distance)
-}
-func (c *Character) OnMoveDownLeft(distance int) {
-	c.PhysicsBody.OnMoveDown(distance)
-	c.PhysicsBody.OnMoveLeft(distance)
-}
-func (c *Character) OnMoveDownRight(distance int) {
-	c.PhysicsBody.OnMoveDown(distance)
-	c.PhysicsBody.OnMoveRight(distance)
-}
-
 // Body methods
-func (c *Character) Position() (minX, minY, maxX, maxY int) {
-	return c.PhysicsBody.Position()
-}
-func (c *Character) Speed() int {
-	return c.PhysicsBody.Speed()
-}
-
-func (c *Character) DrawCollisionBox(screen *ebiten.Image) {
-	c.PhysicsBody.DrawCollisionBox(screen)
-}
-
-func (c *Character) CollisionPosition() []image.Rectangle {
-	return c.PhysicsBody.CollisionPosition()
-}
-func (c *Character) IsColliding(boundaries []physics.Body) (isTouching, isBlocking bool) {
-	return c.PhysicsBody.IsColliding(boundaries)
-}
-
-func (c *Character) ApplyValidMovement(distance int, isXAxis bool, boundaries []physics.Body) {
-	c.PhysicsBody.ApplyValidMovement(distance, isXAxis, boundaries)
-}
-
+// TODO: Improve this
 var bodyToActorState = map[physics.BodyState]ActorStateEnum{
 	physics.Idle: Idle,
 	physics.Walk: Walk,
@@ -210,5 +149,3 @@ func (c *Character) Draw(screen *ebiten.Image) {
 		op,
 	)
 }
-
-func (c *Character) HandleMovement() {}

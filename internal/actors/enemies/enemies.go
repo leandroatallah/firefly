@@ -15,14 +15,6 @@ func NewBaseEnemy() *BaseEnemy {
 }
 
 // Character Methods
-func (e *BaseEnemy) SetBody(rect *physics.Rect) actors.ActorEntity {
-	return e.Character.SetBody(rect)
-}
-
-func (e *BaseEnemy) SetCollisionArea(rect *physics.Rect) actors.ActorEntity {
-	return e.Character.SetCollisionArea(rect)
-}
-
 func (e *BaseEnemy) Update(boundaries []physics.Body) error {
 	return e.Character.Update(boundaries)
 }
