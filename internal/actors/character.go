@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/leandroatallah/firefly/internal/actors/movement"
 	"github.com/leandroatallah/firefly/internal/config"
 	"github.com/leandroatallah/firefly/internal/systems/physics"
 )
@@ -15,9 +16,9 @@ type ActorEntity interface {
 	SetCollisionArea(rect *physics.Rect) ActorEntity
 	DrawCollisionBox(screen *ebiten.Image)
 	SetState(state ActorState)
-	SetMovementState(state MovementStateEnum, target physics.Body)
-	SwitchMovementState(state MovementStateEnum)
-	MovementState() MovementState
+	SetMovementState(state movement.MovementStateEnum, target physics.Body)
+	SwitchMovementState(state movement.MovementStateEnum)
+	MovementState() movement.MovementState
 	Update(boundaries []physics.Body) error
 }
 
@@ -26,7 +27,7 @@ type Character struct {
 	SpriteEntity
 	count         int
 	state         ActorState
-	movementState MovementState
+	movementState movement.MovementState
 }
 
 func NewCharacter(sprites SpriteMap) *Character {
@@ -57,24 +58,24 @@ func (c *Character) SetState(state ActorState) {
 	c.state.OnStart()
 }
 
-func (c *Character) SetMovementState(state MovementStateEnum, target physics.Body) {
-	movementState, err := NewMovementState(c, state, target)
+func (c *Character) SetMovementState(state movement.MovementStateEnum, target physics.Body) {
+	movementState, err := movement.NewMovementState(c, state, target)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	c.movementState = movementState
 }
-func (c *Character) SwitchMovementState(state MovementStateEnum) {
+func (c *Character) SwitchMovementState(state movement.MovementStateEnum) {
 	target := c.MovementState().Target()
-	movementState, err := NewMovementState(c, state, target)
+	movementState, err := movement.NewMovementState(c, state, target)
 	if err != nil {
 		log.Fatal(err)
 	}
 	c.movementState = movementState
 }
 
-func (c *Character) MovementState() MovementState {
+func (c *Character) MovementState() movement.MovementState {
 	return c.movementState
 }
 

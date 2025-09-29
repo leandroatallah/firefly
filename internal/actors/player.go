@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/leandroatallah/firefly/internal/actors/movement"
 	"github.com/leandroatallah/firefly/internal/core/screenutil"
 	"github.com/leandroatallah/firefly/internal/systems/physics"
 )
@@ -47,7 +48,7 @@ func NewPlayer() *Player {
 
 	// TODO: Move it to the right place (builder)
 	player.SetSpeedAndMaxSpeed(4, 4)
-	player.SetMovementState(Input, nil)
+	player.SetMovementState(movement.Input, nil)
 
 	return player
 }

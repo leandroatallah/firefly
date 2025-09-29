@@ -8,6 +8,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/actors"
 	"github.com/leandroatallah/firefly/internal/actors/enemies"
+	"github.com/leandroatallah/firefly/internal/actors/movement"
 	"github.com/leandroatallah/firefly/internal/systems/physics"
 )
 
@@ -84,7 +85,7 @@ func (s *SandboxScene) OnStart() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	blueEnemy.SetMovementState(actors.DumbChase, s.player)
+	blueEnemy.SetMovementState(movement.DumbChase, s.player)
 
 	obstacleFactory := physics.NewDefaultObstacleFactory()
 
