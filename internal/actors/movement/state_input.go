@@ -9,6 +9,10 @@ type InputMovementState struct {
 	BaseMovementState
 }
 
+func NewInputMovementState(base BaseMovementState) *InputMovementState {
+	return &InputMovementState{BaseMovementState: base}
+}
+
 func (s *InputMovementState) Move() {
 	if input.IsSomeKeyPressed(ebiten.KeyA, ebiten.KeyLeft) {
 		s.actor.OnMoveLeft(s.actor.Speed())

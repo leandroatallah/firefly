@@ -32,8 +32,8 @@ func NewBaseMovementState(
 	state MovementStateEnum,
 	actor physics.Body,
 	target physics.Body,
-) *BaseMovementState {
-	return &BaseMovementState{state: state, actor: actor, target: target}
+) BaseMovementState {
+	return BaseMovementState{state: state, actor: actor, target: target}
 }
 
 func (s *BaseMovementState) State() MovementStateEnum {

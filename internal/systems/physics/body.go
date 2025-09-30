@@ -111,10 +111,6 @@ func (b *PhysicsBody) OnMoveDown(distance int) {
 	b.MoveY(distance)
 }
 
-func (b *PhysicsBody) Position() image.Rectangle {
-	return b.Shape.Position()
-}
-
 // TODO: Improve this method (split of find out a better approach)
 func (b *PhysicsBody) SetSpeedAndMaxSpeed(speed, maxSpeed int) {
 	b.speed = speed

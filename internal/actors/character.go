@@ -14,9 +14,12 @@ type ActorEntity interface {
 	physics.Body
 	SetBody(rect *physics.Rect) ActorEntity
 	SetCollisionArea(rect *physics.Rect) ActorEntity
-	DrawCollisionBox(screen *ebiten.Image)
 	SetState(state ActorState)
-	SetMovementState(state movement.MovementStateEnum, target physics.Body)
+	SetMovementState(
+		state movement.MovementStateEnum,
+		target physics.Body,
+		options ...movement.MovementStateOption,
+	)
 	SwitchMovementState(state movement.MovementStateEnum)
 	MovementState() movement.MovementState
 	Update(boundaries []physics.Body) error
@@ -58,13 +61,18 @@ func (c *Character) SetState(state ActorState) {
 	c.state.OnStart()
 }
 
-func (c *Character) SetMovementState(state movement.MovementStateEnum, target physics.Body) {
-	movementState, err := movement.NewMovementState(c, state, target)
+func (c *Character) SetMovementState(
+	state movement.MovementStateEnum,
+	target physics.Body,
+	options ...movement.MovementStateOption,
+) {
+	movementState, err := movement.NewMovementState(c, state, target, options...)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	c.movementState = movementState
+	c.movementState.OnStart()
 }
 func (c *Character) SwitchMovementState(state movement.MovementStateEnum) {
 	target := c.MovementState().Target()

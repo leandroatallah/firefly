@@ -5,7 +5,6 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/actors"
-	"github.com/leandroatallah/firefly/internal/actors/movement"
 	"github.com/leandroatallah/firefly/internal/systems/physics"
 )
 
@@ -47,15 +46,6 @@ func NewBlueEnemy(x, y int) *BlueEnemy {
 // Character Methods
 func (e *BlueEnemy) Update(boundaries []physics.Body) error {
 	e.count++
-
-	// Example of movement state change
-	if e.count > 200 {
-		e.SwitchMovementState(movement.Rand)
-	}
-	if e.count > 400 {
-		e.SwitchMovementState(movement.DumbChase)
-	}
-
 	return e.Character.Update(boundaries)
 }
 

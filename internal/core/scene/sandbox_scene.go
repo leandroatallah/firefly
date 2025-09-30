@@ -85,7 +85,17 @@ func (s *SandboxScene) OnStart() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	blueEnemy.SetMovementState(movement.DumbChase, s.player)
+	// Set up patrol movement with predefined waypoints
+	waypoints := []*physics.Rect{
+		physics.NewRect(100, 100, 32, 32),
+		physics.NewRect(200, 100, 32, 32),
+		physics.NewRect(200, 200, 32, 32),
+		physics.NewRect(100, 200, 32, 32),
+	}
+	predefinedConfig := movement.NewPredefinedWaypointConfig(waypoints, 120) // 2 seconds at 60 FPS
+	blueEnemy.SetMovementState(
+		movement.Patrol, s.player, movement.WithWaypointConfig(predefinedConfig),
+	)
 
 	obstacleFactory := physics.NewDefaultObstacleFactory()
 

@@ -6,23 +6,38 @@ import (
 	"github.com/leandroatallah/firefly/internal/systems/physics"
 )
 
-func NewMovementState(actor physics.Body, state MovementStateEnum, target physics.Body) (MovementState, error) {
+// MovementStateOption defines a function that configures a movement state
+type MovementStateOption func(MovementState)
+
+func NewMovementState(
+	actor physics.Body,
+	state MovementStateEnum,
+	target physics.Body,
+	options ...MovementStateOption,
+) (MovementState, error) {
 	b := NewBaseMovementState(state, actor, target)
+
+	var movementState MovementState
 
 	switch state {
 	case Input:
-		return &InputMovementState{BaseMovementState: *b}, nil
-	case Rand:
-		return &RandMovementState{BaseMovementState: *b}, nil
+		movementState = NewInputMovementState(b)
 	case Chase:
-		return &ChaseMovementState{BaseMovementState: *b}, nil
+		movementState = NewChaseMovementState(b)
 	case DumbChase:
-		return &DumbChaseMovementState{BaseMovementState: *b}, nil
+		movementState = NewDumbChaseMovementState(b)
 	case Avoid:
-		return &AvoidMovementState{BaseMovementState: *b}, nil
+		movementState = NewAvoidMovementState(b)
 	case Patrol:
-		return &PatrolMovementState{BaseMovementState: *b}, nil
+		movementState = NewPatrolMovementState(b)
 	default:
 		return nil, fmt.Errorf("unknown movement state type")
 	}
+
+	// Apply options
+	for _, option := range options {
+		option(movementState)
+	}
+
+	return movementState, nil
 }
