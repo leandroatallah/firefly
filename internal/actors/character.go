@@ -119,7 +119,9 @@ func (c *Character) handleState() {
 }
 
 func (c *Character) Draw(screen *ebiten.Image) {
-	minX, minY, maxX, maxY := c.Position()
+	pos := c.Position()
+	minX, minY := pos.Min.X, pos.Min.Y
+	maxX, maxY := pos.Max.X, pos.Max.Y
 	width := maxX - minX
 	height := maxY - minY
 

@@ -13,21 +13,19 @@ import (
 
 // Movable is a Shape but with movement
 type Movable interface {
-	// TODO: Make all Position return the same data type
-	Position() (minX, minY, maxX, maxY int)
+	Position() image.Rectangle
 	ApplyValidMovement(velocity int, isXAxis bool, boundaries []Body)
 }
 
 // Body is a Shape but with collision
 type Body interface {
-	// TODO: Make all Position return the same data type
 	ID() string
 	DrawCollisionBox(screen *ebiten.Image)
 	CollisionPosition() []image.Rectangle
 	IsColliding(boundaries []Body) (isTouching, isBlocking bool)
 	IsObstructive() bool
 	SetIsObstructive(value bool)
-	Position() (minX, minY, maxX, maxY int)
+	Position() image.Rectangle
 	SetSpeedAndMaxSpeed(speed, maxSpeed int)
 	Speed() int
 
@@ -113,17 +111,8 @@ func (b *PhysicsBody) OnMoveDown(distance int) {
 	b.MoveY(distance)
 }
 
-func (b *PhysicsBody) Position() (minX, minY, maxX, maxY int) {
-	// TODO: Replace switch with "polymorphism"
-	switch b.Shape.(type) {
-	case *Rect:
-		rect := b.Shape.(*Rect)
-		minX = rect.x16 / config.Unit
-		minY = rect.y16 / config.Unit
-		maxX = minX + rect.width
-		maxY = minY + rect.height
-	}
-	return
+func (b *PhysicsBody) Position() image.Rectangle {
+	return b.Shape.Position()
 }
 
 // TODO: Improve this method (split of find out a better approach)

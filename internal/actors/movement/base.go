@@ -56,8 +56,12 @@ type MovementDirections struct {
 
 // calculateMovementDirections determines which directions to move based on actor and target positions
 func calculateMovementDirections(actorPos, targetPos physics.Body, isAvoid bool) MovementDirections {
-	p0x, p0y, p1x, p1y := actorPos.Position()
-	e0x, e0y, e1x, e1y := targetPos.Position()
+	actorRect := actorPos.Position()
+	targetRect := targetPos.Position()
+	p0x, p0y := actorRect.Min.X, actorRect.Min.Y
+	p1x, p1y := actorRect.Max.X, actorRect.Max.Y
+	e0x, e0y := targetRect.Min.X, targetRect.Min.Y
+	e1x, e1y := targetRect.Max.X, targetRect.Max.Y
 	var up, down, left, right bool
 
 	// Check direction to chase destination
