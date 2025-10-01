@@ -52,3 +52,9 @@ func (e *BlueEnemy) Update(boundaries []physics.Body) error {
 func (e *BlueEnemy) Draw(screen *ebiten.Image) {
 	e.Character.Draw(screen)
 }
+
+func (e *BlueEnemy) OnTouch(other physics.Body) {
+	other.OnMoveRight(other.Speed() * 4)
+
+	e.PhysicsBody.OnTouch(other)
+}

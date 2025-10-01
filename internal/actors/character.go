@@ -98,7 +98,9 @@ func (c *Character) Update(boundaries []physics.Body) error {
 	c.count++
 
 	// Handle movement by Movement State - must happen BEFORE UpdateMovement
-	c.movementState.Move()
+	if c.movementState != nil {
+		c.movementState.Move()
+	}
 
 	// Update physics and apply movement
 	c.UpdateMovement(boundaries)

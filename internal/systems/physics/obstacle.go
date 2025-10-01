@@ -8,6 +8,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/config"
 )
 
+// TODO: Should it be merge with Collidable?
 type Obstacle interface {
 	Body
 	Draw(screen *ebiten.Image)

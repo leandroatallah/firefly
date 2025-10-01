@@ -11,21 +11,21 @@ import (
 	"github.com/leandroatallah/firefly/internal/config"
 )
 
-// Movable is a Shape but with movement
-type Movable interface {
-	Position() image.Rectangle
-	ApplyValidMovement(velocity int, isXAxis bool, boundaries []Body)
-}
-
-// Body is a Shape but with collision
-type Body interface {
-	ID() string
+type Collidable interface {
+	Shape
 	DrawCollisionBox(screen *ebiten.Image)
 	CollisionPosition() []image.Rectangle
 	IsColliding(boundaries []Body) (isTouching, isBlocking bool)
 	IsObstructive() bool
 	SetIsObstructive(value bool)
+}
+
+// Movable is a Shape but with movement
+type Movable interface {
+	Shape
 	Position() image.Rectangle
+	ApplyValidMovement(velocity int, isXAxis bool, boundaries []Body)
+
 	SetSpeedAndMaxSpeed(speed, maxSpeed int)
 	Speed() int
 
@@ -39,6 +39,22 @@ type Body interface {
 	OnMoveDownRight(distance int)
 }
 
+type Touchable interface {
+	OnTouch(other Body)
+	OnBlock(other Body)
+}
+
+// Body is a Shape but with collision
+type Body interface {
+	// TODO: Check this Body, Movable and Collidable usage
+	Shape
+	Movable
+	Collidable
+	// Touchable
+
+	ID() string
+}
+
 type FacingDirectionEnum int
 
 const (
@@ -49,6 +65,7 @@ const (
 // TODO: Split into Movable struct
 type PhysicsBody struct {
 	Shape
+	Touchable     Touchable
 	id            string
 	vx16          int
 	vy16          int
@@ -189,17 +206,32 @@ func (b *PhysicsBody) ID() string {
 }
 
 // TODO: Should return the collisions? If yes, collision need to become a struct
+// TODO: Handle multiple simultaneos collision
 func (b *PhysicsBody) IsColliding(boundaries []Body) (isTouching, isBlocking bool) {
 	for _, o := range boundaries {
-		if b.ID() != o.ID() && b.checkRectIntersect(b, o.(Body)) {
+		if b.ID() == o.ID() {
+			continue
+		}
+
+		if b.checkRectIntersect(b, o) {
+			// A collision happened. Notify the touch handler if it's set.
+			b.OnTouch(o)
+
+			// Check if it's a blocking collision.
 			if o.IsObstructive() {
+				b.OnBlock(o)
 				return true, true
 			}
+
 			return true, false
 		}
 	}
 	return false, false
 }
+
+func (b *PhysicsBody) OnTouch(other Body) {}
+
+func (b *PhysicsBody) OnBlock(other Body) {}
 
 func (b *PhysicsBody) updatePosition(distance int, isXAxis bool) {
 	// TODO: Replace switch with "polymorphism"
