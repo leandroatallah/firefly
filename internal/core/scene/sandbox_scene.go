@@ -77,26 +77,6 @@ func (s *SandboxScene) OnStart() {
 
 	const wallWidth = 20
 
-	s.player = actors.NewPlayer()
-
-	// TODO: It should be a builder
-	enemyFactory := enemies.NewEnemyFactory()
-	blueEnemy, err := enemyFactory.Create(enemies.BlueEnemyType, 60, 30)
-	if err != nil {
-		log.Fatal(err)
-	}
-	// Set up patrol movement with predefined waypoints
-	waypoints := []*physics.Rect{
-		physics.NewRect(100, 100, 32, 32),
-		physics.NewRect(200, 100, 32, 32),
-		physics.NewRect(200, 200, 32, 32),
-		physics.NewRect(100, 200, 32, 32),
-	}
-	predefinedConfig := movement.NewPredefinedWaypointConfig(waypoints, 120) // 2 seconds at 60 FPS
-	blueEnemy.SetMovementState(
-		movement.Patrol, s.player, movement.WithWaypointConfig(predefinedConfig),
-	)
-
 	obstacleFactory := physics.NewDefaultObstacleFactory()
 
 	// Boundaries
@@ -120,11 +100,32 @@ func (s *SandboxScene) OnStart() {
 	).AddCollision()
 	box.SetIsObstructive(true)
 
-	s.AddBoundaries(
-		// TODO: Should it be added here?
-		blueEnemy.(physics.Body),
-		box,
-	)
+	s.AddBoundaries(box)
+
+	// Create Player
+	s.player = actors.NewPlayer()
+
+	// Create enemies
+	// TODO: It should be a builder
+	enemyFactory := enemies.NewEnemyFactory()
+	blueEnemy, err := enemyFactory.Create(enemies.BlueEnemyType, 60, 30)
+	if err != nil {
+		log.Fatal(err)
+	}
+	// // Set up patrol movement with predefined waypoints
+	// waypoints := []*physics.Rect{
+	// 	physics.NewRect(100, 100, 32, 32),
+	// 	physics.NewRect(200, 100, 32, 32),
+	// 	physics.NewRect(200, 200, 32, 32),
+	// 	physics.NewRect(100, 200, 32, 32),
+	// }
+	// predefinedConfig := movement.NewPredefinedWaypointConfig(waypoints, 120) // 2 seconds at 60 FPS
+	// blueEnemy.SetMovementState(
+	// 	movement.Patrol, s.player, movement.WithWaypointConfig(predefinedConfig),
+	// )
+	blueEnemy.SetMovementState(movement.Chase, s.player, movement.WithObstacles(s.boundaries))
+
+	s.AddBoundaries(blueEnemy.(physics.Body))
 }
 
 func (s *SandboxScene) OnFinish() {

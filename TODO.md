@@ -12,8 +12,6 @@
 
 ### 3. Enemy AI System
 
-- Basic AI behaviors (patrol, chase, avoid)
-- Enemy movement patterns and pathfinding
 - Enemy-player interaction system
 
 ### 4. UI/HUD System
