@@ -10,6 +10,10 @@ func NewDumbChaseMovementState(base BaseMovementState) *DumbChaseMovementState {
 }
 
 func (s *DumbChaseMovementState) Move() {
+	if s.actor.Immobile() {
+		return
+	}
+
 	directions := calculateMovementDirections(s.actor, s.target, false)
 	executeMovement(s.actor, directions)
 }

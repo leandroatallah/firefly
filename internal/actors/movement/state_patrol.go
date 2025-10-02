@@ -86,6 +86,10 @@ func (s *PatrolMovementState) OnStart() {
 func (s *PatrolMovementState) Move() {
 	s.count++
 
+	if s.actor.Immobile() {
+		return
+	}
+
 	if len(s.waypoints) == 0 {
 		return
 	}

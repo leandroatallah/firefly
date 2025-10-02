@@ -14,6 +14,10 @@ func NewInputMovementState(base BaseMovementState) *InputMovementState {
 }
 
 func (s *InputMovementState) Move() {
+	if s.actor.Immobile() {
+		return
+	}
+
 	if input.IsSomeKeyPressed(ebiten.KeyA, ebiten.KeyLeft) {
 		s.actor.OnMoveLeft(s.actor.Speed())
 	}

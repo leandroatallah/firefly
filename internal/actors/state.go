@@ -11,6 +11,7 @@ type ActorState interface {
 
 type ActorStateEnum int
 
+// TODO: Rename to IdleState, etc.
 const (
 	Idle ActorStateEnum = iota
 	Walk
@@ -42,9 +43,23 @@ func (s *WalkState) OnStart() {}
 
 type HurtState struct {
 	BaseState
+	count         int
+	durationLimit int
 }
 
-func (s *HurtState) OnStart() {}
+func (s *HurtState) OnStart() {
+	s.durationLimit = 15 // 0.25 sec
+}
+
+func (s *HurtState) CheckRecovery() bool {
+	s.count++
+
+	if s.count > s.durationLimit {
+		return true
+	}
+
+	return false
+}
 
 // State factory method
 func NewActorState(actor ActorEntity, state ActorStateEnum) (ActorState, error) {
@@ -54,6 +69,8 @@ func NewActorState(actor ActorEntity, state ActorStateEnum) (ActorState, error) 
 		return &IdleState{BaseState: b}, nil
 	case Walk:
 		return &WalkState{BaseState: b}, nil
+	case Hurted:
+		return &HurtState{BaseState: b}, nil
 	default:
 		return nil, fmt.Errorf("unknown scene type")
 	}

@@ -11,6 +11,16 @@ import (
 	"github.com/leandroatallah/firefly/internal/config"
 )
 
+// TODO: Should it be here?
+type Alive interface {
+	Health() int
+	MaxHealth() int
+	LoseHealth(damage int)
+	RestoreHealth(heal int)
+	Invulnerable() bool
+	SetInvulnerable(value bool)
+}
+
 type Collidable interface {
 	Shape
 	DrawCollisionBox(screen *ebiten.Image)
@@ -27,6 +37,8 @@ type Movable interface {
 
 	SetSpeedAndMaxSpeed(speed, maxSpeed int)
 	Speed() int
+	Immobile() bool
+	SetImmobile(immobile bool)
 
 	OnMoveUp(distance int)
 	OnMoveDown(distance int)
@@ -50,6 +62,7 @@ type Body interface {
 	Movable
 	Collidable
 	Touchable
+	Alive
 
 	ID() string
 }
@@ -72,10 +85,13 @@ type PhysicsBody struct {
 	accelerationY int
 	speed         int
 	maxSpeed      int
+	immobile      bool
 	faceDirection FacingDirectionEnum
 
 	isObstructive bool
 	collisionList []*CollisionArea
+
+	invulnerable bool
 }
 
 func NewPhysicsBody(shape Shape) *PhysicsBody {
@@ -139,6 +155,14 @@ func (b *PhysicsBody) SetSpeedAndMaxSpeed(speed, maxSpeed int) {
 
 func (b *PhysicsBody) Speed() int {
 	return b.speed
+}
+
+func (b *PhysicsBody) Immobile() bool {
+	return b.immobile
+}
+
+func (b *PhysicsBody) SetImmobile(immobile bool) {
+	b.immobile = immobile
 }
 
 func (b *PhysicsBody) FaceDirection() FacingDirectionEnum {
@@ -291,18 +315,24 @@ func (b *PhysicsBody) UpdateMovement(space *Space) {
 
 }
 
-type BodyState int
+func (b *PhysicsBody) IsWalking() bool {
+	return b.vx16 != 0 || b.vy16 != 0
+}
 
-const (
-	Idle BodyState = iota
-	Walk
-	Hurted
-)
+// Alive methods
+func (b *PhysicsBody) Health() int {
+	panic("Implement me")
+}
+func (b *PhysicsBody) MaxHealth() int {
+	panic("Implement me")
+}
 
-func (b *PhysicsBody) CurrentBodyState() BodyState {
-	isWalking := b.vx16 != 0 || b.vy16 != 0
-	if isWalking {
-		return Walk
-	}
-	return Idle
+func (b *PhysicsBody) LoseHealth(damage int)  {}
+func (b *PhysicsBody) RestoreHealth(heal int) {}
+
+func (b *PhysicsBody) Invulnerable() bool {
+	return b.invulnerable
+}
+func (b *PhysicsBody) SetInvulnerable(value bool) {
+	b.invulnerable = value
 }

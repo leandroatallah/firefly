@@ -57,6 +57,7 @@ func (e *BlueEnemy) Draw(screen *ebiten.Image) {
 func (e *BlueEnemy) OnTouch(other physics.Body) {
 	player := e.MovementState().Target()
 	if other.ID() == player.ID() {
-		player.(*actors.Player).Hurt()
+		// TODO: Replace the condition of hurting
+		player.(*actors.Player).Hurt(1)
 	}
 }

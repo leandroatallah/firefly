@@ -22,6 +22,10 @@ func NewChaseMovementState(base BaseMovementState) *ChaseMovementState {
 func (s *ChaseMovementState) Move() {
 	s.count++
 
+	if s.actor.Immobile() {
+		return
+	}
+
 	calculatePathRate := 30 // 0.5 seconds in 60 fps
 
 	if s.count == 0 || s.count%calculatePathRate == 0 {

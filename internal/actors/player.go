@@ -29,7 +29,7 @@ func NewPlayer() *Player {
 	assets = assets.
 		AddSprite(Idle, "assets/default-idle.png").
 		AddSprite(Walk, "assets/default-walk.png").
-		AddSprite(Hurted, "assets/default-idle.png")
+		AddSprite(Hurted, "assets/default-hurt.png")
 
 	sprites, err := LoadSprites(assets)
 	if err != nil {

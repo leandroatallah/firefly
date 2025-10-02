@@ -23,15 +23,16 @@ type ActorEntity interface {
 	SwitchMovementState(state movement.MovementStateEnum)
 	MovementState() movement.MovementState
 	Update(space *physics.Space) error
-	Hurt()
+	Hurt(damage int)
 }
 
 type Character struct {
 	physics.PhysicsBody
 	SpriteEntity
-	count         int
-	state         ActorState
-	movementState movement.MovementState
+	count          int
+	state          ActorState
+	movementState  movement.MovementState
+	animationCount int
 }
 
 func NewCharacter(sprites SpriteMap) *Character {
@@ -89,14 +90,6 @@ func (c *Character) MovementState() movement.MovementState {
 	return c.movementState
 }
 
-// Body methods
-// TODO: Improve this
-var bodyToActorState = map[physics.BodyState]ActorStateEnum{
-	physics.Idle:   Idle,
-	physics.Walk:   Walk,
-	physics.Hurted: Hurted,
-}
-
 func (c *Character) Update(space *physics.Space) error {
 	c.count++
 
@@ -117,17 +110,31 @@ func (c *Character) Update(space *physics.Space) error {
 }
 
 func (c *Character) handleState() {
-	bodyState := c.CurrentBodyState()
-	if state, exists := bodyToActorState[bodyState]; exists {
-		if state == c.state.State() {
-			return
-		}
-
-		s, err := NewActorState(c, state)
+	setNewState := func(s ActorStateEnum) {
+		state, err := NewActorState(c, s)
 		if err != nil {
 			log.Fatal(err)
 		}
-		c.SetState(s)
+		c.SetState(state)
+	}
+
+	state := c.state.State()
+
+	switch {
+	case state == Idle && c.IsWalking():
+		setNewState(Walk)
+	case state == Walk && !c.IsWalking():
+		setNewState(Idle)
+	case state == Hurted:
+		// TODO: The player should be recover the mobility before becomes vulnerable again
+		// TODO: Should add a panic checking here?
+		isRecovered := c.state.(*HurtState).CheckRecovery()
+		if isRecovered {
+			setNewState(Idle)
+			// TODO: Group this in a helper function or method
+			c.SetImmobile(false)
+			c.SetInvulnerable(false)
+		}
 	}
 }
 
@@ -152,10 +159,6 @@ func (c *Character) Draw(screen *ebiten.Image) {
 		float64(minY*config.Unit)/config.Unit,
 	)
 
-	if c.state.State() == Hurted {
-		op.GeoM.Scale(1.5, 1.5)
-	}
-
 	img := c.sprites[c.state.State()]
 	characterWidth := img.Bounds().Dx()
 	frameCount := characterWidth / width
@@ -174,6 +177,22 @@ func (c *Character) OnTouch(other physics.Body) {}
 
 func (c *Character) OnBlock(other physics.Body) {}
 
-func (c *Character) Hurt() {
-	c.SetState(&HurtState{})
+func (c *Character) Hurt(damage int) {
+	if c.Invulnerable() {
+		return
+	}
+
+	// TODO: Check condition to react to damage 0
+
+	// Switch to Hurt state
+	state, err := NewActorState(c, Hurted)
+	if err != nil {
+		log.Fatal(err)
+	}
+	c.SetState(state)
+	// TODO: Group this in a helper function or method
+	c.SetImmobile(true)
+	c.SetInvulnerable(true)
+
+	c.LoseHealth(damage)
 }

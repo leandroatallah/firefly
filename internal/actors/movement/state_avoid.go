@@ -9,6 +9,10 @@ func NewAvoidMovementState(base BaseMovementState) *AvoidMovementState {
 }
 
 func (s *AvoidMovementState) Move() {
+	if s.actor.Immobile() {
+		return
+	}
+
 	directions := calculateMovementDirections(s.actor, s.target, true)
 	executeMovement(s.actor, directions)
 }
