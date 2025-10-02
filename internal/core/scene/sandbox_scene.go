@@ -9,6 +9,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/actors"
 	"github.com/leandroatallah/firefly/internal/actors/enemies"
 	"github.com/leandroatallah/firefly/internal/actors/movement"
+	"github.com/leandroatallah/firefly/internal/config"
 	"github.com/leandroatallah/firefly/internal/core/hud"
 	"github.com/leandroatallah/firefly/internal/systems/physics"
 )
@@ -20,8 +21,10 @@ const (
 
 type SandboxScene struct {
 	BaseScene
-	player       *actors.Player
-	isPlayingJab bool
+	player            *actors.Player
+	isPlayingJab      bool
+	showMenu          bool
+	menuDeadzoneCount int
 }
 
 func (s *SandboxScene) Update() error {
@@ -38,8 +41,12 @@ func (s *SandboxScene) Update() error {
 	}
 
 	// Key events
+	s.menuDeadzoneCount++
 	if ebiten.IsKeyPressed(ebiten.KeyEscape) {
-		s.Manager.NavigateTo(SceneMenu, nil)
+		if s.menuDeadzoneCount > 10 {
+			s.showMenu = !s.showMenu
+			s.menuDeadzoneCount = 0
+		}
 	}
 	if ebiten.IsKeyPressed(ebiten.KeySpace) && !s.isPlayingJab {
 		s.audiomanager.PlaySound(jab8)
@@ -72,12 +79,25 @@ func (s *SandboxScene) Draw(screen *ebiten.Image) {
 	}
 
 	// HUD
-	// TODO: HUD should be in the BaseScene
 	statusBar, err := hud.NewStatusBar(s.player)
 	if err != nil {
 		log.Fatal(err)
 	}
 	statusBar.Draw(screen)
+
+	if s.showMenu {
+		shadow := ebiten.NewImage(config.ScreenWidth, config.ScreenWidth)
+		shadow.Fill(color.RGBA{0, 0, 0, 0xCC})
+		screen.DrawImage(shadow, nil)
+
+		containerWidth, containerHeight := config.ScreenWidth/3, config.ScreenHeight/2
+		container := ebiten.NewImage(containerWidth, containerHeight)
+		container.Fill(color.RGBA{0xAA, 0xAA, 0xAA, 0xff})
+		containerOp := &ebiten.DrawImageOptions{}
+		containerOp.GeoM.Translate(config.ScreenWidth/2, config.ScreenHeight/2)
+		containerOp.GeoM.Translate(-float64(containerWidth/2), -float64(containerHeight/2))
+		screen.DrawImage(container, containerOp)
+	}
 }
 
 func (s *SandboxScene) OnStart() {
