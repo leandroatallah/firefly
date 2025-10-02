@@ -48,7 +48,7 @@ type HurtState struct {
 }
 
 func (s *HurtState) OnStart() {
-	s.durationLimit = 15 // 0.25 sec
+	s.durationLimit = 30 // 0.5 sec
 }
 
 func (s *HurtState) CheckRecovery() bool {

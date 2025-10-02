@@ -9,6 +9,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/actors"
 	"github.com/leandroatallah/firefly/internal/actors/enemies"
 	"github.com/leandroatallah/firefly/internal/actors/movement"
+	"github.com/leandroatallah/firefly/internal/core/hud"
 	"github.com/leandroatallah/firefly/internal/systems/physics"
 )
 
@@ -69,6 +70,14 @@ func (s *SandboxScene) Draw(screen *ebiten.Image) {
 			b.(physics.Obstacle).Draw(screen)
 		}
 	}
+
+	// HUD
+	// TODO: HUD should be in the BaseScene
+	statusBar, err := hud.NewStatusBar(s.player)
+	if err != nil {
+		log.Fatal(err)
+	}
+	statusBar.Draw(screen)
 }
 
 func (s *SandboxScene) OnStart() {

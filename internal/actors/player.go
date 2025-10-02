@@ -45,6 +45,7 @@ func NewPlayer() *Player {
 	// TODO: Create a builder with director to automate this process
 	player := &Player{Character: *character}
 	player.SetBody(bodyRect)
+	player.SetMaxHealth(5)
 	player.SetCollisionArea(collisionRect)
 	player.PhysicsBody.SetTouchable(player)
 
