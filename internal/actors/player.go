@@ -28,7 +28,8 @@ func NewPlayer() *Player {
 	var assets SpriteAssets
 	assets = assets.
 		AddSprite(Idle, "assets/default-idle.png").
-		AddSprite(Walk, "assets/default-walk.png")
+		AddSprite(Walk, "assets/default-walk.png").
+		AddSprite(Hurted, "assets/default-idle.png")
 
 	sprites, err := LoadSprites(assets)
 	if err != nil {
@@ -45,6 +46,7 @@ func NewPlayer() *Player {
 	player := &Player{Character: *character}
 	player.SetBody(bodyRect)
 	player.SetCollisionArea(collisionRect)
+	player.PhysicsBody.SetTouchable(player)
 
 	// TODO: Move it to the right place (builder)
 	player.SetSpeedAndMaxSpeed(4, 4)

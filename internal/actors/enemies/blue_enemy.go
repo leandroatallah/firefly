@@ -39,6 +39,7 @@ func NewBlueEnemy(x, y int) *BlueEnemy {
 	// TODO: Move it to the right place (builder)
 	enemy.SetSpeedAndMaxSpeed(2, 2)
 	enemy.SetCollisionArea(collisionRect)
+	enemy.PhysicsBody.SetTouchable(enemy)
 
 	return enemy
 }
@@ -54,7 +55,8 @@ func (e *BlueEnemy) Draw(screen *ebiten.Image) {
 }
 
 func (e *BlueEnemy) OnTouch(other physics.Body) {
-	other.OnMoveRight(other.Speed() * 4)
-
-	e.PhysicsBody.OnTouch(other)
+	player := e.MovementState().Target()
+	if other.ID() == player.ID() {
+		player.(*actors.Player).Hurt()
+	}
 }

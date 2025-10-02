@@ -14,6 +14,7 @@ type ActorStateEnum int
 const (
 	Idle ActorStateEnum = iota
 	Walk
+	Hurted
 )
 
 type BaseState struct {
@@ -38,6 +39,12 @@ type WalkState struct {
 }
 
 func (s *WalkState) OnStart() {}
+
+type HurtState struct {
+	BaseState
+}
+
+func (s *HurtState) OnStart() {}
 
 // State factory method
 func NewActorState(actor ActorEntity, state ActorStateEnum) (ActorState, error) {

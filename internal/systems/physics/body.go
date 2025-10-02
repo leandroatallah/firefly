@@ -86,6 +86,10 @@ func NewPhysicsBody(shape Shape) *PhysicsBody {
 	}
 }
 
+func (b *PhysicsBody) SetTouchable(t Touchable) {
+	b.Touchable = t
+}
+
 func (b *PhysicsBody) Move() {
 	panic("You should implement this method in derivated structs")
 }
@@ -229,9 +233,17 @@ func (b *PhysicsBody) IsColliding(boundaries []Body) (isTouching, isBlocking boo
 	return false, false
 }
 
-func (b *PhysicsBody) OnTouch(other Body) {}
+func (b *PhysicsBody) OnTouch(other Body) {
+	if b.Touchable != nil {
+		b.Touchable.OnTouch(other)
+	}
+}
 
-func (b *PhysicsBody) OnBlock(other Body) {}
+func (b *PhysicsBody) OnBlock(other Body) {
+	if b.Touchable != nil {
+		b.Touchable.OnBlock(other)
+	}
+}
 
 func (b *PhysicsBody) updatePosition(distance int, isXAxis bool) {
 	// TODO: Replace switch with "polymorphism"
@@ -322,6 +334,7 @@ type BodyState int
 const (
 	Idle BodyState = iota
 	Walk
+	Hurted
 )
 
 func (b *PhysicsBody) CurrentBodyState() BodyState {

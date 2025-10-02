@@ -24,13 +24,17 @@ type SandboxScene struct {
 }
 
 func (s *SandboxScene) Update() error {
+	allBodies := make([]physics.Body, len(s.boundaries))
+	copy(allBodies, s.boundaries)
 	if s.player != nil {
-		s.player.Update(s.boundaries)
+		allBodies = append(allBodies, s.player)
+		// Update player with full collision context (player + enemies + obstacles).
+		s.player.Update(allBodies)
 	}
 	for _, i := range s.boundaries {
 		actor, ok := i.(actors.ActorEntity)
 		if ok {
-			actor.Update(s.boundaries)
+			actor.Update(allBodies)
 		}
 	}
 

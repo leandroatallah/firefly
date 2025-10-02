@@ -23,6 +23,7 @@ type ActorEntity interface {
 	SwitchMovementState(state movement.MovementStateEnum)
 	MovementState() movement.MovementState
 	Update(boundaries []physics.Body) error
+	Hurt()
 }
 
 type Character struct {
@@ -47,6 +48,7 @@ func NewCharacter(sprites SpriteMap) *Character {
 // Builder methods
 func (c *Character) SetBody(rect *physics.Rect) ActorEntity {
 	c.PhysicsBody = *physics.NewPhysicsBody(rect)
+	c.PhysicsBody.SetTouchable(c)
 	return c
 }
 
@@ -90,8 +92,9 @@ func (c *Character) MovementState() movement.MovementState {
 // Body methods
 // TODO: Improve this
 var bodyToActorState = map[physics.BodyState]ActorStateEnum{
-	physics.Idle: Idle,
-	physics.Walk: Walk,
+	physics.Idle:   Idle,
+	physics.Walk:   Walk,
+	physics.Hurted: Hurted,
 }
 
 func (c *Character) Update(boundaries []physics.Body) error {
@@ -149,6 +152,10 @@ func (c *Character) Draw(screen *ebiten.Image) {
 		float64(minY*config.Unit)/config.Unit,
 	)
 
+	if c.state.State() == Hurted {
+		op.GeoM.Scale(1.5, 1.5)
+	}
+
 	img := c.sprites[c.state.State()]
 	characterWidth := img.Bounds().Dx()
 	frameCount := characterWidth / width
@@ -161,4 +168,12 @@ func (c *Character) Draw(screen *ebiten.Image) {
 		).(*ebiten.Image),
 		op,
 	)
+}
+
+func (c *Character) OnTouch(other physics.Body) {}
+
+func (c *Character) OnBlock(other physics.Body) {}
+
+func (c *Character) Hurt() {
+	c.SetState(&HurtState{})
 }
