@@ -12,7 +12,7 @@
 
 ### 3. Enemy AI System
 
-- Enemy-player interaction system
+...
 
 ### 4. UI/HUD System
 

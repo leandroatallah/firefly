@@ -1,67 +1,18 @@
 package physics
 
 import (
-	"image"
-	"image/color"
 	"math"
 
 	"github.com/google/uuid"
-	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/vector"
 	"github.com/leandroatallah/firefly/internal/config"
 )
 
-// TODO: Should it be here?
-type Alive interface {
-	Health() int
-	MaxHealth() int
-	LoseHealth(damage int)
-	RestoreHealth(heal int)
-	Invulnerable() bool
-	SetInvulnerable(value bool)
-}
-
-type Collidable interface {
-	Shape
-	DrawCollisionBox(screen *ebiten.Image)
-	CollisionPosition() []image.Rectangle
-	IsObstructive() bool
-	SetIsObstructive(value bool)
-}
-
-// Movable is a Shape but with movement
-type Movable interface {
-	Shape
-	Position() image.Rectangle
-	ApplyValidMovement(velocity int, isXAxis bool, space *Space)
-
-	SetSpeedAndMaxSpeed(speed, maxSpeed int)
-	Speed() int
-	Immobile() bool
-	SetImmobile(immobile bool)
-
-	OnMoveUp(distance int)
-	OnMoveDown(distance int)
-	OnMoveLeft(distance int)
-	OnMoveRight(distance int)
-	OnMoveUpLeft(distance int)
-	OnMoveUpRight(distance int)
-	OnMoveDownLeft(distance int)
-	OnMoveDownRight(distance int)
-}
-
-type Touchable interface {
-	OnTouch(other Body)
-	OnBlock(other Body)
-}
-
-// Body is a Shape but with collision
+// Body is a Shape with collision, movable and alive
 type Body interface {
 	// TODO: Check this Body, Movable and Collidable usage
 	Shape
 	Movable
 	Collidable
-	Touchable
 	Alive
 
 	ID() string
@@ -74,23 +25,14 @@ const (
 	FaceDirectionRight
 )
 
-// TODO: Split into Movable struct
 type PhysicsBody struct {
 	Shape
-	Touchable     Touchable
-	id            string
-	vx16          int
-	vy16          int
-	accelerationX int
-	accelerationY int
-	speed         int
-	maxSpeed      int
-	immobile      bool
-	faceDirection FacingDirectionEnum
 
-	isObstructive bool
-	collisionList []*CollisionArea
+	MovableBody
+	CollidableBody
+	AliveBody
 
+	id           string
 	invulnerable bool
 }
 
@@ -101,120 +43,18 @@ func NewPhysicsBody(shape Shape) *PhysicsBody {
 	}
 }
 
-func (b *PhysicsBody) SetTouchable(t Touchable) {
-	b.Touchable = t
-}
-
-func (b *PhysicsBody) Move() {
-	panic("You should implement this method in derivated structs")
-}
-
-func (b *PhysicsBody) MoveX(distance int) {
-	b.accelerationX = distance * config.Unit
-}
-
-func (b *PhysicsBody) MoveY(distance int) {
-	b.accelerationY = distance * config.Unit
-}
-
-// TODO: Should it be moved to Movable?
-func (b *PhysicsBody) OnMoveLeft(distance int) {
-	b.MoveX(-distance)
-}
-func (b *PhysicsBody) OnMoveUpLeft(distance int) {
-	b.MoveX(-distance)
-	b.MoveY(-distance)
-}
-func (b *PhysicsBody) OnMoveDownLeft(distance int) {
-	b.MoveX(-distance)
-	b.MoveY(distance)
-}
-func (b *PhysicsBody) OnMoveRight(distance int) {
-	b.MoveX(distance)
-}
-func (b *PhysicsBody) OnMoveUpRight(distance int) {
-	b.MoveX(distance)
-	b.MoveY(-distance)
-}
-func (b *PhysicsBody) OnMoveDownRight(distance int) {
-	b.MoveX(distance)
-	b.MoveY(distance)
-}
-func (b *PhysicsBody) OnMoveUp(distance int) {
-	b.MoveY(-distance)
-}
-func (b *PhysicsBody) OnMoveDown(distance int) {
-	b.MoveY(distance)
-}
-
-// TODO: Improve this method (split of find out a better approach)
-func (b *PhysicsBody) SetSpeedAndMaxSpeed(speed, maxSpeed int) {
-	b.speed = speed
-	b.maxSpeed = maxSpeed
-}
-
-func (b *PhysicsBody) Speed() int {
-	return b.speed
-}
-
-func (b *PhysicsBody) Immobile() bool {
-	return b.immobile
-}
-
-func (b *PhysicsBody) SetImmobile(immobile bool) {
-	b.immobile = immobile
-}
-
-func (b *PhysicsBody) FaceDirection() FacingDirectionEnum {
-	return b.faceDirection
-}
-
-func (b *PhysicsBody) DrawCollisionBox(screen *ebiten.Image) {
-	for _, c := range b.CollisionPosition() {
-		minX := c.Min.X
-		minY := c.Min.Y
-		maxX := c.Max.X
-		maxY := c.Max.Y
-
-		width := float32(maxX - minX)
-		height := float32(maxY - minY)
-		vector.DrawFilledRect(
-			screen,
-			float32(minX), float32(minY), width, height,
-			color.RGBA{0, 0xaa, 0, 0xff}, false)
-		vector.DrawFilledRect(
-			screen,
-			float32(minX)+1, float32(minY)+1, width-2, height-2,
-			color.RGBA{0, 0xff, 0, 0xff}, false)
-	}
-}
-
-func (b *PhysicsBody) AddCollision(list ...*CollisionArea) *PhysicsBody {
-	for _, i := range list {
-		b.collisionList = append(b.collisionList, i)
-	}
-	return b
-}
-
-func (b *PhysicsBody) CollisionPosition() []image.Rectangle {
-	res := []image.Rectangle{}
-	for _, c := range b.collisionList {
-		res = append(res, c.Position())
-	}
-	return res
-}
-
-func (b *PhysicsBody) SetIsObstructive(value bool) {
-	b.isObstructive = value
-}
-
-func (b *PhysicsBody) IsObstructive() bool {
-	return b.isObstructive
-}
-
+// Attribute methods
 func (b *PhysicsBody) ID() string {
 	return b.id
 }
+func (b *PhysicsBody) Invulnerable() bool {
+	return b.invulnerable
+}
+func (b *PhysicsBody) SetInvulnerable(value bool) {
+	b.invulnerable = value
+}
+
+// Collision methods
 func (b *PhysicsBody) OnTouch(other Body) {
 	if b.Touchable != nil {
 		b.Touchable.OnTouch(other)
@@ -227,25 +67,14 @@ func (b *PhysicsBody) OnBlock(other Body) {
 	}
 }
 
-func (b *PhysicsBody) updatePosition(distance int, isXAxis bool) {
-	// TODO: Replace switch with "polymorphism"
-	switch b.Shape.(type) {
-	case *Rect:
-		rect := b.Shape.(*Rect)
-		if isXAxis {
-			rect.x16 += distance
-			for _, c := range b.collisionList {
-				c.Shape.(*Rect).x16 += distance
-			}
-		} else {
-			rect.y16 += distance
-			for _, c := range b.collisionList {
-				c.Shape.(*Rect).y16 += distance
-			}
-		}
+func (b *PhysicsBody) AddCollision(list ...*CollisionArea) *PhysicsBody {
+	for _, i := range list {
+		b.collisionList = append(b.collisionList, i)
 	}
+	return b
 }
 
+// Movement methods
 func (b *PhysicsBody) ApplyValidMovement(distance int, isXAxis bool, space *Space) {
 	if distance == 0 {
 		return
@@ -312,27 +141,23 @@ func (b *PhysicsBody) UpdateMovement(space *Space) {
 	// Apply friction to slow the player down when there is no input.
 	b.vx16 = reduceVelocity(b.vx16)
 	b.vy16 = reduceVelocity(b.vy16)
-
 }
 
-func (b *PhysicsBody) IsWalking() bool {
-	return b.vx16 != 0 || b.vy16 != 0
-}
-
-// Alive methods
-func (b *PhysicsBody) Health() int {
-	panic("Implement me")
-}
-func (b *PhysicsBody) MaxHealth() int {
-	panic("Implement me")
-}
-
-func (b *PhysicsBody) LoseHealth(damage int)  {}
-func (b *PhysicsBody) RestoreHealth(heal int) {}
-
-func (b *PhysicsBody) Invulnerable() bool {
-	return b.invulnerable
-}
-func (b *PhysicsBody) SetInvulnerable(value bool) {
-	b.invulnerable = value
+func (b *PhysicsBody) updatePosition(distance int, isXAxis bool) {
+	// TODO: Replace switch with "polymorphism"
+	switch b.Shape.(type) {
+	case *Rect:
+		rect := b.Shape.(*Rect)
+		if isXAxis {
+			rect.x16 += distance
+			for _, c := range b.collisionList {
+				c.Shape.(*Rect).x16 += distance
+			}
+		} else {
+			rect.y16 += distance
+			for _, c := range b.collisionList {
+				c.Shape.(*Rect).y16 += distance
+			}
+		}
+	}
 }
