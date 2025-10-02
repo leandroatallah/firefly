@@ -15,7 +15,6 @@ type Collidable interface {
 	Shape
 	DrawCollisionBox(screen *ebiten.Image)
 	CollisionPosition() []image.Rectangle
-	IsColliding(boundaries []Body) (isTouching, isBlocking bool)
 	IsObstructive() bool
 	SetIsObstructive(value bool)
 }
@@ -24,7 +23,7 @@ type Collidable interface {
 type Movable interface {
 	Shape
 	Position() image.Rectangle
-	ApplyValidMovement(velocity int, isXAxis bool, boundaries []Body)
+	ApplyValidMovement(velocity int, isXAxis bool, space *Space)
 
 	SetSpeedAndMaxSpeed(speed, maxSpeed int)
 	Speed() int
@@ -50,7 +49,7 @@ type Body interface {
 	Shape
 	Movable
 	Collidable
-	// Touchable
+	Touchable
 
 	ID() string
 }
@@ -189,50 +188,9 @@ func (b *PhysicsBody) IsObstructive() bool {
 	return b.isObstructive
 }
 
-// TODO: Needs to be updated when dealing with different shapes (e.g. circle)
-func (b *PhysicsBody) checkRectIntersect(obj1, obj2 Body) bool {
-	rects1 := obj1.CollisionPosition()
-	rects2 := obj2.CollisionPosition()
-
-	for _, r1 := range rects1 {
-		for _, r2 := range rects2 {
-			if r1.Overlaps(r2) {
-				return true
-			}
-		}
-	}
-
-	return false
-}
-
 func (b *PhysicsBody) ID() string {
 	return b.id
 }
-
-// TODO: Should return the collisions? If yes, collision need to become a struct
-// TODO: Handle multiple simultaneos collision
-func (b *PhysicsBody) IsColliding(boundaries []Body) (isTouching, isBlocking bool) {
-	for _, o := range boundaries {
-		if b.ID() == o.ID() {
-			continue
-		}
-
-		if b.checkRectIntersect(b, o) {
-			// A collision happened. Notify the touch handler if it's set.
-			b.OnTouch(o)
-
-			// Check if it's a blocking collision.
-			if o.IsObstructive() {
-				b.OnBlock(o)
-				return true, true
-			}
-
-			return true, false
-		}
-	}
-	return false, false
-}
-
 func (b *PhysicsBody) OnTouch(other Body) {
 	if b.Touchable != nil {
 		b.Touchable.OnTouch(other)
@@ -264,14 +222,18 @@ func (b *PhysicsBody) updatePosition(distance int, isXAxis bool) {
 	}
 }
 
-func (b *PhysicsBody) ApplyValidMovement(distance int, isXAxis bool, boundaries []Body) {
+func (b *PhysicsBody) ApplyValidMovement(distance int, isXAxis bool, space *Space) {
 	if distance == 0 {
 		return
 	}
 
 	b.updatePosition(distance, isXAxis)
 
-	_, isBlocking := b.IsColliding(boundaries)
+	if space == nil {
+		return
+	}
+
+	_, isBlocking := space.ResolveCollisions(b)
 	if isBlocking {
 		b.updatePosition(-distance, isXAxis)
 	}
@@ -286,11 +248,11 @@ func (b *PhysicsBody) CheckMovementDirectionX() {
 	}
 }
 
-func (b *PhysicsBody) UpdateMovement(boundaries []Body) {
+func (b *PhysicsBody) UpdateMovement(space *Space) {
 	// Apply physics to player's position based on the velocity from previous frame.
 	// This is a simple Euler integration step: position += velocity * deltaTime (where deltaTime=1 frame).
-	b.ApplyValidMovement(b.vx16, true, boundaries)
-	b.ApplyValidMovement(b.vy16, false, boundaries)
+	b.ApplyValidMovement(b.vx16, true, space)
+	b.ApplyValidMovement(b.vy16, false, space)
 
 	// Convert the raw input acceleration into a scaled and normalized vector.
 	scaledAccX, scaledAccY := smoothDiagonalMovement(b.accelerationX, b.accelerationY)

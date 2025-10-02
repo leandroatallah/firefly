@@ -24,17 +24,15 @@ type SandboxScene struct {
 }
 
 func (s *SandboxScene) Update() error {
-	allBodies := make([]physics.Body, len(s.boundaries))
-	copy(allBodies, s.boundaries)
-	if s.player != nil {
-		allBodies = append(allBodies, s.player)
-		// Update player with full collision context (player + enemies + obstacles).
-		s.player.Update(allBodies)
-	}
-	for _, i := range s.boundaries {
+	space := s.PhysicsSpace()
+
+	for _, i := range space.Bodies() {
 		actor, ok := i.(actors.ActorEntity)
-		if ok {
-			actor.Update(allBodies)
+		if !ok {
+			continue
+		}
+		if err := actor.Update(space); err != nil {
+			return err
 		}
 	}
 
@@ -60,8 +58,10 @@ func (s *SandboxScene) Draw(screen *ebiten.Image) {
 		s.player.Draw(screen)
 	}
 
-	for _, b := range s.boundaries {
+	space := s.PhysicsSpace()
+	for _, b := range space.Bodies() {
 		// TODO: Fix it
+		// TODO: Is player calling Draw twice?
 		switch b.(type) {
 		case *enemies.BlueEnemy:
 			b.(*enemies.BlueEnemy).Draw(screen)
@@ -72,6 +72,10 @@ func (s *SandboxScene) Draw(screen *ebiten.Image) {
 }
 
 func (s *SandboxScene) OnStart() {
+	// Init space
+	space := s.PhysicsSpace()
+
+	// Init audio manager
 	s.audiomanager = s.Manager.audioManager
 	go func() {
 		time.Sleep(1 * time.Second)
@@ -108,6 +112,7 @@ func (s *SandboxScene) OnStart() {
 
 	// Create Player
 	s.player = actors.NewPlayer()
+	s.PhysicsSpace().AddBody(s.player)
 
 	// Create enemies
 	// TODO: It should be a builder
@@ -127,7 +132,7 @@ func (s *SandboxScene) OnStart() {
 	// blueEnemy.SetMovementState(
 	// 	movement.Patrol, s.player, movement.WithWaypointConfig(predefinedConfig),
 	// )
-	blueEnemy.SetMovementState(movement.Chase, s.player, movement.WithObstacles(s.boundaries))
+	blueEnemy.SetMovementState(movement.Chase, s.player, movement.WithObstacles(space.Bodies()))
 
 	s.AddBoundaries(blueEnemy.(physics.Body))
 }

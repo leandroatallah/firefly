@@ -17,42 +17,42 @@ type Scene interface {
 }
 
 type BaseScene struct {
-	boundaries   []physics.Body
 	count        int
 	Manager      *SceneManager
 	audiomanager *audiomanager.AudioManager
+	space        *physics.Space
 }
 
 func NewScene() *BaseScene {
-	return &BaseScene{}
+	return &BaseScene{space: physics.NewSpace()}
 }
 
-func (s *BaseScene) Draw(screen *ebiten.Image) {
-	panic("You should implement this method in derivated structs")
-}
+func (s *BaseScene) Draw(screen *ebiten.Image) {}
 
 func (s *BaseScene) Update() error {
-	panic("You should implement this method in derivated structs")
+	return nil
 }
 
-func (s *BaseScene) OnStart() {
-	panic("You should implement this method in derivated structs")
-}
+func (s *BaseScene) OnStart() {}
 
-func (s *BaseScene) OnFinish() {
-	panic("You should implement this method in derivated structs")
-}
+func (s *BaseScene) OnFinish() {}
 
-func (s *BaseScene) Exit() {
-	panic("You should implement this method in derivated structs")
-}
+func (s *BaseScene) Exit() {}
 
 func (s *BaseScene) AddBoundaries(boundaries ...physics.Body) {
+	space := s.PhysicsSpace()
 	for _, o := range boundaries {
-		s.boundaries = append(s.boundaries, o)
+		space.AddBody(o)
 	}
 }
 
 func (s *BaseScene) SetManager(manager *SceneManager) {
 	s.Manager = manager
+}
+
+func (s *BaseScene) PhysicsSpace() *physics.Space {
+	if s.space == nil {
+		s.space = physics.NewSpace()
+	}
+	return s.space
 }

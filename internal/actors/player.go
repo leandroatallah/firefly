@@ -56,8 +56,8 @@ func NewPlayer() *Player {
 }
 
 // Character Methods
-func (p *Player) Update(boundaries []physics.Body) error {
-	return p.Character.Update(boundaries)
+func (p *Player) Update(space *physics.Space) error {
+	return p.Character.Update(space)
 }
 
 func (p *Player) Draw(screen *ebiten.Image) {

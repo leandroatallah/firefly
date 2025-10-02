@@ -3,7 +3,6 @@ package movement
 import (
 	"container/heap"
 	"image"
-	"math"
 
 	"github.com/leandroatallah/firefly/internal/systems/physics"
 )
@@ -18,71 +17,6 @@ type ChaseMovementState struct {
 
 func NewChaseMovementState(base BaseMovementState) *ChaseMovementState {
 	return &ChaseMovementState{BaseMovementState: base}
-}
-
-// --- A* Node and Priority Queue ---
-
-// Node represents a point in the search grid for A*.
-type Node struct {
-	point    image.Point
-	parent   *Node
-	gCost    int // Distance from starting node
-	hCost    int // Heuristic distance to end node
-	fCost    int // gCost + hCost
-	mapIndex int // Index of the item in the priority queue
-}
-
-// PriorityQueue implements heap.Interface and holds Nodes.
-type PriorityQueue []*Node
-
-func (pq PriorityQueue) Len() int { return len(pq) }
-
-func (pq PriorityQueue) Less(i, j int) bool {
-	// We want Pop to give us the lowest fCost, so we use less than here.
-	return pq[i].fCost < pq[j].fCost
-}
-
-func (pq PriorityQueue) Swap(i, j int) {
-	pq[i], pq[j] = pq[j], pq[i]
-	pq[i].mapIndex = i
-	pq[j].mapIndex = j
-}
-
-func (pq *PriorityQueue) Push(x any) {
-	n := len(*pq)
-	node := x.(*Node)
-	node.mapIndex = n
-	*pq = append(*pq, node)
-}
-
-func (pq *PriorityQueue) Pop() any {
-	old := *pq
-	n := len(old)
-	node := old[n-1]
-	old[n-1] = nil     // avoid memory leak
-	node.mapIndex = -1 // for safety
-	*pq = old[0 : n-1]
-	return node
-}
-
-// --- Helper Functions ---
-func euclideanDistance(a, b image.Point) int {
-	dx := float64(a.X - b.X)
-	dy := float64(a.Y - b.Y)
-	return int(math.Sqrt(dx*dx + dy*dy))
-}
-
-// reconstructPath builds the path from the end node back to the start.
-func reconstructPath(endNode *Node) []image.Point {
-	path := []image.Point{}
-	for current := endNode; current != nil; current = current.parent {
-		path = append(path, current.point)
-	}
-	// Reverse the path to get it from start to end
-	for i, j := 0, len(path)-1; i < j; i, j = i+1, j-1 {
-		path[i], path[j] = path[j], path[i]
-	}
-	return path
 }
 
 func (s *ChaseMovementState) Move() {
@@ -143,6 +77,7 @@ func (s *ChaseMovementState) calculatePath() {
 	openSet := &PriorityQueue{}
 	heap.Init(openSet)
 	heap.Push(openSet, startNode)
+	openSetMap := map[image.Point]*Node{startPos: startNode}
 
 	// visited nodes
 	closedSet := make(map[image.Point]*Node)
@@ -152,6 +87,7 @@ func (s *ChaseMovementState) calculatePath() {
 	for openSet.Len() > 0 {
 		// Get the node with the lowest F cost
 		currentNode := heap.Pop(openSet).(*Node)
+		delete(openSetMap, currentNode.point)
 
 		// Check if we've reached the destination
 		if euclideanDistance(currentNode.point, targetPos) < actorSize.X { // Close enough
@@ -168,23 +104,30 @@ func (s *ChaseMovementState) calculatePath() {
 				continue
 			}
 
-			// Temporary fCost
 			tentativeGCost := currentNode.gCost + euclideanDistance(currentNode.point, neighborPoint)
 
-			// TODO: Check it to optimize.
-			// For now, we don't have a good way to check if the neighbor is in the open set
-			// without iterating, which is inefficient. A* can be optimized by using a map
-			// for the open set as well, but for simplicity, we'll just add the node.
-			// This can lead to duplicates but is functionally closer to correct.
+			neighborNode, inOpenSet := openSetMap[neighborPoint]
 
-			neighborNode := &Node{
-				point:  neighborPoint,
-				parent: currentNode,
-				gCost:  tentativeGCost,
-				hCost:  euclideanDistance(neighborPoint, targetPos),
+			if inOpenSet && tentativeGCost >= neighborNode.gCost {
+				continue // This path is not better
 			}
+
+			// This path is the best until now. Record it
+			if neighborNode == nil {
+				neighborNode = &Node{point: neighborPoint}
+				openSetMap[neighborPoint] = neighborNode
+			}
+
+			neighborNode.parent = currentNode
+			neighborNode.gCost = tentativeGCost
+			neighborNode.hCost = euclideanDistance(neighborPoint, targetPos)
 			neighborNode.fCost = neighborNode.gCost + neighborNode.hCost
-			heap.Push(openSet, neighborNode)
+
+			if !inOpenSet {
+				heap.Push(openSet, neighborNode)
+			} else {
+				heap.Fix(openSet, neighborNode.mapIndex)
+			}
 		}
 	}
 }
@@ -200,6 +143,9 @@ func (s *ChaseMovementState) isTraversable(point image.Point, size image.Point) 
 	// Obstacle detection
 	neighborRect := image.Rect(point.X, point.Y, point.X+size.X, point.Y+size.Y)
 	for _, obstacle := range s.obstacles {
+		if obstacle == s.target {
+			continue
+		}
 		if obstacle != nil && obstacle.Position().Overlaps(neighborRect) {
 			return false
 		}
@@ -266,14 +212,4 @@ func (s *ChaseMovementState) getNeighbors(point image.Point, size image.Point) [
 	}
 
 	return neighbors
-}
-
-// Functional Options Pattern
-// WithObstacles is an option to provide obstacles for pathfinding states.
-func WithObstacles(obstacles []physics.Body) MovementStateOption {
-	return func(ms MovementState) {
-		if chaseState, ok := ms.(*ChaseMovementState); ok {
-			chaseState.obstacles = obstacles
-		}
-	}
 }

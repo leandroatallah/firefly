@@ -45,9 +45,9 @@ func NewBlueEnemy(x, y int) *BlueEnemy {
 }
 
 // Character Methods
-func (e *BlueEnemy) Update(boundaries []physics.Body) error {
+func (e *BlueEnemy) Update(space *physics.Space) error {
 	e.count++
-	return e.Character.Update(boundaries)
+	return e.Character.Update(space)
 }
 
 func (e *BlueEnemy) Draw(screen *ebiten.Image) {

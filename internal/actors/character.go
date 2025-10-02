@@ -22,7 +22,7 @@ type ActorEntity interface {
 	)
 	SwitchMovementState(state movement.MovementStateEnum)
 	MovementState() movement.MovementState
-	Update(boundaries []physics.Body) error
+	Update(space *physics.Space) error
 	Hurt()
 }
 
@@ -97,7 +97,7 @@ var bodyToActorState = map[physics.BodyState]ActorStateEnum{
 	physics.Hurted: Hurted,
 }
 
-func (c *Character) Update(boundaries []physics.Body) error {
+func (c *Character) Update(space *physics.Space) error {
 	c.count++
 
 	// Handle movement by Movement State - must happen BEFORE UpdateMovement
@@ -106,7 +106,7 @@ func (c *Character) Update(boundaries []physics.Body) error {
 	}
 
 	// Update physics and apply movement
-	c.UpdateMovement(boundaries)
+	c.UpdateMovement(space)
 
 	// Check movement direction for sprite mirroring
 	c.CheckMovementDirectionX()

@@ -15,8 +15,8 @@ func NewBaseEnemy() *BaseEnemy {
 }
 
 // Character Methods
-func (e *BaseEnemy) Update(boundaries []physics.Body) error {
-	return e.Character.Update(boundaries)
+func (e *BaseEnemy) Update(space *physics.Space) error {
+	return e.Character.Update(space)
 }
 
 func (e *BaseEnemy) Draw(screen *ebiten.Image) {
