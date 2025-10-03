@@ -25,12 +25,12 @@ type HUD interface {
 
 type StatusBar struct {
 	heartImg *ebiten.Image
-	player   *actors.Player
+	player   actors.PlayerEntity
 	score    int
 	mainText *font.FontText
 }
 
-func NewStatusBar(player *actors.Player, score int) (*StatusBar, error) {
+func NewStatusBar(player actors.PlayerEntity, score int) (*StatusBar, error) {
 	heart, _, err := ebitenutil.NewImageFromFile("assets/heart.png")
 	if err != nil {
 		return nil, err

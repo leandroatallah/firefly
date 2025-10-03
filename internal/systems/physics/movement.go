@@ -55,3 +55,50 @@ func smoothDiagonalMovement(accX, accY int) (int, int) {
 
 	return int(fAccX), int(fAccY)
 }
+
+func clampAxisVelocity(velocity, limit int) int {
+	if limit <= 0 {
+		return 0
+	}
+	switch {
+	case velocity > limit:
+		return limit
+	case velocity < -limit:
+		return -limit
+	default:
+		return velocity
+	}
+}
+
+func applyAxisMovement(body *PhysicsBody, distance int, isXAxis bool, space *Space) bool {
+	if distance == 0 {
+		return false
+	}
+
+	rect, ok := body.Shape.(*Rect)
+	var before int
+	if ok {
+		if isXAxis {
+			before = rect.x16
+		} else {
+			before = rect.y16
+		}
+	}
+
+	body.ApplyValidMovement(distance, isXAxis, space)
+
+	if !ok {
+		return false
+	}
+
+	if isXAxis {
+		return rect.x16 == before
+	}
+	return rect.y16 == before
+}
+
+func applyGravity(body *PhysicsBody, ground int) {
+	if body.vy16 < ground {
+		body.vy16 += 4
+	}
+}
