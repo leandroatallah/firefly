@@ -25,10 +25,24 @@ type SandboxScene struct {
 	isPlayingJab      bool
 	showMenu          bool
 	menuDeadzoneCount int
+	count             int
+	score             int
 }
 
 func (s *SandboxScene) Update() error {
+	s.count++
+
 	space := s.PhysicsSpace()
+
+	// Increase score
+	if s.count%60 == 0 {
+		s.score++
+	}
+
+	// reset score when player is hurted
+	if s.player.State() == actors.Hurted {
+		s.score = 0
+	}
 
 	for _, i := range space.Bodies() {
 		actor, ok := i.(actors.ActorEntity)
@@ -79,7 +93,7 @@ func (s *SandboxScene) Draw(screen *ebiten.Image) {
 	}
 
 	// HUD
-	statusBar, err := hud.NewStatusBar(s.player)
+	statusBar, err := hud.NewStatusBar(s.player, s.score)
 	if err != nil {
 		log.Fatal(err)
 	}

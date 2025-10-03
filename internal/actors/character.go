@@ -14,6 +14,7 @@ type ActorEntity interface {
 	physics.Body
 	SetBody(rect *physics.Rect) ActorEntity
 	SetCollisionArea(rect *physics.Rect) ActorEntity
+	State() ActorStateEnum
 	SetState(state ActorState)
 	SetMovementState(
 		state movement.MovementStateEnum,
@@ -57,6 +58,10 @@ func (c *Character) SetCollisionArea(rect *physics.Rect) ActorEntity {
 	collisionArea := &physics.CollisionArea{Shape: rect}
 	c.PhysicsBody.AddCollision(collisionArea)
 	return c
+}
+
+func (c *Character) State() ActorStateEnum {
+	return c.state.State()
 }
 
 func (c *Character) SetState(state ActorState) {

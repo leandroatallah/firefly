@@ -16,9 +16,7 @@
 
 ### 4. UI/HUD System
 
-- Health bars, score display, menus
 - Button system with click handling
-- Text rendering and font management
 
 ## 🔧 MEDIUM PRIORITY - Game Systems
 
