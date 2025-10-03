@@ -23,6 +23,9 @@ func (m *TopDownMovementModel) Update(body *PhysicsBody, space *Space) error {
 	body.ApplyValidMovement(body.vx16, true, space)
 	body.ApplyValidMovement(body.vy16, false, space)
 
+	// Prevents leaving the play area`
+	clampToPlayArea(body)
+
 	// Convert the raw input acceleration into a scaled and normalized vector.
 	scaledAccX, scaledAccY := smoothDiagonalMovement(body.accelerationX, body.accelerationY)
 
@@ -61,6 +64,8 @@ func (m *TopDownMovementModel) Update(body *PhysicsBody, space *Space) error {
 	return nil
 }
 
+// InputHandler processes player input for movement.
+// Top-Down player can move for all directions and diagonals.
 func (m *TopDownMovementModel) InputHandler(body *PhysicsBody) {
 	if body.Immobile() {
 		return

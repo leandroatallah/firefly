@@ -21,7 +21,7 @@ const (
 
 type SandboxScene struct {
 	BaseScene
-	player            *actors.Player
+	player            actors.PlayerEntity
 	isPlayingJab      bool
 	showMenu          bool
 	menuDeadzoneCount int
@@ -83,7 +83,6 @@ func (s *SandboxScene) Draw(screen *ebiten.Image) {
 	space := s.PhysicsSpace()
 	for _, b := range space.Bodies() {
 		// TODO: Fix it
-		// TODO: Is player calling Draw twice?
 		switch b.(type) {
 		case *enemies.BlueEnemy:
 			b.(*enemies.BlueEnemy).Draw(screen)
@@ -155,7 +154,7 @@ func (s *SandboxScene) OnStart() {
 
 	// Create Player
 	var err error
-	s.player, err = actors.NewPlayer()
+	s.player, err = actors.NewPlayer(actors.TopDown)
 	if err != nil {
 		log.Fatal(err)
 	}

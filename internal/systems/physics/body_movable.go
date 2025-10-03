@@ -22,6 +22,8 @@ type Movable interface {
 	OnMoveUpRight(distance int)
 	OnMoveDownLeft(distance int)
 	OnMoveDownRight(distance int)
+
+	TryJump(force int)
 }
 
 type MovableBody struct {
@@ -103,4 +105,9 @@ func (b *MovableBody) FaceDirection() FacingDirectionEnum {
 
 func (b *MovableBody) IsWalking() bool {
 	return b.vx16 != 0 || b.vy16 != 0
+}
+
+// Platform methods
+func (b *MovableBody) TryJump(force int) {
+	b.vy16 = -force * config.Unit
 }

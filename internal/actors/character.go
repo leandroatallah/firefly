@@ -171,6 +171,7 @@ func (c *Character) Hurt(damage int) {
 	}
 
 	// TODO: Check condition to react to damage 0
+	// ...
 
 	// Switch to Hurt state
 	state, err := NewActorState(c, Hurted)

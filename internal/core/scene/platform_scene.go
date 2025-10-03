@@ -1,7 +1,6 @@
 package scene
 
 import (
-	"image"
 	"image/color"
 	"log"
 	"time"
@@ -18,7 +17,7 @@ const (
 type PlatformScene struct {
 	BaseScene
 	count  int
-	player *actors.Player
+	player actors.PlayerEntity
 }
 
 func (s *PlatformScene) Update() error {
@@ -61,7 +60,7 @@ func (s *PlatformScene) OnStart() {
 	}()
 
 	var err error
-	s.player, err = actors.NewPlayer()
+	s.player, err = actors.NewPlayer(actors.Platform)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -79,17 +78,4 @@ func (s *PlatformScene) DrawGround(screen *ebiten.Image) {
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Translate(0, float64(config.ScreenHeight-groundHeight))
 	screen.DrawImage(ground, op)
-}
-
-func (s *PlatformScene) DrawPlayer(screen *ebiten.Image, count int) {
-	player := ebiten.NewImage(32, 76)
-	player.Fill(color.RGBA{0x00, 0xdd, 0x66, 0xff})
-	op := &ebiten.DrawImageOptions{}
-
-	position := image.Point{20, 20}
-	position = position.Add(image.Point{0, count})
-
-	op.GeoM.Translate(float64(position.X), float64(position.Y))
-
-	screen.DrawImage(player, op)
 }

@@ -6,17 +6,20 @@ import (
 	"github.com/leandroatallah/firefly/internal/config"
 )
 
+const (
+	gravityForce = 4
+)
+
+// increaseVelocity applies acceleration to the velocity for a single axis.
+// Capping is handled in the Update loop to correctly manage the 2D vector's magnitude.
 func increaseVelocity(velocity, acceleration int) int {
-	// increaseVelocity applies acceleration to the velocity for a single axis.
-	// v_new = v_old + a
-	// Capping is handled in the Update loop to correctly manage the 2D vector's magnitude.
 	velocity += acceleration
 	return velocity
 }
 
+// reduceVelocity applies friction to the velocity for a single axis, slowing it down.
+// It brings the velocity to zero if it's smaller than the friction value to prevent jitter.
 func reduceVelocity(velocity int) int {
-	// reduceVelocity applies friction to the velocity for a single axis, slowing it down.
-	// It brings the velocity to zero if it's smaller than the friction value to prevent jitter.
 	friction := config.Unit / 4
 	if velocity > friction {
 		return velocity - friction
@@ -54,4 +57,94 @@ func smoothDiagonalMovement(accX, accY int) (int, int) {
 	}
 
 	return int(fAccX), int(fAccY)
+}
+
+// clampAxisVelocity ensures that the velocity on a single axis does not exceed a given limit.
+// It handles both positive and negative velocities by comparing against the absolute limit.
+func clampAxisVelocity(velocity, limit int) int {
+	if limit <= 0 {
+		return 0
+	}
+	switch {
+	case velocity > limit:
+		return limit
+	case velocity < -limit:
+		return -limit
+	default:
+		return velocity
+	}
+}
+
+// applyAxisMovement moves the body by a given distance along a single axis (X or Y).
+// It checks for collisions with other objects in the space.
+// It returns true if the movement was blocked by a collision.
+func applyAxisMovement(body *PhysicsBody, distance int, isXAxis bool, space *Space) bool {
+	if distance == 0 {
+		return false
+	}
+
+	rect, ok := body.Shape.(*Rect)
+	var before int
+	if ok {
+		if isXAxis {
+			before = rect.x16
+		} else {
+			before = rect.y16
+		}
+	}
+
+	body.ApplyValidMovement(distance, isXAxis, space)
+
+	if !ok {
+		return false
+	}
+
+	if isXAxis {
+		return rect.x16 == before
+	}
+	return rect.y16 == before
+}
+
+// applyGravity simulates gravity by increasing the vertical velocity of the body
+// downwards, up to a terminal velocity specified by `ground`.
+func applyGravity(body *PhysicsBody, ground int) {
+	if body.vy16 < ground {
+		body.vy16 += gravityForce
+	}
+}
+
+// clampToPlayArea ensures the body stays within the screen boundaries.
+// It adjusts the body's position if it goes beyond the edges of the screen.
+// It returns true if the body is touching or has gone past the bottom of the screen,
+// which can be interpreted as being on the ground for platformer.
+func clampToPlayArea(body *PhysicsBody) bool {
+	rect, ok := body.Shape.(*Rect)
+	if !ok {
+		return false
+	}
+
+	if rect.x16 < 0 {
+		body.ApplyValidMovement(-rect.x16, true, nil)
+	}
+
+	rightEdge := rect.x16 + rect.width*config.Unit
+	maxRight := config.ScreenWidth * config.Unit
+	if rightEdge > maxRight {
+		body.ApplyValidMovement(maxRight-rightEdge, true, nil)
+	}
+
+	if rect.y16 < 0 {
+		body.ApplyValidMovement(-rect.y16, false, nil)
+	}
+
+	bottom := rect.y16 + rect.height*config.Unit
+	maxBottom := config.ScreenHeight * config.Unit
+	if bottom >= maxBottom {
+		if bottom > maxBottom {
+			body.ApplyValidMovement(maxBottom-bottom, false, nil)
+		}
+		return true
+	}
+
+	return false
 }

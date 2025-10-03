@@ -133,3 +133,8 @@ func (b *PhysicsBody) SetMovementModel(model MovementModel) {
 func (b *PhysicsBody) MovementModel() MovementModel {
 	return b.movementModel
 }
+
+// Platform methods
+func (b *PhysicsBody) TryJump(force int) {
+	b.MovableBody.TryJump(force)
+}
