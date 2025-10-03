@@ -1,11 +1,8 @@
 package actors
 
 import (
-	"log"
-
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/core/screenutil"
-	"github.com/leandroatallah/firefly/internal/systems/input"
 	"github.com/leandroatallah/firefly/internal/systems/physics"
 )
 
@@ -19,7 +16,7 @@ type Player struct {
 	Character
 }
 
-func NewPlayer() *Player {
+func NewPlayer() (*Player, error) {
 	const (
 		frameWidth  = 32
 		frameHeight = 32
@@ -33,7 +30,7 @@ func NewPlayer() *Player {
 
 	sprites, err := LoadSprites(assets)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	character := NewCharacter(sprites)
@@ -50,36 +47,21 @@ func NewPlayer() *Player {
 	player.SetTouchable(player)
 	player.SetSpeedAndMaxSpeed(4, 4)
 
-	return player
+	movementModel, err := physics.NewMovementModel(physics.TopDown)
+	if err != nil {
+		return nil, err
+	}
+
+	player.SetMovementModel(movementModel)
+
+	return player, nil
 }
 
 // Character Methods
 func (p *Player) Update(space *physics.Space) error {
-	p.InputHandler()
-
 	return p.Character.Update(space)
 }
 
 func (p *Player) Draw(screen *ebiten.Image) {
 	p.Character.Draw(screen)
-}
-
-func (p *Player) InputHandler() {
-	if p.Immobile() {
-		return
-	}
-
-	if input.IsSomeKeyPressed(ebiten.KeyA, ebiten.KeyLeft) {
-		p.OnMoveLeft(p.Speed())
-	}
-	if input.IsSomeKeyPressed(ebiten.KeyD, ebiten.KeyRight) {
-		p.OnMoveRight(p.Speed())
-	}
-	if input.IsSomeKeyPressed(ebiten.KeyW, ebiten.KeyUp) {
-		p.OnMoveUp(p.Speed())
-	}
-	if input.IsSomeKeyPressed(ebiten.KeyS, ebiten.KeyDown) {
-		p.OnMoveDown(p.Speed())
-	}
-
 }

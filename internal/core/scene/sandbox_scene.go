@@ -154,7 +154,11 @@ func (s *SandboxScene) OnStart() {
 	s.AddBoundaries(box)
 
 	// Create Player
-	s.player = actors.NewPlayer()
+	var err error
+	s.player, err = actors.NewPlayer()
+	if err != nil {
+		log.Fatal(err)
+	}
 	s.PhysicsSpace().AddBody(s.player)
 
 	// Create enemies
