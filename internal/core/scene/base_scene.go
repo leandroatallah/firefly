@@ -4,21 +4,14 @@ package scene
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/leandroatallah/firefly/internal/navigation"
 	"github.com/leandroatallah/firefly/internal/systems/audiomanager"
 	"github.com/leandroatallah/firefly/internal/systems/physics"
 )
 
-type Scene interface {
-	Draw(screen *ebiten.Image)
-	Update() error
-	OnStart()
-	OnFinish()
-	SetManager(manager *SceneManager)
-}
-
 type BaseScene struct {
 	count        int
-	Manager      *SceneManager
+	Manager      navigation.SceneManager
 	audiomanager *audiomanager.AudioManager
 	space        *physics.Space
 }
@@ -46,7 +39,7 @@ func (s *BaseScene) AddBoundaries(boundaries ...physics.Body) {
 	}
 }
 
-func (s *BaseScene) SetManager(manager *SceneManager) {
+func (s *BaseScene) SetManager(manager navigation.SceneManager) {
 	s.Manager = manager
 }
 

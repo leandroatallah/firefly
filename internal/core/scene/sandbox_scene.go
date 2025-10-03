@@ -119,7 +119,7 @@ func (s *SandboxScene) OnStart() {
 	space := s.PhysicsSpace()
 
 	// Init audio manager
-	s.audiomanager = s.Manager.audioManager
+	s.audiomanager = s.Manager.AudioManager()
 	go func() {
 		time.Sleep(1 * time.Second)
 		s.audiomanager.SetVolume(0)

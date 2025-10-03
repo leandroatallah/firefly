@@ -6,6 +6,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/config"
 	"github.com/leandroatallah/firefly/internal/core/transition"
+	"github.com/leandroatallah/firefly/internal/navigation"
 )
 
 const (
@@ -24,7 +25,7 @@ func (s *MenuScene) Draw(screen *ebiten.Image) {
 
 func (s *MenuScene) Update() error {
 	if ebiten.IsKeyPressed(ebiten.KeyEnter) {
-		s.Manager.NavigateTo(SceneSandbox, transition.NewFader())
+		s.Manager.NavigateTo(navigation.SceneSandbox, transition.NewFader())
 	}
 	return nil
 }

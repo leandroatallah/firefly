@@ -10,3 +10,16 @@ func IsSomeKeyPressed(keys ...ebiten.Key) bool {
 	}
 	return false
 }
+
+type Manager struct {
+	// TODO: Implement this
+}
+
+func NewManager() *Manager {
+	return &Manager{}
+}
+
+func (m *Manager) Update() {
+	// TODO: Implement this
+}
+

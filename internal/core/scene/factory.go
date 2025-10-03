@@ -1,39 +1,36 @@
 package scene
 
-import "fmt"
+import (
+	"fmt"
 
-type SceneType int
+	"github.com/leandroatallah/firefly/internal/navigation"
+)
 
 type SceneFactory interface {
-	Create(sceneType SceneType) (Scene, error)
-	SetManager(manager *SceneManager)
+	Create(sceneType navigation.SceneType) (navigation.Scene, error)
+	SetManager(manager navigation.SceneManager)
 }
 
 type DefaultSceneFactory struct {
-	manager *SceneManager
+	manager navigation.SceneManager
 }
 
 func NewDefaultSceneFactory() *DefaultSceneFactory {
 	return &DefaultSceneFactory{}
 }
 
-func (f *DefaultSceneFactory) SetManager(manager *SceneManager) {
+func (f *DefaultSceneFactory) SetManager(manager navigation.SceneManager) {
 	f.manager = manager
 }
 
-const (
-	SceneMenu SceneType = iota
-	SceneSandbox
-)
-
-func (f *DefaultSceneFactory) Create(sceneType SceneType) (Scene, error) {
-	var scene Scene
+func (f *DefaultSceneFactory) Create(sceneType navigation.SceneType) (navigation.Scene, error) {
+	var scene navigation.Scene
 	var err error
 
 	switch sceneType {
-	case SceneMenu:
+	case navigation.SceneMenu:
 		scene = &MenuScene{}
-	case SceneSandbox:
+	case navigation.SceneSandbox:
 		scene = &SandboxScene{}
 	default:
 		err = fmt.Errorf("unknown scene type")

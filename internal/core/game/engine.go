@@ -1,78 +1,46 @@
 package game
 
 import (
-	"log"
-	"os"
-	"strings"
-
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/config"
-	"github.com/leandroatallah/firefly/internal/core/scene"
-	"github.com/leandroatallah/firefly/internal/systems/audiomanager"
+	"github.com/leandroatallah/firefly/internal/core"
+	"github.com/leandroatallah/firefly/internal/core/game/state"
 )
 
 type Game struct {
-	sceneManager *scene.SceneManager
-	state        GameState
-	audioManager *audiomanager.AudioManager
+	AppContext *core.AppContext
+	state      state.GameState
 }
 
-func NewGame() *Game {
-	return &Game{}
+func NewGame(ctx *core.AppContext) *Game {
+	return &Game{AppContext: ctx}
 }
 
 func (g *Game) Update() error {
-	g.sceneManager.Update()
+	// First, update the input manager
+	g.AppContext.InputManager.Update()
+
+	// Then, update the current scene
+	g.AppContext.SceneManager.Update()
 	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	g.sceneManager.Draw(screen)
+	g.AppContext.SceneManager.Draw(screen)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	return config.ScreenWidth, config.ScreenHeight
 }
 
-func (g *Game) SetState(state GameState) *Game {
-	state.SetContext(g)
-	g.state = state
-	if g.state != nil {
-		g.state.OnStart()
-	}
-	return g
-}
-
-func (g *Game) SetSceneManager() *Game {
-	sceneManager := scene.NewSceneManager()
-	sceneFactory := scene.NewDefaultSceneFactory()
-
-	sceneManager.SetFactory(sceneFactory)
-	sceneFactory.SetManager(sceneManager)
-
-	g.sceneManager = sceneManager
-	return g
-}
-
-func (g *Game) SetAudioManager() *Game {
-	g.audioManager = audiomanager.NewAudioManager()
-	g.loadAudioAssets()
-	g.sceneManager.SetAudioManager(g.audioManager)
-	return g
-}
-
-func (g *Game) loadAudioAssets() {
-	files, err := os.ReadDir("assets")
+func (g *Game) SetState(stateID state.GameStateEnum) error {
+	state, err := state.NewGameState(stateID, g.AppContext)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
-	for _, file := range files {
-		if !file.IsDir() && (strings.HasSuffix(file.Name(), ".ogg") || strings.HasSuffix(file.Name(), ".wav")) {
-			audioItem, err := g.audioManager.Load("assets/" + file.Name())
-			if err != nil {
-				log.Fatal(err)
-			}
-			g.audioManager.Add(audioItem.Name(), audioItem.Data())
-		}
-	}
+
+	g.state = state
+	g.state.OnStart()
+
+	return nil
 }

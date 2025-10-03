@@ -4,15 +4,15 @@ import (
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/leandroatallah/firefly/internal/core/transition"
+	"github.com/leandroatallah/firefly/internal/navigation"
 	"github.com/leandroatallah/firefly/internal/systems/audiomanager"
 )
 
 type SceneManager struct {
-	current      Scene
+	current      navigation.Scene
 	factory      SceneFactory
-	nextScene    Scene
-	transitioner transition.Transition
+	nextScene    navigation.Scene
+	transitioner navigation.Transition
 	audioManager *audiomanager.AudioManager
 }
 
@@ -45,7 +45,7 @@ func (m *SceneManager) Draw(screen *ebiten.Image) {
 	}
 }
 
-func (m *SceneManager) SwitchTo(scene Scene) {
+func (m *SceneManager) SwitchTo(scene navigation.Scene) {
 	if m.current != nil {
 		m.current.OnFinish()
 	}
@@ -61,7 +61,9 @@ func (m *SceneManager) SetFactory(factory SceneFactory) {
 	m.factory = factory
 }
 
-func (m *SceneManager) NavigateTo(sceneType SceneType, sceneTransition transition.Transition) {
+func (m *SceneManager) NavigateTo(
+	sceneType navigation.SceneType, sceneTransition navigation.Transition,
+) {
 	scene, err := m.factory.Create(sceneType)
 	if err != nil {
 		log.Fatalf("Error creating scene: %v", err)
