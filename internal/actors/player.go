@@ -4,8 +4,8 @@ import (
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/leandroatallah/firefly/internal/actors/movement"
 	"github.com/leandroatallah/firefly/internal/core/screenutil"
+	"github.com/leandroatallah/firefly/internal/systems/input"
 	"github.com/leandroatallah/firefly/internal/systems/physics"
 )
 
@@ -47,20 +47,39 @@ func NewPlayer() *Player {
 	player.SetBody(bodyRect)
 	player.SetMaxHealth(5)
 	player.SetCollisionArea(collisionRect)
-	player.PhysicsBody.SetTouchable(player)
-
-	// TODO: Move it to the right place (builder)
+	player.SetTouchable(player)
 	player.SetSpeedAndMaxSpeed(4, 4)
-	player.SetMovementState(movement.Input, nil)
 
 	return player
 }
 
 // Character Methods
 func (p *Player) Update(space *physics.Space) error {
+	p.InputHandler()
+
 	return p.Character.Update(space)
 }
 
 func (p *Player) Draw(screen *ebiten.Image) {
 	p.Character.Draw(screen)
+}
+
+func (p *Player) InputHandler() {
+	if p.Immobile() {
+		return
+	}
+
+	if input.IsSomeKeyPressed(ebiten.KeyA, ebiten.KeyLeft) {
+		p.OnMoveLeft(p.Speed())
+	}
+	if input.IsSomeKeyPressed(ebiten.KeyD, ebiten.KeyRight) {
+		p.OnMoveRight(p.Speed())
+	}
+	if input.IsSomeKeyPressed(ebiten.KeyW, ebiten.KeyUp) {
+		p.OnMoveUp(p.Speed())
+	}
+	if input.IsSomeKeyPressed(ebiten.KeyS, ebiten.KeyDown) {
+		p.OnMoveDown(p.Speed())
+	}
+
 }

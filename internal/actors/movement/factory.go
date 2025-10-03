@@ -20,8 +20,6 @@ func NewMovementState(
 	var movementState MovementState
 
 	switch state {
-	case Input:
-		movementState = NewInputMovementState(b)
 	case Chase:
 		movementState = NewChaseMovementState(b)
 	case DumbChase:

@@ -32,6 +32,8 @@ func (f *DefaultSceneFactory) Create(sceneType navigation.SceneType) (navigation
 		scene = &MenuScene{}
 	case navigation.SceneSandbox:
 		scene = &SandboxScene{}
+	case navigation.ScenePlatform:
+		scene = &PlatformScene{}
 	default:
 		err = fmt.Errorf("unknown scene type")
 	}

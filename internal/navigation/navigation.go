@@ -11,6 +11,7 @@ type SceneType int
 const (
 	SceneMenu SceneType = iota
 	SceneSandbox
+	ScenePlatform
 )
 
 type Scene interface {
