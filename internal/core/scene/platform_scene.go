@@ -8,6 +8,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/actors"
 	"github.com/leandroatallah/firefly/internal/config"
+	"github.com/leandroatallah/firefly/internal/systems/physics"
 )
 
 const (
@@ -18,6 +19,51 @@ type PlatformScene struct {
 	BaseScene
 	count  int
 	player actors.PlayerEntity
+	space  *physics.Space
+}
+
+func (s *PlatformScene) OnStart() {
+	// Init audio manager
+	s.audiomanager = s.Manager.AudioManager()
+	go func() {
+		time.Sleep(1 * time.Second)
+		s.audiomanager.SetVolume(0)
+		s.audiomanager.PlaySound(bgSound)
+	}()
+
+	// Init boundaries
+	s.space = s.PhysicsSpace()
+
+	// Ground
+	groundHeight := 40
+	createPlatform(
+		physics.NewRect(0, config.ScreenHeight-groundHeight, config.ScreenWidth, groundHeight),
+		s.space,
+	)
+
+	// Flying platform
+	createPlatform(
+		physics.NewRect(120, 140, 100, 30),
+		s.space,
+	)
+	createPlatform(
+		physics.NewRect(280, 200, 100, 30),
+		s.space,
+	)
+
+	player, err := createPlayer(s.space)
+	if err != nil {
+		log.Fatal(err)
+	}
+	s.player = player
+
+	// Parse space bodies to scene boundaries
+	for _, o := range s.space.Bodies() {
+		s.AddBoundaries(o)
+	}
+
+	// Create player
+	s.space.AddBody(s.player)
 }
 
 func (s *PlatformScene) Update() error {
@@ -41,41 +87,34 @@ func (s *PlatformScene) Update() error {
 func (s *PlatformScene) Draw(screen *ebiten.Image) {
 	screen.Fill(color.RGBA{0x33, 0x33, 0x33, 0xff})
 
-	s.DrawGround(screen)
-
-	if s.player != nil {
-		s.player.Draw(screen)
-	}
-}
-
-func (s *PlatformScene) OnStart() {
 	space := s.PhysicsSpace()
 
-	// Init audio manager
-	s.audiomanager = s.Manager.AudioManager()
-	go func() {
-		time.Sleep(1 * time.Second)
-		s.audiomanager.SetVolume(0)
-		s.audiomanager.PlaySound(bgSound)
-	}()
-
-	var err error
-	s.player, err = actors.NewPlayer(actors.Platform)
-	if err != nil {
-		log.Fatal(err)
+	for _, b := range space.Bodies() {
+		switch b.(type) {
+		case actors.PlayerEntity:
+			b.(actors.PlayerEntity).Draw(screen)
+		case physics.Obstacle:
+			b.(physics.Obstacle).DrawCollisionBox(screen)
+		}
 	}
-	space.AddBody(s.player)
 }
 
 func (s *PlatformScene) OnFinish() {
 	s.audiomanager.PauseMusic(bgSound)
 }
 
-func (s *PlatformScene) DrawGround(screen *ebiten.Image) {
-	groundHeight := 120
-	ground := ebiten.NewImage(config.ScreenWidth, groundHeight)
-	ground.Fill(color.RGBA{0x99, 0x99, 0x99, 0xff})
-	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Translate(0, float64(config.ScreenHeight-groundHeight))
-	screen.DrawImage(ground, op)
+func createPlatform(rect *physics.Rect, space *physics.Space) {
+	o := physics.NewObstacleRect(rect).AddCollision()
+	o.SetIsObstructive(true)
+
+	space.AddBody(o)
+}
+
+func createPlayer(space *physics.Space) (actors.PlayerEntity, error) {
+	player, err := actors.NewPlayer(actors.Platform)
+	if err != nil {
+		return nil, err
+	}
+	space.AddBody(player)
+	return player, nil
 }
