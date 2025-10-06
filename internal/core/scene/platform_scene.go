@@ -7,8 +7,10 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/actors"
+	"github.com/leandroatallah/firefly/internal/config"
 	"github.com/leandroatallah/firefly/internal/systems/physics"
 	"github.com/leandroatallah/firefly/internal/systems/tilemap"
+	"github.com/setanarut/kamera/v2"
 )
 
 const (
@@ -22,9 +24,11 @@ type PlatformScene struct {
 	player  actors.PlayerEntity
 	space   *physics.Space
 	tilemap *tilemap.Tilemap
+	cam     *kamera.Camera
 }
 
 func (s *PlatformScene) OnStart() {
+	// Init tilemap
 	tm, err := tilemap.LoadTilemap(mapPath)
 	if err != nil {
 		log.Fatal(err)
@@ -43,17 +47,56 @@ func (s *PlatformScene) OnStart() {
 	s.space = s.PhysicsSpace()
 	s.tilemap.CreateCollisionBodies(s.space)
 
-	player, err := createPlayer(s.space)
+	p, err := createPlayer(s.space)
 	if err != nil {
 		log.Fatal(err)
 	}
-	s.player = player
+	s.player = p
 
 	// Create player
 	s.space.AddBody(s.player)
+
+	pPos := s.player.Position().Min
+
+	s.cam = kamera.NewCamera(
+		float64(pPos.X),
+		float64(pPos.Y),
+		float64(config.ScreenWidth),
+		float64(config.ScreenHeight),
+	)
+	s.cam.SmoothType = kamera.SmoothDamp
+	s.cam.ShakeEnabled = true
 }
 
 func (s *PlatformScene) Update() error {
+	// REMOVE
+	if ebiten.IsKeyPressed(ebiten.KeyR) {
+		s.cam.Angle += 0.02
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyF) {
+		s.cam.Angle -= 0.02
+	}
+
+	if ebiten.IsKeyPressed(ebiten.KeyBackspace) {
+		s.cam.Reset()
+	}
+
+	if ebiten.IsKeyPressed(ebiten.KeyQ) { // zoom out
+		s.cam.ZoomFactor /= 1.02
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyE) { // zoom in
+		s.cam.ZoomFactor *= 1.02
+	}
+	// REMOVE
+
+	pPos := s.player.Position().Min
+	pWidth := s.player.Position().Dx()
+	pHeight := s.player.Position().Dy()
+	s.cam.LookAt(
+		float64(pPos.X+(pWidth/2)),
+		float64(pPos.Y+(pHeight/2)),
+	)
+
 	space := s.PhysicsSpace()
 
 	s.count++
@@ -71,21 +114,40 @@ func (s *PlatformScene) Update() error {
 	return nil
 }
 
+func Translate(bx *[4]float64, x, y float64) {
+	bx[0] += x
+	bx[1] += y
+}
+
 func (s *PlatformScene) Draw(screen *ebiten.Image) {
 	screen.Fill(color.RGBA{0x3c, 0xbc, 0xfc, 0xff})
 
-	s.tilemap.ParseToImage(screen)
+	tilemapImg, err := s.tilemap.ParseToImage(screen)
+	if err != nil {
+		log.Fatal(err)
+	}
+	s.cam.Draw(tilemapImg, s.tilemap.ImageOptions(), screen)
 
 	space := s.PhysicsSpace()
 
+	bodyOpts := &ebiten.DrawImageOptions{}
 	for _, b := range space.Bodies() {
-		switch b.(type) {
+		switch body := b.(type) {
 		case actors.PlayerEntity:
-			b.(actors.PlayerEntity).Draw(screen)
+			continue
 		case physics.Obstacle:
-			b.(physics.Obstacle).Draw(screen)
+			bodyOpts.GeoM.Reset()
+			pos := body.Position().Min
+			bodyOpts.GeoM.Translate(float64(pos.X), float64(pos.Y))
+			s.cam.Draw(body.Image(), bodyOpts, screen)
 		}
 	}
+
+	pPos := s.player.Position().Min
+	img := s.player.Image()
+	s.player.ImageOptions().GeoM.Reset()
+	s.player.ImageOptions().GeoM.Translate(float64(pPos.X), float64(pPos.Y))
+	s.cam.Draw(img, s.player.ImageOptions(), screen)
 }
 
 func (s *PlatformScene) OnFinish() {

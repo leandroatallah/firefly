@@ -1,6 +1,7 @@
 package actors
 
 import (
+	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/actors/movement"
 	"github.com/leandroatallah/firefly/internal/systems/physics"
 )
@@ -20,4 +21,6 @@ type ActorEntity interface {
 	MovementState() movement.MovementState
 	Update(space *physics.Space) error
 	Hurt(damage int)
+	Image() *ebiten.Image
+	ImageOptions() *ebiten.DrawImageOptions
 }

@@ -15,11 +15,12 @@ import (
 )
 
 type Tilemap struct {
-	Height     int        `json:"height"`
-	Infinite   bool       `json:"infinite"`
-	Layers     []*Layer   `json:"layers"`
-	Tileheight int        `json:"tileheight"`
-	Tilesets   []*Tileset `json:"tilesets"`
+	Height       int        `json:"height"`
+	Infinite     bool       `json:"infinite"`
+	Layers       []*Layer   `json:"layers"`
+	Tileheight   int        `json:"tileheight"`
+	Tilesets     []*Tileset `json:"tilesets"`
+	imageOptions *ebiten.DrawImageOptions
 }
 
 type Layer struct {
@@ -64,12 +65,12 @@ type Tileset struct {
 	EbitenImage      *ebiten.Image `json:"-"`
 }
 
-func (t *Tilemap) ParseToImage(screen *ebiten.Image) error {
+func (t *Tilemap) ParseToImage(screen *ebiten.Image) (*ebiten.Image, error) {
 	if t == nil {
-		return fmt.Errorf("the tilemap was not initialized")
+		return nil, fmt.Errorf("the tilemap was not initialized")
 	}
 	if len(t.Layers) == 0 || len(t.Tilesets) == 0 {
-		return fmt.Errorf("tilemap is not valid")
+		return nil, fmt.Errorf("tilemap is not valid")
 	}
 
 	// Use the first layer to determine map dimensions. This assumes all layers are the same size.
@@ -116,12 +117,11 @@ func (t *Tilemap) ParseToImage(screen *ebiten.Image) error {
 		}
 	}
 
-	op := &ebiten.DrawImageOptions{}
-	_, sh := screen.Size()
-	op.GeoM.Translate(0, float64(sh-mapHeight))
-	screen.DrawImage(result, op)
+	t.imageOptions.GeoM.Reset()
+	sh := screen.Bounds().Dy()
+	t.imageOptions.GeoM.Translate(0, float64(sh-mapHeight))
 
-	return nil
+	return result, nil
 }
 
 func LoadTilemap(path string) (*Tilemap, error) {
@@ -140,6 +140,7 @@ func LoadTilemap(path string) (*Tilemap, error) {
 	if err := json.Unmarshal(byteValue, &tilemap); err != nil {
 		return nil, err
 	}
+	tilemap.imageOptions = &ebiten.DrawImageOptions{}
 
 	// After loading the tilemap structure, load the associated tileset images.
 	for _, ts := range tilemap.Tilesets {
@@ -192,4 +193,8 @@ func (t *Tilemap) CreateCollisionBodies(space *physics.Space) error {
 	}
 
 	return nil
+}
+
+func (t *Tilemap) ImageOptions() *ebiten.DrawImageOptions {
+	return t.imageOptions
 }

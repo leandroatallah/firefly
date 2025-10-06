@@ -15,7 +15,18 @@ func NewPlayerPlatform() (PlayerEntity, error) {
 		frameHeight = 48
 	)
 
-	character := NewCharacter(nil)
+	var assets SpriteAssets
+	assets = assets.
+		AddSprite(Idle, "assets/default-idle.png").
+		AddSprite(Walk, "assets/default-walk.png").
+		AddSprite(Hurted, "assets/default-hurt.png")
+
+	sprites, err := LoadSprites(assets)
+	if err != nil {
+		return nil, err
+	}
+
+	character := NewCharacter(sprites)
 
 	x := 0
 	_, y := screenutil.GetCenterOfScreenPosition(frameWidth, frameHeight)

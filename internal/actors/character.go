@@ -2,6 +2,7 @@ package actors
 
 import (
 	"image"
+	"image/color"
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -17,11 +18,16 @@ type Character struct {
 	state          ActorState
 	movementState  movement.MovementState
 	animationCount int
+	// TODO: Rename this
+	op *ebiten.DrawImageOptions
 }
 
 func NewCharacter(sprites SpriteMap) *Character {
 	spriteEntity := NewSpriteEntity(sprites)
-	c := &Character{SpriteEntity: spriteEntity}
+	c := &Character{
+		SpriteEntity: spriteEntity,
+		op:           &ebiten.DrawImageOptions{},
+	}
 	state, err := NewActorState(c, Idle)
 	if err != nil {
 		log.Fatal(err)
@@ -91,10 +97,31 @@ func (c *Character) Update(space *physics.Space) error {
 
 	// Check movement direction for sprite mirroring
 	c.CheckMovementDirectionX()
+	c.UpdateImageOptions()
 
 	c.handleState()
 
 	return nil
+}
+
+func (c *Character) UpdateImageOptions() {
+	c.op.GeoM.Reset()
+
+	pos := c.Position()
+	minX, minY := pos.Min.X, pos.Min.Y
+	// width := pos.Dx()
+	//
+	// fDirection := c.FaceDirection()
+	// if fDirection == physics.FaceDirectionRight {
+	// 	c.op.GeoM.Scale(-1, 1)
+	// 	c.op.GeoM.Translate(float64(width), 0)
+	// }
+
+	// Apply character position
+	c.op.GeoM.Translate(
+		float64(minX),
+		float64(minY),
+	)
 }
 
 func (c *Character) handleState() {
@@ -133,16 +160,16 @@ func (c *Character) Draw(screen *ebiten.Image) {
 	width := maxX - minX
 	height := maxY - minY
 
-	op := &ebiten.DrawImageOptions{}
+	c.op.GeoM.Reset()
 
 	fDirection := c.FaceDirection()
 	if fDirection == physics.FaceDirectionRight {
-		op.GeoM.Scale(-1, 1)
-		op.GeoM.Translate(float64(width), 0)
+		c.op.GeoM.Scale(-1, 1)
+		c.op.GeoM.Translate(float64(width), 0)
 	}
 
 	// Apply character movement
-	op.GeoM.Translate(
+	c.op.GeoM.Translate(
 		float64(minX*config.Unit)/config.Unit,
 		float64(minY*config.Unit)/config.Unit,
 	)
@@ -157,7 +184,7 @@ func (c *Character) Draw(screen *ebiten.Image) {
 		img.SubImage(
 			image.Rect(sx, sy, sx+width, sy+height),
 		).(*ebiten.Image),
-		op,
+		c.op,
 	)
 }
 
@@ -188,4 +215,47 @@ func (c *Character) Hurt(damage int) {
 
 func (c *Character) SetTouchable(t physics.Touchable) {
 	c.PhysicsBody.Touchable = t
+}
+
+func (c *Character) Image() *ebiten.Image {
+	img := ebiten.NewImage(c.Position().Dx(), c.Position().Dy())
+	img.Fill(color.RGBA{0xff, 0xff, 0xff, 0xff})
+	return img
+
+	// pos := c.Position()
+	// width := pos.Dx()
+	// height := pos.Dy()
+	//
+	// // Fallback in case of missing sprite
+	// if c.sprites == nil || c.sprites[c.state.State()] == nil {
+	// 	if width == 0 || height == 0 {
+	// 		// Avoid panic with zero size image
+	// 		img := ebiten.NewImage(1, 1)
+	// 		img.Fill(color.White)
+	// 		return img
+	// 	}
+	// 	img := ebiten.NewImage(width, height)
+	// 	img.Fill(color.RGBA{R: 255, A: 255})
+	// 	return img
+	// }
+	//
+	// img := c.sprites[c.state.State()]
+	// characterWidth := img.Bounds().Dx()
+	// if width == 0 {
+	// 	// Avoid division by zero
+	// 	img := ebiten.NewImage(1, 1)
+	// 	img.Fill(color.White)
+	// 	return img
+	// }
+	// frameCount := characterWidth / width
+	// i := (c.count / frameRate) % frameCount
+	// sx, sy := frameOX+i*width, frameOY
+	//
+	// return img.SubImage(
+	// 	image.Rect(sx, sy, sx+width, sy+height),
+	// ).(*ebiten.Image)
+}
+
+func (c *Character) ImageOptions() *ebiten.DrawImageOptions {
+	return c.op
 }

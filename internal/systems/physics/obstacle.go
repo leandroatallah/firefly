@@ -13,14 +13,22 @@ type Obstacle interface {
 	Body
 	Draw(screen *ebiten.Image)
 	DrawCollisionBox(screen *ebiten.Image)
+	Image() *ebiten.Image
+	ImageOptions() *ebiten.DrawImageOptions
 }
 
 type ObstacleRect struct {
 	PhysicsBody
+
+	// TODO: Rename this
+	op *ebiten.DrawImageOptions
 }
 
 func NewObstacleRect(rect *Rect) *ObstacleRect {
-	return &ObstacleRect{PhysicsBody: *NewPhysicsBody(rect)}
+	return &ObstacleRect{
+		PhysicsBody: *NewPhysicsBody(rect),
+		op:          &ebiten.DrawImageOptions{},
+	}
 }
 
 func (o *ObstacleRect) AddCollision(list ...*CollisionArea) *ObstacleRect {
@@ -42,4 +50,14 @@ func (o *ObstacleRect) Draw(screen *ebiten.Image) {
 		color.Transparent,
 		false,
 	)
+}
+
+func (o *ObstacleRect) Image() *ebiten.Image {
+	w := o.Position().Dx()
+	h := o.Position().Dy()
+	return ebiten.NewImage(w, h)
+}
+
+func (o *ObstacleRect) ImageOptions() *ebiten.DrawImageOptions {
+	return o.op
 }
