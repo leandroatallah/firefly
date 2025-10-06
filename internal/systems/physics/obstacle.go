@@ -39,7 +39,7 @@ func (o *ObstacleRect) Draw(screen *ebiten.Image) {
 		float32(rect.y16)/config.Unit,
 		float32(rect.width),
 		float32(rect.height),
-		color.RGBA{0x77, 0x55, 0x55, 0xff},
+		color.Transparent,
 		false,
 	)
 }

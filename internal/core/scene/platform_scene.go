@@ -7,22 +7,30 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/actors"
-	"github.com/leandroatallah/firefly/internal/config"
 	"github.com/leandroatallah/firefly/internal/systems/physics"
+	"github.com/leandroatallah/firefly/internal/systems/tilemap"
 )
 
 const (
 	bgSound = "assets/Sketchbook 2024-06-19.ogg"
+	mapPath = "assets/mr-gimmick-stage-3.tmj"
 )
 
 type PlatformScene struct {
 	BaseScene
-	count  int
-	player actors.PlayerEntity
-	space  *physics.Space
+	count   int
+	player  actors.PlayerEntity
+	space   *physics.Space
+	tilemap *tilemap.Tilemap
 }
 
 func (s *PlatformScene) OnStart() {
+	tm, err := tilemap.LoadTilemap(mapPath)
+	if err != nil {
+		log.Fatal(err)
+	}
+	s.tilemap = tm
+
 	// Init audio manager
 	s.audiomanager = s.Manager.AudioManager()
 	go func() {
@@ -33,34 +41,13 @@ func (s *PlatformScene) OnStart() {
 
 	// Init boundaries
 	s.space = s.PhysicsSpace()
-
-	// Ground
-	groundHeight := 40
-	createPlatform(
-		physics.NewRect(0, config.ScreenHeight-groundHeight, config.ScreenWidth, groundHeight),
-		s.space,
-	)
-
-	// Flying platform
-	createPlatform(
-		physics.NewRect(120, 140, 100, 30),
-		s.space,
-	)
-	createPlatform(
-		physics.NewRect(280, 200, 100, 30),
-		s.space,
-	)
+	s.tilemap.CreateCollisionBodies(s.space)
 
 	player, err := createPlayer(s.space)
 	if err != nil {
 		log.Fatal(err)
 	}
 	s.player = player
-
-	// Parse space bodies to scene boundaries
-	for _, o := range s.space.Bodies() {
-		s.AddBoundaries(o)
-	}
 
 	// Create player
 	s.space.AddBody(s.player)
@@ -85,7 +72,9 @@ func (s *PlatformScene) Update() error {
 }
 
 func (s *PlatformScene) Draw(screen *ebiten.Image) {
-	screen.Fill(color.RGBA{0x33, 0x33, 0x33, 0xff})
+	screen.Fill(color.RGBA{0x3c, 0xbc, 0xfc, 0xff})
+
+	s.tilemap.ParseToImage(screen)
 
 	space := s.PhysicsSpace()
 
@@ -94,7 +83,7 @@ func (s *PlatformScene) Draw(screen *ebiten.Image) {
 		case actors.PlayerEntity:
 			b.(actors.PlayerEntity).Draw(screen)
 		case physics.Obstacle:
-			b.(physics.Obstacle).DrawCollisionBox(screen)
+			b.(physics.Obstacle).Draw(screen)
 		}
 	}
 }
