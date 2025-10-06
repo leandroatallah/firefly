@@ -24,7 +24,7 @@ func (m *TopDownMovementModel) Update(body *PhysicsBody, space *Space) error {
 	body.ApplyValidMovement(body.vy16, false, space)
 
 	// Prevents leaving the play area`
-	clampToPlayArea(body)
+	clampToPlayArea(body, space)
 
 	// Convert the raw input acceleration into a scaled and normalized vector.
 	scaledAccX, scaledAccY := smoothDiagonalMovement(body.accelerationX, body.accelerationY)

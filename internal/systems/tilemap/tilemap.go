@@ -6,6 +6,7 @@ import (
 	"image"
 	_ "image/png"
 	"io"
+	"math"
 	"os"
 	"path/filepath"
 
@@ -180,7 +181,7 @@ func (t *Tilemap) CreateCollisionBodies(space *physics.Space) error {
 	yOffset := config.ScreenHeight - mapHeight
 
 	for _, layer := range t.Layers {
-		if layer.Type != "objectgroup" {
+		if layer.Type != "objectgroup" || layer.Name == "PlayerStart" {
 			continue
 		}
 
@@ -197,4 +198,27 @@ func (t *Tilemap) CreateCollisionBodies(space *physics.Space) error {
 
 func (t *Tilemap) ImageOptions() *ebiten.DrawImageOptions {
 	return t.imageOptions
+}
+
+// GetPlayerStartPosition searches for a layer named "PlayerStart" in the tilemap's object layers.
+// It assumes there is only one object in this layer and returns its x, y coordinates.
+// The y coordinate is adjusted to account for the tilemap's rendering offset.
+func (t *Tilemap) GetPlayerStartPosition() (x, y int, found bool) {
+	if t == nil {
+		return 0, 0, false
+	}
+
+	mapHeight := t.Height * t.Tileheight
+	yOffset := config.ScreenHeight - mapHeight
+
+	for _, layer := range t.Layers {
+		if layer.Name == "PlayerStart" && layer.Type == "objectgroup" && len(layer.Objects) > 0 {
+			obj := layer.Objects[0]
+			px := int(math.Round(obj.X))
+			py := int(math.Round(obj.Y)) + yOffset
+			return px * config.Unit, py * config.Unit, true
+		}
+	}
+
+	return 0, 0, false
 }

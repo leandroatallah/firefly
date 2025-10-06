@@ -41,7 +41,7 @@ func (m *PlatformMovementModel) Update(body *PhysicsBody, space *Space) error {
 	}
 
 	// Clamp the body's position to the play area boundaries.
-	if clampToPlayArea(body) {
+	if clampToPlayArea(body, space) {
 		landed = true
 		body.vy16 = 0
 	}

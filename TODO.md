@@ -40,7 +40,7 @@
 
 ### 8. Camera System
 
-- Camera following and zoom
+- ~Camera following and zoom~
 - World scrolling for larger maps
 - Viewport management
 

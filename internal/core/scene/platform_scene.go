@@ -45,6 +45,7 @@ func (s *PlatformScene) OnStart() {
 
 	// Init boundaries
 	s.space = s.PhysicsSpace()
+	s.space.SetTilemapDimensionsProvider(s)
 	s.tilemap.CreateCollisionBodies(s.space)
 
 	p, err := createPlayer(s.space)
@@ -52,6 +53,12 @@ func (s *PlatformScene) OnStart() {
 		log.Fatal(err)
 	}
 	s.player = p
+
+	// Set player initial position from tilemap
+	startX, startY, found := s.tilemap.GetPlayerStartPosition()
+	if found {
+		s.player.SetPosition(startX, startY)
+	}
 
 	// Create player
 	s.space.AddBody(s.player)
@@ -66,6 +73,20 @@ func (s *PlatformScene) OnStart() {
 	)
 	s.cam.SmoothType = kamera.SmoothDamp
 	s.cam.ShakeEnabled = true
+}
+
+func (s *PlatformScene) GetTilemapWidth() int {
+	if s.tilemap != nil && len(s.tilemap.Layers) > 0 {
+		return s.tilemap.Layers[0].Width * s.tilemap.Tileheight
+	}
+	return config.ScreenWidth // Fallback
+}
+
+func (s *PlatformScene) GetTilemapHeight() int {
+	if s.tilemap != nil && len(s.tilemap.Layers) > 0 {
+		return s.tilemap.Layers[0].Height * s.tilemap.Tileheight
+	}
+	return config.ScreenHeight // Fallback
 }
 
 func (s *PlatformScene) Update() error {

@@ -117,7 +117,7 @@ func applyGravity(body *PhysicsBody, ground int) {
 // It adjusts the body's position if it goes beyond the edges of the screen.
 // It returns true if the body is touching or has gone past the bottom of the screen,
 // which can be interpreted as being on the ground for platformer.
-func clampToPlayArea(body *PhysicsBody) bool {
+func clampToPlayArea(body *PhysicsBody, space *Space) bool {
 	rect, ok := body.Shape.(*Rect)
 	if !ok {
 		return false
@@ -129,16 +129,27 @@ func clampToPlayArea(body *PhysicsBody) bool {
 
 	rightEdge := rect.x16 + rect.width*config.Unit
 	maxRight := config.ScreenWidth * config.Unit
+	provider := space.GetTilemapDimensionsProvider()
+	if provider != nil {
+		maxRight = provider.GetTilemapWidth() * config.Unit
+	}
 	if rightEdge > maxRight {
 		body.ApplyValidMovement(maxRight-rightEdge, true, nil)
 	}
 
-	if rect.y16 < 0 {
-		body.ApplyValidMovement(-rect.y16, false, nil)
+	// Vertical clamping
+	minTop := 0
+	maxBottom := config.ScreenHeight * config.Unit
+	if provider != nil {
+		minTop = (config.ScreenHeight - provider.GetTilemapHeight()) * config.Unit
+		maxBottom = provider.GetTilemapHeight() * config.Unit
+	}
+
+	if rect.y16 < minTop {
+		body.ApplyValidMovement(minTop-rect.y16, false, nil)
 	}
 
 	bottom := rect.y16 + rect.height*config.Unit
-	maxBottom := config.ScreenHeight * config.Unit
 	if bottom >= maxBottom {
 		if bottom > maxBottom {
 			body.ApplyValidMovement(maxBottom-bottom, false, nil)

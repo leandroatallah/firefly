@@ -14,6 +14,7 @@ type Body interface {
 	ID() string
 	SetMovementModel(model MovementModel)
 	MovementModel() MovementModel
+	SetPosition(x, y int)
 }
 
 type FacingDirectionEnum int
@@ -137,4 +138,22 @@ func (b *PhysicsBody) MovementModel() MovementModel {
 // Platform methods
 func (b *PhysicsBody) TryJump(force int) {
 	b.MovableBody.TryJump(force)
+}
+
+func (b *PhysicsBody) SetPosition(x, y int) {
+	switch b.Shape.(type) {
+	case *Rect:
+		rect := b.Shape.(*Rect)
+		// Calculate the difference to move the collision areas as well
+		diffX := x - rect.x16
+		diffY := y - rect.y16
+
+		rect.x16 = x
+		rect.y16 = y
+
+		for _, c := range b.collisionList {
+			c.Shape.(*Rect).x16 += diffX
+			c.Shape.(*Rect).y16 += diffY
+		}
+	}
 }

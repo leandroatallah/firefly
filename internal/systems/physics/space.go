@@ -4,8 +4,9 @@ import "sync"
 
 // Space centralizes physics bodies and collision resolution.
 type Space struct {
-	mu     sync.RWMutex
-	bodies map[string]Body
+	mu                        sync.RWMutex
+	bodies                    map[string]Body
+	tilemapDimensionsProvider TilemapDimensionsProvider
 }
 
 func NewSpace() *Space {
@@ -102,4 +103,16 @@ func hasCollision(a, b Body) bool {
 	}
 
 	return false
+}
+
+func (s *Space) SetTilemapDimensionsProvider(provider TilemapDimensionsProvider) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.tilemapDimensionsProvider = provider
+}
+
+func (s *Space) GetTilemapDimensionsProvider() TilemapDimensionsProvider {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return s.tilemapDimensionsProvider
 }
