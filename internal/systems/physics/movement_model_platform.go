@@ -7,8 +7,9 @@ import (
 )
 
 type PlatformMovementModel struct {
-	onGround     bool
-	maxFallSpeed int
+	onGround       bool
+	maxFallSpeed   int
+	jumpKeyPressed bool
 }
 
 // NewPlatformMovementModel creates a new PlatformMovementModel with default values.
@@ -64,7 +65,10 @@ func (m *PlatformMovementModel) Update(body *PhysicsBody, space *Space) error {
 	body.vx16 = reduceVelocity(body.vx16)
 
 	if m.onGround {
-		body.vy16 = 0
+		// By setting vy16 to a small positive value, we ensure that the collision
+		// detection for the ground is triggered on the next frame. This allows
+		// the system to detect when the player walks off a platform.
+		body.vy16 = 1
 	} else {
 		// Apply gravity if the body is in the air.
 		applyGravity(body, m.maxFallSpeed)
@@ -87,8 +91,10 @@ func (m *PlatformMovementModel) InputHandler(body *PhysicsBody) {
 	if input.IsSomeKeyPressed(ebiten.KeyD, ebiten.KeyRight) {
 		body.OnMoveRight(body.Speed())
 	}
-	if m.onGround && input.IsSomeKeyPressed(ebiten.KeySpace) {
+	isJumpPressed := input.IsSomeKeyPressed(ebiten.KeySpace)
+	if m.onGround && isJumpPressed && !m.jumpKeyPressed {
 		body.TryJump(8) // Replace magic number
 		m.onGround = false
 	}
+	m.jumpKeyPressed = isJumpPressed
 }

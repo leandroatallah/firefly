@@ -17,7 +17,8 @@ func NewPlayerPlatform() (PlayerEntity, error) {
 
 	character := NewCharacter(nil)
 
-	x, y := screenutil.GetCenterOfScreenPosition(frameWidth, frameHeight)
+	x := 0
+	_, y := screenutil.GetCenterOfScreenPosition(frameWidth, frameHeight)
 	bodyRect := physics.NewRect(x, y, frameWidth, frameHeight)
 	collisionRect := physics.NewRect(x+2, y+3, frameWidth-5, frameHeight-6)
 
