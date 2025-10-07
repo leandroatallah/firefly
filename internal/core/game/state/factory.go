@@ -10,6 +10,8 @@ import (
 func NewGameState(state GameStateEnum, ctx *core.AppContext) (GameState, error) {
 	base := BaseState{ctx: ctx}
 	switch state {
+	case Intro:
+		return NewIntroState(ctx), nil
 	case MainMenu:
 		return NewMainMenuState(ctx), nil
 	case Playing:

@@ -11,7 +11,8 @@ type GameState interface {
 type GameStateEnum int
 
 const (
-	MainMenu GameStateEnum = iota
+	Intro GameStateEnum = iota
+	MainMenu
 	Playing
 	Paused
 	GameOver

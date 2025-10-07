@@ -35,7 +35,10 @@ func (f *Fader) Update() {
 				f.onExitCb()
 			}
 		}
-	} else if f.starting {
+		return
+	}
+
+	if f.starting {
 		f.alpha -= transitionSpeed
 		if f.alpha <= 0 {
 			f.alpha = 0

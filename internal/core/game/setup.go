@@ -56,7 +56,7 @@ func Setup() {
 	game := NewGame(appContext)
 
 	// Set initial game state
-	game.SetState(state.MainMenu)
+	game.SetState(state.Intro)
 
 	if err := ebiten.RunGame(game); err != nil {
 		log.Fatal(err)

@@ -7,9 +7,9 @@ import (
 
 type SceneType int
 
-// TODO: should it be initialized in Game?
 const (
-	SceneMenu SceneType = iota
+	SceneIntro SceneType = iota
+	SceneMenu
 	SceneSandbox
 	ScenePlatform
 )

@@ -31,6 +31,8 @@ func (f *DefaultSceneFactory) Create(sceneType navigation.SceneType) (navigation
 	var err error
 
 	switch sceneType {
+	case navigation.SceneIntro:
+		scene = NewIntroScene()
 	case navigation.SceneMenu:
 		scene = &MenuScene{}
 	case navigation.SceneSandbox:
