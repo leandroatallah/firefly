@@ -23,7 +23,7 @@
 ### 5. Scoring & Progression System
 
 - Points system with high scores
-- Level progression mechanics
+- ~Level progression mechanics~
 - Achievement system
 
 ### 6. Collectibles System

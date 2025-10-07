@@ -10,6 +10,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/core"
 	"github.com/leandroatallah/firefly/internal/core/game/state"
 	"github.com/leandroatallah/firefly/internal/core/scene"
+	"github.com/leandroatallah/firefly/internal/levels"
 	"github.com/leandroatallah/firefly/internal/systems/audiomanager"
 	"github.com/leandroatallah/firefly/internal/systems/input"
 )
@@ -24,23 +25,34 @@ func Setup() {
 	inputManager := input.NewManager()
 	audioManager := audiomanager.NewAudioManager()
 	sceneManager := scene.NewSceneManager()
+	levelManager := levels.NewManager()
 
-	// Setup SceneManager with its factory
+	// Connect scene factory and scene manager
 	sceneFactory := scene.NewDefaultSceneFactory()
 	sceneManager.SetFactory(sceneFactory)
 	sceneFactory.SetManager(sceneManager)
+	sceneFactory.SetLevelManager(levelManager)
 
-	// Connect managers that depend on each other
+	// Connect scene manager and audio manager
 	sceneManager.SetAudioManager(audioManager)
 
-	// Load assets
+	// Load audio assets
 	loadAudioAssets(audioManager)
 
-	// Create the application context
+	// TODO: The factories and manager should be separated from the levels creation
+	// Load levels
+	level1 := levels.Level{ID: 1, Name: "Level 1", TilemapPath: "assets/mr-gimmick-stage-3.tmj", NextLevelID: 2}
+	level2 := levels.Level{ID: 2, Name: "Level 2", TilemapPath: "assets/mr-gimmick-stage-3.tmj", NextLevelID: 0} // 0 means no next level
+	levelManager.AddLevel(level1)
+	levelManager.AddLevel(level2)
+	levelManager.SetCurrentLevel(1)
+
+	// TODO: Use the app context
 	appContext := &core.AppContext{
 		InputManager:  inputManager,
 		AudioManager:  audioManager,
 		SceneManager:  sceneManager,
+		LevelManager:  levelManager,
 		Configuration: cfg,
 	}
 

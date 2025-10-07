@@ -2,6 +2,7 @@ package navigation
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/leandroatallah/firefly/internal/levels"
 	"github.com/leandroatallah/firefly/internal/systems/audiomanager"
 )
 
@@ -20,6 +21,7 @@ type Scene interface {
 	OnStart()
 	OnFinish()
 	SetManager(manager SceneManager)
+	SetLevelManager(manager *levels.Manager)
 }
 
 type SceneManager interface {

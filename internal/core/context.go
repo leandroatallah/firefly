@@ -2,6 +2,7 @@ package core
 
 import (
 	"github.com/leandroatallah/firefly/internal/config"
+	"github.com/leandroatallah/firefly/internal/levels"
 	"github.com/leandroatallah/firefly/internal/navigation"
 	"github.com/leandroatallah/firefly/internal/systems/audiomanager"
 	"github.com/leandroatallah/firefly/internal/systems/input"
@@ -15,5 +16,6 @@ type AppContext struct {
 	InputManager  *input.Manager
 	AudioManager  *audiomanager.AudioManager
 	SceneManager  navigation.SceneManager
+	LevelManager  *levels.Manager
 	Configuration *config.Config
 }

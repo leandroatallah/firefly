@@ -22,4 +22,3 @@ func NewManager() *Manager {
 func (m *Manager) Update() {
 	// TODO: Implement this
 }
-

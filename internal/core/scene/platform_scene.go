@@ -6,8 +6,10 @@ import (
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/leandroatallah/firefly/internal/actors"
 	"github.com/leandroatallah/firefly/internal/config"
+	"github.com/leandroatallah/firefly/internal/navigation"
 	"github.com/leandroatallah/firefly/internal/systems/physics"
 	"github.com/leandroatallah/firefly/internal/systems/tilemap"
 	"github.com/setanarut/kamera/v2"
@@ -15,7 +17,6 @@ import (
 
 const (
 	bgSound = "assets/Sketchbook 2024-06-19.ogg"
-	mapPath = "assets/mr-gimmick-stage-3.tmj"
 )
 
 type PlatformScene struct {
@@ -28,8 +29,13 @@ type PlatformScene struct {
 }
 
 func (s *PlatformScene) OnStart() {
+	level, err := s.levelManager.GetCurrentLevel()
+	if err != nil {
+		log.Fatalf("failed to get current level: %v", err)
+	}
+
 	// Init tilemap
-	tm, err := tilemap.LoadTilemap(mapPath)
+	tm, err := tilemap.LoadTilemap(level.TilemapPath)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -109,6 +115,11 @@ func (s *PlatformScene) Update() error {
 		s.cam.ZoomFactor *= 1.02
 	}
 	// REMOVE
+
+	if inpututil.IsKeyJustPressed(ebiten.KeyN) {
+		s.levelManager.AdvanceToNextLevel()
+		s.Manager.NavigateTo(navigation.ScenePlatform, nil)
+	}
 
 	pPos := s.player.Position().Min
 	pWidth := s.player.Position().Dx()
