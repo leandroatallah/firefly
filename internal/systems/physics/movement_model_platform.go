@@ -2,14 +2,14 @@ package physics
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/leandroatallah/firefly/internal/config"
 	"github.com/leandroatallah/firefly/internal/systems/input"
 )
 
 type PlatformMovementModel struct {
-	onGround       bool
-	maxFallSpeed   int
-	jumpKeyPressed bool
+	onGround     bool
+	maxFallSpeed int
 }
 
 // NewPlatformMovementModel creates a new PlatformMovementModel with default values.
@@ -91,10 +91,8 @@ func (m *PlatformMovementModel) InputHandler(body *PhysicsBody) {
 	if input.IsSomeKeyPressed(ebiten.KeyD, ebiten.KeyRight) {
 		body.OnMoveRight(body.Speed())
 	}
-	isJumpPressed := input.IsSomeKeyPressed(ebiten.KeySpace)
-	if m.onGround && isJumpPressed && !m.jumpKeyPressed {
+	if m.onGround && inpututil.IsKeyJustPressed(ebiten.KeySpace) {
 		body.TryJump(8) // Replace magic number
 		m.onGround = false
 	}
-	m.jumpKeyPressed = isJumpPressed
 }
