@@ -27,15 +27,6 @@ func Setup() {
 	sceneManager := scene.NewSceneManager()
 	levelManager := levels.NewManager()
 
-	// Connect scene factory and scene manager
-	sceneFactory := scene.NewDefaultSceneFactory()
-	sceneManager.SetFactory(sceneFactory)
-	sceneFactory.SetManager(sceneManager)
-	sceneFactory.SetLevelManager(levelManager)
-
-	// Connect scene manager and audio manager
-	sceneManager.SetAudioManager(audioManager)
-
 	// Load audio assets
 	loadAudioAssets(audioManager)
 
@@ -47,7 +38,6 @@ func Setup() {
 	levelManager.AddLevel(level2)
 	levelManager.SetCurrentLevel(1)
 
-	// TODO: Use the app context
 	appContext := &core.AppContext{
 		InputManager:  inputManager,
 		AudioManager:  audioManager,
@@ -55,6 +45,12 @@ func Setup() {
 		LevelManager:  levelManager,
 		Configuration: cfg,
 	}
+
+	sceneFactory := scene.NewDefaultSceneFactory()
+	sceneFactory.SetAppContext(appContext)
+
+	sceneManager.SetFactory(sceneFactory)
+	sceneManager.SetAppContext(appContext)
 
 	// Create and run the game
 	game := NewGame(appContext)

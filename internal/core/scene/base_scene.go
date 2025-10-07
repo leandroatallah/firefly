@@ -4,7 +4,7 @@ package scene
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/leandroatallah/firefly/internal/levels"
+	"github.com/leandroatallah/firefly/internal/core"
 	"github.com/leandroatallah/firefly/internal/navigation"
 	"github.com/leandroatallah/firefly/internal/systems/audiomanager"
 	"github.com/leandroatallah/firefly/internal/systems/physics"
@@ -15,7 +15,7 @@ type BaseScene struct {
 	Manager      navigation.SceneManager
 	audiomanager *audiomanager.AudioManager
 	space        *physics.Space
-	levelManager *levels.Manager
+	appContext   *core.AppContext
 }
 
 func NewScene() *BaseScene {
@@ -41,12 +41,10 @@ func (s *BaseScene) AddBoundaries(boundaries ...physics.Body) {
 	}
 }
 
-func (s *BaseScene) SetManager(manager navigation.SceneManager) {
-	s.Manager = manager
-}
-
-func (s *BaseScene) SetLevelManager(levelManager *levels.Manager) {
-	s.levelManager = levelManager
+func (s *BaseScene) SetAppContext(appContext any) {
+	s.appContext = appContext.(*core.AppContext)
+	s.Manager = s.appContext.SceneManager
+	s.audiomanager = s.appContext.AudioManager
 }
 
 func (s *BaseScene) PhysicsSpace() *physics.Space {

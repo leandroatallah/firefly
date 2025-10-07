@@ -2,7 +2,6 @@ package navigation
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/leandroatallah/firefly/internal/levels"
 	"github.com/leandroatallah/firefly/internal/systems/audiomanager"
 )
 
@@ -20,15 +19,14 @@ type Scene interface {
 	Update() error
 	OnStart()
 	OnFinish()
-	SetManager(manager SceneManager)
-	SetLevelManager(manager *levels.Manager)
+	// Use any to prevent import cycle error
+	SetAppContext(appContext any)
 }
 
 type SceneManager interface {
 	AudioManager() *audiomanager.AudioManager
 	Draw(screen *ebiten.Image)
 	NavigateTo(sceneType SceneType, sceneTransition Transition)
-	// SetAudioManager(am *audiomanager.AudioManager)
 	// SetFactory(factory SceneFactory)
 	SwitchTo(scene Scene)
 	Update() error

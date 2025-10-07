@@ -29,7 +29,7 @@ type PlatformScene struct {
 }
 
 func (s *PlatformScene) OnStart() {
-	level, err := s.levelManager.GetCurrentLevel()
+	level, err := s.appContext.LevelManager.GetCurrentLevel()
 	if err != nil {
 		log.Fatalf("failed to get current level: %v", err)
 	}
@@ -42,7 +42,7 @@ func (s *PlatformScene) OnStart() {
 	s.tilemap = tm
 
 	// Init audio manager
-	s.audiomanager = s.Manager.AudioManager()
+	s.audiomanager = s.appContext.AudioManager
 	go func() {
 		time.Sleep(1 * time.Second)
 		s.audiomanager.SetVolume(0)
@@ -117,8 +117,8 @@ func (s *PlatformScene) Update() error {
 	// REMOVE
 
 	if inpututil.IsKeyJustPressed(ebiten.KeyN) {
-		s.levelManager.AdvanceToNextLevel()
-		s.Manager.NavigateTo(navigation.ScenePlatform, nil)
+		s.appContext.LevelManager.AdvanceToNextLevel()
+		s.appContext.SceneManager.NavigateTo(navigation.ScenePlatform, nil)
 	}
 
 	pPos := s.player.Position().Min

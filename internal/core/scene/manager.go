@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/leandroatallah/firefly/internal/core"
 	"github.com/leandroatallah/firefly/internal/navigation"
 	"github.com/leandroatallah/firefly/internal/systems/audiomanager"
 )
@@ -13,7 +14,7 @@ type SceneManager struct {
 	factory      SceneFactory
 	nextScene    navigation.Scene
 	transitioner navigation.Transition
-	audioManager *audiomanager.AudioManager
+	appContext   *core.AppContext
 }
 
 func NewSceneManager() *SceneManager {
@@ -81,10 +82,11 @@ func (m *SceneManager) NavigateTo(
 	}
 }
 
-func (m *SceneManager) SetAudioManager(am *audiomanager.AudioManager) {
-	m.audioManager = am
+func (m *SceneManager) SetAppContext(appContext *core.AppContext) {
+	m.appContext = appContext
+	m.factory.SetAppContext(appContext)
 }
 
 func (m *SceneManager) AudioManager() *audiomanager.AudioManager {
-	return m.audioManager
+	return m.appContext.AudioManager
 }

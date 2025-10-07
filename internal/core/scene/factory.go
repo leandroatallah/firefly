@@ -3,31 +3,27 @@ package scene
 import (
 	"fmt"
 
-	"github.com/leandroatallah/firefly/internal/levels"
+	"github.com/leandroatallah/firefly/internal/core"
 	"github.com/leandroatallah/firefly/internal/navigation"
 )
 
 type SceneFactory interface {
 	Create(sceneType navigation.SceneType) (navigation.Scene, error)
-	SetManager(manager navigation.SceneManager)
-	SetLevelManager(manager *levels.Manager)
+	SetAppContext(appContext any)
 }
 
 type DefaultSceneFactory struct {
-	manager      navigation.SceneManager
-	levelManager *levels.Manager
+	manager    navigation.SceneManager
+	appContext *core.AppContext
 }
 
 func NewDefaultSceneFactory() *DefaultSceneFactory {
 	return &DefaultSceneFactory{}
 }
 
-func (f *DefaultSceneFactory) SetManager(manager navigation.SceneManager) {
-	f.manager = manager
-}
-
-func (f *DefaultSceneFactory) SetLevelManager(manager *levels.Manager) {
-	f.levelManager = manager
+func (f *DefaultSceneFactory) SetAppContext(appContext any) {
+	f.appContext = appContext.(*core.AppContext)
+	f.manager = f.appContext.SceneManager
 }
 
 func (f *DefaultSceneFactory) Create(sceneType navigation.SceneType) (navigation.Scene, error) {
@@ -46,8 +42,7 @@ func (f *DefaultSceneFactory) Create(sceneType navigation.SceneType) (navigation
 	}
 
 	if err == nil {
-		scene.SetManager(f.manager)
-		scene.SetLevelManager(f.levelManager)
+		scene.SetAppContext(f.appContext)
 	}
 
 	return scene, err
