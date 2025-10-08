@@ -17,7 +17,7 @@ import (
 
 func Setup() {
 	// Basic Ebiten setup
-	ebiten.SetWindowSize(config.ScreenWidth*2, config.ScreenHeight*2)
+	ebiten.SetWindowSize(config.ScreenWidth*3, config.ScreenHeight*3)
 	ebiten.SetWindowTitle("Firefly")
 
 	// Initialize all systems and managers

@@ -2,8 +2,8 @@ package config
 
 const (
 	// TODO: To simplify, we can use the Celeste resolution (320x180)
-	ScreenWidth   = 640 // 20 32px tiles
-	ScreenHeight  = 360 // 11.25 32px tiles (use 12 tiles)
+	ScreenWidth   = 320
+	ScreenHeight  = 180
 	Unit          = 16
 	DefaultVolume = 0.5
 

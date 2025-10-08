@@ -11,8 +11,8 @@ type PlayerPlatform struct {
 
 func NewPlayerPlatform() (PlayerEntity, error) {
 	const (
-		frameWidth  = 32
-		frameHeight = 48
+		frameWidth  = 16
+		frameHeight = 16
 	)
 
 	var assets SpriteAssets

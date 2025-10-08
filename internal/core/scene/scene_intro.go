@@ -54,7 +54,7 @@ func NewIntroScene() *IntroScene {
 func (s *IntroScene) Draw(screen *ebiten.Image) {
 	screen.Fill(color.RGBA{A: 255})
 
-	screenutil.DrawCenteredText(screen, s.fontText, "Presented by", 10, color.White)
+	screenutil.DrawCenteredText(screen, s.fontText, "Presented by", 8, color.White)
 
 	op := &ebiten.DrawImageOptions{}
 	op.ColorScale.Scale(1, 1, 1, float32(s.fadeAlpha)/255.0)

@@ -43,7 +43,7 @@ func (s *MenuScene) Draw(screen *ebiten.Image) {
 	}
 	textOp.GeoM.Translate(config.ScreenWidth/2, config.ScreenHeight/2)
 	textOp.ColorScale.Scale(1, 1, 1, float32(120))
-	s.fontText.Draw(screen, "Press Enter to start", 14, textOp)
+	s.fontText.Draw(screen, "Press Enter to start", 8, textOp)
 
 }
 
