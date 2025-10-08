@@ -2,7 +2,7 @@ package core
 
 import (
 	"github.com/leandroatallah/firefly/internal/config"
-	"github.com/leandroatallah/firefly/internal/levels"
+	"github.com/leandroatallah/firefly/internal/core/levels"
 	"github.com/leandroatallah/firefly/internal/navigation"
 	"github.com/leandroatallah/firefly/internal/systems/audiomanager"
 	"github.com/leandroatallah/firefly/internal/systems/input"
