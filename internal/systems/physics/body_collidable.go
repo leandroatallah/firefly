@@ -8,11 +8,6 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
-type Touchable interface {
-	OnTouch(other Body)
-	OnBlock(other Body)
-}
-
 type Collidable interface {
 	Shape
 	Touchable

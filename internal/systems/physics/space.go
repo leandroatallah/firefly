@@ -1,6 +1,8 @@
 package physics
 
-import "sync"
+import (
+	"sync"
+)
 
 // Space centralizes physics bodies and collision resolution.
 type Space struct {
@@ -78,10 +80,12 @@ func (s *Space) ResolveCollisions(body Body) (touching bool, blocking bool) {
 		}
 
 		body.OnTouch(other)
+		other.OnTouch(body)
 		touching = true
 
 		if other.IsObstructive() {
 			body.OnBlock(other)
+			other.OnBlock(body)
 			blocking = true
 			break
 		}

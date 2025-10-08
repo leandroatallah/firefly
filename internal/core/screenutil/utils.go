@@ -28,3 +28,4 @@ func DrawCenteredText(screen *ebiten.Image, fontText *font.FontText, str string,
 
 	fontText.Draw(screen, str, size, textOp)
 }
+

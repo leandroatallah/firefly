@@ -11,7 +11,8 @@ const (
 	SceneIntro SceneType = iota
 	SceneMenu
 	SceneSandbox
-	ScenePlatform
+	SceneLevels
+	SceneSummary
 )
 
 type Scene interface {

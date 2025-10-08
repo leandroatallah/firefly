@@ -192,7 +192,7 @@ func loadImage(path string) (*ebiten.Image, error) {
 	return ebiten.NewImageFromImage(img), nil
 }
 
-func (t *Tilemap) CreateCollisionBodies(space *physics.Space) error {
+func (t *Tilemap) CreateCollisionBodies(space *physics.Space, endpointTrigger physics.Touchable) error {
 	if t == nil {
 		return fmt.Errorf("the tilemap was not initialized")
 	}
@@ -201,15 +201,26 @@ func (t *Tilemap) CreateCollisionBodies(space *physics.Space) error {
 	yOffset := config.ScreenHeight - mapHeight
 
 	for _, layer := range t.Layers {
-		if layer.Type != "objectgroup" || layer.Name == "PlayerStart" {
+		if layer.Type != "objectgroup" {
 			continue
 		}
 
-		for _, obj := range layer.Objects {
-			rect := physics.NewRect(int(obj.X), int(obj.Y)+yOffset, int(obj.Width), int(obj.Height))
-			obstacle := physics.NewObstacleRect(rect).AddCollision()
-			obstacle.SetIsObstructive(true)
-			space.AddBody(obstacle)
+		switch layer.Name {
+		case "Endpoint":
+			for _, obj := range layer.Objects {
+				rect := physics.NewRect(int(obj.X), int(obj.Y)+yOffset, int(obj.Width), int(obj.Height))
+				obstacle := physics.NewObstacleRect(rect).AddCollision()
+				obstacle.SetIsObstructive(false)
+				obstacle.SetTouchable(endpointTrigger)
+				space.AddBody(obstacle)
+			}
+		case "Obstacles":
+			for _, obj := range layer.Objects {
+				rect := physics.NewRect(int(obj.X), int(obj.Y)+yOffset, int(obj.Width), int(obj.Height))
+				obstacle := physics.NewObstacleRect(rect).AddCollision()
+				obstacle.SetIsObstructive(true)
+				space.AddBody(obstacle)
+			}
 		}
 	}
 

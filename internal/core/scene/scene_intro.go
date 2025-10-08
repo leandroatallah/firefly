@@ -57,11 +57,17 @@ func (s *IntroScene) Draw(screen *ebiten.Image) {
 	screenutil.DrawCenteredText(screen, s.fontText, "Presented by", 10, color.White)
 
 	op := &ebiten.DrawImageOptions{}
-	op.ColorM.Scale(1, 1, 1, float64(s.fadeAlpha)/255.0)
+	op.ColorScale.Scale(1, 1, 1, float32(s.fadeAlpha)/255.0)
 	screen.DrawImage(s.fadeOverlay, op)
 }
 
 func (s *IntroScene) Update() error {
+	// TODO: REMOVE THIS
+	// FORCE SKIP
+	if ebiten.IsKeyPressed(ebiten.KeyEnter) {
+		s.NextScene()
+	}
+
 	s.count++
 
 	// Allow user to skip
@@ -91,11 +97,15 @@ func (s *IntroScene) Update() error {
 			s.introAnimation = over
 		}
 	case over:
-		s.appContext.SceneManager.NavigateTo(navigation.SceneMenu, transition.NewFader())
-		s.introAnimation = navigationStarted
+		s.NextScene()
 	}
 
 	return nil
+}
+
+func (s *IntroScene) NextScene() {
+	s.appContext.SceneManager.NavigateTo(navigation.SceneMenu, transition.NewFader())
+	s.introAnimation = navigationStarted
 }
 
 func (s *IntroScene) OnStart() {

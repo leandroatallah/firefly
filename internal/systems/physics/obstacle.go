@@ -14,6 +14,7 @@ type Obstacle interface {
 	Draw(screen *ebiten.Image)
 	DrawCollisionBox(screen *ebiten.Image)
 	Image() *ebiten.Image
+	ImageCollisionBox() *ebiten.Image
 	ImageOptions() *ebiten.DrawImageOptions
 }
 
@@ -56,6 +57,16 @@ func (o *ObstacleRect) Image() *ebiten.Image {
 	w := o.Position().Dx()
 	h := o.Position().Dy()
 	return ebiten.NewImage(w, h)
+}
+
+func (o *ObstacleRect) ImageCollisionBox() *ebiten.Image {
+	img := o.Image()
+	if o.IsObstructive() {
+		img.Fill(color.RGBA{G: 255, A: 255})
+	} else {
+		img.Fill(color.RGBA{R: 255, A: 255})
+	}
+	return img
 }
 
 func (o *ObstacleRect) ImageOptions() *ebiten.DrawImageOptions {
