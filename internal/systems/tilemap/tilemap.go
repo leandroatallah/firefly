@@ -21,6 +21,7 @@ type Tilemap struct {
 	Layers       []*Layer   `json:"layers"`
 	Tileheight   int        `json:"tileheight"`
 	Tilesets     []*Tileset `json:"tilesets"`
+	image        *ebiten.Image
 	imageOptions *ebiten.DrawImageOptions
 }
 
@@ -64,6 +65,20 @@ type Tileset struct {
 	Tilewidth        int           `json:"tilewidth"`
 	Transparentcolor string        `json:"transparentcolor"`
 	EbitenImage      *ebiten.Image `json:"-"`
+}
+
+func (t *Tilemap) Image(screen *ebiten.Image) (*ebiten.Image, error) {
+	if t.image == nil {
+		var err error
+		t.image, err = t.ParseToImage(screen)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	t.Reset(screen)
+
+	return t.image, nil
 }
 
 func (t *Tilemap) ParseToImage(screen *ebiten.Image) (*ebiten.Image, error) {
@@ -118,11 +133,16 @@ func (t *Tilemap) ParseToImage(screen *ebiten.Image) (*ebiten.Image, error) {
 		}
 	}
 
-	t.imageOptions.GeoM.Reset()
-	sh := screen.Bounds().Dy()
-	t.imageOptions.GeoM.Translate(0, float64(sh-mapHeight))
+	t.Reset(screen)
 
 	return result, nil
+}
+
+func (t *Tilemap) Reset(screen *ebiten.Image) {
+	t.imageOptions.GeoM.Reset()
+	sh := screen.Bounds().Dy()
+	mapHeight := t.Layers[0].Height * t.Tileheight
+	t.imageOptions.GeoM.Translate(0, float64(sh-mapHeight))
 }
 
 func LoadTilemap(path string) (*Tilemap, error) {
