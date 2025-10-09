@@ -24,6 +24,7 @@ const (
 	FaceDirectionLeft
 )
 
+// TODO: Split PhysicsBody in a complex MovableCollidableAlive and MovableCollidable for items and move the methods to the right one.
 type PhysicsBody struct {
 	Shape
 

@@ -10,6 +10,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/actors"
 	"github.com/leandroatallah/firefly/internal/config"
 	"github.com/leandroatallah/firefly/internal/core/transition"
+	"github.com/leandroatallah/firefly/internal/items"
 	"github.com/leandroatallah/firefly/internal/navigation"
 	"github.com/leandroatallah/firefly/internal/systems/physics"
 	"github.com/leandroatallah/firefly/internal/systems/tilemap"
@@ -66,6 +67,10 @@ func (s *LevelsScene) OnStart() {
 	}
 	s.player = p
 	s.space.AddBody(s.player)
+
+	// Manually add Item to test
+	coin := items.NewCollectibleCoinItem()
+	s.space.AddBody(coin)
 
 	// Set player initial position from tilemap
 	startX, startY, found := s.tilemap.GetPlayerStartPosition()
@@ -133,6 +138,12 @@ func (s *LevelsScene) Update() error {
 	// Execute bodies updates
 	space := s.PhysicsSpace()
 	for _, i := range space.Bodies() {
+		// Remove items marked as removed
+		if item, ok := i.(items.Item); ok && item.IsRemoved() {
+			s.space.RemoveBody(i)
+			continue
+		}
+
 		actor, ok := i.(actors.ActorEntity)
 		if !ok {
 			continue
@@ -162,6 +173,14 @@ func (s *LevelsScene) Draw(screen *ebiten.Image) {
 		switch body := b.(type) {
 		case actors.PlayerEntity:
 			continue
+		case items.Item:
+			if b.(items.Item).IsRemoved() {
+				continue
+			}
+			bodyOpts.GeoM.Reset()
+			pos := body.Position().Min
+			bodyOpts.GeoM.Translate(float64(pos.X), float64(pos.Y))
+			s.cam.Draw(body.Image(), bodyOpts, screen)
 		case physics.Obstacle:
 			bodyOpts.GeoM.Reset()
 			pos := body.Position().Min

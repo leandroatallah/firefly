@@ -109,13 +109,13 @@ func (c *Character) UpdateImageOptions() {
 
 	pos := c.Position()
 	minX, minY := pos.Min.X, pos.Min.Y
-	// width := pos.Dx()
-	//
-	// fDirection := c.FaceDirection()
-	// if fDirection == physics.FaceDirectionRight {
-	// 	c.op.GeoM.Scale(-1, 1)
-	// 	c.op.GeoM.Translate(float64(width), 0)
-	// }
+	width := pos.Dx()
+
+	fDirection := c.FaceDirection()
+	if fDirection == physics.FaceDirectionRight {
+		c.op.GeoM.Scale(-1, 1)
+		c.op.GeoM.Translate(float64(width), 0)
+	}
 
 	// Apply character position
 	c.op.GeoM.Translate(
