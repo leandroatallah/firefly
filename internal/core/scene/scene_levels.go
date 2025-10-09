@@ -1,6 +1,7 @@
 package scene
 
 import (
+	"fmt"
 	"image/color"
 	"log"
 	"time"
@@ -85,7 +86,17 @@ func (s *LevelsScene) OnStart() {
 
 	// Init collisions bodies and touch trigger for endpoints
 	endpointTrigger := physics.NewTouchTrigger(s.finishLevel, s.player)
-	s.tilemap.CreateCollisionBodies(s.space, endpointTrigger)
+	itemsTrigger := physics.NewTouchTrigger(func() {
+		fmt.Println("ITEM TRIGGER")
+	}, s.player)
+
+	// TODO: Review this implementation
+	triggerMap := map[tilemap.LayerNameID]physics.Touchable{
+		tilemap.EndpointLayer: endpointTrigger,
+		tilemap.ItemsLayer:    itemsTrigger,
+	}
+
+	s.tilemap.CreateCollisionBodies(s.space, triggerMap)
 
 	s.levelCompleted = false
 }
@@ -155,7 +166,7 @@ func (s *LevelsScene) Draw(screen *ebiten.Image) {
 			bodyOpts.GeoM.Reset()
 			pos := body.Position().Min
 			bodyOpts.GeoM.Translate(float64(pos.X), float64(pos.Y))
-			s.cam.Draw(body.Image(), bodyOpts, screen)
+			s.cam.Draw(body.ImageCollisionBox(), bodyOpts, screen)
 		}
 	}
 
