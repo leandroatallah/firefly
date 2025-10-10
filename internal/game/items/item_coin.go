@@ -1,14 +1,15 @@
-package items
+package gameitems
 
 import (
 	"github.com/leandroatallah/firefly/internal/engine/actors"
+	"github.com/leandroatallah/firefly/internal/engine/items"
 	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
 	"github.com/leandroatallah/firefly/internal/engine/systems/sprites"
 )
 
 // Concrete
 type CollectibleCoinItem struct {
-	BaseItem
+	items.BaseItem
 }
 
 func NewCollectibleCoinItem(x, y int) (*CollectibleCoinItem, error) {
@@ -22,9 +23,9 @@ func NewCollectibleCoinItem(x, y int) (*CollectibleCoinItem, error) {
 		return nil, err
 	}
 
-	base := NewBaseItem(sprites)
-	// TODO: It should be set in a better place
-	base.frameRate = 10
+	// TODO: It should be set in a better place (frameRate)
+	frameRate := 10
+	base := items.NewBaseItem(sprites, frameRate)
 	rect := physics.NewRect(x, y, frameWidth, frameHeight)
 	collisionRect := rect
 	base.SetBody(rect)

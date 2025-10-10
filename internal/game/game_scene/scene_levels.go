@@ -18,6 +18,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/systems/audiomanager"
 	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
 	"github.com/leandroatallah/firefly/internal/engine/systems/tilemap"
+	gameitems "github.com/leandroatallah/firefly/internal/game/items"
 	"github.com/setanarut/kamera/v2"
 )
 
@@ -83,7 +84,7 @@ func (s *LevelsScene) OnStart() {
 	// Set items (and enemies?) position from tilemap
 	itemsPos := s.tilemap.GetItemsPositionID()
 	for _, i := range itemsPos {
-		item, err := items.NewCollectibleCoinItem(i.X, i.Y)
+		item, err := gameitems.NewCollectibleCoinItem(i.X, i.Y)
 		if err != nil {
 			log.Fatal(err)
 		}
