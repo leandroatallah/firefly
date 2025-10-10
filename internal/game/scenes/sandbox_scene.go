@@ -10,10 +10,10 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/actors/enemies"
 	"github.com/leandroatallah/firefly/internal/engine/actors/movement"
 	"github.com/leandroatallah/firefly/internal/engine/config"
-	"github.com/leandroatallah/firefly/internal/engine/core/hud"
 	"github.com/leandroatallah/firefly/internal/engine/core/scene"
 	"github.com/leandroatallah/firefly/internal/engine/systems/audiomanager"
 	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
+	gamehud "github.com/leandroatallah/firefly/internal/game/hud"
 )
 
 const (
@@ -95,7 +95,7 @@ func (s *SandboxScene) Draw(screen *ebiten.Image) {
 	}
 
 	// HUD
-	statusBar, err := hud.NewStatusBar(s.player, s.score)
+	statusBar, err := gamehud.NewStatusBar(s.player, s.score)
 	if err != nil {
 		log.Fatal(err)
 	}
