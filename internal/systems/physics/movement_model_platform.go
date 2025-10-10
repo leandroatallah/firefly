@@ -78,8 +78,8 @@ func (m *PlatformMovementModel) Update(body *PhysicsBody, space *Space) error {
 }
 
 // InputHandler processes player input for movement.
-// Platform player can move horinzontally acceleration based
-// and triggers a jump if the jump key is pressed while on the ground.
+// It handles horizontal acceleration-based movement and jumping.
+// A jump can be cut short by releasing the jump key, allowing for variable jump height.
 func (m *PlatformMovementModel) InputHandler(body *PhysicsBody) {
 	if body.Immobile() {
 		return
@@ -94,5 +94,10 @@ func (m *PlatformMovementModel) InputHandler(body *PhysicsBody) {
 	if m.onGround && inpututil.IsKeyJustPressed(ebiten.KeySpace) {
 		body.TryJump(8) // Replace magic number
 		m.onGround = false
+	}
+
+	// If the player releases the jump button mid-air, reduce the upward velocity.
+	if !m.onGround && !input.IsSomeKeyPressed(ebiten.KeySpace) && body.vy16 < 0 {
+		body.vy16 /= 2
 	}
 }
