@@ -35,7 +35,9 @@ type BaseItem struct {
 }
 
 func NewBaseItem() *BaseItem {
-	return &BaseItem{}
+	return &BaseItem{
+		imageOptions: &ebiten.DrawImageOptions{},
+	}
 }
 
 func (b *BaseItem) SetBody(rect *physics.Rect) Item {

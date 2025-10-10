@@ -68,9 +68,12 @@ func (s *LevelsScene) OnStart() {
 	s.player = p
 	s.space.AddBody(s.player)
 
-	// Manually add Item to test
-	coin := items.NewCollectibleCoinItem()
-	s.space.AddBody(coin)
+	// Set items (and enemies?) position from tilemap
+	itemsPos := s.tilemap.GetItemsPositionID()
+	for _, i := range itemsPos {
+		item := items.NewCollectibleCoinItem(i.X, i.Y)
+		s.space.AddBody(item)
+	}
 
 	// Set player initial position from tilemap
 	startX, startY, found := s.tilemap.GetPlayerStartPosition()
@@ -168,24 +171,27 @@ func (s *LevelsScene) Draw(screen *ebiten.Image) {
 
 	// Draw collisions based on camera
 	space := s.PhysicsSpace()
-	bodyOpts := &ebiten.DrawImageOptions{}
 	for _, b := range space.Bodies() {
 		switch body := b.(type) {
 		case actors.PlayerEntity:
 			continue
 		case items.Item:
-			if b.(items.Item).IsRemoved() {
+			if body.IsRemoved() {
 				continue
 			}
-			bodyOpts.GeoM.Reset()
+			opts := body.ImageOptions()
+			opts.GeoM.Reset()
 			pos := body.Position().Min
-			bodyOpts.GeoM.Translate(float64(pos.X), float64(pos.Y))
-			s.cam.Draw(body.Image(), bodyOpts, screen)
+			opts.GeoM.Translate(float64(pos.X), float64(pos.Y))
+			s.cam.Draw(body.Image(), opts, screen)
 		case physics.Obstacle:
-			bodyOpts.GeoM.Reset()
+			opts := body.ImageOptions()
+			opts.GeoM.Reset()
 			pos := body.Position().Min
-			bodyOpts.GeoM.Translate(float64(pos.X), float64(pos.Y))
-			s.cam.Draw(body.ImageCollisionBox(), bodyOpts, screen)
+			opts.GeoM.Translate(float64(pos.X), float64(pos.Y))
+			s.cam.Draw(body.Image(), opts, screen)
+		default:
+			continue
 		}
 	}
 

@@ -9,15 +9,14 @@ import (
 )
 
 type Tilemap struct {
-	Height        int        `json:"height"`
-	Infinite      bool       `json:"infinite"`
-	Layers        []*Layer   `json:"layers"`
-	Tileheight    int        `json:"tileheight"`
-	Tilewidth     int        `json:"tilewidth"`
-	Tilesets      []*Tileset `json:"tilesets"`
-	image         *ebiten.Image
-	imageBaseDone bool
-	imageOptions  *ebiten.DrawImageOptions
+	Height       int        `json:"height"`
+	Infinite     bool       `json:"infinite"`
+	Layers       []*Layer   `json:"layers"`
+	Tileheight   int        `json:"tileheight"`
+	Tilewidth    int        `json:"tilewidth"`
+	Tilesets     []*Tileset `json:"tilesets"`
+	image        *ebiten.Image
+	imageOptions *ebiten.DrawImageOptions
 }
 
 type Layer struct {
@@ -65,8 +64,6 @@ type Tileset struct {
 
 func (t *Tilemap) Image(screen *ebiten.Image) (*ebiten.Image, error) {
 	var err error
-	// ParseToImage draw the base layer only one time.
-	// TODO: Check a way to reduce other layers reset rate.
 	t.image, err = t.ParseToImage(screen)
 	if err != nil {
 		return nil, err
@@ -98,4 +95,43 @@ func (t *Tilemap) GetPlayerStartPosition() (x, y int, found bool) {
 	}
 
 	return 0, 0, false
+}
+
+type ItemPosition struct {
+	X, Y int
+	ID   int
+}
+
+func (t *Tilemap) GetItemsPositionID() []*ItemPosition {
+	if t == nil {
+		return nil
+	}
+
+	mapHeight := t.Height * t.Tileheight
+	yOffset := config.ScreenHeight - mapHeight
+
+	res := []*ItemPosition{}
+	var firstgid int
+	var ts *Tileset
+
+	for _, layer := range t.Layers {
+		if layer.Name == "Items" && layer.Type == "objectgroup" && len(layer.Objects) > 0 {
+			for _, obj := range layer.Objects {
+				x16 := int(math.Round(obj.X))
+				yValue := obj.Y
+				if obj.Gid > 0 {
+					yValue -= obj.Height
+				}
+				y16 := int(math.Round(yValue)) + yOffset
+				if firstgid == 0 {
+					firstgid = obj.Gid
+					ts = t.findTileset(firstgid)
+				}
+				id := tilesetSourceID(ts, firstgid)
+				res = append(res, &ItemPosition{X: x16, Y: y16, ID: id})
+			}
+		}
+	}
+
+	return res
 }

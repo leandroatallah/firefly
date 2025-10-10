@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"image"
-	"image/color"
 	_ "image/png"
 	"io"
 	"os"
@@ -22,7 +21,7 @@ func (t *Tilemap) ParseToImage(screen *ebiten.Image) (*ebiten.Image, error) {
 	}
 
 	// Use the first layer to determine map dimensions. This assumes all layers are the same size.
-	mapWidth := t.Layers[0].Width * t.Tileheight
+	mapWidth := t.Layers[0].Width * t.Tilewidth
 	mapHeight := t.Layers[0].Height * t.Tileheight
 	result := ebiten.NewImage(mapWidth, mapHeight)
 
@@ -31,17 +30,8 @@ func (t *Tilemap) ParseToImage(screen *ebiten.Image) (*ebiten.Image, error) {
 			continue
 		}
 
-		switch {
-		case layer.Type == "objectgroup" && layer.Name == "Items":
-			// TODO: Spawn items
-			t.ParseItems(layer, result)
-		case layer.Type == "tilelayer":
-			if !t.imageBaseDone {
-				t.ParseBase(layer, result)
-				t.imageBaseDone = true
-			}
-		default:
-			continue
+		if layer.Type == "tilelayer" {
+			t.ParseBase(layer, result)
 		}
 	}
 
@@ -81,18 +71,24 @@ func tilesetSourceRect(ts *Tileset, gid int) image.Rectangle {
 	return image.Rect(sx, sy, sx+ts.Tilewidth, sy+ts.Tileheight)
 }
 
-// drawOptsAtPixel returns a DrawImageOptions translated to the destination pixel coordinates.
-func drawOptsAtPixel(i int, ts *Tileset) *ebiten.DrawImageOptions {
-	x := i % ts.Tilewidth
-	y := i / ts.Tileheight
-	dx := x * ts.Tilewidth
-	dy := y * ts.Tileheight
+// tilesetSourceID returns the tile ID (zero-based numbering)
+func tilesetSourceID(ts *Tileset, gid int) int {
+	return gid - ts.Firstgid
+}
+
+// drawTileOpts returns a DrawImageOptions translated to the destination pixel coordinates.
+func drawTileOpts(i, layerWidth, tileWidth, tileHeight int) *ebiten.DrawImageOptions {
+	x := i % layerWidth
+	y := i / layerWidth
+	dx := x * tileWidth
+	dy := y * tileHeight
 
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Translate(float64(dx), float64(dy))
 	return op
 }
 
+// TODO: Prevent parse base image more than once. It's unchangeable.
 func (t *Tilemap) ParseBase(layer *Layer, result *ebiten.Image) {
 	if layer == nil || result == nil {
 		return
@@ -111,7 +107,7 @@ func (t *Tilemap) ParseBase(layer *Layer, result *ebiten.Image) {
 		srcRect := tilesetSourceRect(ts, tileID)
 
 		tile := ts.EbitenImage.SubImage(srcRect).(*ebiten.Image)
-		op := drawOptsAtPixel(i, ts)
+		op := drawTileOpts(i, layer.Width, ts.Tilewidth, ts.Tileheight)
 		result.DrawImage(tile, op)
 	}
 }
@@ -121,7 +117,7 @@ func (t *Tilemap) ParseItems(layer *Layer, result *ebiten.Image) {
 		return
 	}
 
-	for i, obj := range layer.Objects {
+	for _, obj := range layer.Objects {
 		gid := obj.Gid
 		if gid == 0 {
 			continue
@@ -134,8 +130,8 @@ func (t *Tilemap) ParseItems(layer *Layer, result *ebiten.Image) {
 
 		srcRect := tilesetSourceRect(ts, gid)
 		tileImg := ts.EbitenImage.SubImage(srcRect).(*ebiten.Image)
-		tileImg.Fill(color.RGBA{0, 0, 0xff, 0xff})
-		op := drawOptsAtPixel(i, ts)
+		op := &ebiten.DrawImageOptions{}
+		op.GeoM.Translate(obj.X, obj.Y-obj.Height)
 		result.DrawImage(tileImg, op)
 	}
 }

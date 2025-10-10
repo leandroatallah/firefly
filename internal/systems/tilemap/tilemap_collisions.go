@@ -37,6 +37,7 @@ func (t *Tilemap) CreateCollisionBodies(space *physics.Space, triggerMap map[Lay
 		}
 
 		switch LayerNameMap[layer.Name] {
+		// TODO: Move endpoint to the scene and create as Item Coin
 		case EndpointLayer:
 			for _, obj := range layer.Objects {
 				obstacle := t.NewObstacleRect(obj, false)
@@ -45,45 +46,11 @@ func (t *Tilemap) CreateCollisionBodies(space *physics.Space, triggerMap map[Lay
 				}
 				space.AddBody(obstacle)
 			}
+		// TODO: Move obstacles to the scene and create as Item Coin
 		case ObstaclesLayer:
 			for _, obj := range layer.Objects {
 				obstacle := t.NewObstacleRect(obj, true)
 				space.AddBody(obstacle)
-			}
-		case EnemiesLayer:
-			continue
-		case ItemsLayer:
-			for _, obj := range layer.Objects {
-				obstacle := t.NewObstacleRect(obj, false)
-				if trigger, ok := triggerMap[ItemsLayer]; ok {
-					obstacle.SetTouchable(trigger)
-				}
-				space.AddBody(obstacle)
-				// space.AddBody(obstacle)
-				// obstacle := t.NewObstacleRect(obj, false)
-				// trigger := physics.NewTouchTrigger(func() {
-				// 	space.RemoveBody(obstacle)
-				//
-				// 	var itemsTileLayer *Layer
-				// 	for _, l := range t.Layers {
-				// 		if l.Name == "Items" && l.Type == "tilelayer" {
-				// 			itemsTileLayer = l
-				// 			break
-				// 		}
-				// 	}
-				//
-				// 	if itemsTileLayer != nil {
-				// 		tileX := int(obj.X / float64(t.Tilewidth))
-				// 		tileY := int(obj.Y / float64(t.Tileheight))
-				// 		index := tileY*itemsTileLayer.Width + tileX
-				// 		if index < len(itemsTileLayer.Data) {
-				// 			itemsTileLayer.Data[index] = 0
-				// 		}
-				// 		t.image = nil // Invalidate cached image
-				// 	}
-				// }, player)
-				// obstacle.SetTouchable(trigger)
-				// space.AddBody(obstacle)
 			}
 		default:
 			continue

@@ -9,8 +9,8 @@ type CollectibleCoinItem struct {
 	BaseItem
 }
 
-func NewCollectibleCoinItem() *CollectibleCoinItem {
-	x, y := 220, -140
+// TODO: Replace param with a rect
+func NewCollectibleCoinItem(x, y int) *CollectibleCoinItem {
 	frameWidth, frameHeight := 16, 16
 
 	base := NewBaseItem()
