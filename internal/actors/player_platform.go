@@ -7,6 +7,8 @@ import (
 
 type PlayerPlatform struct {
 	Player
+
+	coinCount int
 }
 
 func NewPlayerPlatform() (PlayerEntity, error) {
@@ -53,4 +55,11 @@ func NewPlayerPlatform() (PlayerEntity, error) {
 	player.SetMovementModel(movementModel)
 
 	return player, nil
+}
+
+func (p *PlayerPlatform) AddCoinCount(amount int) {
+	p.coinCount += amount
+}
+func (p *PlayerPlatform) CoinCount() int {
+	return p.coinCount
 }

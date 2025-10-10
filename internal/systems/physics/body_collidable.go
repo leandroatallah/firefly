@@ -11,6 +11,7 @@ import (
 type Collidable interface {
 	Shape
 	Touchable
+	GetTouchable() Touchable
 	DrawCollisionBox(screen *ebiten.Image)
 	CollisionPosition() []image.Rectangle
 	IsObstructive() bool
@@ -28,6 +29,10 @@ type CollidableBody struct {
 
 func (b *CollidableBody) SetTouchable(t Touchable) {
 	b.Touchable = t
+}
+
+func (b *CollidableBody) GetTouchable() Touchable {
+	return b.Touchable
 }
 
 func (b *CollidableBody) DrawCollisionBox(screen *ebiten.Image) {

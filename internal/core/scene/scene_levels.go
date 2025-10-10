@@ -7,7 +7,9 @@ import (
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/text/v2"
 	"github.com/leandroatallah/firefly/internal/actors"
+	"github.com/leandroatallah/firefly/internal/assets/font"
 	"github.com/leandroatallah/firefly/internal/config"
 	"github.com/leandroatallah/firefly/internal/core/transition"
 	"github.com/leandroatallah/firefly/internal/items"
@@ -29,10 +31,15 @@ type LevelsScene struct {
 	tilemap        *tilemap.Tilemap
 	cam            *kamera.Camera
 	levelCompleted bool
+	mainText       *font.FontText
 }
 
 func NewLevelsScene() *LevelsScene {
-	return &LevelsScene{}
+	mainText, err := font.NewFontText(config.MainFontFace)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return &LevelsScene{mainText: mainText}
 }
 
 func (s *LevelsScene) OnStart() {
@@ -94,17 +101,7 @@ func (s *LevelsScene) OnStart() {
 
 	// Init collisions bodies and touch trigger for endpoints
 	endpointTrigger := physics.NewTouchTrigger(s.finishLevel, s.player)
-	itemsTrigger := physics.NewTouchTrigger(func() {
-		fmt.Println("ITEM TRIGGER")
-	}, s.player)
-
-	// TODO: Review this implementation
-	triggerMap := map[tilemap.LayerNameID]physics.Touchable{
-		tilemap.EndpointLayer: endpointTrigger,
-		tilemap.ItemsLayer:    itemsTrigger,
-	}
-
-	s.tilemap.CreateCollisionBodies(s.space, triggerMap)
+	s.tilemap.CreateCollisionBodies(s.space, endpointTrigger)
 
 	s.levelCompleted = false
 }
@@ -201,6 +198,8 @@ func (s *LevelsScene) Draw(screen *ebiten.Image) {
 	s.player.ImageOptions().GeoM.Reset()
 	s.player.ImageOptions().GeoM.Translate(float64(pPos.X), float64(pPos.Y))
 	s.cam.Draw(img, s.player.ImageOptions(), screen)
+
+	s.DrawHUD(screen)
 }
 
 func (s *LevelsScene) OnFinish() {
@@ -245,4 +244,25 @@ func (s *LevelsScene) CamDebug() {
 	if ebiten.IsKeyPressed(ebiten.KeyE) { // zoom in
 		s.cam.ZoomFactor *= 1.02
 	}
+}
+
+func (s *LevelsScene) DrawHUD(screen *ebiten.Image) {
+	coinCount := 0
+
+	if p, ok := s.player.(*actors.PlayerPlatform); ok {
+		coinCount = p.CoinCount()
+	}
+
+	hud := ebiten.NewImage(74, 12)
+	hud.Fill(color.White)
+	hudOp := &ebiten.DrawImageOptions{}
+	hudOp.GeoM.Translate(4, 5)
+	textOp := &text.DrawOptions{}
+	textOp.ColorScale.Scale(0, 0, 0, 255)
+	textOp.GeoM.Translate(2, 2)
+	s.mainText.Draw(hud, fmt.Sprintf("Score: %d", coinCount), 8, textOp)
+
+	// Draw simple HUD score
+	// HUD need to be drawed on screen and not on the camera.
+	screen.DrawImage(hud, hudOp)
 }

@@ -25,7 +25,7 @@ var LayerNameMap = map[string]LayerNameID{
 	"Endpoint":    EndpointLayer,
 }
 
-func (t *Tilemap) CreateCollisionBodies(space *physics.Space, triggerMap map[LayerNameID]physics.Touchable) error {
+func (t *Tilemap) CreateCollisionBodies(space *physics.Space, triggerEndpoint physics.Touchable) error {
 	if t == nil {
 		return fmt.Errorf("the tilemap was not initialized")
 	}
@@ -41,9 +41,7 @@ func (t *Tilemap) CreateCollisionBodies(space *physics.Space, triggerMap map[Lay
 		case EndpointLayer:
 			for _, obj := range layer.Objects {
 				obstacle := t.NewObstacleRect(obj, false)
-				if trigger, ok := triggerMap[EndpointLayer]; ok {
-					obstacle.SetTouchable(trigger)
-				}
+				obstacle.SetTouchable(triggerEndpoint)
 				space.AddBody(obstacle)
 			}
 		// TODO: Move obstacles to the scene and create as Item Coin

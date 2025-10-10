@@ -1,6 +1,7 @@
 package items
 
 import (
+	"github.com/leandroatallah/firefly/internal/actors"
 	"github.com/leandroatallah/firefly/internal/systems/physics"
 )
 
@@ -28,7 +29,8 @@ func (c *CollectibleCoinItem) OnTouch(other physics.Body) {
 		return
 	}
 
-	c.SetRemoved(true)
-
-	// TODO: Handle player reward
+	if p, ok := other.GetTouchable().(*actors.PlayerPlatform); ok {
+		c.SetRemoved(true)
+		p.AddCoinCount(1)
+	}
 }
