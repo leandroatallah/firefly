@@ -13,7 +13,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/core/scene"
 	"github.com/leandroatallah/firefly/internal/engine/systems/audiomanager"
 	"github.com/leandroatallah/firefly/internal/engine/systems/input"
-	gamescene "github.com/leandroatallah/firefly/internal/game/game_scene"
+	gamescene "github.com/leandroatallah/firefly/internal/game/scenes"
 )
 
 func Setup() {
