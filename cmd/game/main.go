@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/leandroatallah/firefly/internal/core/game"
+	"github.com/leandroatallah/firefly/internal/engine/core/game"
 )
 
 func main() {
