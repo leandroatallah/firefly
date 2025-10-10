@@ -78,7 +78,10 @@ func (s *LevelsScene) OnStart() {
 	// Set items (and enemies?) position from tilemap
 	itemsPos := s.tilemap.GetItemsPositionID()
 	for _, i := range itemsPos {
-		item := items.NewCollectibleCoinItem(i.X, i.Y)
+		item, err := items.NewCollectibleCoinItem(i.X, i.Y)
+		if err != nil {
+			log.Fatal(err)
+		}
 		s.space.AddBody(item)
 	}
 
@@ -139,9 +142,12 @@ func (s *LevelsScene) Update() error {
 	space := s.PhysicsSpace()
 	for _, i := range space.Bodies() {
 		// Remove items marked as removed
-		if item, ok := i.(items.Item); ok && item.IsRemoved() {
-			s.space.RemoveBody(i)
-			continue
+		if item, ok := i.(items.Item); ok {
+			if item.IsRemoved() {
+				s.space.RemoveBody(i)
+				continue
+			}
+			item.Update(space)
 		}
 
 		actor, ok := i.(actors.ActorEntity)

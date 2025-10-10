@@ -3,6 +3,7 @@ package items
 import (
 	"github.com/leandroatallah/firefly/internal/actors"
 	"github.com/leandroatallah/firefly/internal/systems/physics"
+	"github.com/leandroatallah/firefly/internal/systems/sprites"
 )
 
 // Concrete
@@ -10,18 +11,27 @@ type CollectibleCoinItem struct {
 	BaseItem
 }
 
-// TODO: Replace param with a rect
-func NewCollectibleCoinItem(x, y int) *CollectibleCoinItem {
+func NewCollectibleCoinItem(x, y int) (*CollectibleCoinItem, error) {
 	frameWidth, frameHeight := 16, 16
 
-	base := NewBaseItem()
+	var assets sprites.SpriteAssets
+	assets = assets.AddSprite(actors.Idle, "assets/collectible-coin.png")
+
+	sprites, err := sprites.LoadSprites(assets)
+	if err != nil {
+		return nil, err
+	}
+
+	base := NewBaseItem(sprites)
+	// TODO: It should be set in a better place
+	base.frameRate = 10
 	rect := physics.NewRect(x, y, frameWidth, frameHeight)
 	collisionRect := rect
 	base.SetBody(rect)
 	base.SetCollisionArea(collisionRect)
 	base.SetTouchable(base)
 
-	return &CollectibleCoinItem{BaseItem: *base}
+	return &CollectibleCoinItem{BaseItem: *base}, nil
 }
 
 func (c *CollectibleCoinItem) OnTouch(other physics.Body) {

@@ -3,6 +3,7 @@ package actors
 import (
 	"github.com/leandroatallah/firefly/internal/core/screenutil"
 	"github.com/leandroatallah/firefly/internal/systems/physics"
+	"github.com/leandroatallah/firefly/internal/systems/sprites"
 )
 
 type PlayerTopDown struct {
@@ -15,13 +16,13 @@ func NewPlayerTopDown() (PlayerEntity, error) {
 		frameHeight = 32
 	)
 
-	var assets SpriteAssets
+	var assets sprites.SpriteAssets
 	assets = assets.
 		AddSprite(Idle, "assets/default-idle.png").
 		AddSprite(Walk, "assets/default-walk.png").
 		AddSprite(Hurted, "assets/default-hurt.png")
 
-	sprites, err := LoadSprites(assets)
+	sprites, err := sprites.LoadSprites(assets)
 	if err != nil {
 		return nil, err
 	}

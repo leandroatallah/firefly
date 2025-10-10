@@ -1,12 +1,11 @@
 package items
 
 import (
-	"fmt"
 	"image/color"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/leandroatallah/firefly/internal/actors"
 	"github.com/leandroatallah/firefly/internal/systems/physics"
+	"github.com/leandroatallah/firefly/internal/systems/sprites"
 )
 
 type Item interface {
@@ -28,15 +27,19 @@ type Item interface {
 type BaseItem struct {
 	// TODO: Item is not alive. Try to split PhysicsBody to not inherit AliveBody methods
 	physics.PhysicsBody
-	actors.SpriteEntity
+	sprites.SpriteEntity
 
+	count        int
+	frameRate    int
 	removed      bool
 	imageOptions *ebiten.DrawImageOptions
 }
 
-func NewBaseItem() *BaseItem {
+func NewBaseItem(s sprites.SpriteMap) *BaseItem {
+	spriteEntity := sprites.NewSpriteEntity(s)
 	return &BaseItem{
 		imageOptions: &ebiten.DrawImageOptions{},
+		SpriteEntity: spriteEntity,
 	}
 }
 
@@ -57,7 +60,8 @@ func (b *BaseItem) SetTouchable(t physics.Touchable) {
 }
 
 func (b *BaseItem) Update(space *physics.Space) error {
-	fmt.Println("UPDATE ITEM")
+	b.count++
+
 	return nil
 }
 
@@ -79,8 +83,9 @@ func (b *BaseItem) OnBlock(other physics.Body) {}
 func (b *BaseItem) OnTouch(other physics.Body) {}
 
 func (b *BaseItem) Image() *ebiten.Image {
-	img := ebiten.NewImage(b.Position().Dx(), b.Position().Dy())
-	img.Fill(color.RGBA{0xff, 0xff, 0, 0xff})
+	pos := b.Position()
+	img := b.SpriteEntity.GetFirstSprite()
+	img = b.AnimatedSpriteImage(img, pos, b.count, b.frameRate)
 	return img
 }
 

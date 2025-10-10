@@ -9,11 +9,12 @@ import (
 	"github.com/leandroatallah/firefly/internal/actors/movement"
 	"github.com/leandroatallah/firefly/internal/config"
 	"github.com/leandroatallah/firefly/internal/systems/physics"
+	"github.com/leandroatallah/firefly/internal/systems/sprites"
 )
 
 type Character struct {
 	physics.PhysicsBody
-	SpriteEntity
+	sprites.SpriteEntity
 	count          int
 	state          ActorState
 	movementState  movement.MovementState
@@ -22,8 +23,8 @@ type Character struct {
 	op *ebiten.DrawImageOptions
 }
 
-func NewCharacter(sprites SpriteMap) *Character {
-	spriteEntity := NewSpriteEntity(sprites)
+func NewCharacter(s sprites.SpriteMap) *Character {
+	spriteEntity := sprites.NewSpriteEntity(s)
 	c := &Character{
 		SpriteEntity: spriteEntity,
 		op:           &ebiten.DrawImageOptions{},
@@ -174,7 +175,7 @@ func (c *Character) Draw(screen *ebiten.Image) {
 		float64(minY*config.Unit)/config.Unit,
 	)
 
-	img := c.sprites[c.state.State()]
+	img := c.GetSpriteByState(c.state.State())
 	characterWidth := img.Bounds().Dx()
 	frameCount := characterWidth / width
 	i := (c.count / frameRate) % frameCount

@@ -6,6 +6,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/actors"
 	"github.com/leandroatallah/firefly/internal/systems/physics"
+	"github.com/leandroatallah/firefly/internal/systems/sprites"
 )
 
 type BlueEnemy struct {
@@ -19,11 +20,11 @@ func NewBlueEnemy(x, y int) *BlueEnemy {
 		frameHeight = 32
 	)
 
-	var assets actors.SpriteAssets
+	var assets sprites.SpriteAssets
 	assets = assets.AddSprite(actors.Idle, "assets/blue-enemy.png").
 		AddSprite(actors.Walk, "assets/blue-enemy.png")
 
-	sprites, err := actors.LoadSprites(assets)
+	sprites, err := sprites.LoadSprites(assets)
 	if err != nil {
 		log.Fatal(err)
 	}
