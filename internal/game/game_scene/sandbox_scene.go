@@ -1,4 +1,4 @@
-package scene
+package gamescene
 
 import (
 	"image/color"
@@ -11,6 +11,8 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/actors/movement"
 	"github.com/leandroatallah/firefly/internal/engine/config"
 	"github.com/leandroatallah/firefly/internal/engine/core/hud"
+	"github.com/leandroatallah/firefly/internal/engine/core/scene"
+	"github.com/leandroatallah/firefly/internal/engine/systems/audiomanager"
 	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
 )
 
@@ -20,13 +22,14 @@ const (
 )
 
 type SandboxScene struct {
-	BaseScene
+	scene.BaseScene
 	player            actors.PlayerEntity
 	isPlayingJab      bool
 	showMenu          bool
 	menuDeadzoneCount int
 	count             int
 	score             int
+	audiomanager      *audiomanager.AudioManager
 }
 
 func (s *SandboxScene) Update() error {

@@ -1,4 +1,4 @@
-package scene
+package gamescene
 
 import (
 	"image/color"
@@ -8,8 +8,10 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
 	"github.com/leandroatallah/firefly/internal/engine/assets/font"
 	"github.com/leandroatallah/firefly/internal/engine/config"
+	"github.com/leandroatallah/firefly/internal/engine/core"
+	"github.com/leandroatallah/firefly/internal/engine/core/scene"
 	"github.com/leandroatallah/firefly/internal/engine/core/transition"
-	"github.com/leandroatallah/firefly/internal/engine/navigation"
+	"github.com/leandroatallah/firefly/internal/engine/systems/audiomanager"
 )
 
 const (
@@ -17,18 +19,21 @@ const (
 )
 
 type MenuScene struct {
-	BaseScene
+	scene.BaseScene
 
-	fontText *font.FontText
+	audiomanager *audiomanager.AudioManager
+	fontText     *font.FontText
 }
 
-func NewMenuScene() *MenuScene {
+func NewMenuScene(context *core.AppContext) *MenuScene {
 	fontText, err := font.NewFontText(config.MainFontFace)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	return &MenuScene{fontText: fontText}
+	scene := MenuScene{fontText: fontText}
+	scene.SetAppContext(context)
+	return &scene
 }
 
 func (s *MenuScene) Draw(screen *ebiten.Image) {
@@ -49,7 +54,7 @@ func (s *MenuScene) Draw(screen *ebiten.Image) {
 
 func (s *MenuScene) Update() error {
 	if ebiten.IsKeyPressed(ebiten.KeyEnter) {
-		s.Manager.NavigateTo(navigation.SceneLevels, transition.NewFader())
+		s.Manager.NavigateTo(SceneLevels, transition.NewFader())
 	}
 	return nil
 }

@@ -1,4 +1,4 @@
-package scene
+package gamescene
 
 import (
 	"image/color"
@@ -7,9 +7,11 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/engine/assets/font"
 	"github.com/leandroatallah/firefly/internal/engine/config"
+	"github.com/leandroatallah/firefly/internal/engine/core"
+	"github.com/leandroatallah/firefly/internal/engine/core/scene"
 	"github.com/leandroatallah/firefly/internal/engine/core/screenutil"
 	"github.com/leandroatallah/firefly/internal/engine/core/transition"
-	"github.com/leandroatallah/firefly/internal/engine/navigation"
+	"github.com/leandroatallah/firefly/internal/engine/systems/audiomanager"
 )
 
 const (
@@ -31,7 +33,7 @@ const (
 )
 
 type IntroScene struct {
-	BaseScene
+	scene.BaseScene
 
 	count          int
 	fontText       *font.FontText
@@ -39,16 +41,19 @@ type IntroScene struct {
 	duration       int
 	introAnimation introAnimation
 	fadeOverlay    *ebiten.Image
+	audiomanager   *audiomanager.AudioManager
 }
 
-func NewIntroScene() *IntroScene {
+func NewIntroScene(context *core.AppContext) *IntroScene {
 	fontText, err := font.NewFontText(config.MainFontFace)
 	if err != nil {
 		log.Fatal(err)
 	}
 	overlay := ebiten.NewImage(config.ScreenWidth, config.ScreenHeight)
 	overlay.Fill(color.Black)
-	return &IntroScene{fontText: fontText, fadeOverlay: overlay}
+	scene := IntroScene{fontText: fontText, fadeOverlay: overlay}
+	scene.SetAppContext(context)
+	return &scene
 }
 
 func (s *IntroScene) Draw(screen *ebiten.Image) {
@@ -104,7 +109,7 @@ func (s *IntroScene) Update() error {
 }
 
 func (s *IntroScene) NextScene() {
-	s.appContext.SceneManager.NavigateTo(navigation.SceneMenu, transition.NewFader())
+	s.AppContext.SceneManager.NavigateTo(SceneMenu, transition.NewFader())
 	s.introAnimation = navigationStarted
 }
 

@@ -15,7 +15,7 @@ type BaseScene struct {
 	Manager      navigation.SceneManager
 	audiomanager *audiomanager.AudioManager
 	space        *physics.Space
-	appContext   *core.AppContext
+	AppContext   *core.AppContext
 }
 
 func NewScene() *BaseScene {
@@ -42,9 +42,9 @@ func (s *BaseScene) AddBoundaries(boundaries ...physics.Body) {
 }
 
 func (s *BaseScene) SetAppContext(appContext any) {
-	s.appContext = appContext.(*core.AppContext)
-	s.Manager = s.appContext.SceneManager
-	s.audiomanager = s.appContext.AudioManager
+	s.AppContext = appContext.(*core.AppContext)
+	s.Manager = s.AppContext.SceneManager
+	s.audiomanager = s.AppContext.AudioManager
 }
 
 func (s *BaseScene) PhysicsSpace() *physics.Space {

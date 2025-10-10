@@ -1,4 +1,4 @@
-package scene
+package gamescene
 
 import (
 	"fmt"
@@ -11,9 +11,11 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/actors"
 	"github.com/leandroatallah/firefly/internal/engine/assets/font"
 	"github.com/leandroatallah/firefly/internal/engine/config"
+	"github.com/leandroatallah/firefly/internal/engine/core"
+	"github.com/leandroatallah/firefly/internal/engine/core/scene"
 	"github.com/leandroatallah/firefly/internal/engine/core/transition"
 	"github.com/leandroatallah/firefly/internal/engine/items"
-	"github.com/leandroatallah/firefly/internal/engine/navigation"
+	"github.com/leandroatallah/firefly/internal/engine/systems/audiomanager"
 	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
 	"github.com/leandroatallah/firefly/internal/engine/systems/tilemap"
 	"github.com/setanarut/kamera/v2"
@@ -24,7 +26,7 @@ const (
 )
 
 type LevelsScene struct {
-	BaseScene
+	scene.BaseScene
 	count          int
 	player         actors.PlayerEntity
 	space          *physics.Space
@@ -32,18 +34,21 @@ type LevelsScene struct {
 	cam            *kamera.Camera
 	levelCompleted bool
 	mainText       *font.FontText
+	audiomanager   *audiomanager.AudioManager
 }
 
-func NewLevelsScene() *LevelsScene {
+func NewLevelsScene(context *core.AppContext) *LevelsScene {
 	mainText, err := font.NewFontText(config.MainFontFace)
 	if err != nil {
 		log.Fatal(err)
 	}
-	return &LevelsScene{mainText: mainText}
+	scene := LevelsScene{mainText: mainText}
+	scene.SetAppContext(context)
+	return &scene
 }
 
 func (s *LevelsScene) OnStart() {
-	level, err := s.appContext.LevelManager.GetCurrentLevel()
+	level, err := s.AppContext.LevelManager.GetCurrentLevel()
 	if err != nil {
 		log.Fatalf("failed to get current level: %v", err)
 	}
@@ -56,7 +61,7 @@ func (s *LevelsScene) OnStart() {
 	s.tilemap = tm
 
 	// Init audio manager
-	s.audiomanager = s.appContext.AudioManager
+	s.audiomanager = s.AppContext.AudioManager
 	go func() {
 		time.Sleep(1 * time.Second)
 		s.audiomanager.SetVolume(0)
@@ -218,7 +223,7 @@ func (s *LevelsScene) finishLevel() {
 	}
 
 	s.levelCompleted = true
-	s.appContext.SceneManager.NavigateTo(navigation.SceneSummary, transition.NewFader())
+	s.AppContext.SceneManager.NavigateTo(SceneSummary, transition.NewFader())
 }
 
 func createPlayer(space *physics.Space) (actors.PlayerEntity, error) {

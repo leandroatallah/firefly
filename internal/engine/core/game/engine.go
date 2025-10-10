@@ -34,13 +34,13 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 }
 
 func (g *Game) SetState(stateID state.GameStateEnum) error {
-	state, err := state.NewGameState(stateID, g.AppContext)
-	if err != nil {
-		return err
-	}
-
-	g.state = state
-	g.state.OnStart()
+	// state, err := state.NewGameState(stateID, g.AppContext)
+	// if err != nil {
+	// 	return err
+	// }
+	//
+	// g.state = state
+	// g.state.OnStart()
 
 	return nil
 }

@@ -1,4 +1,4 @@
-package scene
+package gamescene
 
 import (
 	"image/color"
@@ -8,25 +8,30 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/leandroatallah/firefly/internal/engine/assets/font"
 	"github.com/leandroatallah/firefly/internal/engine/config"
+	"github.com/leandroatallah/firefly/internal/engine/core"
+	"github.com/leandroatallah/firefly/internal/engine/core/scene"
 	"github.com/leandroatallah/firefly/internal/engine/core/screenutil"
 	"github.com/leandroatallah/firefly/internal/engine/core/transition"
-	"github.com/leandroatallah/firefly/internal/engine/navigation"
+	"github.com/leandroatallah/firefly/internal/engine/systems/audiomanager"
 )
 
 type SummaryScene struct {
-	BaseScene
+	scene.BaseScene
 
-	fontText *font.FontText
+	audiomanager *audiomanager.AudioManager
+	fontText     *font.FontText
 }
 
-func NewSummaryScene() *SummaryScene {
+func NewSummaryScene(context *core.AppContext) *SummaryScene {
 	fontText, err := font.NewFontText(config.MainFontFace)
 	if err != nil {
 		log.Fatal(err)
 	}
 	overlay := ebiten.NewImage(config.ScreenWidth, config.ScreenHeight)
 	overlay.Fill(color.Black)
-	return &SummaryScene{fontText: fontText}
+	scene := SummaryScene{fontText: fontText}
+	scene.SetAppContext(context)
+	return &scene
 }
 
 func (s *SummaryScene) Draw(screen *ebiten.Image) {
@@ -36,8 +41,8 @@ func (s *SummaryScene) Draw(screen *ebiten.Image) {
 
 func (s *SummaryScene) Update() error {
 	if inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
-		s.appContext.LevelManager.AdvanceToNextLevel()
-		s.appContext.SceneManager.NavigateTo(navigation.SceneLevels, transition.NewFader())
+		s.AppContext.LevelManager.AdvanceToNextLevel()
+		s.AppContext.SceneManager.NavigateTo(SceneLevels, transition.NewFader())
 	}
 
 	return nil

@@ -7,14 +7,6 @@ import (
 
 type SceneType int
 
-const (
-	SceneIntro SceneType = iota
-	SceneMenu
-	SceneSandbox
-	SceneLevels
-	SceneSummary
-)
-
 type Scene interface {
 	Draw(screen *ebiten.Image)
 	Update() error
@@ -23,6 +15,8 @@ type Scene interface {
 	// Use any to prevent import cycle error
 	SetAppContext(appContext any)
 }
+
+type SceneMap map[SceneType]Scene
 
 type SceneManager interface {
 	AudioManager() *audiomanager.AudioManager

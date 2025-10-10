@@ -10,16 +10,16 @@ type GameState interface {
 
 type GameStateEnum int
 
-const (
-	Intro GameStateEnum = iota
-	MainMenu
-	Playing
-	Paused
-	GameOver
-)
+type StateMap map[GameStateEnum]GameState
 
 type BaseState struct {
 	ctx *core.AppContext
+
+	stateMap map[GameStateEnum]GameState
+}
+
+func NewBaseState(stateMap map[GameStateEnum]GameState) *BaseState {
+	return &BaseState{stateMap: stateMap}
 }
 
 func (s *BaseState) OnStart() {}

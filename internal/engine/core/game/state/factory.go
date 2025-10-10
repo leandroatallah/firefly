@@ -2,25 +2,25 @@ package state
 
 import (
 	"fmt"
-
-	"github.com/leandroatallah/firefly/internal/engine/core"
 )
 
-// State factory method
-func NewGameState(state GameStateEnum, ctx *core.AppContext) (GameState, error) {
-	base := BaseState{ctx: ctx}
-	switch state {
-	case Intro:
-		return NewIntroState(ctx), nil
-	case MainMenu:
-		return NewMainMenuState(ctx), nil
-	case Playing:
-		return &PlayingState{BaseState: base}, nil
-	case Paused:
-		return &PausedState{BaseState: base}, nil
-	case GameOver:
-		return &GameOverState{BaseState: base}, nil
-	default:
-		return nil, fmt.Errorf("unknown scene type")
+type StateFactory interface {
+	Create(state GameStateEnum) (GameState, error)
+}
+
+type DefaultStateFactory struct {
+	stateMap StateMap
+}
+
+func NewDefaultSceneFactory(stateMap StateMap) *DefaultStateFactory {
+	return &DefaultStateFactory{stateMap: stateMap}
+}
+
+func (f *DefaultStateFactory) Create(state GameStateEnum) (GameState, error) {
+	s, ok := f.stateMap[state]
+	if !ok {
+		return nil, fmt.Errorf("unknown state type")
 	}
+
+	return s, nil
 }

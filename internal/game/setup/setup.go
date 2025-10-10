@@ -1,4 +1,4 @@
-package game
+package gamesetup
 
 import (
 	"log"
@@ -8,11 +8,12 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/engine/config"
 	"github.com/leandroatallah/firefly/internal/engine/core"
-	"github.com/leandroatallah/firefly/internal/engine/core/game/state"
+	"github.com/leandroatallah/firefly/internal/engine/core/game"
 	"github.com/leandroatallah/firefly/internal/engine/core/levels"
 	"github.com/leandroatallah/firefly/internal/engine/core/scene"
 	"github.com/leandroatallah/firefly/internal/engine/systems/audiomanager"
 	"github.com/leandroatallah/firefly/internal/engine/systems/input"
+	gamescene "github.com/leandroatallah/firefly/internal/game/game_scene"
 )
 
 func Setup() {
@@ -45,17 +46,19 @@ func Setup() {
 		Configuration: cfg,
 	}
 
-	sceneFactory := scene.NewDefaultSceneFactory()
+	sceneFactory := scene.NewDefaultSceneFactory(gamescene.InitSceneMap(appContext))
 	sceneFactory.SetAppContext(appContext)
 
 	sceneManager.SetFactory(sceneFactory)
 	sceneManager.SetAppContext(appContext)
 
 	// Create and run the game
-	game := NewGame(appContext)
+	game := game.NewGame(appContext)
 
+	// TODO: Game state is disabled. Check if it is necessary. The game is handled by scenes.
 	// Set initial game state
-	game.SetState(state.Intro)
+	// game.SetState(state.Intro)
+	game.AppContext.SceneManager.NavigateTo(gamescene.SceneIntro, nil)
 
 	if err := ebiten.RunGame(game); err != nil {
 		log.Fatal(err)
