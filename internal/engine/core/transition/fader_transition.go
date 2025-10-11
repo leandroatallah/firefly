@@ -4,7 +4,7 @@ import (
 	"image/color"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/leandroatallah/firefly/internal/engine/config"
+	"github.com/leandroatallah/firefly/internal/game/constants"
 )
 
 const (
@@ -53,7 +53,7 @@ func (f *Fader) Draw(screen *ebiten.Image) {
 		return
 	}
 	c := color.RGBA{A: uint8(f.alpha)}
-	img := ebiten.NewImage(config.ScreenWidth, config.ScreenHeight)
+	img := ebiten.NewImage(constants.ScreenWidth, constants.ScreenHeight)
 	img.Fill(c)
 	screen.DrawImage(img, nil)
 }

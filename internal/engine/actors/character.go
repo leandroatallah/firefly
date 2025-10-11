@@ -7,10 +7,10 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/engine/actors/movement"
-	"github.com/leandroatallah/firefly/internal/engine/config"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
 	"github.com/leandroatallah/firefly/internal/engine/systems/sprites"
+	"github.com/leandroatallah/firefly/internal/game/constants"
 )
 
 type Character struct {
@@ -172,8 +172,8 @@ func (c *Character) Draw(screen *ebiten.Image) {
 
 	// Apply character movement
 	c.op.GeoM.Translate(
-		float64(minX*config.Unit)/config.Unit,
-		float64(minY*config.Unit)/config.Unit,
+		float64(minX*constants.Unit)/constants.Unit,
+		float64(minY*constants.Unit)/constants.Unit,
 	)
 
 	img := c.GetSpriteByState(c.state.State())

@@ -3,8 +3,8 @@ package physics
 import (
 	"fmt"
 
-	"github.com/leandroatallah/firefly/internal/engine/config"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
+	"github.com/leandroatallah/firefly/internal/game/constants"
 )
 
 type ObstacleType int
@@ -45,27 +45,27 @@ const wallWidth = 20
 
 func NewWallTop() *ObstacleRect {
 	return NewObstacleRect(
-		NewRect(0, 0, config.ScreenWidth, wallWidth),
+		NewRect(0, 0, constants.ScreenWidth, wallWidth),
 	).AddCollision(
 		NewCollisionArea(
-			NewRect(0, 0, config.ScreenWidth, wallWidth),
+			NewRect(0, 0, constants.ScreenWidth, wallWidth),
 		),
 	)
 }
 
 func NewWallLeft() *ObstacleRect {
 	return NewObstacleRect(
-		NewRect(0, 0, wallWidth, config.ScreenHeight),
+		NewRect(0, 0, wallWidth, constants.ScreenHeight),
 	).AddCollision()
 }
 
 func NewWallRight() *ObstacleRect {
 	return NewObstacleRect(
-		NewRect(config.ScreenWidth-wallWidth, 0, wallWidth, config.ScreenHeight),
+		NewRect(constants.ScreenWidth-wallWidth, 0, wallWidth, constants.ScreenHeight),
 	).AddCollision()
 }
 func NewWallDown() *ObstacleRect {
 	return NewObstacleRect(
-		NewRect(0, config.ScreenHeight-wallWidth, config.ScreenWidth, wallWidth),
+		NewRect(0, constants.ScreenHeight-wallWidth, constants.ScreenWidth, wallWidth),
 	).AddCollision()
 }

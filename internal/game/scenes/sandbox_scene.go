@@ -9,11 +9,11 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/actors"
 	"github.com/leandroatallah/firefly/internal/engine/actors/enemies"
 	"github.com/leandroatallah/firefly/internal/engine/actors/movement"
-	"github.com/leandroatallah/firefly/internal/engine/config"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/core/scene"
 	"github.com/leandroatallah/firefly/internal/engine/systems/audiomanager"
 	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
+	"github.com/leandroatallah/firefly/internal/game/constants"
 	gamehud "github.com/leandroatallah/firefly/internal/game/hud"
 )
 
@@ -103,15 +103,15 @@ func (s *SandboxScene) Draw(screen *ebiten.Image) {
 	statusBar.Draw(screen)
 
 	if s.showMenu {
-		shadow := ebiten.NewImage(config.ScreenWidth, config.ScreenWidth)
+		shadow := ebiten.NewImage(constants.ScreenWidth, constants.ScreenWidth)
 		shadow.Fill(color.RGBA{0, 0, 0, 0xCC})
 		screen.DrawImage(shadow, nil)
 
-		containerWidth, containerHeight := config.ScreenWidth/3, config.ScreenHeight/2
+		containerWidth, containerHeight := constants.ScreenWidth/3, constants.ScreenHeight/2
 		container := ebiten.NewImage(containerWidth, containerHeight)
 		container.Fill(color.RGBA{0xAA, 0xAA, 0xAA, 0xff})
 		containerOp := &ebiten.DrawImageOptions{}
-		containerOp.GeoM.Translate(config.ScreenWidth/2, config.ScreenHeight/2)
+		containerOp.GeoM.Translate(constants.ScreenWidth/2, constants.ScreenHeight/2)
 		containerOp.GeoM.Translate(-float64(containerWidth/2), -float64(containerHeight/2))
 		screen.DrawImage(container, containerOp)
 	}

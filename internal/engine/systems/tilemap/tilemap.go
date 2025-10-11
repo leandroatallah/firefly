@@ -5,7 +5,7 @@ import (
 	"math"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/leandroatallah/firefly/internal/engine/config"
+	"github.com/leandroatallah/firefly/internal/game/constants"
 )
 
 type Tilemap struct {
@@ -83,14 +83,14 @@ func (t *Tilemap) GetPlayerStartPosition() (x, y int, found bool) {
 	}
 
 	mapHeight := t.Height * t.Tileheight
-	yOffset := config.ScreenHeight - mapHeight
+	yOffset := constants.ScreenHeight - mapHeight
 
 	for _, layer := range t.Layers {
 		if layer.Name == "PlayerStart" && layer.Type == "objectgroup" && len(layer.Objects) > 0 {
 			obj := layer.Objects[0]
 			px := int(math.Round(obj.X))
 			py := int(math.Round(obj.Y)) + yOffset
-			return px * config.Unit, py * config.Unit, true
+			return px * constants.Unit, py * constants.Unit, true
 		}
 	}
 
@@ -108,7 +108,7 @@ func (t *Tilemap) GetItemsPositionID() []*ItemPosition {
 	}
 
 	mapHeight := t.Height * t.Tileheight
-	yOffset := config.ScreenHeight - mapHeight
+	yOffset := constants.ScreenHeight - mapHeight
 
 	res := []*ItemPosition{}
 	var firstgid int

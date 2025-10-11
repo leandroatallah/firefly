@@ -3,9 +3,9 @@ package tilemap
 import (
 	"fmt"
 
-	"github.com/leandroatallah/firefly/internal/engine/config"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
+	"github.com/leandroatallah/firefly/internal/game/constants"
 )
 
 type LayerNameID int
@@ -61,7 +61,7 @@ func (t *Tilemap) CreateCollisionBodies(space *physics.Space, triggerEndpoint bo
 
 func (t *Tilemap) NewObstacleRect(obj *Obstacle, isObstructive bool) *physics.ObstacleRect {
 	mapHeight := t.Height * t.Tileheight
-	yOffset := config.ScreenHeight - mapHeight
+	yOffset := constants.ScreenHeight - mapHeight
 
 	rect := physics.NewRect(int(obj.X), int(obj.Y)+yOffset, int(obj.Width), int(obj.Height))
 	obstacle := physics.NewObstacleRect(rect).AddCollision()

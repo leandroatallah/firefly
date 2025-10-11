@@ -7,11 +7,11 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
 	"github.com/leandroatallah/firefly/internal/engine/assets/font"
-	"github.com/leandroatallah/firefly/internal/engine/config"
 	"github.com/leandroatallah/firefly/internal/engine/core"
 	"github.com/leandroatallah/firefly/internal/engine/core/scene"
 	"github.com/leandroatallah/firefly/internal/engine/core/transition"
 	"github.com/leandroatallah/firefly/internal/engine/systems/audiomanager"
+	"github.com/leandroatallah/firefly/internal/game/constants"
 )
 
 const (
@@ -26,7 +26,7 @@ type MenuScene struct {
 }
 
 func NewMenuScene(context *core.AppContext) *MenuScene {
-	fontText, err := font.NewFontText(config.MainFontFace)
+	fontText, err := font.NewFontText(constants.MainFontFace)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -46,7 +46,7 @@ func (s *MenuScene) Draw(screen *ebiten.Image) {
 			LineSpacing:    0,
 		},
 	}
-	textOp.GeoM.Translate(config.ScreenWidth/2, config.ScreenHeight/2)
+	textOp.GeoM.Translate(constants.ScreenWidth/2, constants.ScreenHeight/2)
 	textOp.ColorScale.Scale(1, 1, 1, float32(120))
 	s.fontText.Draw(screen, "Press Enter to start", 8, textOp)
 

@@ -7,12 +7,12 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/leandroatallah/firefly/internal/engine/assets/font"
-	"github.com/leandroatallah/firefly/internal/engine/config"
 	"github.com/leandroatallah/firefly/internal/engine/core"
 	"github.com/leandroatallah/firefly/internal/engine/core/scene"
 	"github.com/leandroatallah/firefly/internal/engine/core/screenutil"
 	"github.com/leandroatallah/firefly/internal/engine/core/transition"
 	"github.com/leandroatallah/firefly/internal/engine/systems/audiomanager"
+	"github.com/leandroatallah/firefly/internal/game/constants"
 )
 
 type SummaryScene struct {
@@ -23,11 +23,11 @@ type SummaryScene struct {
 }
 
 func NewSummaryScene(context *core.AppContext) *SummaryScene {
-	fontText, err := font.NewFontText(config.MainFontFace)
+	fontText, err := font.NewFontText(constants.MainFontFace)
 	if err != nil {
 		log.Fatal(err)
 	}
-	overlay := ebiten.NewImage(config.ScreenWidth, config.ScreenHeight)
+	overlay := ebiten.NewImage(constants.ScreenWidth, constants.ScreenHeight)
 	overlay.Fill(color.Black)
 	scene := SummaryScene{fontText: fontText}
 	scene.SetAppContext(context)

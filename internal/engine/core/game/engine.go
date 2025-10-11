@@ -2,7 +2,6 @@ package game
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/leandroatallah/firefly/internal/engine/config"
 	"github.com/leandroatallah/firefly/internal/engine/core"
 	"github.com/leandroatallah/firefly/internal/engine/core/game/state"
 )
@@ -30,7 +29,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
-	return config.ScreenWidth, config.ScreenHeight
+	return g.AppContext.Config.ScreenWidth, g.AppContext.Config.ScreenHeight
 }
 
 func (g *Game) SetState(stateID state.GameStateEnum) error {
