@@ -14,6 +14,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/core/scene"
 	"github.com/leandroatallah/firefly/internal/engine/systems/audiomanager"
 	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
+	gameenemies "github.com/leandroatallah/firefly/internal/game/actors/enemies"
 	gamehud "github.com/leandroatallah/firefly/internal/game/hud"
 )
 
@@ -87,9 +88,9 @@ func (s *SandboxScene) Draw(screen *ebiten.Image) {
 	space := s.PhysicsSpace()
 	for _, b := range space.Bodies() {
 		// TODO: Fix it
-		switch b.(type) {
-		case *enemies.BlueEnemy:
-			b.(*enemies.BlueEnemy).Draw(screen)
+		switch t := b.(type) {
+		case *gameenemies.BlueEnemy:
+			t.Draw(screen)
 		default:
 			b.(body.Obstacle).Draw(screen)
 		}
@@ -169,8 +170,8 @@ func (s *SandboxScene) OnStart() {
 
 	// Create enemies
 	// TODO: It should be a builder
-	enemyFactory := enemies.NewEnemyFactory()
-	blueEnemy, err := enemyFactory.Create(enemies.BlueEnemyType, 60, 30)
+	enemyFactory := enemies.NewEnemyFactory(gameenemies.InitEnemyMap())
+	blueEnemy, err := enemyFactory.Create(gameenemies.BlueEnemyType)
 	if err != nil {
 		log.Fatal(err)
 	}

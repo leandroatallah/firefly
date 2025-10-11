@@ -1,3 +1,4 @@
+// TODO: Move to contracts folder
 package navigation
 
 import (

@@ -1,4 +1,4 @@
-package enemies
+package gameenemies
 
 import (
 	"log"
@@ -15,7 +15,9 @@ type BlueEnemy struct {
 	count int
 }
 
-func NewBlueEnemy(x, y int) *BlueEnemy {
+func NewBlueEnemy() *BlueEnemy {
+	// TODO: Set logic to initial position
+	x, y := 0, 0
 	const (
 		frameWidth  = 32
 		frameHeight = 32

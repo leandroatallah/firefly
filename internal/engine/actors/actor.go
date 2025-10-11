@@ -25,3 +25,7 @@ type ActorEntity interface {
 	Image() *ebiten.Image
 	ImageOptions() *ebiten.DrawImageOptions
 }
+
+type ActorType int
+
+type ActorMap map[ActorType]ActorEntity
