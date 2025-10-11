@@ -4,7 +4,7 @@ import (
 	"image"
 	"math"
 
-	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
+	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 )
 
 // --- A* Node and Priority Queue ---
@@ -74,7 +74,7 @@ func reconstructPath(endNode *Node) []image.Point {
 
 // Functional Options Pattern
 // WithObstacles is an option to provide obstacles for pathfinding states.
-func WithObstacles(obstacles []physics.Body) MovementStateOption {
+func WithObstacles(obstacles []body.Body) MovementStateOption {
 	return func(ms MovementState) {
 		if chaseState, ok := ms.(*ChaseMovementState); ok {
 			chaseState.obstacles = obstacles

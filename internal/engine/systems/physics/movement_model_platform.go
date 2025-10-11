@@ -4,6 +4,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/leandroatallah/firefly/internal/engine/config"
+	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/systems/input"
 )
 
@@ -21,7 +22,7 @@ func NewPlatformMovementModel() *PlatformMovementModel {
 
 // Update handles the physics for a platformer-style character.
 // It processes input, applies movement and collisions, handles gravity.
-func (m *PlatformMovementModel) Update(body *PhysicsBody, space *Space) error {
+func (m *PlatformMovementModel) Update(body *PhysicsBody, space body.BodiesSpace) error {
 	// Handle input for player movement
 	m.InputHandler(body)
 
@@ -41,7 +42,7 @@ func (m *PlatformMovementModel) Update(body *PhysicsBody, space *Space) error {
 	}
 
 	// Clamp the body's position to the play area boundaries.
-	if clampToPlayArea(body, space) {
+	if clampToPlayArea(body, space.(*Space)) {
 		landed = true
 		body.vy16 = 0
 	}

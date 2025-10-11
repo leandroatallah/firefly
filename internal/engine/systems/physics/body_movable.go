@@ -2,32 +2,11 @@ package physics
 
 import (
 	"github.com/leandroatallah/firefly/internal/engine/config"
+	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 )
 
-// Movable is a Shape but with movement
-type Movable interface {
-	Shape
-	ApplyValidMovement(velocity int, isXAxis bool, space *Space)
-
-	SetSpeedAndMaxSpeed(speed, maxSpeed int)
-	Speed() int
-	Immobile() bool
-	SetImmobile(immobile bool)
-
-	OnMoveUp(distance int)
-	OnMoveDown(distance int)
-	OnMoveLeft(distance int)
-	OnMoveRight(distance int)
-	OnMoveUpLeft(distance int)
-	OnMoveUpRight(distance int)
-	OnMoveDownLeft(distance int)
-	OnMoveDownRight(distance int)
-
-	TryJump(force int)
-}
-
 type MovableBody struct {
-	Shape
+	body.Shape
 
 	vx16          int
 	vy16          int

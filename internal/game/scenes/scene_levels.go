@@ -11,6 +11,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/actors"
 	"github.com/leandroatallah/firefly/internal/engine/assets/font"
 	"github.com/leandroatallah/firefly/internal/engine/config"
+	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/core"
 	"github.com/leandroatallah/firefly/internal/engine/core/scene"
 	"github.com/leandroatallah/firefly/internal/engine/core/transition"
@@ -181,24 +182,24 @@ func (s *LevelsScene) Draw(screen *ebiten.Image) {
 	// Draw collisions based on camera
 	space := s.PhysicsSpace()
 	for _, b := range space.Bodies() {
-		switch body := b.(type) {
+		switch sb := b.(type) {
 		case actors.PlayerEntity:
 			continue
 		case items.Item:
-			if body.IsRemoved() {
+			if sb.IsRemoved() {
 				continue
 			}
-			opts := body.ImageOptions()
+			opts := sb.ImageOptions()
 			opts.GeoM.Reset()
-			pos := body.Position().Min
+			pos := sb.Position().Min
 			opts.GeoM.Translate(float64(pos.X), float64(pos.Y))
-			s.cam.Draw(body.Image(), opts, screen)
-		case physics.Obstacle:
-			opts := body.ImageOptions()
+			s.cam.Draw(sb.Image(), opts, screen)
+		case body.Obstacle:
+			opts := sb.ImageOptions()
 			opts.GeoM.Reset()
-			pos := body.Position().Min
+			pos := sb.Position().Min
 			opts.GeoM.Translate(float64(pos.X), float64(pos.Y))
-			s.cam.Draw(body.Image(), opts, screen)
+			s.cam.Draw(sb.Image(), opts, screen)
 		default:
 			continue
 		}

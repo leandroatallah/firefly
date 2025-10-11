@@ -1,14 +1,14 @@
 package movement
 
 import (
-	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
+	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 )
 
 type MovementState interface {
 	State() MovementStateEnum
 	OnStart()
 	Move()
-	Target() physics.Body
+	Target() body.Body
 }
 
 type MovementStateEnum int
@@ -24,14 +24,14 @@ const (
 
 type BaseMovementState struct {
 	state  MovementStateEnum
-	actor  physics.Body
-	target physics.Body
+	actor  body.Body
+	target body.Body
 }
 
 func NewBaseMovementState(
 	state MovementStateEnum,
-	actor physics.Body,
-	target physics.Body,
+	actor body.Body,
+	target body.Body,
 ) BaseMovementState {
 	return BaseMovementState{state: state, actor: actor, target: target}
 }
@@ -42,7 +42,7 @@ func (s *BaseMovementState) State() MovementStateEnum {
 
 func (s *BaseMovementState) OnStart() {}
 
-func (s *BaseMovementState) Target() physics.Body {
+func (s *BaseMovementState) Target() body.Body {
 	return s.target
 }
 
@@ -55,7 +55,7 @@ type MovementDirections struct {
 }
 
 // calculateMovementDirections determines which directions to move based on actor and target positions
-func calculateMovementDirections(actorPos, targetPos physics.Body, isAvoid bool) MovementDirections {
+func calculateMovementDirections(actorPos, targetPos body.Body, isAvoid bool) MovementDirections {
 	actorRect := actorPos.Position()
 	targetRect := targetPos.Position()
 	p0x, p0y := actorRect.Min.X, actorRect.Min.Y
@@ -85,7 +85,7 @@ func calculateMovementDirections(actorPos, targetPos physics.Body, isAvoid bool)
 	return MovementDirections{Up: up, Down: down, Left: left, Right: right}
 }
 
-func executeMovement(actor physics.Body, directions MovementDirections) {
+func executeMovement(actor body.Body, directions MovementDirections) {
 	if !directions.Up && !directions.Down && !directions.Left && !directions.Right {
 		return
 	}

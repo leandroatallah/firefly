@@ -3,7 +3,7 @@ package enemies
 import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/engine/actors"
-	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
+	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 )
 
 type BaseEnemy struct {
@@ -15,7 +15,7 @@ func NewBaseEnemy() *BaseEnemy {
 }
 
 // Character Methods
-func (e *BaseEnemy) Update(space *physics.Space) error {
+func (e *BaseEnemy) Update(space body.BodiesSpace) error {
 	return e.Character.Update(space)
 }
 

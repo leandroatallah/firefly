@@ -1,16 +1,18 @@
 package physics
 
+import "github.com/leandroatallah/firefly/internal/engine/contracts/body"
+
 type CollisionArea struct {
-	Shape
+	body.Shape
 }
 
-func NewCollisionArea(element Shape) *CollisionArea {
+func NewCollisionArea(element body.Shape) *CollisionArea {
 	return &CollisionArea{
 		Shape: element,
 	}
 }
 
-func rectToCollisionArea(element Shape) *CollisionArea {
+func rectToCollisionArea(element body.Shape) *CollisionArea {
 	rect := element.Position()
 	width := rect.Max.X - rect.Min.X
 	height := rect.Max.Y - rect.Min.Y

@@ -4,6 +4,7 @@ import (
 	"image/color"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
 	"github.com/leandroatallah/firefly/internal/engine/systems/sprites"
 )
@@ -40,11 +41,11 @@ func (b *BaseItem) SetCollisionArea(rect *physics.Rect) Item {
 	return b
 }
 
-func (b *BaseItem) SetTouchable(t physics.Touchable) {
+func (b *BaseItem) SetTouchable(t body.Touchable) {
 	b.PhysicsBody.Touchable = t
 }
 
-func (b *BaseItem) Update(space *physics.Space) error {
+func (b *BaseItem) Update(space body.BodiesSpace) error {
 	b.count++
 
 	return nil
@@ -63,9 +64,9 @@ func (b *BaseItem) UpdateImageOptions() {
 	)
 }
 
-func (b *BaseItem) OnBlock(other physics.Body) {}
+func (b *BaseItem) OnBlock(other body.Body) {}
 
-func (b *BaseItem) OnTouch(other physics.Body) {}
+func (b *BaseItem) OnTouch(other body.Body) {}
 
 func (b *BaseItem) Image() *ebiten.Image {
 	pos := b.Position()

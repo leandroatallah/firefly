@@ -4,12 +4,13 @@ import (
 	"fmt"
 
 	"github.com/leandroatallah/firefly/internal/engine/config"
+	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 )
 
 type ObstacleType int
 
 type ObstacleFactory interface {
-	Create(obstacleType ObstacleType) (Obstacle, error)
+	Create(obstacleType ObstacleType) (body.Obstacle, error)
 }
 
 type DefaultObstacleFactory struct{}
@@ -25,7 +26,7 @@ const (
 	ObstacleWallDown
 )
 
-func (f *DefaultObstacleFactory) Create(obstableType ObstacleType) (Obstacle, error) {
+func (f *DefaultObstacleFactory) Create(obstableType ObstacleType) (body.Obstacle, error) {
 	switch obstableType {
 	case ObstacleWallTop:
 		return NewWallTop(), nil

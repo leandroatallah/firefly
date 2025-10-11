@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/leandroatallah/firefly/internal/engine/config"
+	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
 )
 
@@ -25,7 +26,7 @@ var LayerNameMap = map[string]LayerNameID{
 	"Endpoint":    EndpointLayer,
 }
 
-func (t *Tilemap) CreateCollisionBodies(space *physics.Space, triggerEndpoint physics.Touchable) error {
+func (t *Tilemap) CreateCollisionBodies(space *physics.Space, triggerEndpoint body.Touchable) error {
 	if t == nil {
 		return fmt.Errorf("the tilemap was not initialized")
 	}

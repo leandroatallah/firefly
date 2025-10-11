@@ -2,20 +2,8 @@ package physics
 
 import (
 	"github.com/google/uuid"
+	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 )
-
-// Body is a Shape with collision, movable and alive
-type Body interface {
-	Shape
-	Movable
-	Collidable
-	Alive
-
-	ID() string
-	SetMovementModel(model MovementModel)
-	MovementModel() MovementModel
-	SetPosition(x, y int)
-}
 
 type FacingDirectionEnum int
 
@@ -26,7 +14,7 @@ const (
 
 // TODO: Split PhysicsBody in a complex MovableCollidableAlive and MovableCollidable for items and move the methods to the right one.
 type PhysicsBody struct {
-	Shape
+	body.Shape
 
 	MovableBody
 	CollidableBody
@@ -37,7 +25,7 @@ type PhysicsBody struct {
 	movementModel MovementModel
 }
 
-func NewPhysicsBody(shape Shape) *PhysicsBody {
+func NewPhysicsBody(shape body.Shape) *PhysicsBody {
 	return &PhysicsBody{
 		Shape: shape,
 		id:    uuid.New().String(),
@@ -56,13 +44,13 @@ func (b *PhysicsBody) SetInvulnerable(value bool) {
 }
 
 // Collision methods
-func (b *PhysicsBody) OnTouch(other Body) {
+func (b *PhysicsBody) OnTouch(other body.Body) {
 	if b.Touchable != nil {
 		b.Touchable.OnTouch(other)
 	}
 }
 
-func (b *PhysicsBody) OnBlock(other Body) {
+func (b *PhysicsBody) OnBlock(other body.Body) {
 	if b.Touchable != nil {
 		b.Touchable.OnBlock(other)
 	}
@@ -76,7 +64,7 @@ func (b *PhysicsBody) AddCollision(list ...*CollisionArea) *PhysicsBody {
 }
 
 // Movement methods
-func (b *PhysicsBody) ApplyValidMovement(distance int, isXAxis bool, space *Space) {
+func (b *PhysicsBody) ApplyValidMovement(distance int, isXAxis bool, space body.BodiesSpace) {
 	if distance == 0 {
 		return
 	}
@@ -102,7 +90,7 @@ func (b *PhysicsBody) CheckMovementDirectionX() {
 	}
 }
 
-func (b *PhysicsBody) UpdateMovement(space *Space) {
+func (b *PhysicsBody) UpdateMovement(space body.BodiesSpace) {
 	if b.movementModel != nil {
 		b.movementModel.Update(b, space)
 	}

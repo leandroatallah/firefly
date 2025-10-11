@@ -1,16 +1,6 @@
 package physics
 
-type Alive interface {
-	Health() int
-	MaxHealth() int
-	SetHealth(health int)
-	SetMaxHealth(health int)
-	LoseHealth(damage int)
-	RestoreHealth(heal int)
-	Invulnerable() bool
-	SetInvulnerable(value bool)
-}
-
+// Implements Alive
 type AliveBody struct {
 	health    int
 	maxHealth int

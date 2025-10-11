@@ -2,10 +2,12 @@ package physics
 
 import (
 	"fmt"
+
+	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 )
 
 type MovementModel interface {
-	Update(body *PhysicsBody, space *Space) error
+	Update(body *PhysicsBody, space body.BodiesSpace) error
 	InputHandler(body *PhysicsBody)
 }
 

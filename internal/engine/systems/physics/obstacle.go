@@ -8,16 +8,6 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/config"
 )
 
-// TODO: Should it be merge with Collidable?
-type Obstacle interface {
-	Body
-	Draw(screen *ebiten.Image)
-	DrawCollisionBox(screen *ebiten.Image)
-	Image() *ebiten.Image
-	ImageCollisionBox() *ebiten.Image
-	ImageOptions() *ebiten.DrawImageOptions
-}
-
 type ObstacleRect struct {
 	PhysicsBody
 

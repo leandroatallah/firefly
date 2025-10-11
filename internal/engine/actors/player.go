@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
+	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 )
 
 const (
@@ -51,7 +51,7 @@ func NewPlayer(playerEntity PlayerEntityEnum) (PlayerEntity, error) {
 }
 
 // Character Methods
-func (p *Player) Update(space *physics.Space) error {
+func (p *Player) Update(space body.BodiesSpace) error {
 	return p.Character.Update(space)
 }
 

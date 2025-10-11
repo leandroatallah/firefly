@@ -5,6 +5,7 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/engine/actors"
+	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
 	"github.com/leandroatallah/firefly/internal/engine/systems/sprites"
 )
@@ -46,7 +47,7 @@ func NewBlueEnemy(x, y int) *BlueEnemy {
 }
 
 // Character Methods
-func (e *BlueEnemy) Update(space *physics.Space) error {
+func (e *BlueEnemy) Update(space body.BodiesSpace) error {
 	e.count++
 	return e.Character.Update(space)
 }
@@ -55,7 +56,7 @@ func (e *BlueEnemy) Draw(screen *ebiten.Image) {
 	e.Character.Draw(screen)
 }
 
-func (e *BlueEnemy) OnTouch(other physics.Body) {
+func (e *BlueEnemy) OnTouch(other body.Body) {
 	player := e.MovementState().Target()
 	if other.ID() == player.ID() {
 		// TODO: Replace the condition of hurting

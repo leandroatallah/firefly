@@ -4,6 +4,7 @@ import (
 	"math"
 
 	"github.com/leandroatallah/firefly/internal/engine/config"
+	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 )
 
 const (
@@ -78,7 +79,7 @@ func clampAxisVelocity(velocity, limit int) int {
 // applyAxisMovement moves the body by a given distance along a single axis (X or Y).
 // It checks for collisions with other objects in the space.
 // It returns true if the movement was blocked by a collision.
-func applyAxisMovement(body *PhysicsBody, distance int, isXAxis bool, space *Space) bool {
+func applyAxisMovement(body *PhysicsBody, distance int, isXAxis bool, space body.BodiesSpace) bool {
 	if distance == 0 {
 		return false
 	}

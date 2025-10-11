@@ -4,6 +4,7 @@ package scene
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/core"
 	"github.com/leandroatallah/firefly/internal/engine/navigation"
 	"github.com/leandroatallah/firefly/internal/engine/systems/audiomanager"
@@ -34,7 +35,7 @@ func (s *BaseScene) OnFinish() {}
 
 func (s *BaseScene) Exit() {}
 
-func (s *BaseScene) AddBoundaries(boundaries ...physics.Body) {
+func (s *BaseScene) AddBoundaries(boundaries ...body.Body) {
 	space := s.PhysicsSpace()
 	for _, o := range boundaries {
 		space.AddBody(o)

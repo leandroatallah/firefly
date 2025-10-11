@@ -6,32 +6,23 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/vector"
+	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 )
 
-type Collidable interface {
-	Shape
-	Touchable
-	GetTouchable() Touchable
-	DrawCollisionBox(screen *ebiten.Image)
-	CollisionPosition() []image.Rectangle
-	IsObstructive() bool
-	SetIsObstructive(value bool)
-}
-
 type CollidableBody struct {
-	Shape
-	Touchable
+	body.Shape
+	body.Touchable
 
 	isObstructive bool
 	collisionList []*CollisionArea
 	invulnerable  bool
 }
 
-func (b *CollidableBody) SetTouchable(t Touchable) {
+func (b *CollidableBody) SetTouchable(t body.Touchable) {
 	b.Touchable = t
 }
 
-func (b *CollidableBody) GetTouchable() Touchable {
+func (b *CollidableBody) GetTouchable() body.Touchable {
 	return b.Touchable
 }
 

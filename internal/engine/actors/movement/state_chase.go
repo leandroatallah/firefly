@@ -4,7 +4,7 @@ import (
 	"container/heap"
 	"image"
 
-	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
+	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 )
 
 // ChaseMovementState implements the A* pathfinding algorithm to chase a target.
@@ -12,7 +12,7 @@ type ChaseMovementState struct {
 	BaseMovementState
 	count     int
 	path      []image.Point
-	obstacles []physics.Body
+	obstacles []body.Body
 }
 
 func NewChaseMovementState(base BaseMovementState) *ChaseMovementState {

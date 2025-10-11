@@ -2,23 +2,25 @@ package physics
 
 import (
 	"sync"
+
+	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 )
 
 // Space centralizes physics bodies and collision resolution.
 type Space struct {
 	mu                        sync.RWMutex
-	bodies                    map[string]Body
+	bodies                    map[string]body.Body
 	tilemapDimensionsProvider TilemapDimensionsProvider
 }
 
 func NewSpace() *Space {
 	return &Space{
-		bodies: make(map[string]Body),
+		bodies: make(map[string]body.Body),
 	}
 }
 
-func (s *Space) AddBody(body Body) {
-	if body == nil {
+func (s *Space) AddBody(b body.Body) {
+	if b == nil {
 		return
 	}
 
@@ -26,13 +28,13 @@ func (s *Space) AddBody(body Body) {
 	defer s.mu.Unlock()
 
 	if s.bodies == nil {
-		s.bodies = make(map[string]Body)
+		s.bodies = make(map[string]body.Body)
 	}
 
-	s.bodies[body.ID()] = body
+	s.bodies[b.ID()] = b
 }
 
-func (s *Space) RemoveBody(body Body) {
+func (s *Space) RemoveBody(body body.Body) {
 	if body == nil {
 		return
 	}
@@ -47,11 +49,11 @@ func (s *Space) RemoveBody(body Body) {
 	delete(s.bodies, body.ID())
 }
 
-func (s *Space) Bodies() []Body {
+func (s *Space) Bodies() []body.Body {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
-	res := make([]Body, 0, len(s.bodies))
+	res := make([]body.Body, 0, len(s.bodies))
 	for _, b := range s.bodies {
 		if b == nil {
 			continue
@@ -62,7 +64,7 @@ func (s *Space) Bodies() []Body {
 	return res
 }
 
-func (s *Space) ResolveCollisions(body Body) (touching bool, blocking bool) {
+func (s *Space) ResolveCollisions(body body.Body) (touching bool, blocking bool) {
 	if body == nil {
 		return false, false
 	}
@@ -94,7 +96,7 @@ func (s *Space) ResolveCollisions(body Body) (touching bool, blocking bool) {
 	return touching, blocking
 }
 
-func hasCollision(a, b Body) bool {
+func hasCollision(a, b body.Body) bool {
 	rectsA := a.CollisionPosition()
 	rectsB := b.CollisionPosition()
 

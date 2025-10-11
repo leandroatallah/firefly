@@ -10,6 +10,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/actors/enemies"
 	"github.com/leandroatallah/firefly/internal/engine/actors/movement"
 	"github.com/leandroatallah/firefly/internal/engine/config"
+	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/core/scene"
 	"github.com/leandroatallah/firefly/internal/engine/systems/audiomanager"
 	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
@@ -90,7 +91,7 @@ func (s *SandboxScene) Draw(screen *ebiten.Image) {
 		case *enemies.BlueEnemy:
 			b.(*enemies.BlueEnemy).Draw(screen)
 		default:
-			b.(physics.Obstacle).Draw(screen)
+			b.(body.Obstacle).Draw(screen)
 		}
 	}
 
@@ -183,7 +184,7 @@ func (s *SandboxScene) OnStart() {
 	// )
 	blueEnemy.SetMovementState(movement.Chase, s.player, movement.WithObstacles(space.Bodies()))
 
-	s.AddBoundaries(blueEnemy.(physics.Body))
+	s.AddBoundaries(blueEnemy.(body.Body))
 }
 
 func (s *SandboxScene) OnFinish() {

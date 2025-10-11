@@ -2,6 +2,7 @@ package gameitems
 
 import (
 	"github.com/leandroatallah/firefly/internal/engine/actors"
+	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/items"
 	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
 	"github.com/leandroatallah/firefly/internal/engine/systems/sprites"
@@ -35,7 +36,7 @@ func NewCollectibleCoinItem(x, y int) (*CollectibleCoinItem, error) {
 	return &CollectibleCoinItem{BaseItem: *base}, nil
 }
 
-func (c *CollectibleCoinItem) OnTouch(other physics.Body) {
+func (c *CollectibleCoinItem) OnTouch(other body.Body) {
 	if c.IsRemoved() {
 		return
 	}

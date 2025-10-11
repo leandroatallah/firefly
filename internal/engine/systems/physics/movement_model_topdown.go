@@ -5,6 +5,7 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/engine/config"
+	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/systems/input"
 )
 
@@ -14,7 +15,7 @@ func NewTopDownMovementModel() *TopDownMovementModel {
 	return &TopDownMovementModel{}
 }
 
-func (m *TopDownMovementModel) Update(body *PhysicsBody, space *Space) error {
+func (m *TopDownMovementModel) Update(body *PhysicsBody, space body.BodiesSpace) error {
 	// Handle input for player movement
 	m.InputHandler(body)
 
@@ -24,7 +25,7 @@ func (m *TopDownMovementModel) Update(body *PhysicsBody, space *Space) error {
 	body.ApplyValidMovement(body.vy16, false, space)
 
 	// Prevents leaving the play area`
-	clampToPlayArea(body, space)
+	clampToPlayArea(body, space.(*Space))
 
 	// Convert the raw input acceleration into a scaled and normalized vector.
 	scaledAccX, scaledAccY := smoothDiagonalMovement(body.accelerationX, body.accelerationY)

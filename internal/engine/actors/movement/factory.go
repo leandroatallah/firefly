@@ -3,16 +3,16 @@ package movement
 import (
 	"fmt"
 
-	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
+	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 )
 
 // MovementStateOption defines a function that configures a movement state
 type MovementStateOption func(MovementState)
 
 func NewMovementState(
-	actor physics.Body,
+	actor body.Body,
 	state MovementStateEnum,
-	target physics.Body,
+	target body.Body,
 	options ...MovementStateOption,
 ) (MovementState, error) {
 	b := NewBaseMovementState(state, actor, target)

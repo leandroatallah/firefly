@@ -1,22 +1,19 @@
 package physics
 
-type Touchable interface {
-	OnTouch(other Body)
-	OnBlock(other Body)
-}
+import "github.com/leandroatallah/firefly/internal/engine/contracts/body"
 
 // TouchTrigger implements the physics.Touchable interface to handle body contact.
 type TouchTrigger struct {
 	execute func()
-	subject Body
+	subject body.Body
 }
 
-func NewTouchTrigger(execute func(), subject Body) *TouchTrigger {
+func NewTouchTrigger(execute func(), subject body.Body) *TouchTrigger {
 	return &TouchTrigger{execute: execute, subject: subject}
 }
 
 // OnTouch is called by the physics engine when a non-obstructive collision occurs.
-func (e *TouchTrigger) OnTouch(other Body) {
+func (e *TouchTrigger) OnTouch(other body.Body) {
 	if e.subject == nil {
 		return
 	}
@@ -29,4 +26,4 @@ func (e *TouchTrigger) OnTouch(other Body) {
 }
 
 // OnBlock is called for obstructive collisions, which won't happen for a sensor.
-func (e *TouchTrigger) OnBlock(other Body) {}
+func (e *TouchTrigger) OnBlock(other body.Body) {}

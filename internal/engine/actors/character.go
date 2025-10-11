@@ -8,6 +8,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/engine/actors/movement"
 	"github.com/leandroatallah/firefly/internal/engine/config"
+	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
 	"github.com/leandroatallah/firefly/internal/engine/systems/sprites"
 )
@@ -61,7 +62,7 @@ func (c *Character) SetState(state ActorState) {
 
 func (c *Character) SetMovementState(
 	state movement.MovementStateEnum,
-	target physics.Body,
+	target body.Body,
 	options ...movement.MovementStateOption,
 ) {
 	movementState, err := movement.NewMovementState(c, state, target, options...)
@@ -85,7 +86,7 @@ func (c *Character) MovementState() movement.MovementState {
 	return c.movementState
 }
 
-func (c *Character) Update(space *physics.Space) error {
+func (c *Character) Update(space body.BodiesSpace) error {
 	c.count++
 
 	// Handle movement by Movement State - must happen BEFORE UpdateMovement
@@ -189,9 +190,9 @@ func (c *Character) Draw(screen *ebiten.Image) {
 	)
 }
 
-func (c *Character) OnTouch(other physics.Body) {}
+func (c *Character) OnTouch(other body.Body) {}
 
-func (c *Character) OnBlock(other physics.Body) {}
+func (c *Character) OnBlock(other body.Body) {}
 
 func (c *Character) Hurt(damage int) {
 	if c.Invulnerable() {
@@ -214,7 +215,7 @@ func (c *Character) Hurt(damage int) {
 	c.LoseHealth(damage)
 }
 
-func (c *Character) SetTouchable(t physics.Touchable) {
+func (c *Character) SetTouchable(t body.Touchable) {
 	c.PhysicsBody.Touchable = t
 }
 
