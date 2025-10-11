@@ -3,8 +3,8 @@ package scene
 import (
 	"fmt"
 
+	"github.com/leandroatallah/firefly/internal/engine/contracts/navigation"
 	"github.com/leandroatallah/firefly/internal/engine/core"
-	"github.com/leandroatallah/firefly/internal/engine/navigation"
 )
 
 type SceneFactory interface {

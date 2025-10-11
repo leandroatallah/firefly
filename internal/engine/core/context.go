@@ -1,8 +1,8 @@
 package core
 
 import (
+	"github.com/leandroatallah/firefly/internal/engine/contracts/navigation"
 	"github.com/leandroatallah/firefly/internal/engine/core/levels"
-	"github.com/leandroatallah/firefly/internal/engine/navigation"
 	"github.com/leandroatallah/firefly/internal/engine/systems/audiomanager"
 	"github.com/leandroatallah/firefly/internal/engine/systems/input"
 )
