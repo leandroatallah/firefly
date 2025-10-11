@@ -37,6 +37,7 @@ type LevelsScene struct {
 	levelCompleted bool
 	mainText       *font.FontText
 	audiomanager   *audiomanager.AudioManager
+	itemsMap       map[int]items.ItemType
 }
 
 func NewLevelsScene(context *core.AppContext) *LevelsScene {
@@ -82,14 +83,28 @@ func (s *LevelsScene) OnStart() {
 	s.player = p
 	s.space.AddBody(s.player)
 
-	// Set items (and enemies?) position from tilemap
+	// Set items map to factory creation process
+	s.itemsMap = map[int]items.ItemType{
+		0: gameitems.CollectibleCoinType,
+		1: gameitems.SignpostType,
+	}
+
+	// Set items position from tilemap
 	itemsPos := s.tilemap.GetItemsPositionID()
-	for _, i := range itemsPos {
-		item, err := gameitems.NewCollectibleCoinItem(i.X, i.Y)
-		if err != nil {
-			log.Fatal(err)
+	if len(itemsPos) > 0 {
+		f := items.NewItemFactory(gameitems.InitItemMap())
+		for _, i := range itemsPos {
+			itemType, found := s.itemsMap[i.ID]
+			if !found {
+				log.Fatal(err)
+			}
+
+			item, err := f.Create(itemType, i.X, i.Y)
+			if err != nil {
+				log.Fatal(err)
+			}
+			s.space.AddBody(item)
 		}
-		s.space.AddBody(item)
 	}
 
 	// Set player initial position from tilemap

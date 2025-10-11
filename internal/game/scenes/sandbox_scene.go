@@ -171,6 +171,7 @@ func (s *SandboxScene) OnStart() {
 	// Create enemies
 	// TODO: It should be a builder
 	enemyFactory := enemies.NewEnemyFactory(gameenemies.InitEnemyMap())
+	// Need to set position after creation
 	blueEnemy, err := enemyFactory.Create(gameenemies.BlueEnemyType)
 	if err != nil {
 		log.Fatal(err)

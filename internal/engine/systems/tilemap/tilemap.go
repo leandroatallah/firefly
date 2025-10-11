@@ -127,7 +127,7 @@ func (t *Tilemap) GetItemsPositionID() []*ItemPosition {
 					firstgid = obj.Gid
 					ts = t.findTileset(firstgid)
 				}
-				id := tilesetSourceID(ts, firstgid)
+				id := tilesetSourceID(ts, obj.Gid)
 				res = append(res, &ItemPosition{X: x16, Y: y16, ID: id})
 			}
 		}

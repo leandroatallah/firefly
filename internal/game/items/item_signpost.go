@@ -10,16 +10,15 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/systems/sprites"
 )
 
-// Concrete
-type CollectibleCoinItem struct {
+type SignpostItem struct {
 	items.BaseItem
 }
 
-func NewCollectibleCoinItem(x, y int) *CollectibleCoinItem {
-	frameWidth, frameHeight := 16, 16
+func NewSignpostItem(x, y int) *SignpostItem {
+	frameWidth, frameHeight := 32, 36
 
 	var assets sprites.SpriteAssets
-	assets = assets.AddSprite(actors.Idle, "assets/collectible-coin.png")
+	assets = assets.AddSprite(actors.Idle, "assets/item-signpost.png")
 
 	sprites, err := sprites.LoadSprites(assets)
 	if err != nil {
@@ -35,16 +34,7 @@ func NewCollectibleCoinItem(x, y int) *CollectibleCoinItem {
 	base.SetCollisionArea(collisionRect)
 	base.SetTouchable(base)
 
-	return &CollectibleCoinItem{BaseItem: *base}
+	return &SignpostItem{BaseItem: *base}
 }
 
-func (c *CollectibleCoinItem) OnTouch(other body.Body) {
-	if c.IsRemoved() {
-		return
-	}
-
-	if p, ok := other.GetTouchable().(*actors.PlayerPlatform); ok {
-		c.SetRemoved(true)
-		p.AddCoinCount(1)
-	}
-}
+func (i *SignpostItem) OnTouch(other body.Body) {}
