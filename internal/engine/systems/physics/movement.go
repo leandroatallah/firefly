@@ -3,8 +3,8 @@ package physics
 import (
 	"math"
 
+	"github.com/leandroatallah/firefly/internal/config"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
-	"github.com/leandroatallah/firefly/internal/game/constants"
 )
 
 const (
@@ -21,7 +21,7 @@ func increaseVelocity(velocity, acceleration int) int {
 // reduceVelocity applies friction to the velocity for a single axis, slowing it down.
 // It brings the velocity to zero if it's smaller than the friction value to prevent jitter.
 func reduceVelocity(velocity int) int {
-	friction := constants.Unit / 4
+	friction := config.Get().Unit / 4
 	if velocity > friction {
 		return velocity - friction
 	}
@@ -46,7 +46,7 @@ func smoothDiagonalMovement(accX, accY int) (int, int) {
 	// Friction is `config.Unit / 4`. The base input acceleration is 2.
 	// We'll use a factor of `config.Unit / 6` so that the final acceleration
 	// (2 * config.Unit / 6 = config.Unit / 3) is greater than friction.
-	accelerationFactor := float64(constants.Unit / 6)
+	accelerationFactor := float64(config.Get().Unit / 6)
 
 	fAccX := float64(accX) * accelerationFactor
 	fAccY := float64(accY) * accelerationFactor
@@ -128,11 +128,11 @@ func clampToPlayArea(body *PhysicsBody, space *Space) bool {
 		body.ApplyValidMovement(-rect.x16, true, nil)
 	}
 
-	rightEdge := rect.x16 + rect.width*constants.Unit
-	maxRight := constants.ScreenWidth * constants.Unit
+	rightEdge := rect.x16 + rect.width*config.Get().Unit
+	maxRight := config.Get().ScreenWidth * config.Get().Unit
 	provider := space.GetTilemapDimensionsProvider()
 	if provider != nil {
-		maxRight = provider.GetTilemapWidth() * constants.Unit
+		maxRight = provider.GetTilemapWidth() * config.Get().Unit
 	}
 	if rightEdge > maxRight {
 		body.ApplyValidMovement(maxRight-rightEdge, true, nil)
@@ -140,17 +140,17 @@ func clampToPlayArea(body *PhysicsBody, space *Space) bool {
 
 	// Vertical clamping
 	minTop := 0
-	maxBottom := constants.ScreenHeight * constants.Unit
+	maxBottom := config.Get().ScreenHeight * config.Get().Unit
 	if provider != nil {
-		minTop = (constants.ScreenHeight - provider.GetTilemapHeight()) * constants.Unit
-		maxBottom = provider.GetTilemapHeight() * constants.Unit
+		minTop = (config.Get().ScreenHeight - provider.GetTilemapHeight()) * config.Get().Unit
+		maxBottom = provider.GetTilemapHeight() * config.Get().Unit
 	}
 
 	if rect.y16 < minTop {
 		body.ApplyValidMovement(minTop-rect.y16, false, nil)
 	}
 
-	bottom := rect.y16 + rect.height*constants.Unit
+	bottom := rect.y16 + rect.height*config.Get().Unit
 	if bottom >= maxBottom {
 		if bottom > maxBottom {
 			body.ApplyValidMovement(maxBottom-bottom, false, nil)

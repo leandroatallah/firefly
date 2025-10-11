@@ -3,7 +3,7 @@ package physics
 import (
 	"image"
 
-	"github.com/leandroatallah/firefly/internal/game/constants"
+	"github.com/leandroatallah/firefly/internal/config"
 )
 
 type Rect struct {
@@ -13,16 +13,16 @@ type Rect struct {
 
 func NewRect(x, y, width, height int) *Rect {
 	return &Rect{
-		x16:    x * constants.Unit,
-		y16:    y * constants.Unit,
+		x16:    x * config.Get().Unit,
+		y16:    y * config.Get().Unit,
 		width:  width,
 		height: height,
 	}
 }
 
 func (e *Rect) Position() image.Rectangle {
-	minX := e.x16 / constants.Unit
-	minY := e.y16 / constants.Unit
+	minX := e.x16 / config.Get().Unit
+	minY := e.y16 / config.Get().Unit
 	maxX := minX + e.width
 	maxY := minY + e.height
 	return image.Rect(minX, minY, maxX, maxY)

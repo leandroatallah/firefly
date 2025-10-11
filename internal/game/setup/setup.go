@@ -6,29 +6,22 @@ import (
 	"strings"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/leandroatallah/firefly/internal/engine/config"
+	"github.com/leandroatallah/firefly/internal/config"
 	"github.com/leandroatallah/firefly/internal/engine/core"
 	"github.com/leandroatallah/firefly/internal/engine/core/game"
 	"github.com/leandroatallah/firefly/internal/engine/core/levels"
 	"github.com/leandroatallah/firefly/internal/engine/core/scene"
 	"github.com/leandroatallah/firefly/internal/engine/systems/audiomanager"
 	"github.com/leandroatallah/firefly/internal/engine/systems/input"
-	"github.com/leandroatallah/firefly/internal/game/constants"
 	gamescene "github.com/leandroatallah/firefly/internal/game/scenes"
 )
 
 func Setup() {
 	// Basic Ebiten setup
-	ebiten.SetWindowSize(constants.ScreenWidth*3, constants.ScreenHeight*3)
+	ebiten.SetWindowSize(config.Get().ScreenWidth*3, config.Get().ScreenHeight*3)
 	ebiten.SetWindowTitle("Firefly")
 
 	// Initialize all systems and managers
-	baseConfig := config.BaseConfig{
-		ScreenWidth:  constants.ScreenWidth,
-		ScreenHeight: constants.ScreenHeight,
-		Unit:         constants.Unit,
-	}
-	cfg := config.NewConfig(baseConfig)
 	inputManager := input.NewManager()
 	audioManager := audiomanager.NewAudioManager()
 	sceneManager := scene.NewSceneManager()
@@ -49,7 +42,6 @@ func Setup() {
 		AudioManager: audioManager,
 		SceneManager: sceneManager,
 		LevelManager: levelManager,
-		Config:       cfg,
 	}
 
 	sceneFactory := scene.NewDefaultSceneFactory(gamescene.InitSceneMap(appContext))

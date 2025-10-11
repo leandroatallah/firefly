@@ -3,9 +3,9 @@ package physics
 import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
+	"github.com/leandroatallah/firefly/internal/config"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/systems/input"
-	"github.com/leandroatallah/firefly/internal/game/constants"
 )
 
 type PlatformMovementModel struct {
@@ -16,7 +16,7 @@ type PlatformMovementModel struct {
 // NewPlatformMovementModel creates a new PlatformMovementModel with default values.
 func NewPlatformMovementModel() *PlatformMovementModel {
 	return &PlatformMovementModel{
-		maxFallSpeed: 12 * constants.Unit,
+		maxFallSpeed: 12 * config.Get().Unit,
 	}
 }
 
@@ -57,7 +57,7 @@ func (m *PlatformMovementModel) Update(body *PhysicsBody, space body.BodiesSpace
 	// Apply acceleration and clamp horizontal velocity.
 	scaledAccX, _ := smoothDiagonalMovement(body.accelerationX, 0)
 	body.vx16 = increaseVelocity(body.vx16, scaledAccX)
-	body.vx16 = clampAxisVelocity(body.vx16, body.maxSpeed*constants.Unit)
+	body.vx16 = clampAxisVelocity(body.vx16, body.maxSpeed*config.Get().Unit)
 
 	body.CheckMovementDirectionX()
 

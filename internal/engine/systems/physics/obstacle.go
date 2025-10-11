@@ -5,7 +5,7 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/vector"
-	"github.com/leandroatallah/firefly/internal/game/constants"
+	"github.com/leandroatallah/firefly/internal/config"
 )
 
 type ObstacleRect struct {
@@ -34,8 +34,8 @@ func (o *ObstacleRect) Draw(screen *ebiten.Image) {
 	rect := o.Shape.(*Rect)
 	vector.DrawFilledRect(
 		screen,
-		float32(rect.x16)/constants.Unit,
-		float32(rect.y16)/constants.Unit,
+		float32(rect.x16)/float32(config.Get().Unit),
+		float32(rect.y16)/float32(config.Get().Unit),
 		float32(rect.width),
 		float32(rect.height),
 		color.Transparent,

@@ -8,6 +8,7 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
+	"github.com/leandroatallah/firefly/internal/config"
 	"github.com/leandroatallah/firefly/internal/engine/actors"
 	"github.com/leandroatallah/firefly/internal/engine/assets/font"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
@@ -18,7 +19,6 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/systems/audiomanager"
 	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
 	"github.com/leandroatallah/firefly/internal/engine/systems/tilemap"
-	"github.com/leandroatallah/firefly/internal/game/constants"
 	gameitems "github.com/leandroatallah/firefly/internal/game/items"
 	"github.com/setanarut/kamera/v2"
 )
@@ -40,7 +40,7 @@ type LevelsScene struct {
 }
 
 func NewLevelsScene(context *core.AppContext) *LevelsScene {
-	mainText, err := font.NewFontText(constants.MainFontFace)
+	mainText, err := font.NewFontText(config.Get().MainFontFace)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -103,8 +103,8 @@ func (s *LevelsScene) OnStart() {
 	s.cam = kamera.NewCamera(
 		float64(pPos.X),
 		float64(pPos.Y),
-		float64(constants.ScreenWidth),
-		float64(constants.ScreenHeight),
+		float64(config.Get().ScreenWidth),
+		float64(config.Get().ScreenHeight),
 	)
 	s.cam.SmoothType = kamera.SmoothDamp
 	s.cam.ShakeEnabled = true
@@ -120,14 +120,14 @@ func (s *LevelsScene) GetTilemapWidth() int {
 	if s.tilemap != nil && len(s.tilemap.Layers) > 0 {
 		return s.tilemap.Layers[0].Width * s.tilemap.Tileheight
 	}
-	return constants.ScreenWidth
+	return config.Get().ScreenWidth
 }
 
 func (s *LevelsScene) GetTilemapHeight() int {
 	if s.tilemap != nil && len(s.tilemap.Layers) > 0 {
 		return s.tilemap.Layers[0].Height * s.tilemap.Tileheight
 	}
-	return constants.ScreenHeight
+	return config.Get().ScreenHeight
 }
 
 func (s *LevelsScene) Update() error {

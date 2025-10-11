@@ -8,9 +8,9 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
+	"github.com/leandroatallah/firefly/internal/config"
 	"github.com/leandroatallah/firefly/internal/engine/actors"
 	"github.com/leandroatallah/firefly/internal/engine/assets/font"
-	"github.com/leandroatallah/firefly/internal/game/constants"
 )
 
 const (
@@ -31,7 +31,7 @@ func NewStatusBar(player actors.PlayerEntity, score int) (*StatusBar, error) {
 		return nil, err
 	}
 
-	mainText, err := font.NewFontText(constants.MainFontFace)
+	mainText, err := font.NewFontText(config.Get().MainFontFace)
 	if err != nil {
 		log.Fatal(err)
 	}

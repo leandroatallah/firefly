@@ -4,9 +4,9 @@ import (
 	"math"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/leandroatallah/firefly/internal/config"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/systems/input"
-	"github.com/leandroatallah/firefly/internal/game/constants"
 )
 
 type TopDownMovementModel struct{}
@@ -37,7 +37,7 @@ func (m *TopDownMovementModel) Update(body *PhysicsBody, space body.BodiesSpace)
 	// This is crucial for preventing faster movement on diagonals.
 	// We need to check if the velocity magnitude `sqrt(vx² + vy²)` exceeds `speedMax16²`.
 	// To avoid a costly square root, we can compare the squared values:
-	speedMax16 := body.maxSpeed * constants.Unit
+	speedMax16 := body.maxSpeed * config.Get().Unit
 	// Use int64 for squared values to prevent potential overflow.
 	velSq := int64(body.vx16)*int64(body.vx16) + int64(body.vy16)*int64(body.vy16)
 	maxSq := int64(speedMax16) * int64(speedMax16)

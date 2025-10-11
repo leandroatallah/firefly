@@ -5,13 +5,13 @@ import (
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/leandroatallah/firefly/internal/config"
 	"github.com/leandroatallah/firefly/internal/engine/assets/font"
 	"github.com/leandroatallah/firefly/internal/engine/core"
 	"github.com/leandroatallah/firefly/internal/engine/core/scene"
 	"github.com/leandroatallah/firefly/internal/engine/core/screenutil"
 	"github.com/leandroatallah/firefly/internal/engine/core/transition"
 	"github.com/leandroatallah/firefly/internal/engine/systems/audiomanager"
-	"github.com/leandroatallah/firefly/internal/game/constants"
 )
 
 const (
@@ -45,11 +45,11 @@ type IntroScene struct {
 }
 
 func NewIntroScene(context *core.AppContext) *IntroScene {
-	fontText, err := font.NewFontText(constants.MainFontFace)
+	fontText, err := font.NewFontText(config.Get().MainFontFace)
 	if err != nil {
 		log.Fatal(err)
 	}
-	overlay := ebiten.NewImage(constants.ScreenWidth, constants.ScreenHeight)
+	overlay := ebiten.NewImage(config.Get().ScreenWidth, config.Get().ScreenHeight)
 	overlay.Fill(color.Black)
 	scene := IntroScene{fontText: fontText, fadeOverlay: overlay}
 	scene.SetAppContext(context)

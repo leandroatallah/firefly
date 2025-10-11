@@ -1,8 +1,8 @@
 package physics
 
 import (
+	"github.com/leandroatallah/firefly/internal/config"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
-	"github.com/leandroatallah/firefly/internal/game/constants"
 )
 
 type MovableBody struct {
@@ -23,11 +23,11 @@ func (b *MovableBody) Move() {
 }
 
 func (b *MovableBody) MoveX(distance int) {
-	b.accelerationX = distance * constants.Unit
+	b.accelerationX = distance * config.Get().Unit
 }
 
 func (b *MovableBody) MoveY(distance int) {
-	b.accelerationY = distance * constants.Unit
+	b.accelerationY = distance * config.Get().Unit
 }
 
 // TODO: Should it be moved to Movable?
@@ -88,5 +88,5 @@ func (b *MovableBody) IsWalking() bool {
 
 // Platform methods
 func (b *MovableBody) TryJump(force int) {
-	b.vy16 = -force * constants.Unit
+	b.vy16 = -force * config.Get().Unit
 }
