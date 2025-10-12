@@ -29,7 +29,7 @@ func NewCollectibleCoinItem(x, y int) *CollectibleCoinItem {
 	// TODO: It should be set in a better place (frameRate)
 	frameRate := 10
 	base := items.NewBaseItem(sprites, frameRate)
-	rect := physics.NewRect(x, y, frameWidth, frameHeight)
+	rect := physics.NewRect(x, y-(frameHeight/2), frameWidth, frameHeight)
 	collisionRect := rect
 	base.SetBody(rect)
 	base.SetCollisionArea(collisionRect)
