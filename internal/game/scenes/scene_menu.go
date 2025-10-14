@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
 	"github.com/leandroatallah/firefly/internal/config"
 	"github.com/leandroatallah/firefly/internal/engine/assets/font"
@@ -12,6 +13,8 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/core/scene"
 	"github.com/leandroatallah/firefly/internal/engine/core/transition"
 	"github.com/leandroatallah/firefly/internal/engine/systems/audiomanager"
+	"github.com/leandroatallah/firefly/internal/engine/systems/speech"
+	gamespeech "github.com/leandroatallah/firefly/internal/game/speech"
 )
 
 const (
@@ -23,6 +26,7 @@ type MenuScene struct {
 
 	audiomanager *audiomanager.AudioManager
 	fontText     *font.FontText
+	dialogue     *speech.Dialogue
 }
 
 func NewMenuScene(context *core.AppContext) *MenuScene {
@@ -34,6 +38,50 @@ func NewMenuScene(context *core.AppContext) *MenuScene {
 	scene := MenuScene{fontText: fontText}
 	scene.SetAppContext(context)
 	return &scene
+}
+
+func (s *MenuScene) OnStart() {
+	// Init audio
+	s.audiomanager = s.Manager.AudioManager()
+	s.audiomanager.SetVolume(1)
+	// s.audiomanager.PlayMusic(kickBackBG)
+
+	// Init Dialogue
+	speechFont := speech.NewSpeechFont(s.fontText, 8, 14)
+	bubble := gamespeech.NewSpeechBubble(speechFont)
+	s.dialogue = speech.NewDialogue(bubble)
+	s.dialogue.SetSpellingDelay(60)
+	s.dialogue.SetLines([]string{
+		"Look at those birds in \nthe sky. Are they beautiful?",
+		"To be honest... This is \nvery boring...",
+	})
+}
+
+func (s *MenuScene) Update() error {
+	if ebiten.IsKeyPressed(ebiten.KeyEnter) {
+		s.Manager.NavigateTo(SceneLevels, transition.NewFader())
+	}
+
+	// Draw dialogue
+	if err := s.dialogue.Update(); err != nil {
+		return err
+	}
+
+	// Debug dialogue
+	if inpututil.IsKeyJustPressed(ebiten.KeyUp) {
+		s.dialogue.Show()
+	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyRight) {
+		if !s.dialogue.IsSpellingComplete() {
+			s.dialogue.CompleteSpelling()
+		} else {
+			if ok := s.dialogue.NextLine(); !ok {
+				s.dialogue.Hide()
+			}
+		}
+	}
+
+	return nil
 }
 
 func (s *MenuScene) Draw(screen *ebiten.Image) {
@@ -53,19 +101,8 @@ func (s *MenuScene) Draw(screen *ebiten.Image) {
 	textOp.ColorScale.Scale(1, 1, 1, float32(120))
 	s.fontText.Draw(screen, "Press Enter to start", 8, textOp)
 
-}
-
-func (s *MenuScene) Update() error {
-	if ebiten.IsKeyPressed(ebiten.KeyEnter) {
-		s.Manager.NavigateTo(SceneLevels, transition.NewFader())
-	}
-	return nil
-}
-
-func (s *MenuScene) OnStart() {
-	s.audiomanager = s.Manager.AudioManager()
-	s.audiomanager.SetVolume(1)
-	s.audiomanager.PlayMusic(kickBackBG)
+	// Draw dialogue
+	s.dialogue.Draw(screen)
 }
 
 func (s *MenuScene) OnFinish() {

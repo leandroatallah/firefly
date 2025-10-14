@@ -2,15 +2,7 @@
 
 ## 🎯 HIGH PRIORITY - Core Game Mechanics
 
-### 1. Game State Management
-
-...
-
-### 2. Audio System
-
-...
-
-### 3. Enemy AI System
+### Technical debits and wishlist
 
 ...
 

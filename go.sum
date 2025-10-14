@@ -6,8 +6,14 @@ github.com/ebitengine/oto/v3 v3.3.3 h1:m6RV69OqoXYSWCDsHXN9rc07aDuDstGHtait7HXSM
 github.com/ebitengine/oto/v3 v3.3.3/go.mod h1:MZeb/lwoC4DCOdiTIxYezrURTw7EvK/yF863+tmBI+U=
 github.com/ebitengine/purego v0.8.4 h1:CF7LEKg5FFOsASUj0+QwaXf8Ht6TlFxg09+S9wz0omw=
 github.com/ebitengine/purego v0.8.4/go.mod h1:iIjxzd6CiRiOG0UyXP+V1+jWqUXVjPKLAI0mRfJZTmQ=
+github.com/ebitenui/ebitenui v0.7.2 h1:gSMiKvgJbrbYo57hrYeI3vRzE12kIFDNq4X09WLgM/o=
+github.com/ebitenui/ebitenui v0.7.2/go.mod h1:QiJoDflkWoBv4V/LKErS3cgzTZHrXDQyqajef7IA8vM=
+github.com/frustra/bbcode v0.0.0-20201127003707-6ef347fbe1c8 h1:sdIsYe6Vv7KIWZWp8KqSeTl+XlF17d+wHCC4lbxFcYs=
+github.com/frustra/bbcode v0.0.0-20201127003707-6ef347fbe1c8/go.mod h1:0QBxkXxN+o4FyZgLI9FHY/oUizheze3+bNY/kgCKL+4=
 github.com/go-text/typesetting v0.2.0 h1:fbzsgbmk04KiWtE+c3ZD4W2nmCRzBqrqQOvYlwAOdho=
 github.com/go-text/typesetting v0.2.0/go.mod h1:2+owI/sxa73XA581LAzVuEBZ3WEEV2pXeDswCH/3i1I=
+github.com/go-text/typesetting v0.3.0 h1:OWCgYpp8njoxSRpwrdd1bQOxdjOXDj9Rqart9ML4iF4=
+github.com/go-text/typesetting v0.3.0/go.mod h1:qjZLkhRgOEYMhU9eHBr3AR4sfnGJvOXNLt8yRAySFuY=
 github.com/go-text/typesetting-utils v0.0.0-20240317173224-1986cbe96c66 h1:GUrm65PQPlhFSKjLPGOZNPNxLCybjzjYBzjfoBGaDUY=
 github.com/go-text/typesetting-utils v0.0.0-20240317173224-1986cbe96c66/go.mod h1:DDxDdQEnB70R8owOx3LVpEFvpMK9eeH1o2r0yZhFI9o=
 github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
@@ -28,6 +34,8 @@ github.com/setanarut/fastnoise v1.1.1 h1:cD9gUjY9GMxVab+B7AY09j2GAHMdiKzchDE5z6d
 github.com/setanarut/fastnoise v1.1.1/go.mod h1:74vG3/RcPPcNi2M0riHJXQp9/+eTSh0rnQ/0WTEY6SU=
 github.com/setanarut/kamera/v2 v2.97.2 h1:GiLiYkwq42b5jwXdbjK5OVuQoJK2IrPkOn+JF5bnexg=
 github.com/setanarut/kamera/v2 v2.97.2/go.mod h1:jw5q24L5alrt9OfCRbDWyfswlnnZOXMkiETc3NI/zPo=
+golang.org/x/exp v0.0.0-20250620022241-b7579e27df2b h1:M2rDM6z3Fhozi9O7NWsxAkg/yqS/lQJ6PmkyIV3YP+o=
+golang.org/x/exp v0.0.0-20250620022241-b7579e27df2b/go.mod h1:3//PLf8L/X+8b4vuAfHzxeRUl04Adcb341+IGKfnqS8=
 golang.org/x/image v0.25.0 h1:Y6uW6rH1y5y/LK1J8BPWZtr6yZ7hrsy6hFrXjgsc2fQ=
 golang.org/x/image v0.25.0/go.mod h1:tCAmOEGthTtkalusGp1g3xa2gke8J6c2N565dTyl9Rs=
 golang.org/x/sync v0.16.0 h1:ycBJEhp9p4vXvUZNszeOq0kGTPghopOL8q0fq3vstxw=
