@@ -47,13 +47,17 @@ type PlatformMovementModel struct {
 	coyoteTimeCounter int
 	// jumpBufferCounter remembers a jump input for a few frames, executing it upon landing.
 	jumpBufferCounter int
+
+	skills []Skill
 }
 
 // NewPlatformMovementModel creates a new PlatformMovementModel with default values.
 func NewPlatformMovementModel() *PlatformMovementModel {
-	return &PlatformMovementModel{
+	m := &PlatformMovementModel{
 		maxFallSpeed: 12 * config.Get().Unit,
 	}
+	m.skills = append(m.skills, NewDashSkill())
+	return m
 }
 
 // Update handles the physics for a platformer-style character.
@@ -62,8 +66,17 @@ func (m *PlatformMovementModel) Update(body *PhysicsBody, space body.BodiesSpace
 	// Handle input for player movement. This needs to be done before physics calculations.
 	m.InputHandler(body)
 
+	// Update all skills
+	var skillIsActive bool
+	for _, skill := range m.skills {
+		skill.Update(body, m)
+		if skill.IsActive() {
+			skillIsActive = true
+		}
+	}
+
 	// --- Horizontal Movement ---
-	if horizontalInertia > 0 {
+	if !skillIsActive && horizontalInertia > 0 {
 		// Acceleration-based movement
 		scaledAccX, _ := smoothDiagonalMovement(body.accelerationX, 0)
 
@@ -142,7 +155,7 @@ func (m *PlatformMovementModel) Update(body *PhysicsBody, space body.BodiesSpace
 	// Check for and execute a buffered jump if we just landed.
 	if !wasOnGround && m.onGround && m.jumpBufferCounter > 0 {
 		body.TryJump(jumpHeight)
-		m.onGround = false       // We are jumping, so we are no longer on the ground.
+		m.onGround = false      // We are jumping, so we are no longer on the ground.
 		m.jumpBufferCounter = 0 // Consume the buffer.
 		m.coyoteTimeCounter = 0 // Ensure coyote time isn't used as well.
 	}
@@ -156,7 +169,7 @@ func (m *PlatformMovementModel) Update(body *PhysicsBody, space body.BodiesSpace
 		// is checked on the next frame. This allows the system to detect when the
 		// player walks off a platform.
 		body.vy16 = 1
-	} else {
+	} else if !skillIsActive {
 		// Apply custom gravity based on vertical velocity
 		if body.vy16 < 0 {
 			// Player is moving up (jumping)
@@ -177,6 +190,28 @@ func (m *PlatformMovementModel) Update(body *PhysicsBody, space body.BodiesSpace
 
 // InputHandler processes player input for movement.
 func (m *PlatformMovementModel) InputHandler(body *PhysicsBody) {
+	// Let skills handle their input first.
+	for _, skill := range m.skills {
+		if activeSkill, ok := skill.(ActiveSkill); ok {
+			activeSkill.HandleInput(body, m)
+		}
+	}
+
+	// Check if any skill is active, which might block normal input.
+	var skillIsActive bool
+	for _, skill := range m.skills {
+		if skill.IsActive() {
+			skillIsActive = true
+			break
+		}
+	}
+
+	// If a skill is active, skip normal movement input.
+	if skillIsActive {
+		body.accelerationX = 0 // Prevent acceleration from previous frame carrying over
+		return
+	}
+
 	if body.Immobile() {
 		body.vx16 = 0
 		body.accelerationX = 0
@@ -212,7 +247,7 @@ func (m *PlatformMovementModel) InputHandler(body *PhysicsBody) {
 		// A jump is triggered if the player is on the ground OR if coyote time is active.
 		if m.onGround || m.coyoteTimeCounter > 0 {
 			body.TryJump(jumpHeight)
-			m.onGround = false        // Immediately leave the ground state.
+			m.onGround = false      // Immediately leave the ground state.
 			m.coyoteTimeCounter = 0 // Consume coyote time to prevent double jumps.
 			m.jumpBufferCounter = 0 // Clear any buffered jump.
 		} else {
