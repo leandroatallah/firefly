@@ -70,7 +70,7 @@ func (b *BaseItem) OnTouch(other body.Body) {}
 
 func (b *BaseItem) Image() *ebiten.Image {
 	pos := b.Position()
-	img := b.SpriteEntity.GetFirstSprite()
+	img := b.GetFirstSprite()
 	img = b.AnimatedSpriteImage(img, pos, b.count, b.frameRate)
 	return img
 }

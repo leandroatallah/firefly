@@ -236,11 +236,10 @@ func (s *LevelsScene) Draw(screen *ebiten.Image) {
 	}
 
 	// Draw player based on camera
-	pPos := s.player.Position().Min
-	img := s.player.Image()
-	s.player.ImageOptions().GeoM.Reset()
-	s.player.ImageOptions().GeoM.Translate(float64(pPos.X), float64(pPos.Y))
-	s.cam.Draw(img, s.player.ImageOptions(), screen)
+	if img := s.player.Image(); img != nil {
+		opts := *s.player.ImageOptions()
+		s.cam.Draw(img, &opts, screen)
+	}
 
 	s.DrawHUD(screen)
 }
@@ -264,6 +263,8 @@ func createPlayer(space *physics.Space) (actors.PlayerEntity, error) {
 	if err != nil {
 		return nil, err
 	}
+	pos := player.Position()
+	player.SetCollisionArea(physics.NewRect(pos.Min.X, pos.Min.Y, pos.Dx(), pos.Dy()))
 	space.AddBody(player)
 	return player, nil
 }

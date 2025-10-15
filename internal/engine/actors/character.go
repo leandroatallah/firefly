@@ -2,7 +2,6 @@ package actors
 
 import (
 	"image"
-	"image/color"
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -20,6 +19,8 @@ type Character struct {
 	state          ActorState
 	movementState  movement.MovementState
 	animationCount int
+	// TODO: Move to the right place
+	frameRate int
 	// TODO: Rename this
 	op *ebiten.DrawImageOptions
 }
@@ -28,6 +29,7 @@ func NewCharacter(s sprites.SpriteMap) *Character {
 	spriteEntity := sprites.NewSpriteEntity(s)
 	c := &Character{
 		SpriteEntity: spriteEntity,
+		frameRate:    12,
 		op:           &ebiten.DrawImageOptions{},
 	}
 	state, err := NewActorState(c, Idle)
@@ -163,6 +165,7 @@ func (c *Character) handleState() {
 	}
 }
 
+// TODO: Remove this unused method
 func (c *Character) Draw(screen *ebiten.Image) {
 	pos := c.Position()
 	minX, minY := pos.Min.X, pos.Min.Y
@@ -187,7 +190,7 @@ func (c *Character) Draw(screen *ebiten.Image) {
 	img := c.GetSpriteByState(c.state.State())
 	characterWidth := img.Bounds().Dx()
 	frameCount := characterWidth / width
-	i := (c.count / frameRate) % frameCount
+	i := (c.count / c.frameRate) % frameCount
 	sx, sy := frameOX+i*width, frameOY
 
 	screen.DrawImage(
@@ -228,42 +231,33 @@ func (c *Character) SetTouchable(t body.Touchable) {
 }
 
 func (c *Character) Image() *ebiten.Image {
-	img := ebiten.NewImage(c.Position().Dx(), c.Position().Dy())
-	img.Fill(color.RGBA{0xff, 0xff, 0xff, 0xff})
-	return img
+	pos := c.Position()
+	width := pos.Dx()
+	height := pos.Dy()
 
-	// pos := c.Position()
-	// width := pos.Dx()
-	// height := pos.Dy()
-	//
-	// // Fallback in case of missing sprite
-	// if c.sprites == nil || c.sprites[c.state.State()] == nil {
-	// 	if width == 0 || height == 0 {
-	// 		// Avoid panic with zero size image
-	// 		img := ebiten.NewImage(1, 1)
-	// 		img.Fill(color.White)
-	// 		return img
-	// 	}
-	// 	img := ebiten.NewImage(width, height)
-	// 	img.Fill(color.RGBA{R: 255, A: 255})
-	// 	return img
-	// }
-	//
-	// img := c.sprites[c.state.State()]
-	// characterWidth := img.Bounds().Dx()
-	// if width == 0 {
-	// 	// Avoid division by zero
-	// 	img := ebiten.NewImage(1, 1)
-	// 	img.Fill(color.White)
-	// 	return img
-	// }
-	// frameCount := characterWidth / width
-	// i := (c.count / frameRate) % frameCount
-	// sx, sy := frameOX+i*width, frameOY
-	//
-	// return img.SubImage(
-	// 	image.Rect(sx, sy, sx+width, sy+height),
-	// ).(*ebiten.Image)
+	img := c.GetSpriteByState(c.state.State())
+	if img == nil {
+		// Try to fallback to idle sprite
+		img = c.GetSpriteByState(Idle)
+	}
+
+	characterWidth := img.Bounds().Dx()
+
+	if width <= 0 {
+		return img
+	}
+	frameCount := characterWidth / width
+	if frameCount <= 1 {
+		return img
+	}
+
+	i := (c.count / c.frameRate) % frameCount
+
+	sx, sy := frameOX+i*width, frameOY
+
+	return img.SubImage(
+		image.Rect(sx, sy, sx+width, sy+height),
+	).(*ebiten.Image)
 }
 
 func (c *Character) ImageOptions() *ebiten.DrawImageOptions {
