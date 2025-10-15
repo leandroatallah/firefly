@@ -8,62 +8,28 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/systems/input"
 )
 
-const (
-	// horizontalInertia controls the smoothness of horizontal movement.
-	// 0.0 means instant movement (no inertia).
-	// 1.0 is a good default, providing a smoother, acceleration-based movement.
-	// Higher values will make the character slide more.
-	horizontalInertia = 2.0
-
-	// airFrictionMultiplier controls how much friction is applied in the air.
-	// 1.0 means air friction is the same as ground friction.
-	// 0.0 means no air friction (full momentum).
-	// 0.5 means air friction is half of the ground friction.
-	airFrictionMultiplier = 0.5
-
-	// airControlMultiplier controls how much acceleration is applied in the air.
-	// 1.0 means air control is the same as on the ground.
-	// Values > 1.0 provide stronger air control, making it easier to change direction.
-	// Values < 1.0 provide weaker air control, making it harder to change direction.
-	airControlMultiplier = 0.25
-
-	// coyoteTimeFrames is the number of frames the player can still jump after leaving a ledge.
-	coyoteTimeFrames = 6
-
-	// jumpBufferFrames is the number of frames a jump input is remembered before landing.
-	jumpBufferFrames = 6
-
-	jumpHeight        = 6
-	jumpCutMultiplier = 0.5
-	upwardGravity     = 6 // Gravity when going up
-	downwardGravity   = 8 // Gravity when falling
-)
-
 type PlatformMovementModel struct {
-	onGround     bool
-	maxFallSpeed int
-	isScripted   bool
-
-	// coyoteTimeCounter allows the player to jump for a few frames after leaving a ledge.
+	onGround          bool
+	maxFallSpeed      int
+	isScripted        bool
 	coyoteTimeCounter int
-	// jumpBufferCounter remembers a jump input for a few frames, executing it upon landing.
 	jumpBufferCounter int
-
-	skills []Skill
+	skills            []Skill
 }
 
 // NewPlatformMovementModel creates a new PlatformMovementModel with default values.
 func NewPlatformMovementModel() *PlatformMovementModel {
 	m := &PlatformMovementModel{
-		maxFallSpeed: 12 * config.Get().Unit,
+		maxFallSpeed: config.Get().Physics.MaxFallSpeed,
 	}
 	m.skills = append(m.skills, NewDashSkill())
 	return m
 }
 
 // Update handles the physics for a platformer-style character.
-// It processes input, applies movement and collisions, handles gravity.
 func (m *PlatformMovementModel) Update(body *PhysicsBody, space body.BodiesSpace) error {
+	cfg := config.Get().Physics
+
 	// Handle input for player movement. This needs to be done before physics calculations.
 	m.InputHandler(body)
 
@@ -77,13 +43,13 @@ func (m *PlatformMovementModel) Update(body *PhysicsBody, space body.BodiesSpace
 	}
 
 	// --- Horizontal Movement ---
-	if !skillIsActive && horizontalInertia > 0 {
+	if !skillIsActive && cfg.HorizontalInertia > 0 {
 		// Acceleration-based movement
 		scaledAccX, _ := smoothDiagonalMovement(body.accelerationX, 0)
 
 		// Apply air control multiplier if the player is in the air
 		if !m.onGround {
-			scaledAccX = int(float64(scaledAccX) * airControlMultiplier)
+			scaledAccX = int(float64(scaledAccX) * cfg.AirControlMultiplier)
 		}
 
 		body.vx16 = increaseVelocity(body.vx16, scaledAccX)
@@ -91,12 +57,12 @@ func (m *PlatformMovementModel) Update(body *PhysicsBody, space body.BodiesSpace
 
 		// Apply friction if the player is not actively moving
 		if body.accelerationX == 0 {
-			baseFriction := int(float64(config.Get().Unit/4) * horizontalInertia)
+			baseFriction := int(float64(config.Get().Unit/4) * cfg.HorizontalInertia)
 			friction := baseFriction
 
 			// Apply air friction multiplier if the player is in the air
 			if !m.onGround {
-				friction = int(float64(baseFriction) * airFrictionMultiplier)
+				friction = int(float64(baseFriction) * cfg.AirFrictionMultiplier)
 			}
 
 			if body.vx16 > friction {
@@ -115,10 +81,8 @@ func (m *PlatformMovementModel) Update(body *PhysicsBody, space body.BodiesSpace
 	}
 
 	// --- Vertical Movement & State ---
-	// Store previous onGround status to detect landing
 	wasOnGround := m.onGround
 
-	// Apply vertical movement and check for collisions to determine if the body has landed.
 	verticalBlocked := applyAxisMovement(body, body.vy16, false, space)
 	landed := false
 	if verticalBlocked {
@@ -128,37 +92,31 @@ func (m *PlatformMovementModel) Update(body *PhysicsBody, space body.BodiesSpace
 		body.vy16 = 0
 	}
 
-	// Also consider landing if the body hits the bottom of the play area.
 	if clampToPlayArea(body, space.(*Space)) {
 		landed = true
 		body.vy16 = 0
 	}
 
-	// Update the final 'onGround' state.
 	m.onGround = landed
 
 	// --- Coyote Time & Jump Buffering ---
 	if m.onGround {
-		// If on the ground, reset the coyote time counter.
-		m.coyoteTimeCounter = coyoteTimeFrames
+		m.coyoteTimeCounter = cfg.CoyoteTimeFrames
 	} else {
-		// If in the air, decrement the coyote time counter.
 		if m.coyoteTimeCounter > 0 {
 			m.coyoteTimeCounter--
 		}
 	}
 
-	// Decrement the jump buffer counter each frame.
 	if m.jumpBufferCounter > 0 {
 		m.jumpBufferCounter--
 	}
 
-	// Check for and execute a buffered jump if we just landed.
 	if !wasOnGround && m.onGround && m.jumpBufferCounter > 0 {
-		body.TryJump(jumpHeight)
-		m.onGround = false      // We are jumping, so we are no longer on the ground.
-		m.jumpBufferCounter = 0 // Consume the buffer.
-		m.coyoteTimeCounter = 0 // Ensure coyote time isn't used as well.
+		body.TryJump(cfg.JumpForce)
+		m.onGround = false
+		m.jumpBufferCounter = 0
+		m.coyoteTimeCounter = 0
 	}
 
 	// --- Final State Updates ---
@@ -166,21 +124,14 @@ func (m *PlatformMovementModel) Update(body *PhysicsBody, space body.BodiesSpace
 	body.accelerationX, body.accelerationY = 0, 0
 
 	if m.onGround {
-		// By setting vy16 to a small positive value, we ensure that ground collision
-		// is checked on the next frame. This allows the system to detect when the
-		// player walks off a platform.
 		body.vy16 = 1
 	} else if !skillIsActive {
-		// Apply custom gravity based on vertical velocity
 		if body.vy16 < 0 {
-			// Player is moving up (jumping)
-			body.vy16 += upwardGravity
+			body.vy16 += cfg.UpwardGravity
 		} else {
-			// Player is moving down (falling)
-			body.vy16 += downwardGravity
+			body.vy16 += cfg.DownwardGravity
 		}
 
-		// Clamp fall speed to terminal velocity
 		if body.vy16 > m.maxFallSpeed {
 			body.vy16 = m.maxFallSpeed
 		}
@@ -196,9 +147,12 @@ func (m *PlatformMovementModel) SetIsScripted(isScripted bool) {
 
 // InputHandler processes player input for movement.
 func (m *PlatformMovementModel) InputHandler(body *PhysicsBody) {
+	cfg := config.Get().Physics
+
 	if m.isScripted {
 		return // Ignore player input when scripted
 	}
+
 	// Let skills handle their input first.
 	for _, skill := range m.skills {
 		if activeSkill, ok := skill.(ActiveSkill); ok {
@@ -206,7 +160,6 @@ func (m *PlatformMovementModel) InputHandler(body *PhysicsBody) {
 		}
 	}
 
-	// Check if any skill is active, which might block normal input.
 	var skillIsActive bool
 	for _, skill := range m.skills {
 		if skill.IsActive() {
@@ -215,9 +168,8 @@ func (m *PlatformMovementModel) InputHandler(body *PhysicsBody) {
 		}
 	}
 
-	// If a skill is active, skip normal movement input.
 	if skillIsActive {
-		body.accelerationX = 0 // Prevent acceleration from previous frame carrying over
+		body.accelerationX = 0
 		return
 	}
 
@@ -231,8 +183,7 @@ func (m *PlatformMovementModel) InputHandler(body *PhysicsBody) {
 	moveLeft := input.IsSomeKeyPressed(ebiten.KeyA, ebiten.KeyLeft)
 	moveRight := input.IsSomeKeyPressed(ebiten.KeyD, ebiten.KeyRight)
 
-	if horizontalInertia > 0 {
-		// Acceleration-based movement
+	if cfg.HorizontalInertia > 0 {
 		if moveLeft {
 			body.OnMoveLeft(body.Speed())
 		}
@@ -240,7 +191,6 @@ func (m *PlatformMovementModel) InputHandler(body *PhysicsBody) {
 			body.OnMoveRight(body.Speed())
 		}
 	} else {
-		// Instant movement
 		switch {
 		case moveLeft:
 			body.vx16 = -body.Speed() * config.Get().Unit
@@ -253,21 +203,18 @@ func (m *PlatformMovementModel) InputHandler(body *PhysicsBody) {
 
 	// --- Jump Input ---
 	if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
-		// A jump is triggered if the player is on the ground OR if coyote time is active.
 		if m.onGround || m.coyoteTimeCounter > 0 {
-			body.TryJump(jumpHeight)
-			m.onGround = false      // Immediately leave the ground state.
-			m.coyoteTimeCounter = 0 // Consume coyote time to prevent double jumps.
-			m.jumpBufferCounter = 0 // Clear any buffered jump.
+			body.TryJump(cfg.JumpForce)
+			m.onGround = false
+			m.coyoteTimeCounter = 0
+			m.jumpBufferCounter = 0
 		} else {
-			// If in the air and unable to jump, buffer the jump input.
-			m.jumpBufferCounter = jumpBufferFrames
+			m.jumpBufferCounter = cfg.JumpBufferFrames
 		}
 	}
 
 	// --- Variable Jump Height ---
-	// If the player releases the jump button mid-air, reduce the upward velocity.
 	if !m.onGround && !input.IsSomeKeyPressed(ebiten.KeySpace) && body.vy16 < 0 {
-		body.vy16 = int(float64(body.vy16) * jumpCutMultiplier)
+		body.vy16 = int(float64(body.vy16) * cfg.JumpCutMultiplier)
 	}
 }
