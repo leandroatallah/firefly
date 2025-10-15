@@ -19,7 +19,7 @@ func NewCollectibleCoinItem(x, y int) *CollectibleCoinItem {
 	frameWidth, frameHeight := 16, 16
 
 	var assets sprites.SpriteAssets
-	assets = assets.AddSprite(actors.Idle, "assets/collectible-coin.png")
+	assets = assets.AddSprite(actors.Idle, "assets/images/collectible-coin.png")
 
 	sprites, err := sprites.LoadSprites(assets)
 	if err != nil {

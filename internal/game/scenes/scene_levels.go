@@ -26,7 +26,7 @@ import (
 )
 
 const (
-	bgSound = "assets/Sketchbook 2024-06-19.ogg"
+	bgSound = "assets/audio/Sketchbook.ogg"
 )
 
 type LevelsScene struct {

@@ -24,8 +24,8 @@ func NewBlueEnemy() *BlueEnemy {
 	)
 
 	var assets sprites.SpriteAssets
-	assets = assets.AddSprite(actors.Idle, "assets/blue-enemy.png").
-		AddSprite(actors.Walk, "assets/blue-enemy.png")
+	assets = assets.AddSprite(actors.Idle, "assets/images/blue-enemy.png").
+		AddSprite(actors.Walk, "assets/images/blue-enemy.png")
 
 	sprites, err := sprites.LoadSprites(assets)
 	if err != nil {

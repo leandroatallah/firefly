@@ -1,0 +1,43 @@
+{
+  "commands": [
+    {
+      "command": "dialogue",
+      "lines": [
+        "Eu sei bem que não sou o único que \nvirou programador porque queria \ndesenvolver jogos.",
+        "Porém, minha carreira seguiu uma \ntrilha menos divertida.",
+        "Eu me tornei desenvolvedor frontend, \nagora perto de completar 10 anos \nde carreira.",
+        "Estou escrevendo esse roteiro \nnuma madrugada durante minhas férias...",
+        "...depois de passar alguns dias \nestudando desenvolvimento de jogos \nnas horas vagas."
+      ]
+    },
+    {
+      "command": "delay",
+      "frames": 180
+    },
+    {
+      "command": "dialogue",
+      "lines": [
+        "Mas eu escolhi um caminho \nbem diferente do comum.",
+        "Estou desenvolvendo um jogo usando \nGolang e uma engine pouco conhecida, \na Ebitengine.",
+        "Além de não ser muito popular, \nessa engine exige que se escreva \nmuito código.",
+        "já que ela não tem uma interface \nde usuário com elementos clicáveis",
+        "ou comportamentos prontos \npara reutilizar."
+      ]
+    },
+    {
+      "command": "delay",
+      "frames": 180
+    },
+    {
+      "command": "dialogue",
+      "lines": [
+        "O Ebitengine só fornece um \nloop básico de 60fps e a opção \nde desenhar imagens na tela.",
+        "Através dos exemplos você até \nconsegue encontrar uma boa fonte \npra copiar algumas funcionalidades.",
+        "Mas você ainda vai ter que \nescrever código.",
+        "E, considerando que a arquitetura \nde jogos costuma ser bem complexa...",
+        "não será um desafio tão fácil se \nvocê pretende aplicar boas práticas, \npadrões de projeto e código limpo."
+      ]
+    }
+  ],
+  "block_player_movement": false
+}

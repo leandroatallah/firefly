@@ -26,7 +26,7 @@ type StatusBar struct {
 }
 
 func NewStatusBar(player actors.PlayerEntity, score int) (*StatusBar, error) {
-	heart, _, err := ebitenutil.NewImageFromFile("assets/heart.png")
+	heart, _, err := ebitenutil.NewImageFromFile("assets/images/heart.png")
 	if err != nil {
 		return nil, err
 	}

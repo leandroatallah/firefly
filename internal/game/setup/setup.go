@@ -33,7 +33,7 @@ func Setup() {
 	actorManager := actors.NewManager()
 
 	// Initialize Dialogue Manager
-	fontText, err := font.NewFontText("assets/pressstart2p.ttf")
+	fontText, err := font.NewFontText("assets/fonts/pressstart2p.ttf")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -45,8 +45,8 @@ func Setup() {
 	loadAudioAssets(audioManager)
 
 	// Load levels
-	level1 := levels.Level{ID: 1, Name: "Level 1", TilemapPath: "assets/sample-level-1.tmj", NextLevelID: 2}
-	level2 := levels.Level{ID: 2, Name: "Level 2", TilemapPath: "assets/sample-level-2.tmj", NextLevelID: 0} // 0 means no next level
+	level1 := levels.Level{ID: 1, Name: "Level 1", TilemapPath: "assets/tilemap/sample-level-1.tmj", NextLevelID: 2}
+	level2 := levels.Level{ID: 2, Name: "Level 2", TilemapPath: "assets/tilemap/sample-level-2.tmj", NextLevelID: 0} // 0 means no next level
 	levelManager.AddLevel(level1)
 	levelManager.AddLevel(level2)
 	levelManager.SetCurrentLevel(1)
@@ -85,7 +85,7 @@ func loadAudioAssets(am *audiomanager.AudioManager) {
 	}
 	for _, file := range files {
 		if !file.IsDir() && (strings.HasSuffix(file.Name(), ".ogg") || strings.HasSuffix(file.Name(), ".wav")) {
-			audioItem, err := am.Load("assets/" + file.Name())
+			audioItem, err := am.Load("assets/audio/" + file.Name())
 			if err != nil {
 				log.Printf("error loading audio file %s: %v", file.Name(), err)
 				continue

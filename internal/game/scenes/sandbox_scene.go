@@ -19,8 +19,8 @@ import (
 )
 
 const (
-	jab8         = "assets/jab8.ogg"
-	sketchbookBG = "assets/Sketchbook 2024-06-19.ogg"
+	jab8         = "assets/audio/jab8.ogg"
+	sketchbookBG = "assets/audio/Sketchbook.ogg"
 )
 
 type SandboxScene struct {

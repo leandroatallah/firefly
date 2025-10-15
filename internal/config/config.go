@@ -6,7 +6,7 @@ const (
 	ScreenHeight  = 180
 	Unit          = 16
 	DefaultVolume = 0.5
-	MainFontFace  = "assets/pressstart2p.ttf"
+	MainFontFace  = "assets/fonts/pressstart2p.ttf"
 )
 
 type PhysicsConfig struct {

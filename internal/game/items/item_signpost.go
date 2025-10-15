@@ -18,7 +18,7 @@ func NewSignpostItem(x, y int) *SignpostItem {
 	frameWidth, frameHeight := 32, 36
 
 	var assets sprites.SpriteAssets
-	assets = assets.AddSprite(actors.Idle, "assets/item-signpost.png")
+	assets = assets.AddSprite(actors.Idle, "assets/images/item-signpost.png")
 
 	sprites, err := sprites.LoadSprites(assets)
 	if err != nil {

@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	kickBackBG = "assets/kick_backOGG.ogg"
+	kickBackBG = "assets/audio/kick_backOGG.ogg"
 )
 
 type MenuScene struct {

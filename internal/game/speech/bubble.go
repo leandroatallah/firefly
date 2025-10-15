@@ -34,7 +34,7 @@ type SpeechBubble struct {
 
 func NewSpeechBubble(fontSource *speech.SpeechFont) *SpeechBubble {
 	// Load 9-slice bubble image
-	img, _, err := ebitenutil.NewImageFromFile("assets/9-slice-speech.png")
+	img, _, err := ebitenutil.NewImageFromFile("assets/images/9-slice-speech.png")
 	if err != nil {
 		log.Fatal(err)
 	}

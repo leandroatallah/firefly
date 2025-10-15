@@ -20,9 +20,9 @@ func NewPlayerPlatform(playerMovementBlocker physics.PlayerMovementBlocker) (Pla
 
 	var assets sprites.SpriteAssets
 	assets = assets.
-		AddSprite(Idle, "assets/leandro-idle.png").
-		AddSprite(Walk, "assets/leandro-walk.png").
-		AddSprite(Hurted, "assets/default-hurt.png")
+		AddSprite(Idle, "assets/images/leandro-idle.png").
+		AddSprite(Walk, "assets/images/leandro-walk.png").
+		AddSprite(Hurted, "assets/images/default-hurt.png")
 
 	sprites, err := sprites.LoadSprites(assets)
 	if err != nil {

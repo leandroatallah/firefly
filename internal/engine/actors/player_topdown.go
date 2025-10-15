@@ -18,9 +18,9 @@ func NewPlayerTopDown(playerMovementBlocker physics.PlayerMovementBlocker) (Play
 
 	var assets sprites.SpriteAssets
 	assets = assets.
-		AddSprite(Idle, "assets/default-idle.png").
-		AddSprite(Walk, "assets/default-walk.png").
-		AddSprite(Hurted, "assets/default-hurt.png")
+		AddSprite(Idle, "assets/images/default-idle.png").
+		AddSprite(Walk, "assets/images/default-walk.png").
+		AddSprite(Hurted, "assets/images/default-hurt.png")
 
 	sprites, err := sprites.LoadSprites(assets)
 	if err != nil {
