@@ -36,6 +36,9 @@ func NewPhysicsBody(shape body.Shape) *PhysicsBody {
 func (b *PhysicsBody) ID() string {
 	return b.id
 }
+func (b *PhysicsBody) SetID(id string) {
+	b.id = id
+}
 func (b *PhysicsBody) Invulnerable() bool {
 	return b.invulnerable
 }

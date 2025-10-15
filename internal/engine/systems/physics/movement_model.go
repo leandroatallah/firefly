@@ -9,6 +9,7 @@ import (
 type MovementModel interface {
 	Update(body *PhysicsBody, space body.BodiesSpace) error
 	InputHandler(body *PhysicsBody)
+	SetIsScripted(isScripted bool)
 }
 
 type MovementModelEnum int

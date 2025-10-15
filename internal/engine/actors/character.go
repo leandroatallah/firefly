@@ -51,6 +51,10 @@ func (c *Character) SetCollisionArea(rect *physics.Rect) ActorEntity {
 	return c
 }
 
+func (c *Character) SetID(id string) {
+	c.PhysicsBody.SetID(id)
+}
+
 func (c *Character) State() ActorStateEnum {
 	return c.state.State()
 }
@@ -84,6 +88,10 @@ func (c *Character) SwitchMovementState(state movement.MovementStateEnum) {
 
 func (c *Character) MovementState() movement.MovementState {
 	return c.movementState
+}
+
+func (c *Character) SetMovementModel(model physics.MovementModel) {
+	c.PhysicsBody.SetMovementModel(model)
 }
 
 func (c *Character) Update(space body.BodiesSpace) error {

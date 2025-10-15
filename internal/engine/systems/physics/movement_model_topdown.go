@@ -9,7 +9,9 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/systems/input"
 )
 
-type TopDownMovementModel struct{}
+type TopDownMovementModel struct{
+	isScripted bool
+}
 
 func NewTopDownMovementModel() *TopDownMovementModel {
 	return &TopDownMovementModel{}
@@ -65,9 +67,16 @@ func (m *TopDownMovementModel) Update(body *PhysicsBody, space body.BodiesSpace)
 	return nil
 }
 
+func (m *TopDownMovementModel) SetIsScripted(isScripted bool) {
+	m.isScripted = isScripted
+}
+
 // InputHandler processes player input for movement.
 // Top-Down player can move for all directions and diagonals.
 func (m *TopDownMovementModel) InputHandler(body *PhysicsBody) {
+	if m.isScripted {
+		return // Ignore player input when scripted
+	}
 	if body.Immobile() {
 		return
 	}

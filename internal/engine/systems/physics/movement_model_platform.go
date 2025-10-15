@@ -42,6 +42,7 @@ const (
 type PlatformMovementModel struct {
 	onGround     bool
 	maxFallSpeed int
+	isScripted   bool
 
 	// coyoteTimeCounter allows the player to jump for a few frames after leaving a ledge.
 	coyoteTimeCounter int
@@ -188,8 +189,16 @@ func (m *PlatformMovementModel) Update(body *PhysicsBody, space body.BodiesSpace
 	return nil
 }
 
+// SetIsScripted sets the scripted mode for the movement model.
+func (m *PlatformMovementModel) SetIsScripted(isScripted bool) {
+	m.isScripted = isScripted
+}
+
 // InputHandler processes player input for movement.
 func (m *PlatformMovementModel) InputHandler(body *PhysicsBody) {
+	if m.isScripted {
+		return // Ignore player input when scripted
+	}
 	// Let skills handle their input first.
 	for _, skill := range m.skills {
 		if activeSkill, ok := skill.(ActiveSkill); ok {

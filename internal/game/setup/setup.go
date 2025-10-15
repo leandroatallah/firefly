@@ -7,13 +7,17 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/config"
+	"github.com/leandroatallah/firefly/internal/engine/actors"
+	"github.com/leandroatallah/firefly/internal/engine/assets/font"
 	"github.com/leandroatallah/firefly/internal/engine/core"
 	"github.com/leandroatallah/firefly/internal/engine/core/game"
 	"github.com/leandroatallah/firefly/internal/engine/core/levels"
 	"github.com/leandroatallah/firefly/internal/engine/core/scene"
 	"github.com/leandroatallah/firefly/internal/engine/systems/audiomanager"
 	"github.com/leandroatallah/firefly/internal/engine/systems/input"
+	"github.com/leandroatallah/firefly/internal/engine/systems/speech"
 	gamescene "github.com/leandroatallah/firefly/internal/game/scenes"
+	gamespeech "github.com/leandroatallah/firefly/internal/game/speech"
 )
 
 func Setup() {
@@ -26,6 +30,16 @@ func Setup() {
 	audioManager := audiomanager.NewAudioManager()
 	sceneManager := scene.NewSceneManager()
 	levelManager := levels.NewManager()
+	actorManager := actors.NewManager()
+
+	// Initialize Dialogue Manager
+	fontText, err := font.NewFontText("assets/pressstart2p.ttf")
+	if err != nil {
+		log.Fatal(err)
+	}
+	speechFont := speech.NewSpeechFont(fontText, 8, 14)
+	speechBubble := gamespeech.NewSpeechBubble(speechFont)
+	dialogueManager := speech.NewManager(speechBubble)
 
 	// Load audio assets
 	loadAudioAssets(audioManager)
@@ -38,10 +52,12 @@ func Setup() {
 	levelManager.SetCurrentLevel(1)
 
 	appContext := &core.AppContext{
-		InputManager: inputManager,
-		AudioManager: audioManager,
-		SceneManager: sceneManager,
-		LevelManager: levelManager,
+		InputManager:    inputManager,
+		AudioManager:    audioManager,
+		DialogueManager: dialogueManager,
+		ActorManager:    actorManager,
+		SceneManager:    sceneManager,
+		LevelManager:    levelManager,
 	}
 
 	sceneFactory := scene.NewDefaultSceneFactory(gamescene.InitSceneMap(appContext))

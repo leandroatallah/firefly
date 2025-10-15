@@ -2,78 +2,78 @@ package speech
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/leandroatallah/firefly/internal/engine/systems/input"
 )
 
-// Dialogue manages a sequence of dialogue lines.
-type Dialogue struct {
-	speech      Speech
-	lines       []string
-	currentLine int
+// Manager handles the display of dialogue and speech bubbles.
+type Manager struct {
+	speech          Speech
+	isSpeaking      bool
+	currentText     string
+	lines           []string
+	currentLine     int
+	waitingForInput bool
 }
 
-func NewDialogue(speech Speech) *Dialogue {
-	return &Dialogue{speech: speech}
+// NewManager creates a new dialogue manager.
+func NewManager(speech Speech) *Manager {
+	return &Manager{speech: speech}
 }
 
-func (d *Dialogue) Update() error {
-	if err := d.speech.Update(); err != nil {
+// ShowMessages displays a list of messages.
+func (m *Manager) ShowMessages(lines []string) {
+	if len(lines) == 0 {
+		return
+	}
+	m.lines = lines
+	m.currentLine = 0
+	m.isSpeaking = true
+	m.waitingForInput = false
+	m.speech.ResetText()
+	m.speech.Show()
+}
+
+// IsSpeaking returns true if the dialogue manager is currently displaying a message.
+func (m *Manager) IsSpeaking() bool {
+	return m.isSpeaking
+}
+
+// Update updates the dialogue state. It handles input for proceeding.
+func (m *Manager) Update() error {
+	if !m.isSpeaking {
+		return nil
+	}
+
+	if err := m.speech.Update(); err != nil {
 		return err
+	}
+
+	if m.speech.IsSpellingComplete() && !m.waitingForInput {
+		m.waitingForInput = true
+	}
+
+	if m.waitingForInput {
+		if input.IsSomeKeyPressed(ebiten.KeySpace, ebiten.KeyEnter) {
+			m.currentLine++
+			if m.currentLine >= len(m.lines) {
+				m.speech.Hide()
+				m.isSpeaking = false
+			} else {
+				m.speech.ResetText()
+				m.waitingForInput = false
+			}
+		}
 	}
 	return nil
 }
 
-func (d *Dialogue) Draw(screen *ebiten.Image) {
-	if len(d.lines) == 0 {
+// Draw draws the speech bubble if it's active.
+func (m *Manager) Draw(screen *ebiten.Image) {
+	if !m.isSpeaking {
 		return
 	}
 
-	line := d.GetCurrentLine()
-	d.speech.Draw(screen, line)
-}
-
-func (d *Dialogue) GetCurrentLine() string {
-	if d.currentLine >= len(d.lines) {
-		return ""
+	if m.currentLine < len(m.lines) {
+		m.speech.Draw(screen, m.lines[m.currentLine])
 	}
-	return d.lines[d.currentLine]
-}
-
-func (d *Dialogue) AddLine(line string) {
-	d.lines = append(d.lines, line)
-}
-
-func (d *Dialogue) SetLines(lines []string) {
-	d.lines = lines
-}
-
-func (d *Dialogue) SetSpellingDelay(delay int) {
-	d.speech.SetSpellingDelay(delay)
-}
-
-func (d *Dialogue) NextLine() bool {
-	d.currentLine++
-
-	if d.currentLine >= len(d.lines) {
-		return false
-	}
-
-	d.speech.ResetText()
-
-	return true
-}
-
-func (d *Dialogue) Show() {
-	d.speech.Show()
-}
-
-func (d *Dialogue) Hide() {
-	d.speech.Hide()
-}
-
-func (d *Dialogue) IsSpellingComplete() bool {
-	return d.speech.IsSpellingComplete()
-}
-
-func (d *Dialogue) CompleteSpelling() {
-	d.speech.CompleteSpelling()
 }

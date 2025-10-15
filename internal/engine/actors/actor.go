@@ -9,6 +9,8 @@ import (
 
 type ActorEntity interface {
 	body.Body
+	ID() string
+	SetID(id string)
 	SetBody(rect *physics.Rect) ActorEntity
 	SetCollisionArea(rect *physics.Rect) ActorEntity
 	State() ActorStateEnum
@@ -20,8 +22,12 @@ type ActorEntity interface {
 	)
 	SwitchMovementState(state movement.MovementStateEnum)
 	MovementState() movement.MovementState
+	MovementModel() physics.MovementModel
+	SetMovementModel(model physics.MovementModel)
 	Update(space body.BodiesSpace) error
 	Hurt(damage int)
+	OnMoveLeft(force int)
+	OnMoveRight(force int)
 	Image() *ebiten.Image
 	ImageOptions() *ebiten.DrawImageOptions
 }

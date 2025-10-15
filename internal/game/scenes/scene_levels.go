@@ -16,6 +16,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/core/scene"
 	"github.com/leandroatallah/firefly/internal/engine/core/transition"
 	"github.com/leandroatallah/firefly/internal/engine/items"
+	"github.com/leandroatallah/firefly/internal/engine/sequences"
 	"github.com/leandroatallah/firefly/internal/engine/systems/audiomanager"
 	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
 	"github.com/leandroatallah/firefly/internal/engine/systems/tilemap"
@@ -38,6 +39,8 @@ type LevelsScene struct {
 	mainText       *font.FontText
 	audiomanager   *audiomanager.AudioManager
 	itemsMap       map[int]items.ItemType
+
+	sequencePlayer *sequences.SequencePlayer
 }
 
 func NewLevelsScene(context *core.AppContext) *LevelsScene {
@@ -81,6 +84,8 @@ func (s *LevelsScene) OnStart() {
 		log.Fatal(err)
 	}
 	s.player = p
+	s.player.SetID("player")
+	s.AppContext.ActorManager.Register(s.player)
 	s.space.AddBody(s.player)
 
 	// Set items map to factory creation process
@@ -129,6 +134,14 @@ func (s *LevelsScene) OnStart() {
 	s.tilemap.CreateCollisionBodies(s.space, endpointTrigger)
 
 	s.levelCompleted = false
+
+	// Init sequence
+	s.sequencePlayer = sequences.NewSequencePlayer(s.AppContext)
+	sequence, err := sequences.NewSequenceFromJSON("assets/sequences/sample.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+	s.sequencePlayer.Play(sequence)
 }
 
 func (s *LevelsScene) GetTilemapWidth() int {
@@ -181,6 +194,8 @@ func (s *LevelsScene) Update() error {
 		}
 	}
 
+	s.sequencePlayer.Update()
+
 	return nil
 }
 
@@ -231,6 +246,7 @@ func (s *LevelsScene) Draw(screen *ebiten.Image) {
 }
 
 func (s *LevelsScene) OnFinish() {
+	// TODO: Should reset actor manager?
 	s.audiomanager.PauseMusic(bgSound)
 }
 

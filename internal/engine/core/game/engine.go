@@ -20,6 +20,9 @@ func (g *Game) Update() error {
 	// First, update the input manager
 	g.AppContext.InputManager.Update()
 
+	// Update Dialogue Manager
+	g.AppContext.DialogueManager.Update()
+
 	// Then, update the current scene
 	g.AppContext.SceneManager.Update()
 	return nil
@@ -27,6 +30,9 @@ func (g *Game) Update() error {
 
 func (g *Game) Draw(screen *ebiten.Image) {
 	g.AppContext.SceneManager.Draw(screen)
+
+	// Draw Dialogue Manager
+	g.AppContext.DialogueManager.Draw(screen)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
