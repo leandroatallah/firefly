@@ -83,7 +83,19 @@ func (b *MovableBody) FaceDirection() FacingDirectionEnum {
 }
 
 func (b *MovableBody) IsWalking() bool {
-	return b.vx16 != 0 || b.vy16 != 0
+	threshold := config.Get().Unit / 4
+	if threshold < 1 {
+		threshold = 1
+	}
+
+	if b.vx16 > threshold || b.vx16 < -threshold {
+		return true
+	}
+	if b.vy16 > threshold || b.vy16 < -threshold {
+		return true
+	}
+
+	return false
 }
 
 // Platform methods

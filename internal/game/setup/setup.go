@@ -69,10 +69,8 @@ func Setup() {
 	// Create and run the game
 	game := game.NewGame(appContext)
 
-	// TODO: Game state is disabled. Check if it is necessary. The game is handled by scenes.
-	// Set initial game state
-	// game.SetState(state.Intro)
-	game.AppContext.SceneManager.NavigateTo(gamescene.SceneIntro, nil)
+	// Set initial game scene
+	game.AppContext.SceneManager.NavigateTo(gamescene.SceneLevels, nil)
 
 	if err := ebiten.RunGame(game); err != nil {
 		log.Fatal(err)

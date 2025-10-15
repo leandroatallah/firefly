@@ -19,7 +19,7 @@ const (
 	maxMargin           = 24
 	delayBeforeRemove   = 12
 	delayBeforeSpelling = 60
-	speedText           = 6
+	speedText           = 4
 )
 
 type SpeechBubble struct {
@@ -104,7 +104,7 @@ func (s *SpeechBubble) Draw(screen *ebiten.Image, msg string) {
 
 	// Resting state properties
 	w_rest := float64(config.Get().ScreenWidth - minMargin*2)
-	h_rest := float64(80)
+	h_rest := float64(52)
 	x_rest := float64(minMargin)
 	y_rest := float64(config.Get().ScreenHeight) - h_rest - float64(minMargin)
 

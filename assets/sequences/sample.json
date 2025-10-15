@@ -1,30 +1,33 @@
-[
-  {
-    "command": "delay",
-    "frames": 60
-  },
-  {
-    "command": "move_actor",
-    "target_id": "player",
-    "end_x": 240,
-    "speed": 15
-  },
-  {
-    "command": "delay",
-    "frames": 60
-  },
-  {
-    "command": "dialogue",
-    "lines": ["I've reached the first point.", "But, what can I expect now?"]
-  },
-  {
-    "command": "delay",
-    "frames": 60
-  },
-  {
-    "command": "move_actor",
-    "target_id": "player",
-    "end_x": 140,
-    "speed": 15
-  }
-]
+{
+  "commands": [
+    {
+      "command": "delay",
+      "frames": 60
+    },
+    {
+      "command": "move_actor",
+      "target_id": "player",
+      "end_x": 240,
+      "speed": 15
+    },
+    {
+      "command": "delay",
+      "frames": 60
+    },
+    {
+      "command": "dialogue",
+      "lines": ["I've reached the first point.", "But, what can I expect now?"]
+    },
+    {
+      "command": "delay",
+      "frames": 60
+    },
+    {
+      "command": "move_actor",
+      "target_id": "player",
+      "end_x": 140,
+      "speed": 15
+    }
+  ],
+  "block_player_movement": true
+}

@@ -12,16 +12,16 @@ type PlayerPlatform struct {
 	coinCount int
 }
 
-func NewPlayerPlatform() (PlayerEntity, error) {
+func NewPlayerPlatform(playerMovementBlocker physics.PlayerMovementBlocker) (PlayerEntity, error) {
 	const (
-		frameWidth  = 16
-		frameHeight = 16
+		frameWidth  = 32
+		frameHeight = 32
 	)
 
 	var assets sprites.SpriteAssets
 	assets = assets.
-		AddSprite(Idle, "assets/default-idle.png").
-		AddSprite(Walk, "assets/default-walk.png").
+		AddSprite(Idle, "assets/leandro-idle.png").
+		AddSprite(Walk, "assets/leandro-walk.png").
 		AddSprite(Hurted, "assets/default-hurt.png")
 
 	sprites, err := sprites.LoadSprites(assets)
@@ -46,9 +46,9 @@ func NewPlayerPlatform() (PlayerEntity, error) {
 	player.SetMaxHealth(5)
 	player.SetCollisionArea(collisionRect)
 	player.SetTouchable(player)
-	player.SetSpeedAndMaxSpeed(4, 4)
+	player.SetSpeedAndMaxSpeed(1, 1)
 
-	movementModel, err := physics.NewMovementModel(physics.Platform)
+	movementModel, err := physics.NewMovementModel(physics.Platform, playerMovementBlocker)
 	if err != nil {
 		return nil, err
 	}

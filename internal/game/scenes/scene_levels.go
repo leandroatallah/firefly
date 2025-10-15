@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
 	"github.com/leandroatallah/firefly/internal/config"
 	"github.com/leandroatallah/firefly/internal/engine/actors"
@@ -79,7 +80,7 @@ func (s *LevelsScene) OnStart() {
 	s.space.SetTilemapDimensionsProvider(s)
 
 	// Create player
-	p, err := createPlayer(s.space)
+	p, err := createPlayer(s.space, s.AppContext)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -137,11 +138,6 @@ func (s *LevelsScene) OnStart() {
 
 	// Init sequence
 	s.sequencePlayer = sequences.NewSequencePlayer(s.AppContext)
-	sequence, err := sequences.NewSequenceFromJSON("assets/sequences/sample.json")
-	if err != nil {
-		log.Fatal(err)
-	}
-	s.sequencePlayer.Play(sequence)
 }
 
 func (s *LevelsScene) GetTilemapWidth() int {
@@ -195,6 +191,15 @@ func (s *LevelsScene) Update() error {
 	}
 
 	s.sequencePlayer.Update()
+
+	// Press S to play the sequence
+	if inpututil.IsKeyJustPressed(ebiten.KeyS) {
+		sequence, err := sequences.NewSequenceFromJSON("assets/sequences/leandro.json")
+		if err != nil {
+			log.Fatal(err)
+		}
+		s.sequencePlayer.Play(sequence)
+	}
 
 	return nil
 }
@@ -258,8 +263,8 @@ func (s *LevelsScene) finishLevel() {
 	s.AppContext.SceneManager.NavigateTo(SceneSummary, transition.NewFader())
 }
 
-func createPlayer(space *physics.Space) (actors.PlayerEntity, error) {
-	player, err := actors.NewPlayer(actors.Platform)
+func createPlayer(space *physics.Space, appContext *core.AppContext) (actors.PlayerEntity, error) {
+	player, err := actors.NewPlayer(actors.Platform, appContext)
 	if err != nil {
 		return nil, err
 	}

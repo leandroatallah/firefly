@@ -10,7 +10,7 @@ type PlayerTopDown struct {
 	Player
 }
 
-func NewPlayerTopDown() (PlayerEntity, error) {
+func NewPlayerTopDown(playerMovementBlocker physics.PlayerMovementBlocker) (PlayerEntity, error) {
 	const (
 		frameWidth  = 32
 		frameHeight = 32
@@ -45,7 +45,7 @@ func NewPlayerTopDown() (PlayerEntity, error) {
 	player.SetTouchable(player)
 	player.SetSpeedAndMaxSpeed(4, 4)
 
-	movementModel, err := physics.NewMovementModel(physics.TopDown)
+	movementModel, err := physics.NewMovementModel(physics.TopDown, playerMovementBlocker)
 	if err != nil {
 		return nil, err
 	}

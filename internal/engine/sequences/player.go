@@ -21,9 +21,13 @@ func NewSequencePlayer(appContext *core.AppContext) *SequencePlayer {
 
 // Play starts executing a sequence.
 func (p *SequencePlayer) Play(sequence Sequence) {
+	if p.isPlaying {
+		return // Do not play if another sequence is already in progress
+	}
 	p.currentSequence = sequence
 	p.currentCommandIndex = -1 // Will be incremented to 0 by advanceToNextCommand
 	p.isPlaying = true
+	p.appContext.SetPlayerMovementBlocked(sequence.BlockPlayerMovement)
 	p.advanceToNextCommand()
 }
 
@@ -38,12 +42,13 @@ func (p *SequencePlayer) Update() {
 		return
 	}
 
-	if p.currentCommandIndex >= len(p.currentSequence) {
+	if p.currentCommandIndex >= len(p.currentSequence.Commands) {
 		p.isPlaying = false
+		p.appContext.SetPlayerMovementBlocked(false)
 		return
 	}
 
-	currentCommand := p.currentSequence[p.currentCommandIndex]
+	currentCommand := p.currentSequence.Commands[p.currentCommandIndex]
 	if currentCommand.Update() {
 		p.advanceToNextCommand()
 	}
@@ -52,11 +57,12 @@ func (p *SequencePlayer) Update() {
 // advanceToNextCommand moves to the next command in the queue and initializes it.
 func (p *SequencePlayer) advanceToNextCommand() {
 	p.currentCommandIndex++
-	if p.currentCommandIndex >= len(p.currentSequence) {
+	if p.currentCommandIndex >= len(p.currentSequence.Commands) {
 		p.isPlaying = false
+		p.appContext.SetPlayerMovementBlocked(false)
 		return
 	}
 
-	nextCommand := p.currentSequence[p.currentCommandIndex]
+	nextCommand := p.currentSequence.Commands[p.currentCommandIndex]
 	nextCommand.Init(p.appContext)
 }

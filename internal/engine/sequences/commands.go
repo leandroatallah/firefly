@@ -72,7 +72,7 @@ func (c *MoveActorCommand) Update() bool {
 	currentX := float64(c.targetActor.Position().Min.X)
 	distance := c.EndX - currentX
 
-	const arrivalThreshold = 2.0
+	const arrivalThreshold = 20.0
 	const brakingDistance = 10.0 // This value may need tuning depending on friction and speed
 
 	if math.Abs(distance) < arrivalThreshold {

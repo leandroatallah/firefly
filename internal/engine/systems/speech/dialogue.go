@@ -2,7 +2,7 @@ package speech
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/leandroatallah/firefly/internal/engine/systems/input"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
 // Manager handles the display of dialogue and speech bubbles.
@@ -53,7 +53,7 @@ func (m *Manager) Update() error {
 	}
 
 	if m.waitingForInput {
-		if input.IsSomeKeyPressed(ebiten.KeySpace, ebiten.KeyEnter) {
+		if inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
 			m.currentLine++
 			if m.currentLine >= len(m.lines) {
 				m.speech.Hide()

@@ -27,12 +27,12 @@ const (
 	Platform
 )
 
-func NewMovementModel(model MovementModelEnum) (MovementModel, error) {
+func NewMovementModel(model MovementModelEnum, playerMovementBlocker PlayerMovementBlocker) (MovementModel, error) {
 	switch model {
 	case TopDown:
-		return NewTopDownMovementModel(), nil
+		return NewTopDownMovementModel(playerMovementBlocker), nil
 	case Platform:
-		return NewPlatformMovementModel(), nil
+		return NewPlatformMovementModel(playerMovementBlocker), nil
 	default:
 		return nil, fmt.Errorf("unknown movement model type")
 	}

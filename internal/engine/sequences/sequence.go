@@ -19,8 +19,11 @@ type Command interface {
 	Update() bool
 }
 
-// Sequence is a list of commands to be executed in order.
-type Sequence []Command
+// Sequence is a list of commands to be executed in order, with additional properties.
+type Sequence struct {
+	Commands            []Command
+	BlockPlayerMovement bool
+}
 
 // CommandData is a wrapper used for parsing commands from JSON.
 // It holds the data for all possible command types.
@@ -37,6 +40,12 @@ type CommandData struct {
 	TargetID string  `json:"target_id,omitempty"`
 	EndX     float64 `json:"end_x,omitempty"`
 	Speed    float64 `json:"speed,omitempty"`
+}
+
+// SequenceData is a wrapper used for parsing a full sequence from JSON.
+type SequenceData struct {
+	Commands            []CommandData `json:"commands"`
+	BlockPlayerMovement bool          `json:"block_player_movement,omitempty"`
 }
 
 // ToCommand converts the generic CommandData into a specific Command implementation.
@@ -60,21 +69,24 @@ func (cd *CommandData) ToCommand() Command {
 func NewSequenceFromJSON(filePath string) (Sequence, error) {
 	data, err := os.ReadFile(filePath)
 	if err != nil {
-		return nil, err
+		return Sequence{}, err
 	}
 
-	var commandData []CommandData
-	if err := json.Unmarshal(data, &commandData); err != nil {
-		return nil, err
+	var sequenceData SequenceData
+	if err := json.Unmarshal(data, &sequenceData); err != nil {
+		return Sequence{}, err
 	}
 
-	var sequence Sequence
-	for _, cd := range commandData {
+	var commands []Command
+	for _, cd := range sequenceData.Commands {
 		cmd := cd.ToCommand()
 		if cmd != nil {
-			sequence = append(sequence, cmd)
+			commands = append(commands, cmd)
 		}
 	}
 
-	return sequence, nil
+	return Sequence{
+		Commands:            commands,
+		BlockPlayerMovement: sequenceData.BlockPlayerMovement,
+	}, nil
 }

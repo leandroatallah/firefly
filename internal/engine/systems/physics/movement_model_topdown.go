@@ -10,11 +10,14 @@ import (
 )
 
 type TopDownMovementModel struct{
+	playerMovementBlocker PlayerMovementBlocker
 	isScripted bool
 }
 
-func NewTopDownMovementModel() *TopDownMovementModel {
-	return &TopDownMovementModel{}
+func NewTopDownMovementModel(playerMovementBlocker PlayerMovementBlocker) *TopDownMovementModel {
+	return &TopDownMovementModel{
+		playerMovementBlocker: playerMovementBlocker,
+	}
 }
 
 func (m *TopDownMovementModel) Update(body *PhysicsBody, space body.BodiesSpace) error {
@@ -74,8 +77,8 @@ func (m *TopDownMovementModel) SetIsScripted(isScripted bool) {
 // InputHandler processes player input for movement.
 // Top-Down player can move for all directions and diagonals.
 func (m *TopDownMovementModel) InputHandler(body *PhysicsBody) {
-	if m.isScripted {
-		return // Ignore player input when scripted
+	if m.isScripted || m.playerMovementBlocker.IsPlayerMovementBlocked() {
+		return // Ignore player input when scripted or movement is blocked
 	}
 	if body.Immobile() {
 		return

@@ -162,7 +162,7 @@ func (s *SandboxScene) OnStart() {
 
 	// Create Player
 	var err error
-	s.player, err = actors.NewPlayer(actors.TopDown)
+	s.player, err = actors.NewPlayer(actors.TopDown, s.AppContext)
 	if err != nil {
 		log.Fatal(err)
 	}

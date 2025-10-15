@@ -9,6 +9,7 @@ import (
 )
 
 type PlatformMovementModel struct {
+	playerMovementBlocker PlayerMovementBlocker
 	onGround          bool
 	maxFallSpeed      int
 	isScripted        bool
@@ -18,8 +19,9 @@ type PlatformMovementModel struct {
 }
 
 // NewPlatformMovementModel creates a new PlatformMovementModel with default values.
-func NewPlatformMovementModel() *PlatformMovementModel {
+func NewPlatformMovementModel(playerMovementBlocker PlayerMovementBlocker) *PlatformMovementModel {
 	m := &PlatformMovementModel{
+		playerMovementBlocker: playerMovementBlocker,
 		maxFallSpeed: config.Get().Physics.MaxFallSpeed,
 	}
 	m.skills = append(m.skills, NewDashSkill())
@@ -149,8 +151,8 @@ func (m *PlatformMovementModel) SetIsScripted(isScripted bool) {
 func (m *PlatformMovementModel) InputHandler(body *PhysicsBody) {
 	cfg := config.Get().Physics
 
-	if m.isScripted {
-		return // Ignore player input when scripted
+	if m.isScripted || m.playerMovementBlocker.IsPlayerMovementBlocked() {
+		return // Ignore player input when scripted or movement is blocked
 	}
 
 	// Let skills handle their input first.
