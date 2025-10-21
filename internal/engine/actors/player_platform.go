@@ -29,7 +29,7 @@ func NewPlayerPlatform(playerMovementBlocker physics.PlayerMovementBlocker) (Pla
 		return nil, err
 	}
 
-	character := NewCharacter(sprites)
+	character := NewCharacter(sprites, 6)
 
 	x := 0
 	_, y := screenutil.GetCenterOfScreenPosition(frameWidth, frameHeight)

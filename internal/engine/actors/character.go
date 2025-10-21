@@ -25,11 +25,11 @@ type Character struct {
 	op *ebiten.DrawImageOptions
 }
 
-func NewCharacter(s sprites.SpriteMap) *Character {
+func NewCharacter(s sprites.SpriteMap, frameRate int) *Character {
 	spriteEntity := sprites.NewSpriteEntity(s)
 	c := &Character{
 		SpriteEntity: spriteEntity,
-		frameRate:    12,
+		frameRate:    frameRate,
 		op:           &ebiten.DrawImageOptions{},
 	}
 	state, err := NewActorState(c, Idle)

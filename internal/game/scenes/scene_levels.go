@@ -21,6 +21,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/systems/audiomanager"
 	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
 	"github.com/leandroatallah/firefly/internal/engine/systems/tilemap"
+	gameplayer "github.com/leandroatallah/firefly/internal/game/actors/player"
 	gameitems "github.com/leandroatallah/firefly/internal/game/items"
 	"github.com/setanarut/kamera/v2"
 )
@@ -264,12 +265,10 @@ func (s *LevelsScene) finishLevel() {
 }
 
 func createPlayer(space *physics.Space, appContext *core.AppContext) (actors.PlayerEntity, error) {
-	player, err := actors.NewPlayer(actors.Platform, appContext)
+	player, err := gameplayer.NewCherryPlayer(appContext)
 	if err != nil {
 		return nil, err
 	}
-	pos := player.Position()
-	player.SetCollisionArea(physics.NewRect(pos.Min.X, pos.Min.Y, pos.Dx(), pos.Dy()))
 	space.AddBody(player)
 	return player, nil
 }

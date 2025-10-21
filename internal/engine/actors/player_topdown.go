@@ -27,7 +27,7 @@ func NewPlayerTopDown(playerMovementBlocker physics.PlayerMovementBlocker) (Play
 		return nil, err
 	}
 
-	character := NewCharacter(sprites)
+	character := NewCharacter(sprites, 6)
 
 	x, y := screenutil.GetCenterOfScreenPosition(frameWidth, frameHeight)
 	bodyRect := physics.NewRect(x, y, frameWidth, frameHeight)

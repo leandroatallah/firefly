@@ -32,7 +32,7 @@ func NewBlueEnemy() *BlueEnemy {
 		log.Fatal(err)
 	}
 
-	character := actors.NewCharacter(sprites)
+	character := actors.NewCharacter(sprites, 8)
 
 	bodyRect := physics.NewRect(x, y, frameWidth, frameHeight)
 	collisionRect := physics.NewRect(x, y, frameWidth, frameHeight)

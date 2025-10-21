@@ -82,6 +82,10 @@ func (b *MovableBody) FaceDirection() FacingDirectionEnum {
 	return b.faceDirection
 }
 
+func (b *MovableBody) SetFaceDirection(value FacingDirectionEnum) {
+	b.faceDirection = value
+}
+
 func (b *MovableBody) IsWalking() bool {
 	threshold := config.Get().Unit / 4
 	if threshold < 1 {

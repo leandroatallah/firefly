@@ -8,6 +8,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/items"
 	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
 	"github.com/leandroatallah/firefly/internal/engine/systems/sprites"
+	gameplayer "github.com/leandroatallah/firefly/internal/game/actors/player"
 )
 
 // Concrete
@@ -43,7 +44,8 @@ func (c *CollectibleCoinItem) OnTouch(other body.Body) {
 		return
 	}
 
-	if p, ok := other.GetTouchable().(*actors.PlayerPlatform); ok {
+	// TODO: It should not be coupled to CherryPlayer
+	if p, ok := other.GetTouchable().(*gameplayer.CherryPlayer); ok {
 		c.SetRemoved(true)
 		p.AddCoinCount(1)
 	}

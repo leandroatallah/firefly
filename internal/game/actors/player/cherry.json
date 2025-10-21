@@ -1,0 +1,27 @@
+{
+  "sprites": {
+    "body_rect": {
+      "x": 0,
+      "y": 0,
+      "width": 32,
+      "height": 32
+    },
+    "collision_rect": {
+      "x": 4,
+      "y": 10,
+      "width": 22,
+      "height": 21
+    },
+    "assets": {
+      "idle": "assets/images/cherry-idle.png",
+      "walk": "assets/images/cherry-walk.png"
+    },
+    "facing_direction": 0,
+    "frame_rate": 12
+  },
+  "stats": {
+    "health": 5,
+    "speed": 1,
+    "max_speed": 1
+  }
+}
