@@ -1,0 +1,27 @@
+{
+  "sprites": {
+    "body_rect": {
+      "x": 0,
+      "y": 0,
+      "width": 64,
+      "height": 64
+    },
+    "collision_rect": {
+      "x": 1,
+      "y": 5,
+      "width": 62,
+      "height": 57
+    },
+    "assets": {
+      "idle": "assets/images/zac-idle.png",
+      "walk": "assets/images/zac-idle.png"
+    },
+    "facing_direction": 0,
+    "frame_rate": 12
+  },
+  "stats": {
+    "health": 5,
+    "speed": 1,
+    "max_speed": 1
+  }
+}

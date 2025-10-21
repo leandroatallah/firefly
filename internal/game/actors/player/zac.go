@@ -5,16 +5,16 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
 )
 
-type CherryPlayer struct {
+type ZacPlayer struct {
 	actors.Player
 
 	coinCount int
 }
 
-func NewCherryPlayer(
+func NewZacPlayer(
 	movementBlocker physics.PlayerMovementBlocker,
 ) (actors.PlayerEntity, error) {
-	spriteData, statData, err := actors.ParseJsonPlayer("internal/game/actors/player/cherry.json")
+	spriteData, statData, err := actors.ParseJsonPlayer("internal/game/actors/player/zac.json")
 	if err != nil {
 		return nil, err
 	}
@@ -24,7 +24,7 @@ func NewCherryPlayer(
 		return nil, err
 	}
 
-	player := &CherryPlayer{
+	player := &ZacPlayer{
 		Player: actors.Player{Character: *character},
 	}
 	SetPlayerBodies(player, spriteData)
@@ -32,11 +32,4 @@ func NewCherryPlayer(
 	SetMovementModel(player, physics.Platform, movementBlocker)
 
 	return player, nil
-}
-
-func (p *CherryPlayer) AddCoinCount(amount int) {
-	p.coinCount += amount
-}
-func (p *CherryPlayer) CoinCount() int {
-	return p.coinCount
 }

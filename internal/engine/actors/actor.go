@@ -13,6 +13,7 @@ type ActorEntity interface {
 	SetID(id string)
 	SetBody(rect *physics.Rect) ActorEntity
 	SetCollisionArea(rect *physics.Rect) ActorEntity
+	SetTouchable(t body.Touchable)
 	State() ActorStateEnum
 	SetState(state ActorState)
 	SetMovementState(
