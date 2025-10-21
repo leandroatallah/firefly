@@ -9,9 +9,9 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/systems/input"
 )
 
-type TopDownMovementModel struct{
+type TopDownMovementModel struct {
 	playerMovementBlocker PlayerMovementBlocker
-	isScripted bool
+	isScripted            bool
 }
 
 func NewTopDownMovementModel(playerMovementBlocker PlayerMovementBlocker) *TopDownMovementModel {

@@ -10,19 +10,19 @@ import (
 
 type PlatformMovementModel struct {
 	playerMovementBlocker PlayerMovementBlocker
-	onGround          bool
-	maxFallSpeed      int
-	isScripted        bool
-	coyoteTimeCounter int
-	jumpBufferCounter int
-	skills            []Skill
+	onGround              bool
+	maxFallSpeed          int
+	isScripted            bool
+	coyoteTimeCounter     int
+	jumpBufferCounter     int
+	skills                []Skill
 }
 
 // NewPlatformMovementModel creates a new PlatformMovementModel with default values.
 func NewPlatformMovementModel(playerMovementBlocker PlayerMovementBlocker) *PlatformMovementModel {
 	m := &PlatformMovementModel{
 		playerMovementBlocker: playerMovementBlocker,
-		maxFallSpeed: config.Get().Physics.MaxFallSpeed,
+		maxFallSpeed:          config.Get().Physics.MaxFallSpeed,
 	}
 	m.skills = append(m.skills, NewDashSkill())
 	return m

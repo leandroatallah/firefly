@@ -59,7 +59,7 @@ func init() {
 		JumpForce:             5,
 		JumpCutMultiplier:     0.5,
 		UpwardGravity:         4,
-		DownwardGravity:       4,
+		DownwardGravity:       2,
 		MaxFallSpeed:          3 * Unit,
 	}
 

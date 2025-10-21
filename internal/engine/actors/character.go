@@ -5,7 +5,6 @@ import (
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/leandroatallah/firefly/internal/config"
 	"github.com/leandroatallah/firefly/internal/engine/actors/movement"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
@@ -124,7 +123,7 @@ func (c *Character) UpdateImageOptions() {
 	width := pos.Dx()
 
 	fDirection := c.FaceDirection()
-	if fDirection == physics.FaceDirectionRight {
+	if fDirection == physics.FaceDirectionLeft {
 		c.op.GeoM.Scale(-1, 1)
 		c.op.GeoM.Translate(float64(width), 0)
 	}
@@ -163,42 +162,6 @@ func (c *Character) handleState() {
 			c.SetInvulnerable(false)
 		}
 	}
-}
-
-// TODO: Remove this unused method
-func (c *Character) Draw(screen *ebiten.Image) {
-	pos := c.Position()
-	minX, minY := pos.Min.X, pos.Min.Y
-	maxX, maxY := pos.Max.X, pos.Max.Y
-	width := maxX - minX
-	height := maxY - minY
-
-	c.op.GeoM.Reset()
-
-	fDirection := c.FaceDirection()
-	if fDirection == physics.FaceDirectionRight {
-		c.op.GeoM.Scale(-1, 1)
-		c.op.GeoM.Translate(float64(width), 0)
-	}
-
-	// Apply character movement
-	c.op.GeoM.Translate(
-		float64(minX*config.Get().Unit)/float64(config.Get().Unit),
-		float64(minY*config.Get().Unit)/float64(config.Get().Unit),
-	)
-
-	img := c.GetSpriteByState(c.state.State())
-	characterWidth := img.Bounds().Dx()
-	frameCount := characterWidth / width
-	i := (c.count / c.frameRate) % frameCount
-	sx, sy := frameOX+i*width, frameOY
-
-	screen.DrawImage(
-		img.SubImage(
-			image.Rect(sx, sy, sx+width, sy+height),
-		).(*ebiten.Image),
-		c.op,
-	)
 }
 
 func (c *Character) OnTouch(other body.Body) {}

@@ -3,7 +3,6 @@ package gameenemies
 import (
 	"log"
 
-	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/engine/actors"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
@@ -52,10 +51,6 @@ func NewBlueEnemy() *BlueEnemy {
 func (e *BlueEnemy) Update(space body.BodiesSpace) error {
 	e.count++
 	return e.Character.Update(space)
-}
-
-func (e *BlueEnemy) Draw(screen *ebiten.Image) {
-	e.Character.Draw(screen)
 }
 
 func (e *BlueEnemy) OnTouch(other body.Body) {
