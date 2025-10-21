@@ -7,23 +7,22 @@ import (
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
 	"github.com/leandroatallah/firefly/internal/config"
 	"github.com/leandroatallah/firefly/internal/engine/actors"
 	"github.com/leandroatallah/firefly/internal/engine/assets/font"
+	"github.com/leandroatallah/firefly/internal/engine/camera"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/core"
 	"github.com/leandroatallah/firefly/internal/engine/core/scene"
 	"github.com/leandroatallah/firefly/internal/engine/core/transition"
 	"github.com/leandroatallah/firefly/internal/engine/items"
-	"github.com/leandroatallah/firefly/internal/engine/sequences"
 	"github.com/leandroatallah/firefly/internal/engine/systems/audiomanager"
 	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
 	"github.com/leandroatallah/firefly/internal/engine/systems/tilemap"
 	gameplayer "github.com/leandroatallah/firefly/internal/game/actors/player"
+	gamecamera "github.com/leandroatallah/firefly/internal/game/camera"
 	gameitems "github.com/leandroatallah/firefly/internal/game/items"
-	"github.com/setanarut/kamera/v2"
 )
 
 const (
@@ -36,13 +35,11 @@ type LevelsScene struct {
 	player         actors.PlayerEntity
 	space          *physics.Space
 	tilemap        *tilemap.Tilemap
-	cam            *kamera.Camera
+	cam            *camera.Controller
 	levelCompleted bool
 	mainText       *font.FontText
 	audiomanager   *audiomanager.AudioManager
 	itemsMap       map[int]items.ItemType
-
-	sequencePlayer *sequences.SequencePlayer
 }
 
 func NewLevelsScene(context *core.AppContext) *LevelsScene {
@@ -122,23 +119,14 @@ func (s *LevelsScene) OnStart() {
 
 	// Init player camera
 	pPos := s.player.Position().Min
-	s.cam = kamera.NewCamera(
-		float64(pPos.X),
-		float64(pPos.Y),
-		float64(config.Get().ScreenWidth),
-		float64(config.Get().ScreenHeight),
-	)
-	s.cam.SmoothType = kamera.SmoothDamp
-	s.cam.ShakeEnabled = true
+	s.cam = gamecamera.New(pPos.X, pPos.Y)
+	s.cam.SetFollowTarget(s.player)
 
 	// Init collisions bodies and touch trigger for endpoints
 	endpointTrigger := physics.NewTouchTrigger(s.finishLevel, s.player)
 	s.tilemap.CreateCollisionBodies(s.space, endpointTrigger)
 
 	s.levelCompleted = false
-
-	// Init sequence
-	s.sequencePlayer = sequences.NewSequencePlayer(s.AppContext)
 }
 
 func (s *LevelsScene) GetTilemapWidth() int {
@@ -161,14 +149,27 @@ func (s *LevelsScene) Update() error {
 
 	s.count++
 
-	// Update camera position
-	pPos := s.player.Position().Min
-	pWidth := s.player.Position().Dx()
-	pHeight := s.player.Position().Dy()
-	s.cam.LookAt(
-		float64(pPos.X+(pWidth/2)),
-		float64(pPos.Y+(pHeight/2)),
-	)
+	// // Update cam target to smoothly follow the player
+	// pPos := s.player.Position().Min
+	// targetPos := s.camTarget.Position().Min
+	//
+	// // A smaller factor makes the movement smoother (and slower).
+	// smoothingFactor := 0.05
+	// newX := float64(targetPos.X) + (float64(pPos.X)-float64(targetPos.X))*smoothingFactor
+	// newY := float64(targetPos.Y) + (float64(pPos.Y)-float64(targetPos.Y))*smoothingFactor
+	//
+	// s.camTarget.SetPosition(int(newX)*config.Get().Unit, int(newY)*config.Get().Unit)
+	//
+	// // Update camera to look at the now smoothly moving camTarget
+	// finalTargetPos := s.camTarget.Position().Min
+	// targetWidth := s.camTarget.Position().Dx()
+	// targetHeight := s.camTarget.Position().Dy()
+	// s.cam.LookAt(
+	// 	float64(finalTargetPos.X+(targetWidth/2)),
+	// 	float64(finalTargetPos.Y+(targetHeight/2)),
+	// )
+
+	s.cam.Update()
 
 	// Execute bodies updates
 	space := s.PhysicsSpace()
@@ -189,17 +190,6 @@ func (s *LevelsScene) Update() error {
 		if err := actor.Update(space); err != nil {
 			return err
 		}
-	}
-
-	s.sequencePlayer.Update()
-
-	// Press S to play the sequence
-	if inpututil.IsKeyJustPressed(ebiten.KeyS) {
-		sequence, err := sequences.NewSequenceFromJSON("assets/sequences/leandro.json")
-		if err != nil {
-			log.Fatal(err)
-		}
-		s.sequencePlayer.Play(sequence)
 	}
 
 	return nil
@@ -275,23 +265,22 @@ func createPlayer(space *physics.Space, appContext *core.AppContext) (actors.Pla
 
 // TODO: REMOVE this method
 func (s *LevelsScene) CamDebug() {
-
 	if ebiten.IsKeyPressed(ebiten.KeyR) {
-		s.cam.Angle += 0.02
+		s.cam.Kamera().Angle += 0.02
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyF) {
-		s.cam.Angle -= 0.02
+		s.cam.Kamera().Angle -= 0.02
 	}
 
 	if ebiten.IsKeyPressed(ebiten.KeyBackspace) {
-		s.cam.Reset()
+		s.cam.Kamera().Reset()
 	}
 
 	if ebiten.IsKeyPressed(ebiten.KeyQ) { // zoom out
-		s.cam.ZoomFactor /= 1.02
+		s.cam.Kamera().ZoomFactor /= 1.02
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyE) { // zoom in
-		s.cam.ZoomFactor *= 1.02
+		s.cam.Kamera().ZoomFactor *= 1.02
 	}
 }
 
