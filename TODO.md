@@ -7,7 +7,6 @@
 - Create shape package to split some things from physics package.
 - Review player platform and top down. Maybe it should be removed.
 - Add cam movement command to sequence
-- Add a cam target element to better cam movement
 - Change physics in a real time sandbox control
 - reduce repeated scene contents
 - change sprite animation when jumping

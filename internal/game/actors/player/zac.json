@@ -21,7 +21,7 @@
   },
   "stats": {
     "health": 5,
-    "speed": 1,
-    "max_speed": 1
+    "speed": 2,
+    "max_speed": 3
   }
 }

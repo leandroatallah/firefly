@@ -17,11 +17,11 @@
       "walk": "assets/images/cherry-walk.png"
     },
     "facing_direction": 0,
-    "frame_rate": 12
+    "frame_rate": 6
   },
   "stats": {
     "health": 5,
-    "speed": 1,
-    "max_speed": 1
+    "speed": 3,
+    "max_speed": 3
   }
 }

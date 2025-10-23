@@ -56,11 +56,11 @@ func init() {
 		AirControlMultiplier:  0.25,
 		CoyoteTimeFrames:      6,
 		JumpBufferFrames:      6,
-		JumpForce:             5,
+		JumpForce:             6,
 		JumpCutMultiplier:     0.5,
-		UpwardGravity:         4,
-		DownwardGravity:       2,
-		MaxFallSpeed:          3 * Unit,
+		UpwardGravity:         6,
+		DownwardGravity:       6,
+		MaxFallSpeed:          4 * Unit,
 	}
 
 	cfg = AppConfig{

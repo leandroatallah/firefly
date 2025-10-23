@@ -82,15 +82,17 @@ func (t *Tilemap) GetPlayerStartPosition() (x, y int, found bool) {
 		return 0, 0, false
 	}
 
+	cfg := config.Get()
+
 	mapHeight := t.Height * t.Tileheight
-	yOffset := config.Get().ScreenHeight - mapHeight
+	yOffset := cfg.ScreenHeight - mapHeight
 
 	for _, layer := range t.Layers {
 		if layer.Name == "PlayerStart" && layer.Type == "objectgroup" && len(layer.Objects) > 0 {
 			obj := layer.Objects[0]
 			px := int(math.Round(obj.X))
 			py := int(math.Round(obj.Y)) + yOffset
-			return px * config.Get().Unit, py * config.Get().Unit, true
+			return px * cfg.Unit, py * cfg.Unit, true
 		}
 	}
 

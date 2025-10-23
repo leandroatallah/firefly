@@ -367,7 +367,6 @@
         {
          "draworder":"topdown",
          "id":4,
-         "locked":true,
          "name":"PlayerStart",
          "objects":[
                 {
@@ -379,7 +378,7 @@
                  "visible":true,
                  "width":16,
                  "x":160,
-                 "y":448
+                 "y":464
                 }],
          "opacity":1,
          "type":"objectgroup",
