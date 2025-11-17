@@ -1,10 +1,14 @@
 package core
 
 import (
+	"io/fs"
+
 	"github.com/leandroatallah/firefly/internal/engine/actors"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/navigation"
 	"github.com/leandroatallah/firefly/internal/engine/core/levels"
 	"github.com/leandroatallah/firefly/internal/engine/systems/audiomanager"
+	"github.com/leandroatallah/firefly/internal/engine/systems/datamanager"
+	"github.com/leandroatallah/firefly/internal/engine/systems/imagemanager"
 	"github.com/leandroatallah/firefly/internal/engine/systems/input"
 	"github.com/leandroatallah/firefly/internal/engine/systems/speech"
 )
@@ -14,13 +18,17 @@ import (
 // the game to access systems like input, audio, and scene management without
 // relying on global variables.
 type AppContext struct {
-	InputManager          *input.Manager
-	AudioManager          *audiomanager.AudioManager
-	DialogueManager       *speech.Manager
-	ActorManager          *actors.Manager
-	SceneManager          navigation.SceneManager
-	LevelManager          *levels.Manager
+	InputManager    *input.Manager
+	AudioManager    *audiomanager.AudioManager
+	ImageManager    *imagemanager.ImageManager
+	DataManager     *datamanager.Manager
+	DialogueManager *speech.Manager
+	ActorManager    *actors.Manager
+	SceneManager    navigation.SceneManager
+	LevelManager    *levels.Manager
+	// TODO: It should be in a different place
 	PlayerMovementBlocked bool
+	Assets                fs.FS
 }
 
 // SetPlayerMovementBlocked sets the flag to block or unblock player movement.

@@ -13,12 +13,20 @@ const (
 	SceneSummary
 )
 
-func InitSceneMap(context *core.AppContext) map[navigation.SceneType]navigation.Scene {
-	SceneMap := map[navigation.SceneType]navigation.Scene{
-		SceneIntro:   NewIntroScene(context),
-		SceneMenu:    NewMenuScene(context),
-		SceneLevels:  NewLevelsScene(context),
-		SceneSummary: NewSummaryScene(context),
+func InitSceneMap(context *core.AppContext) navigation.SceneMap {
+	sceneMap := navigation.SceneMap{
+		SceneIntro: func() navigation.Scene {
+			return NewIntroScene(context)
+		},
+		SceneMenu: func() navigation.Scene {
+			return NewMenuScene(context)
+		},
+		SceneLevels: func() navigation.Scene {
+			return NewLevelsScene(context)
+		},
+		SceneSummary: func() navigation.Scene {
+			return NewSummaryScene(context)
+		},
 	}
-	return SceneMap
+	return sceneMap
 }

@@ -63,9 +63,9 @@ func (m *SceneManager) SetFactory(factory SceneFactory) {
 }
 
 func (m *SceneManager) NavigateTo(
-	sceneType navigation.SceneType, sceneTransition navigation.Transition,
+	sceneType navigation.SceneType, sceneTransition navigation.Transition, freshInstance bool,
 ) {
-	scene, err := m.factory.Create(sceneType)
+	scene, err := m.factory.Create(sceneType, freshInstance)
 	if err != nil {
 		log.Fatalf("Error creating scene: %v", err)
 	}

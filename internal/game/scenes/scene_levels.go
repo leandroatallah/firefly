@@ -53,11 +53,10 @@ func NewLevelsScene(context *core.AppContext) *LevelsScene {
 func (s *LevelsScene) OnStart() {
 	s.TilemapScene.OnStart()
 
-	// TODO: Is it working?
-	// Play BG sound
 	go func() {
 		time.Sleep(1 * time.Second)
-		s.Audiomanager().PlaySound(bgSound)
+		s.Audiomanager().SetVolume(0.25)
+		s.Audiomanager().PlayMusic(bgSound)
 	}()
 
 	// Create player and register to space and context
@@ -183,7 +182,7 @@ func (s *LevelsScene) finishLevel() {
 	}
 
 	s.levelCompleted = true
-	s.AppContext.SceneManager.NavigateTo(SceneSummary, transition.NewFader())
+	s.AppContext.SceneManager.NavigateTo(SceneSummary, transition.NewFader(), true)
 }
 
 func createPlayer(appContext *core.AppContext) (actors.PlayerEntity, error) {

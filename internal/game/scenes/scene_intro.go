@@ -109,7 +109,7 @@ func (s *IntroScene) Update() error {
 }
 
 func (s *IntroScene) NextScene() {
-	s.AppContext.SceneManager.NavigateTo(SceneMenu, transition.NewFader())
+	s.AppContext.SceneManager.NavigateTo(SceneMenu, transition.NewFader(), true)
 	s.introAnimation = navigationStarted
 }
 

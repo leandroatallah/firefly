@@ -1,8 +1,8 @@
 package gamesetup
 
 import (
+	"io/fs"
 	"log"
-	"os"
 	"strings"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -20,7 +20,7 @@ import (
 	gamespeech "github.com/leandroatallah/firefly/internal/game/speech"
 )
 
-func Setup() {
+func Setup(assets fs.FS) {
 	// Basic Ebiten setup
 	ebiten.SetWindowSize(config.Get().ScreenWidth*3, config.Get().ScreenHeight*3)
 	ebiten.SetWindowTitle("Firefly")
@@ -42,7 +42,7 @@ func Setup() {
 	dialogueManager := speech.NewManager(speechBubble)
 
 	// Load audio assets
-	loadAudioAssets(audioManager)
+	loadAudioAssetsFromFS(assets, audioManager)
 
 	// Load levels
 	level1 := levels.Level{ID: 1, Name: "Level 1", TilemapPath: "assets/tilemap/sample-level-1.tmj", NextLevelID: 2}
@@ -58,6 +58,11 @@ func Setup() {
 		ActorManager:    actorManager,
 		SceneManager:    sceneManager,
 		LevelManager:    levelManager,
+		ImageManager:    nil,
+		DataManager:     nil,
+		Assets:          assets,
+		// TODO: It should be in a different place
+		PlayerMovementBlocked: false,
 	}
 
 	sceneFactory := scene.NewDefaultSceneFactory(gamescene.InitSceneMap(appContext))
@@ -70,27 +75,40 @@ func Setup() {
 	game := game.NewGame(appContext)
 
 	// Set initial game scene
-	game.AppContext.SceneManager.NavigateTo(gamescene.SceneLevels, nil)
+	game.AppContext.SceneManager.NavigateTo(gamescene.SceneLevels, nil, false)
 
 	if err := ebiten.RunGame(game); err != nil {
 		log.Fatal(err)
 	}
 }
 
-// loadAudioAssets is a helper function to load all audio files from the assets directory.
-func loadAudioAssets(am *audiomanager.AudioManager) {
-	files, err := os.ReadDir("assets")
+// loadAudioAssetsFromFS is a helper function to load all audio files from an fs.FS.
+func loadAudioAssetsFromFS(assets fs.FS, am *audiomanager.AudioManager) {
+	dir := "assets/audio"
+	files, err := fs.ReadDir(assets, dir)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("error reading embedded audio dir: %v", err)
 	}
+
 	for _, file := range files {
-		if !file.IsDir() && (strings.HasSuffix(file.Name(), ".ogg") || strings.HasSuffix(file.Name(), ".wav")) {
-			audioItem, err := am.Load("assets/audio/" + file.Name())
-			if err != nil {
-				log.Printf("error loading audio file %s: %v", file.Name(), err)
-				continue
-			}
-			am.Add(audioItem.Name(), audioItem.Data())
+		if file.IsDir() {
+			continue
 		}
+
+		fileName := file.Name()
+		// Filter for supported audio types
+		if !(strings.HasSuffix(fileName, ".ogg") || strings.HasSuffix(fileName, ".wav") || strings.HasSuffix(fileName, ".mp3")) {
+			continue
+		}
+
+		fullPath := dir + "/" + fileName
+		data, err := fs.ReadFile(assets, fullPath)
+		if err != nil {
+			log.Printf("failed to read embedded file %s: %v", fullPath, err)
+			continue
+		}
+
+		// Use the existing Add method to process and store the player.
+		am.Add(dir+"/"+fileName, data)
 	}
 }

@@ -3,11 +3,8 @@ package game
 import (
 	"fmt"
 	"image/color"
-	"log"
-	"os"
 	"strings"
 
-	"github.com/golang/freetype/truetype"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text"
@@ -25,22 +22,8 @@ type Game struct {
 }
 
 func NewGame(ctx *core.AppContext) *Game {
-	fontData, err := os.ReadFile(config.Get().MainFontFace)
-	if err != nil {
-		log.Fatal(err)
-	}
-	tt, err := truetype.Parse(fontData)
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	return &Game{
 		AppContext: ctx,
-		debugFontFace: truetype.NewFace(tt, &truetype.Options{
-			Size:    8,
-			DPI:     72,
-			Hinting: font.HintingFull,
-		}),
 	}
 }
 
@@ -53,7 +36,9 @@ func (g *Game) Update() error {
 	g.AppContext.InputManager.Update()
 
 	// Update Dialogue Manager
-	g.AppContext.DialogueManager.Update()
+	if g.AppContext.DialogueManager != nil {
+		g.AppContext.DialogueManager.Update()
+	}
 
 	// Then, update the current scene
 	g.AppContext.SceneManager.Update()
@@ -64,7 +49,9 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	g.AppContext.SceneManager.Draw(screen)
 
 	// Draw Dialogue Manager
-	g.AppContext.DialogueManager.Draw(screen)
+	if g.AppContext.DialogueManager != nil {
+		g.AppContext.DialogueManager.Draw(screen)
+	}
 
 	if g.debugVisible {
 		cfg := config.Get().Physics

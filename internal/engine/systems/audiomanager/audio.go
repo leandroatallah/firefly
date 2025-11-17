@@ -3,11 +3,14 @@ package audiomanager
 import (
 	"bytes"
 	"io"
+	"io/fs"
 	"log"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/hajimehoshi/ebiten/v2/audio"
+	"github.com/hajimehoshi/ebiten/v2/audio/mp3"
 	"github.com/hajimehoshi/ebiten/v2/audio/vorbis"
 	"github.com/hajimehoshi/ebiten/v2/audio/wav"
 )
@@ -62,19 +65,45 @@ func (am *AudioManager) Load(path string) (*AudioItem, error) {
 	return &AudioItem{path, bs}, nil
 }
 
+func (am *AudioManager) LoadFromFS(fs fs.FS, path string) (*AudioItem, error) {
+	f, err := fs.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	stat, err := f.Stat()
+	if err != nil {
+		return nil, err
+	}
+	bs := make([]byte, stat.Size())
+	_, err = io.ReadFull(f, bs)
+	if err != nil {
+		return nil, err
+	}
+
+	return &AudioItem{path, bs}, nil
+}
+
 func (am *AudioManager) Add(name string, data []byte) {
 	var s io.ReadSeeker
 	var err error
 
 	switch {
+	case strings.HasSuffix(name, ".mp3"):
+		s, err = mp3.DecodeWithSampleRate(sampleRate, bytes.NewReader(data))
+		if err != nil {
+			log.Printf("failed to decode mp3 file: %v", err)
+			return
+		}
 	case strings.HasSuffix(name, ".ogg"):
-		s, err = vorbis.DecodeWithoutResampling(bytes.NewReader(data))
+		s, err = vorbis.DecodeWithSampleRate(sampleRate, bytes.NewReader(data))
 		if err != nil {
 			log.Printf("failed to decode ogg file: %v", err)
 			return
 		}
 	case strings.HasSuffix(name, ".wav"):
-		s, err = wav.DecodeWithoutResampling(bytes.NewReader(data))
+		s, err = wav.DecodeWithSampleRate(sampleRate, bytes.NewReader(data))
 		if err != nil {
 			log.Printf("failed to decode wav file: %v", err)
 			return
@@ -92,14 +121,15 @@ func (am *AudioManager) Add(name string, data []byte) {
 	am.audioPlayers[name] = p
 }
 
-func (am *AudioManager) PlayMusic(name string) {
+func (am *AudioManager) PlayMusic(name string) *audio.Player {
 	player, ok := am.audioPlayers[name]
 	if !ok {
 		log.Printf("audio player not found: %s", name)
-		return
+		return nil
 	}
 	player.SetVolume(am.volume)
 	player.Play()
+	return player
 }
 
 func (am *AudioManager) PauseMusic(name string) {
@@ -111,15 +141,16 @@ func (am *AudioManager) PauseMusic(name string) {
 	player.Pause()
 }
 
-func (am *AudioManager) PlaySound(name string) {
+func (am *AudioManager) PlaySound(name string) *audio.Player {
 	player, ok := am.audioPlayers[name]
 	if !ok {
 		log.Printf("audio player not found: %s", name)
-		return
+		return nil
 	}
 	player.SetVolume(am.volume)
 	player.Rewind()
 	player.Play()
+	return player
 }
 
 func (am *AudioManager) SetVolume(volume float64) {
@@ -131,4 +162,93 @@ func (am *AudioManager) SetVolume(volume float64) {
 
 func (am *AudioManager) Volume() float64 {
 	return am.volume
+}
+
+func (am *AudioManager) PauseAll() {
+	for _, player := range am.audioPlayers {
+		player.Pause()
+	}
+}
+
+func (am *AudioManager) FadeOutAll(duration time.Duration) {
+	initialVolume := am.volume
+	if initialVolume == 0 {
+		return
+	}
+
+	go func() {
+		ticker := time.NewTicker(100 * time.Millisecond)
+		defer ticker.Stop()
+
+		startTime := time.Now()
+
+		for range ticker.C {
+			elapsed := time.Since(startTime)
+			if elapsed >= duration {
+				am.SetVolume(0)
+				am.PauseAll()
+				return
+			}
+
+			progress := float64(elapsed) / float64(duration)
+			newVolume := initialVolume * (1 - progress)
+			if newVolume < 0 {
+				newVolume = 0
+			}
+			am.SetVolume(newVolume)
+		}
+	}()
+}
+
+func (am *AudioManager) FadeOut(name string, duration time.Duration) {
+	player, ok := am.audioPlayers[name]
+	if !ok {
+		log.Printf("audio player not found: %s", name)
+		return
+	}
+
+	initialVolume := player.Volume()
+	if initialVolume == 0 {
+		return
+	}
+
+	go func() {
+		ticker := time.NewTicker(100 * time.Millisecond)
+		defer ticker.Stop()
+
+		startTime := time.Now()
+
+		for range ticker.C {
+			elapsed := time.Since(startTime)
+			if elapsed >= duration {
+				player.SetVolume(0)
+				player.Pause()
+				return
+			}
+
+			progress := float64(elapsed) / float64(duration)
+			newVolume := initialVolume * (1 - progress)
+			if newVolume < 0 {
+				newVolume = 0
+			}
+			player.SetVolume(newVolume)
+		}
+	}()
+}
+
+func (am *AudioManager) IsPlayingSomething() bool {
+	for _, player := range am.audioPlayers {
+		if player.IsPlaying() {
+			return true
+		}
+	}
+	return false
+}
+
+func (am *AudioManager) IsPlaying(name string) bool {
+	audio, ok := am.audioPlayers[name]
+	if !ok {
+		return false
+	}
+	return audio.IsPlaying()
 }

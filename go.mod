@@ -6,7 +6,6 @@ toolchain go1.24.7
 
 require (
 	github.com/ebitenui/ebitenui v0.7.2
-	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0
 	github.com/google/uuid v1.6.0
 	github.com/hajimehoshi/ebiten/v2 v2.8.8
 	github.com/setanarut/kamera/v2 v2.97.2
@@ -19,6 +18,7 @@ require (
 	github.com/ebitengine/oto/v3 v3.3.3 // indirect
 	github.com/ebitengine/purego v0.8.4 // indirect
 	github.com/go-text/typesetting v0.3.0 // indirect
+	github.com/hajimehoshi/go-mp3 v0.3.4 // indirect
 	github.com/jezek/xgb v1.1.1 // indirect
 	github.com/jfreymuth/oggvorbis v1.0.5 // indirect
 	github.com/jfreymuth/vorbis v1.0.2 // indirect

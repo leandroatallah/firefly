@@ -42,7 +42,7 @@ func (s *SummaryScene) Draw(screen *ebiten.Image) {
 func (s *SummaryScene) Update() error {
 	if inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
 		s.AppContext.LevelManager.AdvanceToNextLevel()
-		s.AppContext.SceneManager.NavigateTo(SceneLevels, transition.NewFader())
+		s.AppContext.SceneManager.NavigateTo(SceneLevels, transition.NewFader(), true)
 	}
 
 	return nil
