@@ -7,9 +7,9 @@
       "height": 32
     },
     "collision_rect": {
-      "x": 4,
+      "x": 6,
       "y": 10,
-      "width": 22,
+      "width": 20,
       "height": 21
     },
     "assets": {

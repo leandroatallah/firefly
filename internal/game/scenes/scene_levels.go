@@ -46,7 +46,6 @@ func NewLevelsScene(context *core.AppContext) *LevelsScene {
 		TilemapScene: *tilemapScene,
 		mainText:     mainText,
 	}
-	// scene.SetAppContext(context)
 	return &scene
 }
 
@@ -85,6 +84,8 @@ func (s *LevelsScene) OnStart() {
 	pPos := s.player.Position().Min
 	s.cam = gamecamera.New(pPos.X, pPos.Y)
 	s.cam.SetFollowTarget(s.player)
+
+	s.SetCamTargetPointToSpace()
 
 	// Init collisions bodies and touch trigger for endpoints
 	endpointTrigger := physics.NewTouchTrigger(s.finishLevel, s.player)
@@ -140,7 +141,11 @@ func (s *LevelsScene) Draw(screen *ebiten.Image) {
 	for _, b := range space.Bodies() {
 		switch sb := b.(type) {
 		case actors.PlayerEntity:
-			continue
+			// Draw player based on camera
+			if img := s.player.Image(); img != nil {
+				opts := *s.player.ImageOptions()
+				s.cam.Draw(img, &opts, screen)
+			}
 		case items.Item:
 			if sb.IsRemoved() {
 				continue
@@ -157,14 +162,11 @@ func (s *LevelsScene) Draw(screen *ebiten.Image) {
 			opts.GeoM.Translate(float64(pos.X), float64(pos.Y))
 			s.cam.Draw(sb.Image(), opts, screen)
 		default:
+			if b.ID() == "TARGET" {
+				s.DrawCamTargetPoint(screen)
+			}
 			continue
 		}
-	}
-
-	// Draw player based on camera
-	if img := s.player.Image(); img != nil {
-		opts := *s.player.ImageOptions()
-		s.cam.Draw(img, &opts, screen)
 	}
 
 	s.DrawHUD(screen)
@@ -234,4 +236,22 @@ func (s *LevelsScene) DrawHUD(screen *ebiten.Image) {
 	// Draw simple HUD score
 	// HUD need to be drawed on screen and not on the camera.
 	screen.DrawImage(hud, hudOp)
+}
+
+func (s *LevelsScene) SetCamTargetPointToSpace() {
+	tPos := s.cam.Target().Position()
+	targetRect := physics.NewObstacleRect(physics.NewRect(tPos.Min.X, tPos.Min.Y, tPos.Dx(), tPos.Dy()))
+	targetBody := physics.NewPhysicsBody(targetRect)
+	targetBody.SetID("TARGET")
+	s.PhysicsSpace().AddBody(targetBody)
+}
+
+func (s *LevelsScene) DrawCamTargetPoint(screen *ebiten.Image) {
+	tPos := s.cam.Target().Position()
+	targetImage := ebiten.NewImage(tPos.Dx(), tPos.Dy())
+	targetImage.Fill(color.RGBA{0xff, 0, 0, 0xff})
+	opts := &ebiten.DrawImageOptions{}
+	opts.GeoM.Reset()
+	opts.GeoM.Translate(float64(tPos.Min.X), float64(tPos.Min.Y))
+	s.cam.Draw(targetImage, opts, screen)
 }

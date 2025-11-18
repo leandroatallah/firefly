@@ -47,23 +47,24 @@ func NewCamera(x, y int) *kamera.Camera {
 }
 
 func (c *Controller) SetFollowTarget(b body.Body) {
-	cfg := config.Get()
 	c.followTarget = b
-	pPos := c.followTarget.Position().Min
-	c.target.SetPosition(pPos.X, pPos.Y) // game coords
-	c.cam.LookAt(float64(pPos.X*cfg.Unit), float64(pPos.Y*cfg.Unit))
 }
 
+// TODO: Should use throtling here?
 func (c *Controller) Update() {
+	cfg := config.Get()
 	// Update cam target to smoothly follow the player
-	pPos := c.followTarget.Position().Min
-	targetPos := c.target.Position().Min
+	pPos := c.followTarget.Position()
+	target := c.target.Position()
 
 	// A smaller factor makes the movement smoother (and slower).
-	newX := float64(targetPos.X) + (float64(pPos.X)-float64(targetPos.X))*c.SmoothingFactor
-	newY := float64(targetPos.Y) + (float64(pPos.Y)-float64(targetPos.Y))*c.SmoothingFactor
+	newX := float64(target.Min.X) + (float64(pPos.Min.X)-float64(target.Min.X))*c.SmoothingFactor
+	newY := float64(target.Min.Y) + (float64(pPos.Min.Y)-float64(target.Min.Y))*c.SmoothingFactor
 
-	c.target.SetPosition(int(newX)*config.Get().Unit, int(newY)*config.Get().Unit)
+	c.target.SetPosition(
+		int(newX)*cfg.Unit+pPos.Dx(), // width offset centralizes the character
+		int(newY)*cfg.Unit,
+	)
 
 	// Update camera to look at the now smoothly moving camTarget
 	finalTargetPos := c.target.Position().Min
@@ -76,9 +77,9 @@ func (c *Controller) Update() {
 }
 
 func (c *Controller) Draw(
-	dst *ebiten.Image, options *ebiten.DrawImageOptions, src *ebiten.Image,
+	src *ebiten.Image, options *ebiten.DrawImageOptions, dst *ebiten.Image,
 ) {
-	c.cam.Draw(dst, options, src)
+	c.cam.Draw(src, options, dst)
 }
 
 // Useful for debugging
@@ -88,4 +89,8 @@ func (c *Controller) Kamera() *kamera.Camera {
 
 func (c *Controller) Position() image.Rectangle {
 	return c.target.Position()
+}
+
+func (c *Controller) Target() body.Body {
+	return c.target
 }
