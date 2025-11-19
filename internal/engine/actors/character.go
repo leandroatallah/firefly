@@ -14,10 +14,11 @@ import (
 type Character struct {
 	physics.PhysicsBody
 	sprites.SpriteEntity
-	count          int
-	state          ActorState
-	movementState  movement.MovementState
-	animationCount int
+	count            int
+	state            ActorState
+	movementState    movement.MovementState
+	movementBlockers int
+	animationCount   int
 	// TODO: Move to the right place
 	frameRate int
 	// TODO: Rename this
@@ -225,4 +226,22 @@ func (c *Character) Image() *ebiten.Image {
 
 func (c *Character) ImageOptions() *ebiten.DrawImageOptions {
 	return c.op
+}
+
+// BlockMovement increases the count of systems blocking movement.
+func (p *Character) BlockMovement() {
+	p.movementBlockers++
+}
+
+// UnblockMovement decreases the count.
+func (p *Character) UnblockMovement() {
+	p.movementBlockers--
+	if p.movementBlockers < 0 {
+		p.movementBlockers = 0
+	}
+}
+
+// IsPlayerMovementBlocked checks if any system is currently blocking movement.
+func (p *Character) IsMovementBlocked() bool {
+	return p.movementBlockers > 0
 }

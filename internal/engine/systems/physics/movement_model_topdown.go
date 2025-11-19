@@ -77,7 +77,7 @@ func (m *TopDownMovementModel) SetIsScripted(isScripted bool) {
 // InputHandler processes player input for movement.
 // Top-Down player can move for all directions and diagonals.
 func (m *TopDownMovementModel) InputHandler(body *PhysicsBody) {
-	if m.isScripted || m.playerMovementBlocker.IsPlayerMovementBlocked() {
+	if m.isScripted || m.playerMovementBlocker.IsMovementBlocked() {
 		return // Ignore player input when scripted or movement is blocked
 	}
 	if body.Immobile() {

@@ -5,7 +5,6 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
-	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
 )
 
 const (
@@ -20,6 +19,7 @@ const (
 	Platform
 )
 
+// TODO: Check if PlayerEntity and ActorEntity could be one
 type PlayerEntity interface {
 	ActorEntity
 	Draw(screen *ebiten.Image)
@@ -37,13 +37,13 @@ type Player struct {
 	Character
 }
 
-func NewPlayer(playerEntity PlayerEntityEnum, playerMovementBlocker physics.PlayerMovementBlocker) (PlayerEntity, error) {
+func NewPlayer(playerEntity PlayerEntityEnum) (PlayerEntity, error) {
 	switch playerEntity {
 	case TopDown:
-		p, err := NewPlayerTopDown(playerMovementBlocker)
+		p, err := NewPlayerTopDown()
 		return p, err
 	case Platform:
-		p, err := NewPlayerPlatform(playerMovementBlocker)
+		p, err := NewPlayerPlatform()
 		return p, err
 	default:
 		return nil, fmt.Errorf("unknown movement model type")

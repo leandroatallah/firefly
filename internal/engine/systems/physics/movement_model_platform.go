@@ -151,7 +151,7 @@ func (m *PlatformMovementModel) SetIsScripted(isScripted bool) {
 func (m *PlatformMovementModel) InputHandler(body *PhysicsBody) {
 	cfg := config.Get().Physics
 
-	if m.isScripted || m.playerMovementBlocker.IsPlayerMovementBlocked() {
+	if m.isScripted || m.playerMovementBlocker.IsMovementBlocked() {
 		return // Ignore player input when scripted or movement is blocked
 	}
 

@@ -7,6 +7,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
 )
 
+// TODO: Check if PlayerEntity and ActorEntity could be one
 type ActorEntity interface {
 	body.Body
 	ID() string
@@ -31,6 +32,9 @@ type ActorEntity interface {
 	OnMoveRight(force int)
 	Image() *ebiten.Image
 	ImageOptions() *ebiten.DrawImageOptions
+	BlockMovement()
+	UnblockMovement()
+	IsMovementBlocked() bool
 }
 
 type ActorType int

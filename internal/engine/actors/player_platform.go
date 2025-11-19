@@ -12,7 +12,7 @@ type PlayerPlatform struct {
 	coinCount int
 }
 
-func NewPlayerPlatform(playerMovementBlocker physics.PlayerMovementBlocker) (PlayerEntity, error) {
+func NewPlayerPlatform() (PlayerEntity, error) {
 	const (
 		frameWidth  = 32
 		frameHeight = 32
@@ -48,7 +48,7 @@ func NewPlayerPlatform(playerMovementBlocker physics.PlayerMovementBlocker) (Pla
 	player.SetTouchable(player)
 	player.SetSpeedAndMaxSpeed(1, 1)
 
-	movementModel, err := physics.NewMovementModel(physics.Platform, playerMovementBlocker)
+	movementModel, err := physics.NewMovementModel(physics.Platform, player)
 	if err != nil {
 		return nil, err
 	}

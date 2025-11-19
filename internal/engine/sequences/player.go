@@ -27,7 +27,12 @@ func (p *SequencePlayer) Play(sequence Sequence) {
 	p.currentSequence = sequence
 	p.currentCommandIndex = -1 // Will be incremented to 0 by advanceToNextCommand
 	p.isPlaying = true
-	p.appContext.SetPlayerMovementBlocked(sequence.BlockPlayerMovement)
+
+	if sequence.BlockPlayerMovement {
+		if player, found := p.appContext.ActorManager.GetPlayer(); found {
+			player.BlockMovement()
+		}
+	}
 	p.advanceToNextCommand()
 }
 
@@ -43,8 +48,7 @@ func (p *SequencePlayer) Update() {
 	}
 
 	if p.currentCommandIndex >= len(p.currentSequence.Commands) {
-		p.isPlaying = false
-		p.appContext.SetPlayerMovementBlocked(false)
+		p.endSequence()
 		return
 	}
 
@@ -58,11 +62,19 @@ func (p *SequencePlayer) Update() {
 func (p *SequencePlayer) advanceToNextCommand() {
 	p.currentCommandIndex++
 	if p.currentCommandIndex >= len(p.currentSequence.Commands) {
-		p.isPlaying = false
-		p.appContext.SetPlayerMovementBlocked(false)
+		p.endSequence()
 		return
 	}
 
 	nextCommand := p.currentSequence.Commands[p.currentCommandIndex]
 	nextCommand.Init(p.appContext)
+}
+
+func (p *SequencePlayer) endSequence() {
+	p.isPlaying = false
+	if p.currentSequence.BlockPlayerMovement {
+		if player, found := p.appContext.ActorManager.GetPlayer(); found {
+			player.UnblockMovement()
+		}
+	}
 }

@@ -63,8 +63,6 @@ func Setup(assets fs.FS) error {
 		ImageManager:    nil,
 		DataManager:     nil,
 		Assets:          assets,
-		// TODO: It should be in a different place
-		PlayerMovementBlocked: false,
 	}
 
 	sceneFactory := scene.NewDefaultSceneFactory(gamescene.InitSceneMap(appContext))

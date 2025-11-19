@@ -58,7 +58,7 @@ func (s *LevelsScene) OnStart() {
 	}()
 
 	// Create player and register to space and context
-	p, err := createPlayer(s.AppContext)
+	p, err := createPlayer()
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -33,3 +33,19 @@ func (m *Manager) Find(id string) (ActorEntity, bool) {
 func (m *Manager) Unregister(actor ActorEntity) {
 	delete(m.actors, actor.ID())
 }
+
+// GetPlayer retrieves the player actor.
+// It assumes the player is registered with the ID "player".
+func (m *Manager) GetPlayer() (PlayerEntity, bool) {
+	actor, found := m.Find("player")
+	if !found {
+		return nil, false
+	}
+	player, ok := actor.(PlayerEntity)
+	if !ok {
+		// This should ideally not happen if "player" ID is reserved for PlayerEntity
+		fmt.Printf("Warning: Actor with ID 'player' is not a PlayerEntity.\n")
+		return nil, false
+	}
+	return player, true
+}

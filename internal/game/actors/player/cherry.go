@@ -8,12 +8,11 @@ import (
 type CherryPlayer struct {
 	actors.Player
 
-	coinCount int
+	coinCount        int
+	movementBlockers int
 }
 
-func NewCherryPlayer(
-	movementBlocker physics.PlayerMovementBlocker,
-) (actors.PlayerEntity, error) {
+func NewCherryPlayer() (actors.PlayerEntity, error) {
 	spriteData, statData, err := actors.ParseJsonPlayer("internal/game/actors/player/cherry.json")
 	if err != nil {
 		return nil, err
@@ -29,7 +28,7 @@ func NewCherryPlayer(
 	}
 	SetPlayerBodies(player, spriteData)
 	SetPlayerStats(player, statData)
-	SetMovementModel(player, physics.Platform, movementBlocker)
+	SetMovementModel(player, physics.Platform, player) // Pass player itself
 
 	return player, nil
 }

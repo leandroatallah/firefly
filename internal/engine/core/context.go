@@ -26,17 +26,5 @@ type AppContext struct {
 	ActorManager    *actors.Manager
 	SceneManager    navigation.SceneManager
 	LevelManager    *levels.Manager
-	// TODO: It should be in a different place
-	PlayerMovementBlocked bool
-	Assets                fs.FS
-}
-
-// SetPlayerMovementBlocked sets the flag to block or unblock player movement.
-func (ac *AppContext) SetPlayerMovementBlocked(blocked bool) {
-	ac.PlayerMovementBlocked = blocked
-}
-
-// IsPlayerMovementBlocked returns true if player movement is currently blocked.
-func (ac *AppContext) IsPlayerMovementBlocked() bool {
-	return ac.PlayerMovementBlocked
+	Assets          fs.FS
 }
