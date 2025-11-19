@@ -12,7 +12,7 @@ type CherryPlayer struct {
 	movementBlockers int
 }
 
-func NewCherryPlayer() (actors.PlayerEntity, error) {
+func NewCherryPlayer() (actors.ActorEntity, error) {
 	spriteData, statData, err := actors.ParseJsonPlayer("internal/game/actors/player/cherry.json")
 	if err != nil {
 		return nil, err

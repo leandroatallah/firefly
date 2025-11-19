@@ -7,14 +7,29 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
 )
 
-// TODO: Check if PlayerEntity and ActorEntity could be one
-type ActorEntity interface {
-	body.Body
+// Identifiable represents any object with a string ID.
+type Identifiable interface {
 	ID() string
 	SetID(id string)
-	SetBody(rect *physics.Rect) ActorEntity
-	SetCollisionArea(rect *physics.Rect) ActorEntity
-	SetTouchable(t body.Touchable)
+}
+
+// Drawable represents any object that can be drawn to the screen.
+type Drawable interface {
+	Image() *ebiten.Image
+	ImageOptions() *ebiten.DrawImageOptions
+}
+
+// Controllable defines methods for an actor that can be moved or have its movement blocked.
+type Controllable interface {
+	OnMoveLeft(force int)
+	OnMoveRight(force int)
+	BlockMovement()
+	UnblockMovement()
+	IsMovementBlocked() bool
+}
+
+// Stateful defines methods for an actor that has general and movement-specific states.
+type Stateful interface {
 	State() ActorStateEnum
 	SetState(state ActorState)
 	SetMovementState(
@@ -24,19 +39,27 @@ type ActorEntity interface {
 	)
 	SwitchMovementState(state movement.MovementStateEnum)
 	MovementState() movement.MovementState
-	MovementModel() physics.MovementModel
-	SetMovementModel(model physics.MovementModel)
-	Update(space body.BodiesSpace) error
-	Hurt(damage int)
-	OnMoveLeft(force int)
-	OnMoveRight(force int)
-	Image() *ebiten.Image
-	ImageOptions() *ebiten.DrawImageOptions
-	BlockMovement()
-	UnblockMovement()
-	IsMovementBlocked() bool
 }
 
-type ActorType int
+// Damageable represents any actor that can take damage.
+type Damageable interface {
+	Hurt(damage int)
+}
 
-type ActorMap map[ActorType]ActorEntity
+// ActorEntity is the master interface for all game actors.
+// It is composed of smaller interfaces that define specific behaviors.
+type ActorEntity interface {
+	body.Body
+	Identifiable
+	Drawable
+	Controllable
+	Stateful
+	Damageable
+
+	Update(space body.BodiesSpace) error
+	MovementModel() physics.MovementModel
+	SetMovementModel(model physics.MovementModel)
+	SetBody(rect *physics.Rect) ActorEntity
+	SetCollisionArea(rect *physics.Rect) ActorEntity
+	SetTouchable(t body.Touchable)
+}

@@ -28,7 +28,7 @@ const (
 type LevelsScene struct {
 	scene.TilemapScene
 	count          int
-	player         actors.PlayerEntity
+	player         actors.ActorEntity
 	cam            *camera.Controller
 	levelCompleted bool
 	mainText       *font.FontText
@@ -139,7 +139,7 @@ func (s *LevelsScene) Draw(screen *ebiten.Image) {
 	space := s.PhysicsSpace()
 	for _, b := range space.Bodies() {
 		switch sb := b.(type) {
-		case actors.PlayerEntity:
+		case actors.ActorEntity:
 			// Draw player based on camera
 			if img := s.player.Image(); img != nil {
 				opts := *s.player.ImageOptions()

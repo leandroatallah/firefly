@@ -10,7 +10,7 @@ type PlayerTopDown struct {
 	Player
 }
 
-func NewPlayerTopDown() (PlayerEntity, error) {
+func NewPlayerTopDown() (ActorEntity, error) {
 	const (
 		frameWidth  = 32
 		frameHeight = 32

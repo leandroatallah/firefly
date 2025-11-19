@@ -30,7 +30,6 @@ func (b *MovableBody) MoveY(distance int) {
 	b.accelerationY = distance * config.Get().Unit
 }
 
-// TODO: Should it be moved to Movable?
 func (b *MovableBody) OnMoveLeft(distance int) {
 	b.MoveX(-distance)
 }

@@ -12,7 +12,7 @@ type PlayerPlatform struct {
 	coinCount int
 }
 
-func NewPlayerPlatform() (PlayerEntity, error) {
+func NewPlayerPlatform() (ActorEntity, error) {
 	const (
 		frameWidth  = 32
 		frameHeight = 32

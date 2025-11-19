@@ -25,7 +25,7 @@ const (
 
 type SandboxScene struct {
 	scene.BaseScene
-	player            actors.PlayerEntity
+	player            actors.ActorEntity
 	isPlayingJab      bool
 	showMenu          bool
 	menuDeadzoneCount int
@@ -82,7 +82,7 @@ func (s *SandboxScene) Update() error {
 func (s *SandboxScene) Draw(screen *ebiten.Image) {
 	screen.Fill(color.RGBA{0xcc, 0xcc, 0xdd, 0xff})
 	if s.player != nil {
-		s.player.Draw(screen)
+		screen.DrawImage(s.player.Image(), s.player.ImageOptions())
 	}
 
 	space := s.PhysicsSpace()

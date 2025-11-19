@@ -19,12 +19,6 @@ const (
 	Platform
 )
 
-// TODO: Check if PlayerEntity and ActorEntity could be one
-type PlayerEntity interface {
-	ActorEntity
-	Draw(screen *ebiten.Image)
-}
-
 func (p PlayerEntityEnum) String() string {
 	PlayerEntityMap := map[PlayerEntityEnum]string{
 		TopDown:  "TopDown",
@@ -37,7 +31,7 @@ type Player struct {
 	Character
 }
 
-func NewPlayer(playerEntity PlayerEntityEnum) (PlayerEntity, error) {
+func NewPlayer(playerEntity PlayerEntityEnum) (ActorEntity, error) {
 	switch playerEntity {
 	case TopDown:
 		p, err := NewPlayerTopDown()

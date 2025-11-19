@@ -20,12 +20,12 @@ const (
 
 type StatusBar struct {
 	heartImg *ebiten.Image
-	player   actors.PlayerEntity
+	player   actors.ActorEntity
 	score    int
 	mainText *font.FontText
 }
 
-func NewStatusBar(player actors.PlayerEntity, score int) (*StatusBar, error) {
+func NewStatusBar(player actors.ActorEntity, score int) (*StatusBar, error) {
 	heart, _, err := ebitenutil.NewImageFromFile("assets/images/heart.png")
 	if err != nil {
 		return nil, err

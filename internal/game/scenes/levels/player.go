@@ -5,7 +5,7 @@ import (
 	gameplayer "github.com/leandroatallah/firefly/internal/game/actors/player"
 )
 
-func createPlayer() (actors.PlayerEntity, error) {
+func createPlayer() (actors.ActorEntity, error) {
 	p, err := gameplayer.NewCherryPlayer()
 	if err != nil {
 		return nil, err
