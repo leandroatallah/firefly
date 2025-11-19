@@ -2,6 +2,7 @@ package main
 
 import (
 	"embed"
+	"log"
 
 	gamesetup "github.com/leandroatallah/firefly/internal/game/setup"
 )
@@ -10,5 +11,8 @@ import (
 var embedFs embed.FS
 
 func main() {
-	gamesetup.Setup(embedFs)
+	err := gamesetup.Setup(embedFs)
+	if err != nil {
+		log.Fatal(err)
+	}
 }

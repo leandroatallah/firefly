@@ -12,6 +12,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/core/scene"
 	"github.com/leandroatallah/firefly/internal/engine/core/transition"
 	"github.com/leandroatallah/firefly/internal/engine/systems/audiomanager"
+	scenestypes "github.com/leandroatallah/firefly/internal/game/scenes/types"
 )
 
 const (
@@ -45,7 +46,7 @@ func (s *MenuScene) OnStart() {
 
 func (s *MenuScene) Update() error {
 	if ebiten.IsKeyPressed(ebiten.KeyEnter) {
-		s.Manager.NavigateTo(SceneLevels, transition.NewFader(), true)
+		s.Manager.NavigateTo(scenestypes.SceneLevels, transition.NewFader(), true)
 	}
 
 	return nil

@@ -13,6 +13,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/core/screenutil"
 	"github.com/leandroatallah/firefly/internal/engine/core/transition"
 	"github.com/leandroatallah/firefly/internal/engine/systems/audiomanager"
+	scenestypes "github.com/leandroatallah/firefly/internal/game/scenes/types"
 )
 
 type SummaryScene struct {
@@ -42,7 +43,7 @@ func (s *SummaryScene) Draw(screen *ebiten.Image) {
 func (s *SummaryScene) Update() error {
 	if inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
 		s.AppContext.LevelManager.AdvanceToNextLevel()
-		s.AppContext.SceneManager.NavigateTo(SceneLevels, transition.NewFader(), true)
+		s.AppContext.SceneManager.NavigateTo(scenestypes.SceneLevels, transition.NewFader(), true)
 	}
 
 	return nil

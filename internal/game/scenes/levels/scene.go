@@ -1,13 +1,11 @@
-package gamescene
+package gamescenelevels
 
 import (
-	"fmt"
 	"image/color"
 	"log"
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/text/v2"
 	"github.com/leandroatallah/firefly/internal/config"
 	"github.com/leandroatallah/firefly/internal/engine/actors"
 	"github.com/leandroatallah/firefly/internal/engine/assets/font"
@@ -18,9 +16,9 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/core/transition"
 	"github.com/leandroatallah/firefly/internal/engine/items"
 	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
-	gameplayer "github.com/leandroatallah/firefly/internal/game/actors/player"
 	gamecamera "github.com/leandroatallah/firefly/internal/game/camera"
 	gameitems "github.com/leandroatallah/firefly/internal/game/items"
+	scenestypes "github.com/leandroatallah/firefly/internal/game/scenes/types"
 )
 
 const (
@@ -46,6 +44,7 @@ func NewLevelsScene(context *core.AppContext) *LevelsScene {
 		TilemapScene: *tilemapScene,
 		mainText:     mainText,
 	}
+	scene.SetAppContext(context)
 	return &scene
 }
 
@@ -184,74 +183,5 @@ func (s *LevelsScene) finishLevel() {
 	}
 
 	s.levelCompleted = true
-	s.AppContext.SceneManager.NavigateTo(SceneSummary, transition.NewFader(), true)
-}
-
-func createPlayer(appContext *core.AppContext) (actors.PlayerEntity, error) {
-	p, err := gameplayer.NewCherryPlayer(appContext)
-	if err != nil {
-		return nil, err
-	}
-
-	return p, nil
-}
-
-// TODO: REMOVE this method
-func (s *LevelsScene) CamDebug() {
-	if ebiten.IsKeyPressed(ebiten.KeyR) {
-		s.cam.Kamera().Angle += 0.02
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyF) {
-		s.cam.Kamera().Angle -= 0.02
-	}
-
-	if ebiten.IsKeyPressed(ebiten.KeyBackspace) {
-		s.cam.Kamera().Reset()
-	}
-
-	if ebiten.IsKeyPressed(ebiten.KeyQ) { // zoom out
-		s.cam.Kamera().ZoomFactor /= 1.02
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyE) { // zoom in
-		s.cam.Kamera().ZoomFactor *= 1.02
-	}
-}
-
-func (s *LevelsScene) DrawHUD(screen *ebiten.Image) {
-	coinCount := 0
-
-	if p, ok := s.player.(*actors.PlayerPlatform); ok {
-		coinCount = p.CoinCount()
-	}
-
-	hud := ebiten.NewImage(74, 12)
-	hud.Fill(color.White)
-	hudOp := &ebiten.DrawImageOptions{}
-	hudOp.GeoM.Translate(4, 5)
-	textOp := &text.DrawOptions{}
-	textOp.ColorScale.Scale(0, 0, 0, 255)
-	textOp.GeoM.Translate(2, 2)
-	s.mainText.Draw(hud, fmt.Sprintf("Score: %d", coinCount), 8, textOp)
-
-	// Draw simple HUD score
-	// HUD need to be drawed on screen and not on the camera.
-	screen.DrawImage(hud, hudOp)
-}
-
-func (s *LevelsScene) SetCamTargetPointToSpace() {
-	tPos := s.cam.Target().Position()
-	targetRect := physics.NewObstacleRect(physics.NewRect(tPos.Min.X, tPos.Min.Y, tPos.Dx(), tPos.Dy()))
-	targetBody := physics.NewPhysicsBody(targetRect)
-	targetBody.SetID("TARGET")
-	s.PhysicsSpace().AddBody(targetBody)
-}
-
-func (s *LevelsScene) DrawCamTargetPoint(screen *ebiten.Image) {
-	tPos := s.cam.Target().Position()
-	targetImage := ebiten.NewImage(tPos.Dx(), tPos.Dy())
-	targetImage.Fill(color.RGBA{0xff, 0, 0, 0xff})
-	opts := &ebiten.DrawImageOptions{}
-	opts.GeoM.Reset()
-	opts.GeoM.Translate(float64(tPos.Min.X), float64(tPos.Min.Y))
-	s.cam.Draw(targetImage, opts, screen)
+	s.AppContext.SceneManager.NavigateTo(scenestypes.SceneSummary, transition.NewFader(), true)
 }

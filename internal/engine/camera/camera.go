@@ -50,7 +50,6 @@ func (c *Controller) SetFollowTarget(b body.Body) {
 	c.followTarget = b
 }
 
-// TODO: Should use throtling here?
 func (c *Controller) Update() {
 	cfg := config.Get()
 	// Update cam target to smoothly follow the player

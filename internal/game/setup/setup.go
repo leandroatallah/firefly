@@ -17,12 +17,14 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/systems/input"
 	"github.com/leandroatallah/firefly/internal/engine/systems/speech"
 	gamescene "github.com/leandroatallah/firefly/internal/game/scenes"
+	scenestypes "github.com/leandroatallah/firefly/internal/game/scenes/types"
 	gamespeech "github.com/leandroatallah/firefly/internal/game/speech"
 )
 
-func Setup(assets fs.FS) {
+func Setup(assets fs.FS) error {
+	cfg := config.Get()
 	// Basic Ebiten setup
-	ebiten.SetWindowSize(config.Get().ScreenWidth*3, config.Get().ScreenHeight*3)
+	ebiten.SetWindowSize(cfg.ScreenWidth*3, cfg.ScreenHeight*3)
 	ebiten.SetWindowTitle("Firefly")
 
 	// Initialize all systems and managers
@@ -33,9 +35,9 @@ func Setup(assets fs.FS) {
 	actorManager := actors.NewManager()
 
 	// Initialize Dialogue Manager
-	fontText, err := font.NewFontText("assets/fonts/pressstart2p.ttf")
+	fontText, err := font.NewFontText(cfg.MainFontFace)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	speechFont := speech.NewSpeechFont(fontText, 8, 14)
 	speechBubble := gamespeech.NewSpeechBubble(speechFont)
@@ -75,11 +77,13 @@ func Setup(assets fs.FS) {
 	game := game.NewGame(appContext)
 
 	// Set initial game scene
-	game.AppContext.SceneManager.NavigateTo(gamescene.SceneLevels, nil, false)
+	game.AppContext.SceneManager.NavigateTo(scenestypes.SceneLevels, nil, false)
 
 	if err := ebiten.RunGame(game); err != nil {
-		log.Fatal(err)
+		return err
 	}
+
+	return nil
 }
 
 // loadAudioAssetsFromFS is a helper function to load all audio files from an fs.FS.

@@ -12,6 +12,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/core/screenutil"
 	"github.com/leandroatallah/firefly/internal/engine/core/transition"
 	"github.com/leandroatallah/firefly/internal/engine/systems/audiomanager"
+	scenestypes "github.com/leandroatallah/firefly/internal/game/scenes/types"
 )
 
 const (
@@ -109,7 +110,7 @@ func (s *IntroScene) Update() error {
 }
 
 func (s *IntroScene) NextScene() {
-	s.AppContext.SceneManager.NavigateTo(SceneMenu, transition.NewFader(), true)
+	s.AppContext.SceneManager.NavigateTo(scenestypes.SceneMenu, transition.NewFader(), true)
 	s.introAnimation = navigationStarted
 }
 

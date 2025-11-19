@@ -1,6 +1,5 @@
 package config
 
-// TODO: Use a env file
 const (
 	ScreenWidth   = 320
 	ScreenHeight  = 180
