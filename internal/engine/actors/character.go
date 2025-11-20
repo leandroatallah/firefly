@@ -22,7 +22,7 @@ type Character struct {
 	// TODO: Move to the right place
 	frameRate int
 	// TODO: Rename this
-	op *ebiten.DrawImageOptions
+	imageOptions *ebiten.DrawImageOptions
 }
 
 func NewCharacter(s sprites.SpriteMap, frameRate int) *Character {
@@ -30,7 +30,7 @@ func NewCharacter(s sprites.SpriteMap, frameRate int) *Character {
 	c := &Character{
 		SpriteEntity: spriteEntity,
 		frameRate:    frameRate,
-		op:           &ebiten.DrawImageOptions{},
+		imageOptions: &ebiten.DrawImageOptions{},
 	}
 	state, err := NewActorState(c, Idle)
 	if err != nil {
@@ -117,7 +117,7 @@ func (c *Character) Update(space body.BodiesSpace) error {
 }
 
 func (c *Character) UpdateImageOptions() {
-	c.op.GeoM.Reset()
+	c.imageOptions.GeoM.Reset()
 
 	pos := c.Position()
 	minX, minY := pos.Min.X, pos.Min.Y
@@ -125,12 +125,12 @@ func (c *Character) UpdateImageOptions() {
 
 	fDirection := c.FaceDirection()
 	if fDirection == physics.FaceDirectionLeft {
-		c.op.GeoM.Scale(-1, 1)
-		c.op.GeoM.Translate(float64(width), 0)
+		c.imageOptions.GeoM.Scale(-1, 1)
+		c.imageOptions.GeoM.Translate(float64(width), 0)
 	}
 
 	// Apply character position
-	c.op.GeoM.Translate(
+	c.imageOptions.GeoM.Translate(
 		float64(minX),
 		float64(minY),
 	)
@@ -225,7 +225,7 @@ func (c *Character) Image() *ebiten.Image {
 }
 
 func (c *Character) ImageOptions() *ebiten.DrawImageOptions {
-	return c.op
+	return c.imageOptions
 }
 
 // BlockMovement increases the count of systems blocking movement.

@@ -11,14 +11,13 @@ import (
 type ObstacleRect struct {
 	PhysicsBody
 
-	// TODO: Rename this
-	op *ebiten.DrawImageOptions
+	imageOptions *ebiten.DrawImageOptions
 }
 
 func NewObstacleRect(rect *Rect) *ObstacleRect {
 	return &ObstacleRect{
-		PhysicsBody: *NewPhysicsBody(rect),
-		op:          &ebiten.DrawImageOptions{},
+		PhysicsBody:  *NewPhysicsBody(rect),
+		imageOptions: &ebiten.DrawImageOptions{},
 	}
 }
 
@@ -60,5 +59,5 @@ func (o *ObstacleRect) ImageCollisionBox() *ebiten.Image {
 }
 
 func (o *ObstacleRect) ImageOptions() *ebiten.DrawImageOptions {
-	return o.op
+	return o.imageOptions
 }
