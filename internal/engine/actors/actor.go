@@ -1,7 +1,6 @@
 package actors
 
 import (
-	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/engine/actors/movement"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
@@ -11,12 +10,6 @@ import (
 type Identifiable interface {
 	ID() string
 	SetID(id string)
-}
-
-// Drawable represents any object that can be drawn to the screen.
-type Drawable interface {
-	Image() *ebiten.Image
-	ImageOptions() *ebiten.DrawImageOptions
 }
 
 // Controllable defines methods for an actor that can be moved or have its movement blocked.
@@ -51,7 +44,7 @@ type Damageable interface {
 type ActorEntity interface {
 	body.Body
 	Identifiable
-	Drawable
+	body.Drawable
 	Controllable
 	Stateful
 	Damageable

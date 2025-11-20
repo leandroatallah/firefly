@@ -36,7 +36,7 @@ type Collidable interface {
 	Shape
 	Touchable
 	GetTouchable() Touchable
-	DrawCollisionBox(screen *ebiten.Image)
+	DrawCollisionBox(screen *ebiten.Image, position image.Rectangle)
 	CollisionPosition() []image.Rectangle
 	IsObstructive() bool
 	SetIsObstructive(value bool)
@@ -45,10 +45,14 @@ type Collidable interface {
 // TODO: Should it be merge with Collidable?
 type Obstacle interface {
 	Body
-	Draw(screen *ebiten.Image)
-	DrawCollisionBox(screen *ebiten.Image)
-	Image() *ebiten.Image
+	Drawable
+	DrawCollisionBox(screen *ebiten.Image, position image.Rectangle)
 	ImageCollisionBox() *ebiten.Image
+}
+
+// Drawable represents any object that can be drawn to the screen.
+type Drawable interface {
+	Image() *ebiten.Image
 	ImageOptions() *ebiten.DrawImageOptions
 }
 

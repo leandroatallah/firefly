@@ -1,6 +1,6 @@
 package body
 
-// TODO: Should these be concrete?
+// TODO: Should these be removed?
 type MovableCollidable interface {
 	Movable
 	Collidable

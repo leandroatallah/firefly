@@ -92,7 +92,7 @@ func (s *SandboxScene) Draw(screen *ebiten.Image) {
 		case *gameenemies.BlueEnemy:
 			screen.DrawImage(t.Image(), t.ImageOptions())
 		default:
-			b.(body.Obstacle).Draw(screen)
+			screen.DrawImage(b.(body.Obstacle).Image(), b.(body.Obstacle).ImageOptions())
 		}
 	}
 
