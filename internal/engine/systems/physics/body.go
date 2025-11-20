@@ -86,9 +86,9 @@ func (b *PhysicsBody) ApplyValidMovement(distance int, isXAxis bool, space body.
 
 func (b *PhysicsBody) CheckMovementDirectionX() {
 	if b.accelerationX > 0 {
-		b.faceDirection = FaceDirectionRight
+		b.SetFaceDirection(FaceDirectionRight)
 	} else if b.accelerationX < 0 {
-		b.faceDirection = FaceDirectionLeft
+		b.SetFaceDirection(FaceDirectionLeft)
 	}
 }
 

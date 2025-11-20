@@ -148,6 +148,7 @@ func (m *PlatformMovementModel) SetIsScripted(isScripted bool) {
 }
 
 // InputHandler processes player input for movement.
+// TODO: Move movement behavior to physics.MovableBody
 func (m *PlatformMovementModel) InputHandler(body *PhysicsBody) {
 	cfg := config.Get().Physics
 
