@@ -6,13 +6,13 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
-	"github.com/leandroatallah/firefly/internal/engine/actors"
+	gameplayer "github.com/leandroatallah/firefly/internal/game/actors/player"
 )
 
 func (s *LevelsScene) DrawHUD(screen *ebiten.Image) {
 	coinCount := 0
 
-	if p, ok := s.player.(*actors.PlayerPlatform); ok {
+	if p, ok := s.player.(*gameplayer.CherryPlayer); ok {
 		coinCount = p.CoinCount()
 	}
 

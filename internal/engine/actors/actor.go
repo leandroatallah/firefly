@@ -1,6 +1,7 @@
 package actors
 
 import (
+	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/engine/actors/movement"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
@@ -55,4 +56,6 @@ type ActorEntity interface {
 	SetBody(rect *physics.Rect) ActorEntity
 	SetCollisionArea(rect *physics.Rect) ActorEntity
 	SetTouchable(t body.Touchable)
+
+	ImageWithCollisionBox() *ebiten.Image
 }

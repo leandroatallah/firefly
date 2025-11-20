@@ -26,22 +26,23 @@ func (b *CollidableBody) GetTouchable() body.Touchable {
 	return b.Touchable
 }
 
-func (b *CollidableBody) DrawCollisionBox(screen *ebiten.Image) {
-	for _, c := range b.CollisionPosition() {
-		minX := c.Min.X
-		minY := c.Min.Y
-		maxX := c.Max.X
-		maxY := c.Max.Y
+func (b *CollidableBody) DrawCollisionBox(screen *ebiten.Image, position image.Rectangle) {
+	for _, collisionRect := range b.CollisionPosition() {
+		// Calculate top-left corner of collision box relative to the character's body origin.
+		offsetX := float32(collisionRect.Min.X - position.Min.X)
+		offsetY := float32(collisionRect.Min.Y - position.Min.Y)
 
-		width := float32(maxX - minX)
-		height := float32(maxY - minY)
+		width := float32(collisionRect.Dx())
+		height := float32(collisionRect.Dy())
+
+		// Draw on the 'screen' (which is the sprite) at the relative offset.
 		vector.DrawFilledRect(
 			screen,
-			float32(minX), float32(minY), width, height,
+			offsetX, offsetY, width, height,
 			color.RGBA{0, 0xaa, 0, 0xff}, false)
 		vector.DrawFilledRect(
 			screen,
-			float32(minX)+1, float32(minY)+1, width-2, height-2,
+			offsetX+1, offsetY+1, width-2, height-2,
 			color.RGBA{0, 0xff, 0, 0xff}, false)
 	}
 }

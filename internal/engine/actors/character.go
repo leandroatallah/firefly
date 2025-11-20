@@ -19,18 +19,17 @@ type Character struct {
 	movementState    movement.MovementState
 	movementBlockers int
 	animationCount   int
-	// TODO: Move to the right place
-	frameRate int
-	// TODO: Rename this
-	imageOptions *ebiten.DrawImageOptions
+	frameRate        int
+	imageOptions     *ebiten.DrawImageOptions
+	collisionRects   map[ActorStateEnum]*physics.Rect
 }
 
-func NewCharacter(s sprites.SpriteMap, frameRate int) *Character {
+func NewCharacter(s sprites.SpriteMap) *Character { // Modified signature
 	spriteEntity := sprites.NewSpriteEntity(s)
 	c := &Character{
-		SpriteEntity: spriteEntity,
-		frameRate:    frameRate,
-		imageOptions: &ebiten.DrawImageOptions{},
+		SpriteEntity:   spriteEntity,
+		imageOptions:   &ebiten.DrawImageOptions{},
+		collisionRects: make(map[ActorStateEnum]*physics.Rect),
 	}
 	state, err := NewActorState(c, Idle)
 	if err != nil {
@@ -64,6 +63,27 @@ func (c *Character) State() ActorStateEnum {
 func (c *Character) SetState(state ActorState) {
 	c.state = state
 	c.state.OnStart()
+
+	if newRectTemplate, ok := c.collisionRects[state.State()]; ok {
+		collisions := c.CollisionShapes()
+		if len(collisions) > 0 {
+			bodyRectPos := c.Position().Min
+			newRectRelativePos := newRectTemplate.Position()
+
+			// The old collision shape is not needed. Create a new one.
+			newAbsoluteX := bodyRectPos.X + newRectRelativePos.Min.X
+			newAbsoluteY := bodyRectPos.Y + newRectRelativePos.Min.Y
+
+			newWidth := newRectRelativePos.Dx()
+			newHeight := newRectRelativePos.Dy()
+
+			collisions[0].Shape = physics.NewRect(newAbsoluteX, newAbsoluteY, newWidth, newHeight)
+		}
+	}
+}
+
+func (c *Character) AddCollisionRect(state ActorStateEnum, rect *physics.Rect) {
+	c.collisionRects[state] = rect
 }
 
 func (c *Character) SetMovementState(
@@ -158,7 +178,6 @@ func (c *Character) handleState() {
 		isRecovered := c.state.(*HurtState).CheckRecovery()
 		if isRecovered {
 			setNewState(Idle)
-			// TODO: Group this in a helper function or method
 			c.SetImmobile(false)
 			c.SetInvulnerable(false)
 		}
@@ -183,7 +202,6 @@ func (c *Character) Hurt(damage int) {
 		log.Fatal(err)
 	}
 	c.SetState(state)
-	// TODO: Group this in a helper function or method
 	c.SetImmobile(true)
 	c.SetInvulnerable(true)
 
@@ -224,8 +242,26 @@ func (c *Character) Image() *ebiten.Image {
 	).(*ebiten.Image)
 }
 
+// WithCollisionBox extend Image method to show a rect with the collision area
+func (c *Character) ImageWithCollisionBox() *ebiten.Image {
+	img := c.Image()
+	pos := c.Position()
+	c.DrawCollisionBox(img, pos)
+
+	// Create a new image and copy the subimage to it
+	res := ebiten.NewImage(img.Bounds().Dx(), img.Bounds().Dy())
+	res.DrawImage(img, nil)
+
+	c.DrawCollisionBox(res, pos)
+	return res
+}
+
 func (c *Character) ImageOptions() *ebiten.DrawImageOptions {
 	return c.imageOptions
+}
+
+func (c *Character) SetFrameRate(value int) {
+	c.frameRate = value
 }
 
 // BlockMovement increases the count of systems blocking movement.

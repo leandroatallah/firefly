@@ -9,7 +9,7 @@ import (
 )
 
 // TODO: Move to the right place
-func getSprites(assets map[string]string) (sprites.SpriteMap, error) {
+func getSprites(assets map[string]actors.AssetData) (sprites.SpriteMap, error) {
 	var s sprites.SpriteAssets
 	for key, value := range assets {
 		var state animation.SpriteState
@@ -23,7 +23,7 @@ func getSprites(assets map[string]string) (sprites.SpriteMap, error) {
 		default:
 			continue
 		}
-		s = s.AddSprite(state, value)
+		s = s.AddSprite(state, value.Path)
 	}
 	result, err := sprites.LoadSprites(s)
 	if err != nil {
@@ -39,19 +39,47 @@ func CreateAnimatedCharacter(data actors.SpriteData) (*actors.Character, error) 
 		return nil, err
 	}
 
-	character := actors.NewCharacter(assets, data.FrameRate)
-	character.SetFaceDirection(data.FacingDirection)
+	c := actors.NewCharacter(assets)
+	c.SetFaceDirection(data.FacingDirection)
+	c.SetFrameRate(data.FrameRate)
 
-	return character, nil
+	return c, nil
+}
+
+type collisionRectSetter interface {
+	AddCollisionRect(state actors.ActorStateEnum, rect *physics.Rect)
 }
 
 func SetPlayerBodies(player actors.ActorEntity, data actors.SpriteData) {
 	bodyRect := physics.NewRect(data.BodyRect.Rect())
-	collisionRect := physics.NewRect(data.CollisionRect.Rect())
+	// Set initial collision area for idle state
+	collisionRect := physics.NewRect(data.Assets["idle"].CollisionRect.Rect())
 
 	player.SetBody(bodyRect)
 	player.SetCollisionArea(collisionRect)
 	player.SetTouchable(player)
+
+	setter, ok := player.(collisionRectSetter)
+	if !ok {
+		// Log error or just return
+		return
+	}
+
+	for key, assetData := range data.Assets {
+		var state actors.ActorStateEnum
+		switch key {
+		case "idle":
+			state = actors.Idle
+		case "walk":
+			state = actors.Walk
+		case "hurt":
+			state = actors.Hurted
+		default:
+			continue
+		}
+		rect := physics.NewRect(assetData.CollisionRect.Rect())
+		setter.AddCollisionRect(state, rect)
+	}
 }
 
 func SetPlayerStats(player body.Body, data actors.StatData) {

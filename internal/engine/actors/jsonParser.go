@@ -14,16 +14,19 @@ type ShapeRect struct {
 	Height int `json:"height"`
 }
 
-func (s *ShapeRect) Rect() (x, y, width, height int) {
+func (s ShapeRect) Rect() (x, y, width, height int) {
 	return s.X, s.Y, s.Width, s.Height
 }
 
+type AssetData struct {
+	Path          string    `json:"path"`
+	CollisionRect ShapeRect `json:"collision_rect"`
+}
+
 type SpriteData struct {
-	BodyRect      ShapeRect         `json:"body_rect"`
-	CollisionRect ShapeRect         `json:"collision_rect"`
-	Assets        map[string]string `json:"assets"`
-	FrameRate     int               `json:"frame_rate"`
-	// TODO: Make facing direction work
+	BodyRect        ShapeRect              `json:"body_rect"`
+	Assets          map[string]AssetData   `json:"assets"`
+	FrameRate       int                    `json:"frame_rate"`
 	FacingDirection physics.FacingDirectionEnum `json:"facing_direction"` // 0 - right, 1 - left
 }
 

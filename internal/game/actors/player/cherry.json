@@ -6,15 +6,25 @@
       "width": 32,
       "height": 32
     },
-    "collision_rect": {
-      "x": 6,
-      "y": 10,
-      "width": 20,
-      "height": 21
-    },
     "assets": {
-      "idle": "assets/images/cherry-idle.png",
-      "walk": "assets/images/cherry-walk.png"
+      "idle": {
+        "path": "assets/images/cherry-idle.png",
+        "collision_rect": {
+          "x": 4,
+          "y": 13,
+          "width": 22,
+          "height": 17
+        }
+      },
+      "walk": {
+        "path": "assets/images/cherry-walk.png",
+        "collision_rect": {
+          "x": 6,
+          "y": 13,
+          "width": 20,
+          "height": 17
+        }
+      }
     },
     "facing_direction": 0,
     "frame_rate": 6

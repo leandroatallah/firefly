@@ -66,6 +66,10 @@ func (b *PhysicsBody) AddCollision(list ...*CollisionArea) *PhysicsBody {
 	return b
 }
 
+func (b *PhysicsBody) CollisionShapes() []*CollisionArea {
+	return b.collisionList
+}
+
 // Movement methods
 func (b *PhysicsBody) ApplyValidMovement(distance int, isXAxis bool, space body.BodiesSpace) {
 	if distance == 0 {
