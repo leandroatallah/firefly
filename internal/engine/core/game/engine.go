@@ -32,9 +32,6 @@ func (g *Game) Update() error {
 		g.debugVisible = !g.debugVisible
 	}
 
-	// First, update the input manager
-	g.AppContext.InputManager.Update()
-
 	// Update Dialogue Manager
 	if g.AppContext.DialogueManager != nil {
 		g.AppContext.DialogueManager.Update()

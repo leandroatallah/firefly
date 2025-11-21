@@ -14,7 +14,6 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/core/levels"
 	"github.com/leandroatallah/firefly/internal/engine/core/scene"
 	"github.com/leandroatallah/firefly/internal/engine/systems/audiomanager"
-	"github.com/leandroatallah/firefly/internal/engine/systems/input"
 	"github.com/leandroatallah/firefly/internal/engine/systems/speech"
 	gamescene "github.com/leandroatallah/firefly/internal/game/scenes"
 	scenestypes "github.com/leandroatallah/firefly/internal/game/scenes/types"
@@ -28,7 +27,6 @@ func Setup(assets fs.FS) error {
 	ebiten.SetWindowTitle("Firefly")
 
 	// Initialize all systems and managers
-	inputManager := input.NewManager()
 	audioManager := audiomanager.NewAudioManager()
 	sceneManager := scene.NewSceneManager()
 	levelManager := levels.NewManager()
@@ -54,7 +52,6 @@ func Setup(assets fs.FS) error {
 	levelManager.SetCurrentLevel(1)
 
 	appContext := &core.AppContext{
-		InputManager:    inputManager,
 		AudioManager:    audioManager,
 		DialogueManager: dialogueManager,
 		ActorManager:    actorManager,
