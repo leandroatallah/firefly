@@ -1,6 +1,8 @@
 package physics
 
 import (
+	"fmt"
+
 	"github.com/leandroatallah/firefly/internal/config"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 )
@@ -59,10 +61,26 @@ func (b *MovableBody) OnMoveDown(distance int) {
 	b.MoveY(distance)
 }
 
-// TODO: Improve this method (split of find out a better approach)
-func (b *MovableBody) SetSpeedAndMaxSpeed(speed, maxSpeed int) {
+func (b *MovableBody) SetSpeed(speed int) error {
+	if b == nil {
+		return fmt.Errorf("MovableBody is nil")
+	}
+	if speed < 0 {
+		return fmt.Errorf("speed must be >= 0; got %d", speed)
+	}
 	b.speed = speed
+	return nil
+}
+
+func (b *MovableBody) SetMaxSpeed(maxSpeed int) error {
+	if b == nil {
+		return fmt.Errorf("MovableBody is nil")
+	}
+	if maxSpeed < 0 {
+		return fmt.Errorf("maxSpeed must be >= 0; got %d", maxSpeed)
+	}
 	b.maxSpeed = maxSpeed
+	return nil
 }
 
 func (b *MovableBody) Speed() int {

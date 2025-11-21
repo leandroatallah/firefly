@@ -15,7 +15,8 @@ type Movable interface {
 	Shape
 	ApplyValidMovement(velocity int, isXAxis bool, space BodiesSpace)
 
-	SetSpeedAndMaxSpeed(speed, maxSpeed int)
+	SetSpeed(speed int) error
+	SetMaxSpeed(maxSpeed int) error
 	Speed() int
 	Immobile() bool
 	SetImmobile(immobile bool)

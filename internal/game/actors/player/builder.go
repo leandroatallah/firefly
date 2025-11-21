@@ -1,6 +1,8 @@
 package gameplayer
 
 import (
+	"fmt"
+
 	"github.com/leandroatallah/firefly/internal/engine/actors"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/animation"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
@@ -50,7 +52,7 @@ type collisionRectSetter interface {
 	AddCollisionRect(state actors.ActorStateEnum, rect *physics.Rect)
 }
 
-func SetPlayerBodies(player actors.ActorEntity, data actors.SpriteData) {
+func SetPlayerBodies(player actors.ActorEntity, data actors.SpriteData) error {
 	bodyRect := physics.NewRect(data.BodyRect.Rect())
 	// Set initial collision area for idle state
 	collisionRect := physics.NewRect(data.Assets["idle"].CollisionRect.Rect())
@@ -61,8 +63,7 @@ func SetPlayerBodies(player actors.ActorEntity, data actors.SpriteData) {
 
 	setter, ok := player.(collisionRectSetter)
 	if !ok {
-		// Log error or just return
-		return
+		return fmt.Errorf("player must implement collisionRectSetter")
 	}
 
 	for key, assetData := range data.Assets {
@@ -80,13 +81,24 @@ func SetPlayerBodies(player actors.ActorEntity, data actors.SpriteData) {
 		rect := physics.NewRect(assetData.CollisionRect.Rect())
 		setter.AddCollisionRect(state, rect)
 	}
+
+	return nil
 }
 
-func SetPlayerStats(player body.Body, data actors.StatData) {
+func SetPlayerStats(player body.Body, data actors.StatData) error {
 	// TODO: Create set stats method
 	// player.SetStats(statData)
 	player.SetMaxHealth(data.Health)
-	player.SetSpeedAndMaxSpeed(data.Speed, data.MaxSpeed)
+	var err error
+	err = player.SetSpeed(data.Speed)
+	if err != nil {
+		return err
+	}
+	err = player.SetMaxSpeed(data.MaxSpeed)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func SetMovementModel(

@@ -14,8 +14,8 @@ type BlueEnemy struct {
 	count int
 }
 
-func NewBlueEnemy() *BlueEnemy {
-	// TODO: Set logic to initial position
+func NewBlueEnemy() (*BlueEnemy, error) {
+	// NOTE: Ignore for now. Set logic to initial position
 	x, y := 0, 0
 	const (
 		frameWidth  = 32
@@ -36,15 +36,20 @@ func NewBlueEnemy() *BlueEnemy {
 	bodyRect := physics.NewRect(x, y, frameWidth, frameHeight)
 	collisionRect := physics.NewRect(x, y, frameWidth, frameHeight)
 
-	// TODO: Create a builder with director to automate this process
 	enemy := &BlueEnemy{Character: *character}
 	enemy.SetBody(bodyRect)
-	// TODO: Move it to the right place (builder)
-	enemy.SetSpeedAndMaxSpeed(2, 2)
+	err = enemy.SetSpeed(2)
+	if err != nil {
+		return nil, err
+	}
+	err = enemy.SetMaxSpeed(2)
+	if err != nil {
+		return nil, err
+	}
 	enemy.SetCollisionArea(collisionRect)
 	enemy.PhysicsBody.SetTouchable(enemy)
 
-	return enemy
+	return enemy, nil
 }
 
 // Character Methods

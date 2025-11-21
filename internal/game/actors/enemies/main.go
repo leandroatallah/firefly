@@ -1,6 +1,8 @@
 package gameenemies
 
 import (
+	"log"
+
 	"github.com/leandroatallah/firefly/internal/engine/actors"
 	"github.com/leandroatallah/firefly/internal/engine/actors/enemies"
 )
@@ -11,7 +13,13 @@ const (
 
 func InitEnemyMap() enemies.EnemyMap {
 	enemyMap := map[enemies.EnemyType]actors.ActorEntity{
-		BlueEnemyType: NewBlueEnemy(),
+		BlueEnemyType: func() actors.ActorEntity {
+			e, err := NewBlueEnemy()
+			if err != nil {
+				log.Fatal("InitEnemyMap: %w", err)
+			}
+			return e
+		}(),
 	}
 	return enemyMap
 }
