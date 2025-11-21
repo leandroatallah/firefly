@@ -62,6 +62,6 @@ func (e *BlueEnemy) OnTouch(other body.Body) {
 	player := e.MovementState().Target()
 	if other.ID() == player.ID() {
 		// TODO: Replace the condition of hurting
-		player.(*actors.Player).Hurt(1)
+		player.(*actors.Character).Hurt(1)
 	}
 }

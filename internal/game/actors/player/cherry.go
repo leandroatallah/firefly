@@ -8,7 +8,7 @@ import (
 )
 
 type CherryPlayer struct {
-	actors.Player
+	actors.Character
 
 	coinCount        int
 	movementBlockers int
@@ -26,7 +26,7 @@ func NewCherryPlayer() (actors.ActorEntity, error) {
 	}
 
 	player := &CherryPlayer{
-		Player: actors.Player{Character: *character},
+		Character: *character,
 	}
 	if err = SetPlayerBodies(player, spriteData); err != nil {
 		return nil, fmt.Errorf("SetPlayerBodies: %w", err)

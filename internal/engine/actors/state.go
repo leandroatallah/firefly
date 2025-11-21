@@ -11,7 +11,6 @@ type ActorState interface {
 
 type ActorStateEnum int
 
-// TODO: Rename to IdleState, etc.
 const (
 	Idle ActorStateEnum = iota
 	Walk

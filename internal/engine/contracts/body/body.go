@@ -82,10 +82,6 @@ type Body interface {
 
 	ID() string
 	SetPosition(x, y int)
-
-	// TODO: For now, I commented movement model methods to prevent import cycle error, by maybe it could be removed.
-	// SetMovementModel(model MovementModel)
-	// MovementModel() MovementModel
 }
 
 type BodiesSpace interface {
@@ -93,7 +89,4 @@ type BodiesSpace interface {
 	Bodies() []Body
 	RemoveBody(body Body)
 	ResolveCollisions(body Body) (touching bool, blocking bool)
-	// TODO: For now, I commented tilemap methods to prevent import cycle error, by maybe it could be removed.
-	// GetTilemapDimensionsProvider() TilemapDimensionsProvider
-	// SetTilemapDimensionsProvider(provider TilemapDimensionsProvider)
 }

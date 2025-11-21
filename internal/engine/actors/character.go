@@ -11,6 +11,11 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/systems/sprites"
 )
 
+const (
+	frameOX = 0
+	frameOY = 0
+)
+
 type Character struct {
 	physics.PhysicsBody
 	sprites.SpriteEntity

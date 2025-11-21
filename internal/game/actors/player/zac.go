@@ -8,7 +8,7 @@ import (
 )
 
 type ZacPlayer struct {
-	actors.Player
+	actors.Character
 
 	coinCount int
 }
@@ -27,7 +27,7 @@ func NewZacPlayer(
 	}
 
 	player := &ZacPlayer{
-		Player: actors.Player{Character: *character},
+		Character: *character,
 	}
 	if err = SetPlayerBodies(player, spriteData); err != nil {
 		return nil, fmt.Errorf("SetPlayerBodies: %w", err)
