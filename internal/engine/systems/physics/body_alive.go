@@ -1,13 +1,23 @@
 package physics
 
+import "github.com/leandroatallah/firefly/internal/engine/contracts/body"
+
 // Implements Alive
 type AliveBody struct {
-	health    int
-	maxHealth int
+	body.Alive
+
+	*Body
+
+	health       int
+	maxHealth    int
+	invulnerable bool
 }
 
-func NewAliveBody() *AliveBody {
-	return &AliveBody{}
+func NewAliveBody(body *Body) *AliveBody {
+	if body == nil {
+		panic("NewAliveBody: body must not be nil")
+	}
+	return &AliveBody{Body: body}
 }
 
 func (b *AliveBody) Health() int {
@@ -32,4 +42,12 @@ func (b *AliveBody) LoseHealth(damage int) {
 }
 func (b *AliveBody) RestoreHealth(heal int) {
 	b.health = min(b.health+heal, b.maxHealth)
+}
+
+func (b *AliveBody) Invulnerable() bool {
+	return b.invulnerable
+}
+
+func (b *AliveBody) SetInvulnerability(value bool) {
+	b.invulnerable = value
 }

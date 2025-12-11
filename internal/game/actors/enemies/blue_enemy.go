@@ -24,20 +24,21 @@ func NewBlueEnemy() (*BlueEnemy, error) {
 
 	var assets sprites.SpriteAssets
 	assets = assets.AddSprite(actors.Idle, "assets/images/blue-enemy.png").
-		AddSprite(actors.Walk, "assets/images/blue-enemy.png")
+		AddSprite(actors.Walking, "assets/images/blue-enemy.png")
 
 	sprites, err := sprites.LoadSprites(assets)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	character := actors.NewCharacter(sprites)
+	rect := physics.NewRect(x, y, frameWidth, frameHeight)
+	character := actors.NewCharacter(sprites, rect)
 
-	bodyRect := physics.NewRect(x, y, frameWidth, frameHeight)
 	collisionRect := physics.NewRect(x, y, frameWidth, frameHeight)
 
 	enemy := &BlueEnemy{Character: *character}
-	enemy.SetBody(bodyRect)
+	// TODO: Handle repeated IDs
+	enemy.SetID("BLUEENEMY")
 	err = enemy.SetSpeed(2)
 	if err != nil {
 		return nil, err
@@ -46,8 +47,8 @@ func NewBlueEnemy() (*BlueEnemy, error) {
 	if err != nil {
 		return nil, err
 	}
-	enemy.SetCollisionArea(collisionRect)
-	enemy.PhysicsBody.SetTouchable(enemy)
+	enemy.AddCollision(physics.NewCollidableBodyFromRect(collisionRect))
+	enemy.SetTouchable(enemy)
 
 	return enemy, nil
 }
@@ -58,7 +59,7 @@ func (e *BlueEnemy) Update(space body.BodiesSpace) error {
 	return e.Character.Update(space)
 }
 
-func (e *BlueEnemy) OnTouch(other body.Body) {
+func (e *BlueEnemy) OnTouch(other body.Collidable) {
 	player := e.MovementState().Target()
 	if other.ID() == player.ID() {
 		// TODO: Replace the condition of hurting

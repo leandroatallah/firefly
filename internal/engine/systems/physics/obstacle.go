@@ -1,40 +1,73 @@
 package physics
 
 import (
+	"fmt"
+	"image"
 	"image/color"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/vector"
-	"github.com/leandroatallah/firefly/internal/config"
+	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 )
 
 type ObstacleRect struct {
-	PhysicsBody
+	*MovableBody
+	*CollidableBody
 
 	imageOptions *ebiten.DrawImageOptions
 }
 
-func NewObstacleRect(rect *Rect) *ObstacleRect {
+func NewObstacleRect(bodyRect *Rect) *ObstacleRect {
+	b := NewBody(bodyRect)
+	movable := NewMovableBody(b)
+	collidable := NewCollidableBody(b)
 	return &ObstacleRect{
-		PhysicsBody:  *NewPhysicsBody(rect),
+		MovableBody:    movable,
+		CollidableBody: collidable,
+
 		imageOptions: &ebiten.DrawImageOptions{},
 	}
 }
 
-func (o *ObstacleRect) AddCollision(list ...*CollisionArea) *ObstacleRect {
+// Forwarding methods for Body to avoid ambiguous selector
+// Always route via the MovableBody component
+func (o *ObstacleRect) ID() string {
+	return o.MovableBody.ID()
+}
+func (o *ObstacleRect) SetID(id string) {
+	o.MovableBody.SetID(id)
+}
+func (o *ObstacleRect) Position() image.Rectangle {
+	return o.MovableBody.Position()
+}
+func (o *ObstacleRect) SetPosition(x, y int) {
+	o.MovableBody.SetPosition(x, y)
+}
+func (o *ObstacleRect) GetPositionMin() (int, int) {
+	return o.MovableBody.GetPositionMin()
+}
+func (o *ObstacleRect) GetShape() body.Shape {
+	return o.MovableBody.GetShape()
+}
+
+func (o *ObstacleRect) AddCollisionBodies(list ...body.Collidable) {
 	if len(list) == 0 {
-		list = []*CollisionArea{rectToCollisionArea(o.Shape)}
+		b := NewCollidableBodyFromRect(o.GetShape())
+		x, y := o.GetPositionMin()
+		b.SetPosition(x, y)
+		b.SetID(fmt.Sprintf("%v_COLLISION_0", o.ID()))
+		list = []body.Collidable{b}
 	}
-	o.PhysicsBody.AddCollision(list...)
-	return o
+	o.AddCollision(list...)
 }
 
 func (o *ObstacleRect) Draw(screen *ebiten.Image) {
-	rect := o.Shape.(*Rect)
+	rect := o.GetShape().(*Rect)
+	x, y := o.GetPositionMin()
 	vector.DrawFilledRect(
 		screen,
-		float32(rect.x16)/float32(config.Get().Unit),
-		float32(rect.y16)/float32(config.Get().Unit),
+		float32(x),
+		float32(y),
 		float32(rect.width),
 		float32(rect.height),
 		color.Transparent,
@@ -45,19 +78,26 @@ func (o *ObstacleRect) Draw(screen *ebiten.Image) {
 func (o *ObstacleRect) Image() *ebiten.Image {
 	w := o.Position().Dx()
 	h := o.Position().Dy()
-	return ebiten.NewImage(w, h)
+	i := ebiten.NewImage(w, h)
+	return i
 }
 
 func (o *ObstacleRect) ImageCollisionBox() *ebiten.Image {
 	img := o.Image()
 	if o.IsObstructive() {
-		img.Fill(color.RGBA{G: 255, A: 255})
+		img.Fill(color.RGBA{G: 255})
 	} else {
-		img.Fill(color.RGBA{R: 255, A: 255})
+		img.Fill(color.RGBA{R: 255})
 	}
 	return img
 }
 
 func (o *ObstacleRect) ImageOptions() *ebiten.DrawImageOptions {
 	return o.imageOptions
+}
+
+func (o *ObstacleRect) UpdateImageOptions() {
+	o.imageOptions.GeoM.Reset()
+	x, y := o.GetPositionMin()
+	o.imageOptions.GeoM.Translate(float64(x), float64(y))
 }

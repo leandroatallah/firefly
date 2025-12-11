@@ -19,6 +19,12 @@ type Tilemap struct {
 	imageOptions *ebiten.DrawImageOptions
 }
 
+type Property struct {
+	Name  string `json:"name"`
+	Type  string `json:"type"`
+	Value string `json:"value"`
+}
+
 type Layer struct {
 	Data    []int       `json:"data"`
 	Height  int         `json:"height"`
@@ -34,16 +40,17 @@ type Layer struct {
 }
 
 type Obstacle struct {
-	Gid      int     `json:"gid"`
-	Height   float64 `json:"height"`
-	Id       int     `json:"id"`
-	Name     string  `json:"name"`
-	Rotation float64 `json:"rotation"`
-	Type     string  `json:"type"`
-	Visible  bool    `json:"visible"`
-	Width    float64 `json:"width"`
-	X        float64 `json:"x"`
-	Y        float64 `json:"y"`
+	Gid        int        `json:"gid"`
+	Height     float64    `json:"height"`
+	Id         int        `json:"id"`
+	Name       string     `json:"name"`
+	Rotation   float64    `json:"rotation"`
+	Type       string     `json:"type"`
+	Visible    bool       `json:"visible"`
+	Width      float64    `json:"width"`
+	X          float64    `json:"x"`
+	Y          float64    `json:"y"`
+	Properties []Property `json:"properties"`
 }
 
 type Tileset struct {
@@ -74,6 +81,10 @@ func (t *Tilemap) Image(screen *ebiten.Image) (*ebiten.Image, error) {
 	return t.image, nil
 }
 
+func (t *Tilemap) ImageOptions() *ebiten.DrawImageOptions {
+	return t.imageOptions
+}
+
 // GetPlayerStartPosition searches for a layer named "PlayerStart" in the tilemap's object layers.
 // It assumes there is only one object in this layer and returns its x, y coordinates.
 // The y coordinate is adjusted to account for the tilemap's rendering offset.
@@ -83,16 +94,18 @@ func (t *Tilemap) GetPlayerStartPosition() (x, y int, found bool) {
 	}
 
 	cfg := config.Get()
-
 	mapHeight := t.Height * t.Tileheight
-	yOffset := cfg.ScreenHeight - mapHeight
+	yOffset := mapHeight - cfg.ScreenHeight - 100
 
+	// TODO: Layers should be parsed one time to not loop more than one time
 	for _, layer := range t.Layers {
 		if layer.Name == "PlayerStart" && layer.Type == "objectgroup" && len(layer.Objects) > 0 {
 			obj := layer.Objects[0]
 			px := int(math.Round(obj.X))
 			py := int(math.Round(obj.Y)) + yOffset
-			return px * cfg.Unit, py * cfg.Unit, true
+
+			// return px * cfg.Unit, py * cfg.Unit, true
+			return px, py, true
 		}
 	}
 
@@ -109,22 +122,19 @@ func (t *Tilemap) GetItemsPositionID() []*ItemPosition {
 		return nil
 	}
 
-	mapHeight := t.Height * t.Tileheight
-	yOffset := config.Get().ScreenHeight - mapHeight
-
 	res := []*ItemPosition{}
 	var firstgid int
 	var ts *Tileset
 
 	for _, layer := range t.Layers {
-		if layer.Name == "Items" && layer.Type == "objectgroup" && len(layer.Objects) > 0 {
+		if layer.Name == "Items" && layer.Type == "objectgroup" && layer.Visible && len(layer.Objects) > 0 {
 			for _, obj := range layer.Objects {
 				x16 := int(math.Round(obj.X))
 				yValue := obj.Y
 				if obj.Gid > 0 {
 					yValue -= obj.Height
 				}
-				y16 := int(math.Round(yValue)) + yOffset
+				y16 := int(math.Round(yValue))
 				if firstgid == 0 {
 					firstgid = obj.Gid
 					ts = t.findTileset(firstgid)

@@ -8,7 +8,7 @@ type MovementState interface {
 	State() MovementStateEnum
 	OnStart()
 	Move()
-	Target() body.Body
+	Target() body.MovableCollidable
 }
 
 type MovementStateEnum int
@@ -24,14 +24,14 @@ const (
 
 type BaseMovementState struct {
 	state  MovementStateEnum
-	actor  body.Body
-	target body.Body
+	actor  body.MovableCollidable
+	target body.MovableCollidable
 }
 
 func NewBaseMovementState(
 	state MovementStateEnum,
-	actor body.Body,
-	target body.Body,
+	actor body.MovableCollidable,
+	target body.MovableCollidable,
 ) BaseMovementState {
 	return BaseMovementState{state: state, actor: actor, target: target}
 }
@@ -42,7 +42,7 @@ func (s *BaseMovementState) State() MovementStateEnum {
 
 func (s *BaseMovementState) OnStart() {}
 
-func (s *BaseMovementState) Target() body.Body {
+func (s *BaseMovementState) Target() body.MovableCollidable {
 	return s.target
 }
 
@@ -85,7 +85,7 @@ func calculateMovementDirections(actorPos, targetPos body.Body, isAvoid bool) Mo
 	return MovementDirections{Up: up, Down: down, Left: left, Right: right}
 }
 
-func executeMovement(actor body.Body, directions MovementDirections) {
+func executeMovement(actor body.MovableCollidable, directions MovementDirections) {
 	if !directions.Up && !directions.Down && !directions.Left && !directions.Right {
 		return
 	}

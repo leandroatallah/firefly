@@ -70,6 +70,12 @@
                  "height":288,
                  "id":1,
                  "name":"",
+                 "properties":[
+                        {
+                         "name":"body_id",
+                         "type":"string",
+                         "value":"GROUND"
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -81,6 +87,12 @@
                  "height":32,
                  "id":3,
                  "name":"",
+                 "properties":[
+                        {
+                         "name":"body_id",
+                         "type":"string",
+                         "value":"PLATFORM_1"
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -92,6 +104,12 @@
                  "height":32,
                  "id":98,
                  "name":"",
+                 "properties":[
+                        {
+                         "name":"body_id",
+                         "type":"string",
+                         "value":"PLATFORM_5"
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -103,6 +121,12 @@
                  "height":480,
                  "id":9,
                  "name":"",
+                 "properties":[
+                        {
+                         "name":"body_id",
+                         "type":"string",
+                         "value":"TRANSPARENT_WALL_LEFT"
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -114,6 +138,12 @@
                  "height":64,
                  "id":95,
                  "name":"",
+                 "properties":[
+                        {
+                         "name":"body_id",
+                         "type":"string",
+                         "value":"PLATFORM_2"
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -125,6 +155,12 @@
                  "height":64,
                  "id":96,
                  "name":"",
+                 "properties":[
+                        {
+                         "name":"body_id",
+                         "type":"string",
+                         "value":"PLATFORM_3"
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -136,6 +172,12 @@
                  "height":64,
                  "id":97,
                  "name":"",
+                 "properties":[
+                        {
+                         "name":"body_id",
+                         "type":"string",
+                         "value":"PLATFORM_4"
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -378,7 +420,7 @@
                  "visible":true,
                  "width":16,
                  "x":160,
-                 "y":464
+                 "y":416
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -395,6 +437,12 @@
                  "height":480,
                  "id":11,
                  "name":"",
+                 "properties":[
+                        {
+                         "name":"body_id",
+                         "type":"string",
+                         "value":"TRANSPARENT_WALL_RIGHT"
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,

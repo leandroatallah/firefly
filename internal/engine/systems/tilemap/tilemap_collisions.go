@@ -3,7 +3,6 @@ package tilemap
 import (
 	"fmt"
 
-	"github.com/leandroatallah/firefly/internal/config"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
 )
@@ -33,7 +32,7 @@ func (t *Tilemap) CreateCollisionBodies(space *physics.Space, triggerEndpoint bo
 
 	for _, layer := range t.Layers {
 		// CreateCollisionBodies only handles layers of objectgroup type
-		if layer.Type != "objectgroup" {
+		if !layer.Visible || layer.Type != "objectgroup" {
 			continue
 		}
 
@@ -41,14 +40,14 @@ func (t *Tilemap) CreateCollisionBodies(space *physics.Space, triggerEndpoint bo
 		// TODO: Move endpoint to the scene and create as Item Coin
 		case EndpointLayer:
 			for _, obj := range layer.Objects {
-				obstacle := t.NewObstacleRect(obj, false)
+				obstacle := t.NewObstacleRect(obj, "ENDPOINT", false)
 				obstacle.SetTouchable(triggerEndpoint)
 				space.AddBody(obstacle)
 			}
 		// TODO: Move obstacles to the scene and create as Item Coin
 		case ObstaclesLayer:
 			for _, obj := range layer.Objects {
-				obstacle := t.NewObstacleRect(obj, true)
+				obstacle := t.NewObstacleRect(obj, "OBSTACLE", true)
 				space.AddBody(obstacle)
 			}
 		default:
@@ -59,12 +58,21 @@ func (t *Tilemap) CreateCollisionBodies(space *physics.Space, triggerEndpoint bo
 	return nil
 }
 
-func (t *Tilemap) NewObstacleRect(obj *Obstacle, isObstructive bool) *physics.ObstacleRect {
-	mapHeight := t.Height * t.Tileheight
-	yOffset := config.Get().ScreenHeight - mapHeight
+func (t *Tilemap) NewObstacleRect(obj *Obstacle, prefix string, isObstructive bool) *physics.ObstacleRect {
+	y := int(obj.Y)
 
-	rect := physics.NewRect(int(obj.X), int(obj.Y)+yOffset, int(obj.Width), int(obj.Height))
-	obstacle := physics.NewObstacleRect(rect).AddCollision()
-	obstacle.SetIsObstructive(isObstructive)
-	return obstacle
+	rect := physics.NewRect(int(obj.X), y, int(obj.Width), int(obj.Height))
+	o := physics.NewObstacleRect(rect)
+	o.SetPosition(int(obj.X), y)
+	var id string
+	for _, p := range obj.Properties {
+		if p.Name == "body_id" {
+			id = p.Value
+			break
+		}
+	}
+	o.SetID(fmt.Sprintf("%v_%v", prefix, id))
+	o.AddCollisionBodies()
+	o.SetIsObstructive(isObstructive)
+	return o
 }

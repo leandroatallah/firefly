@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"os"
 
-	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
+	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 )
 
 type ShapeRect struct {
@@ -19,15 +19,15 @@ func (s ShapeRect) Rect() (x, y, width, height int) {
 }
 
 type AssetData struct {
-	Path          string    `json:"path"`
-	CollisionRect ShapeRect `json:"collision_rect"`
+	Path           string      `json:"path"`
+	CollisionRects []ShapeRect `json:"collision_rect"`
 }
 
 type SpriteData struct {
-	BodyRect        ShapeRect              `json:"body_rect"`
-	Assets          map[string]AssetData   `json:"assets"`
-	FrameRate       int                    `json:"frame_rate"`
-	FacingDirection physics.FacingDirectionEnum `json:"facing_direction"` // 0 - right, 1 - left
+	BodyRect        ShapeRect                `json:"body_rect"`
+	Assets          map[string]AssetData     `json:"assets"`
+	FrameRate       int                      `json:"frame_rate"`
+	FacingDirection body.FacingDirectionEnum `json:"facing_direction"` // 0 - right, 1 - left
 }
 
 type StatData struct {

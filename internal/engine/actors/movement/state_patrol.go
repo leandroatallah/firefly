@@ -75,8 +75,8 @@ func (s *PatrolMovementState) OnStart() {
 
 	if len(s.waypoints) > 0 {
 		target := s.CurrentWaypoint()
-		rect := physics.NewObstacleRect(target)
-		s.movementDirections = calculateMovementDirections(s.actor, rect, false)
+		o := physics.NewObstacleRect(target)
+		s.movementDirections = calculateMovementDirections(s.actor, o, false)
 		s.patrolState = patrolChase
 	}
 
@@ -99,8 +99,8 @@ func (s *PatrolMovementState) Move() {
 		if s.count > s.idleDelay {
 			s.currentTargetIndex = (s.currentTargetIndex + 1) % len(s.waypoints)
 			target := s.CurrentWaypoint()
-			rect := physics.NewObstacleRect(target)
-			s.movementDirections = calculateMovementDirections(s.actor, rect, false)
+			o := physics.NewObstacleRect(target)
+			s.movementDirections = calculateMovementDirections(s.actor, o, false)
 			s.patrolState = patrolChase
 			s.count = 0
 		}

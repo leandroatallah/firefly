@@ -1,6 +1,7 @@
 package physics
 
 import (
+	"log"
 	"sync"
 
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
@@ -9,32 +10,36 @@ import (
 // Space centralizes physics bodies and collision resolution.
 type Space struct {
 	mu                        sync.RWMutex
-	bodies                    map[string]body.Body
+	bodies                    map[string]body.Collidable
 	tilemapDimensionsProvider TilemapDimensionsProvider
 }
 
 func NewSpace() *Space {
 	return &Space{
-		bodies: make(map[string]body.Body),
+		bodies: make(map[string]body.Collidable),
 	}
 }
 
-func (s *Space) AddBody(b body.Body) {
+func (s *Space) AddBody(b body.Collidable) {
 	if b == nil {
 		return
+	}
+
+	if b.ID() == "" {
+		log.Fatal("(*Space).AddBody: A body must have an ID")
 	}
 
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	if s.bodies == nil {
-		s.bodies = make(map[string]body.Body)
+		s.bodies = make(map[string]body.Collidable)
 	}
 
 	s.bodies[b.ID()] = b
 }
 
-func (s *Space) RemoveBody(body body.Body) {
+func (s *Space) RemoveBody(body body.Collidable) {
 	if body == nil {
 		return
 	}
@@ -49,11 +54,11 @@ func (s *Space) RemoveBody(body body.Body) {
 	delete(s.bodies, body.ID())
 }
 
-func (s *Space) Bodies() []body.Body {
+func (s *Space) Bodies() []body.Collidable {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
-	res := make([]body.Body, 0, len(s.bodies))
+	res := make([]body.Collidable, 0, len(s.bodies))
 	for _, b := range s.bodies {
 		if b == nil {
 			continue
@@ -64,7 +69,9 @@ func (s *Space) Bodies() []body.Body {
 	return res
 }
 
-func (s *Space) ResolveCollisions(body body.Body) (touching bool, blocking bool) {
+// ResolveCollisions compare a body parameter with all bodies in space.
+// Returns boolean values if is touching or blocking.
+func (s *Space) ResolveCollisions(body body.Collidable) (touching bool, blocking bool) {
 	if body == nil {
 		return false, false
 	}
@@ -96,13 +103,23 @@ func (s *Space) ResolveCollisions(body body.Body) (touching bool, blocking bool)
 	return touching, blocking
 }
 
-func hasCollision(a, b body.Body) bool {
+func hasCollision(a, b body.Collidable) bool {
+	// Every body must have an ID
+	if a.ID() == "" || b.ID() == "" {
+		return false
+	}
+
+	// Prevent to check the same body
+	if a.ID() == b.ID() {
+		return false
+	}
+
 	rectsA := a.CollisionPosition()
 	rectsB := b.CollisionPosition()
 
-	for _, rectA := range rectsA {
-		for _, rectB := range rectsB {
-			if rectA.Overlaps(rectB) {
+	for _, r := range rectsA {
+		for _, s := range rectsB {
+			if r.Overlaps(s) {
 				return true
 			}
 		}

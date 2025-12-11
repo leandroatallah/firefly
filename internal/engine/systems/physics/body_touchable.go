@@ -13,7 +13,7 @@ func NewTouchTrigger(execute func(), subject body.Body) *TouchTrigger {
 }
 
 // OnTouch is called by the physics engine when a non-obstructive collision occurs.
-func (e *TouchTrigger) OnTouch(other body.Body) {
+func (e *TouchTrigger) OnTouch(other body.Collidable) {
 	if e.subject == nil {
 		return
 	}
@@ -26,4 +26,4 @@ func (e *TouchTrigger) OnTouch(other body.Body) {
 }
 
 // OnBlock is called for obstructive collisions, which won't happen for a sensor.
-func (e *TouchTrigger) OnBlock(other body.Body) {}
+func (e *TouchTrigger) OnBlock(other body.Collidable) {}

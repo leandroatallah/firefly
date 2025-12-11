@@ -8,7 +8,7 @@ import (
 )
 
 type MovableBody struct {
-	body.Shape
+	*Body
 
 	vx16          int
 	vy16          int
@@ -17,11 +17,14 @@ type MovableBody struct {
 	speed         int
 	maxSpeed      int
 	immobile      bool
-	faceDirection FacingDirectionEnum
+	faceDirection body.FacingDirectionEnum
 }
 
-func (b *MovableBody) Move() {
-	panic("You should implement this method in derivated structs")
+func NewMovableBody(body *Body) *MovableBody {
+	if body == nil {
+		panic("NewMovableBody: body must not be nil")
+	}
+	return &MovableBody{Body: body}
 }
 
 func (b *MovableBody) MoveX(distance int) {
@@ -87,6 +90,26 @@ func (b *MovableBody) Speed() int {
 	return b.speed
 }
 
+func (b *MovableBody) MaxSpeed() int {
+	return b.maxSpeed
+}
+
+func (b *MovableBody) Velocity() (int, int) {
+	return b.vx16, b.vy16
+}
+
+func (b *MovableBody) SetVelocity(vx16, vy16 int) {
+	b.vx16, b.vy16 = vx16, vy16
+}
+
+func (b *MovableBody) Acceleration() (accX, accY int) {
+	return b.accelerationX, b.accelerationY
+}
+
+func (b *MovableBody) SetAcceleration(accX, accY int) {
+	b.accelerationX, b.accelerationY = accX, accY
+}
+
 func (b *MovableBody) Immobile() bool {
 	return b.immobile
 }
@@ -95,24 +118,44 @@ func (b *MovableBody) SetImmobile(immobile bool) {
 	b.immobile = immobile
 }
 
-func (b *MovableBody) FaceDirection() FacingDirectionEnum {
+func (b *MovableBody) FaceDirection() body.FacingDirectionEnum {
 	return b.faceDirection
 }
 
-func (b *MovableBody) SetFaceDirection(value FacingDirectionEnum) {
+func (b *MovableBody) SetFaceDirection(value body.FacingDirectionEnum) {
 	b.faceDirection = value
 }
 
+func (b *MovableBody) IsIdle() bool {
+	return !b.IsWalking() && !b.IsFalling() && !b.IsGoingUp()
+}
+
 func (b *MovableBody) IsWalking() bool {
-	threshold := config.Get().Unit / 4
-	if threshold < 1 {
-		threshold = 1
+	// A body cannot be walking if it is airborne.
+	if b.IsFalling() || b.IsGoingUp() {
+		return false
 	}
 
+	threshold := config.Get().Physics.DownwardGravity
 	if b.vx16 > threshold || b.vx16 < -threshold {
 		return true
 	}
-	if b.vy16 > threshold || b.vy16 < -threshold {
+
+	return false
+}
+
+func (b *MovableBody) IsGoingUp() bool {
+	threshold := config.Get().Physics.DownwardGravity
+	if b.vy16 <= -threshold {
+		return true
+	}
+
+	return false
+}
+
+func (b *MovableBody) IsFalling() bool {
+	threshold := config.Get().Physics.DownwardGravity
+	if b.vy16 >= threshold {
 		return true
 	}
 
@@ -122,4 +165,13 @@ func (b *MovableBody) IsWalking() bool {
 // Platform methods
 func (b *MovableBody) TryJump(force int) {
 	b.vy16 = -force * config.Get().Unit
+}
+
+// CheckMovementDirectionX set face direction based on accelerationX
+func (b *MovableBody) CheckMovementDirectionX() {
+	if b.accelerationX > 0 {
+		b.SetFaceDirection(body.FaceDirectionRight)
+	} else if b.accelerationX < 0 {
+		b.SetFaceDirection(body.FaceDirectionLeft)
+	}
 }

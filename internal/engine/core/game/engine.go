@@ -51,21 +51,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	}
 
 	if g.debugVisible {
-		cfg := config.Get().Physics
-		var b strings.Builder
-		fmt.Fprintf(&b, "--- Physics Debug ---\n")
-		fmt.Fprintf(&b, "HorizontalInertia: %.2f\n", cfg.HorizontalInertia)
-		fmt.Fprintf(&b, "AirFrictionMultiplier: %.2f\n", cfg.AirFrictionMultiplier)
-		fmt.Fprintf(&b, "AirControlMultiplier: %.2f\n", cfg.AirControlMultiplier)
-		fmt.Fprintf(&b, "CoyoteTimeFrames: %d\n", cfg.CoyoteTimeFrames)
-		fmt.Fprintf(&b, "JumpBufferFrames: %d\n", cfg.JumpBufferFrames)
-		fmt.Fprintf(&b, "JumpForce: %d\n", cfg.JumpForce)
-		fmt.Fprintf(&b, "JumpCutMultiplier: %.2f\n", cfg.JumpCutMultiplier)
-		fmt.Fprintf(&b, "UpwardGravity: %d\n", cfg.UpwardGravity)
-		fmt.Fprintf(&b, "DownwardGravity: %d\n", cfg.DownwardGravity)
-		fmt.Fprintf(&b, "MaxFallSpeed: %d\n", cfg.MaxFallSpeed)
-
-		text.Draw(screen, b.String(), g.debugFontFace, 5, 15, color.White)
+		g.DebugPhysics(screen)
 	}
 }
 
@@ -83,4 +69,23 @@ func (g *Game) SetState(stateID state.GameStateEnum) error {
 	// g.state.OnStart()
 
 	return nil
+}
+
+func (g *Game) DebugPhysics(screen *ebiten.Image) {
+	cfg := config.Get().Physics
+	var b strings.Builder
+	fmt.Fprintf(&b, "--- Physics Debug ---\n")
+	fmt.Fprintf(&b, "HorizontalInertia: %.2f\n", cfg.HorizontalInertia)
+	fmt.Fprintf(&b, "AirFrictionMultiplier: %.2f\n", cfg.AirFrictionMultiplier)
+	fmt.Fprintf(&b, "AirControlMultiplier: %.2f\n", cfg.AirControlMultiplier)
+	fmt.Fprintf(&b, "CoyoteTimeFrames: %d\n", cfg.CoyoteTimeFrames)
+	fmt.Fprintf(&b, "JumpBufferFrames: %d\n", cfg.JumpBufferFrames)
+	fmt.Fprintf(&b, "JumpForce: %d\n", cfg.JumpForce)
+	fmt.Fprintf(&b, "JumpCutMultiplier: %.2f\n", cfg.JumpCutMultiplier)
+	fmt.Fprintf(&b, "UpwardGravity: %d\n", cfg.UpwardGravity)
+	fmt.Fprintf(&b, "DownwardGravity: %d\n", cfg.DownwardGravity)
+	fmt.Fprintf(&b, "MaxFallSpeed: %d\n", cfg.MaxFallSpeed)
+
+	text.Draw(screen, b.String(), g.debugFontFace, 5, 15, color.White)
+
 }

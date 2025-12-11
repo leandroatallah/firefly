@@ -17,24 +17,46 @@ const (
 )
 
 type Character struct {
-	physics.PhysicsBody
+	// TODO: Should it be a interface?
 	sprites.SpriteEntity
+
+	// TODO: Review this types
+	*physics.MovableBody
+	*physics.CollidableBody
+	*physics.AliveBody
+
+	// TODO: Should this be here?
+	// body.Drawable
+
+	Touchable body.Touchable
+
 	count            int
 	state            ActorState
 	movementState    movement.MovementState
+	movementModel    physics.MovementModel
 	movementBlockers int
 	animationCount   int
 	frameRate        int
 	imageOptions     *ebiten.DrawImageOptions
-	collisionRects   map[ActorStateEnum]*physics.Rect
+	collisionBodies  map[ActorStateEnum][]body.Collidable
 }
 
-func NewCharacter(s sprites.SpriteMap) *Character { // Modified signature
+func NewCharacter(s sprites.SpriteMap, bodyRect *physics.Rect) *Character { // Modified signature
 	spriteEntity := sprites.NewSpriteEntity(s)
+	b := physics.NewBody(bodyRect)
+	movable := physics.NewMovableBody(b)
+	collidable := physics.NewCollidableBody(b)
+	alive := physics.NewAliveBody(b)
 	c := &Character{
-		SpriteEntity:   spriteEntity,
-		imageOptions:   &ebiten.DrawImageOptions{},
-		collisionRects: make(map[ActorStateEnum]*physics.Rect),
+		// Body variations
+		MovableBody:    movable,
+		CollidableBody: collidable,
+		AliveBody:      alive,
+
+		SpriteEntity: spriteEntity,
+		imageOptions: &ebiten.DrawImageOptions{},
+		// TODO: Rename this, and review
+		collisionBodies: make(map[ActorStateEnum][]body.Collidable), // Character collisions based on state
 	}
 	state, err := NewActorState(c, Idle)
 	if err != nil {
@@ -44,56 +66,67 @@ func NewCharacter(s sprites.SpriteMap) *Character { // Modified signature
 	return c
 }
 
-// Builder methods
-func (c *Character) SetBody(rect *physics.Rect) ActorEntity {
-	c.PhysicsBody = *physics.NewPhysicsBody(rect)
-	c.PhysicsBody.SetTouchable(c)
-	return c
+// Forwarding methods for Body to avoid ambiguous selector
+// Always route via the MovableBody component
+func (c *Character) ID() string {
+	return c.MovableBody.ID()
 }
-
-func (c *Character) SetCollisionArea(rect *physics.Rect) ActorEntity {
-	collisionArea := &physics.CollisionArea{Shape: rect}
-	c.PhysicsBody.AddCollision(collisionArea)
-	return c
-}
-
 func (c *Character) SetID(id string) {
-	c.PhysicsBody.SetID(id)
+	c.MovableBody.SetID(id)
+}
+func (c *Character) Position() image.Rectangle {
+	return c.MovableBody.Position()
+}
+func (c *Character) SetPosition(x, y int) {
+	c.MovableBody.SetPosition(x, y)
+}
+func (c *Character) GetPositionMin() (int, int) {
+	return c.MovableBody.GetPositionMin()
+}
+func (c *Character) GetShape() body.Shape {
+	return c.MovableBody.GetShape()
 }
 
+// Builder methods
 func (c *Character) State() ActorStateEnum {
 	return c.state.State()
 }
 
+// SetState set a new Character state and update current collision shapes.
 func (c *Character) SetState(state ActorState) {
 	c.state = state
-	c.state.OnStart()
 
-	if newRectTemplate, ok := c.collisionRects[state.State()]; ok {
-		collisions := c.CollisionShapes()
-		if len(collisions) > 0 {
-			bodyRectPos := c.Position().Min
-			newRectRelativePos := newRectTemplate.Position()
-
-			// The old collision shape is not needed. Create a new one.
-			newAbsoluteX := bodyRectPos.X + newRectRelativePos.Min.X
-			newAbsoluteY := bodyRectPos.Y + newRectRelativePos.Min.Y
-
-			newWidth := newRectRelativePos.Dx()
-			newHeight := newRectRelativePos.Dy()
-
-			collisions[0].Shape = physics.NewRect(newAbsoluteX, newAbsoluteY, newWidth, newHeight)
+	if rects, ok := c.collisionBodies[state.State()]; ok {
+		c.ClearCollisions()
+		x, y := c.GetPositionMin()
+		for _, r := range rects {
+			// Create a deep copy of the collision body to avoid mutating the template
+			template := r.(*physics.CollidableBody)
+			newCollisionBody := physics.NewCollidableBody(
+				physics.NewBody(template.GetShape()),
+			)
+			relativePos := template.Position()
+			newPos := image.Rect(
+				x+relativePos.Min.X,
+				y+relativePos.Min.Y,
+				x+relativePos.Max.X,
+				y+relativePos.Max.Y,
+			)
+			newCollisionBody.SetPosition(newPos.Min.X, newPos.Min.Y)
+			newCollisionBody.SetID("MEW-COLLISION-BODY")
+			c.AddCollision(newCollisionBody)
 		}
 	}
+	c.state.OnStart()
 }
 
-func (c *Character) AddCollisionRect(state ActorStateEnum, rect *physics.Rect) {
-	c.collisionRects[state] = rect
+func (c *Character) AddCollisionRect(state ActorStateEnum, rect body.Collidable) {
+	c.collisionBodies[state] = append(c.collisionBodies[state], rect)
 }
 
 func (c *Character) SetMovementState(
 	state movement.MovementStateEnum,
-	target body.Body,
+	target body.MovableCollidable,
 	options ...movement.MovementStateOption,
 ) {
 	movementState, err := movement.NewMovementState(c, state, target, options...)
@@ -117,10 +150,6 @@ func (c *Character) MovementState() movement.MovementState {
 	return c.movementState
 }
 
-func (c *Character) SetMovementModel(model physics.MovementModel) {
-	c.PhysicsBody.SetMovementModel(model)
-}
-
 func (c *Character) Update(space body.BodiesSpace) error {
 	c.count++
 
@@ -132,36 +161,53 @@ func (c *Character) Update(space body.BodiesSpace) error {
 	// Update physics and apply movement
 	c.UpdateMovement(space)
 
-	// Check movement direction for sprite mirroring
-	c.CheckMovementDirectionX()
-	c.UpdateImageOptions()
-
 	c.handleState()
 
 	return nil
 }
 
+func (c *Character) UpdateMovement(space body.BodiesSpace) {
+	if c.movementModel != nil {
+		c.movementModel.Update(c, space)
+	}
+}
+
 func (c *Character) UpdateImageOptions() {
+	if c.imageOptions == nil {
+		return
+	}
 	c.imageOptions.GeoM.Reset()
 
-	pos := c.Position()
-	minX, minY := pos.Min.X, pos.Min.Y
-	width := pos.Dx()
-
+	accX, _ := c.Acceleration()
 	fDirection := c.FaceDirection()
-	if fDirection == physics.FaceDirectionLeft {
+
+	if accX > 0 {
+		fDirection = body.FaceDirectionRight
+	} else if accX < 0 {
+		fDirection = body.FaceDirectionLeft
+	}
+
+	c.SetFaceDirection(fDirection)
+
+	if fDirection == body.FaceDirectionLeft {
+		width := c.Position().Dx()
 		c.imageOptions.GeoM.Scale(-1, 1)
 		c.imageOptions.GeoM.Translate(float64(width), 0)
 	}
 
 	// Apply character position
+	x, y := c.GetPositionMin()
 	c.imageOptions.GeoM.Translate(
-		float64(minX),
-		float64(minY),
+		float64(x),
+		float64(y),
 	)
 }
 
 func (c *Character) handleState() {
+	if c.state == nil {
+		return
+	}
+
 	setNewState := func(s ActorStateEnum) {
 		state, err := NewActorState(c, s)
 		if err != nil {
@@ -173,9 +219,11 @@ func (c *Character) handleState() {
 	state := c.state.State()
 
 	switch {
-	case state == Idle && c.IsWalking():
-		setNewState(Walk)
-	case state == Walk && !c.IsWalking():
+	case state != Falling && c.IsFalling():
+		setNewState(Falling)
+	case state != Walking && c.IsWalking():
+		setNewState(Walking)
+	case state != Idle && c.IsIdle():
 		setNewState(Idle)
 	case state == Hurted:
 		// TODO: The player should be recover the mobility before becomes vulnerable again
@@ -184,14 +232,10 @@ func (c *Character) handleState() {
 		if isRecovered {
 			setNewState(Idle)
 			c.SetImmobile(false)
-			c.SetInvulnerable(false)
+			c.SetInvulnerability(false)
 		}
 	}
 }
-
-func (c *Character) OnTouch(other body.Body) {}
-
-func (c *Character) OnBlock(other body.Body) {}
 
 func (c *Character) Hurt(damage int) {
 	if c.Invulnerable() {
@@ -208,13 +252,13 @@ func (c *Character) Hurt(damage int) {
 	}
 	c.SetState(state)
 	c.SetImmobile(true)
-	c.SetInvulnerable(true)
+	c.SetInvulnerability(true)
 
 	c.LoseHealth(damage)
 }
 
 func (c *Character) SetTouchable(t body.Touchable) {
-	c.PhysicsBody.Touchable = t
+	c.Touchable = t
 }
 
 func (c *Character) Image() *ebiten.Image {
@@ -251,7 +295,6 @@ func (c *Character) Image() *ebiten.Image {
 func (c *Character) ImageWithCollisionBox() *ebiten.Image {
 	img := c.Image()
 	pos := c.Position()
-	c.DrawCollisionBox(img, pos)
 
 	// Create a new image and copy the subimage to it
 	res := ebiten.NewImage(img.Bounds().Dx(), img.Bounds().Dy())
@@ -285,4 +328,18 @@ func (p *Character) UnblockMovement() {
 // IsPlayerMovementBlocked checks if any system is currently blocking movement.
 func (p *Character) IsMovementBlocked() bool {
 	return p.movementBlockers > 0
+}
+
+// Platform methods
+func (c *Character) TryJump(force int) {
+	c.MovableBody.TryJump(force)
+}
+
+// Movement Model methods
+func (c *Character) SetMovementModel(model physics.MovementModel) {
+	c.movementModel = model
+}
+
+func (c *Character) MovementModel() physics.MovementModel {
+	return c.movementModel
 }

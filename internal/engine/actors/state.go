@@ -13,7 +13,8 @@ type ActorStateEnum int
 
 const (
 	Idle ActorStateEnum = iota
-	Walk
+	Walking
+	Falling
 	Hurted
 )
 
@@ -28,49 +29,19 @@ func (s *BaseState) State() ActorStateEnum {
 
 func (s *BaseState) OnStart() {}
 
-type IdleState struct {
-	BaseState
-}
-
-func (s *IdleState) OnStart() {}
-
-type WalkState struct {
-	BaseState
-}
-
-func (s *WalkState) OnStart() {}
-
-type HurtState struct {
-	BaseState
-	count         int
-	durationLimit int
-}
-
-func (s *HurtState) OnStart() {
-	s.durationLimit = 30 // 0.5 sec
-}
-
-func (s *HurtState) CheckRecovery() bool {
-	s.count++
-
-	if s.count > s.durationLimit {
-		return true
-	}
-
-	return false
-}
-
 // State factory method
 func NewActorState(actor ActorEntity, state ActorStateEnum) (ActorState, error) {
 	b := BaseState{actor: actor, state: state}
 	switch state {
 	case Idle:
 		return &IdleState{BaseState: b}, nil
-	case Walk:
+	case Walking:
 		return &WalkState{BaseState: b}, nil
+	case Falling:
+		return &FallState{BaseState: b}, nil
 	case Hurted:
 		return &HurtState{BaseState: b}, nil
 	default:
-		return nil, fmt.Errorf("unknown scene type")
+		return nil, fmt.Errorf("unknown actor state")
 	}
 }

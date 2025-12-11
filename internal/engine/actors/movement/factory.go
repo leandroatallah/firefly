@@ -10,9 +10,9 @@ import (
 type MovementStateOption func(MovementState)
 
 func NewMovementState(
-	actor body.Body,
+	actor body.MovableCollidable,
 	state MovementStateEnum,
-	target body.Body,
+	target body.MovableCollidable,
 	options ...MovementStateOption,
 ) (MovementState, error) {
 	b := NewBaseMovementState(state, actor, target)

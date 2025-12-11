@@ -42,7 +42,7 @@ func (s *BaseScene) OnFinish() {}
 
 func (s *BaseScene) Exit() {}
 
-func (s *BaseScene) AddBoundaries(boundaries ...body.Body) {
+func (s *BaseScene) AddBoundaries(boundaries ...body.MovableCollidable) {
 	space := s.PhysicsSpace()
 	for _, o := range boundaries {
 		space.AddBody(o)

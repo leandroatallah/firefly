@@ -3,6 +3,7 @@ package scene
 import (
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/leandroatallah/firefly/internal/config"
 	"github.com/leandroatallah/firefly/internal/engine/actors"
@@ -83,6 +84,12 @@ func (s *TilemapScene) InitItems(items map[int]items.ItemType, factory *items.It
 			item, err := factory.Create(itemType, i.X, i.Y)
 			if err != nil {
 				return err
+			}
+			// TODO: Improve this
+			if item.ID() == "" {
+				item.SetID(fmt.Sprintf("ITEM-%d", time.Now().Nanosecond()))
+			} else {
+				item.SetID(fmt.Sprintf("%vITEM-%d", item.ID(), time.Now().Nanosecond()))
 			}
 			s.PhysicsSpace().AddBody(item)
 		}

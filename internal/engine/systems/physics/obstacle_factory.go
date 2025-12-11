@@ -26,6 +26,7 @@ const (
 	ObstacleWallDown
 )
 
+// TODO: This file should not implement concrete objects and should have an example file follwing sequence example.
 func (f *DefaultObstacleFactory) Create(obstableType ObstacleType) (body.Obstacle, error) {
 	switch obstableType {
 	case ObstacleWallTop:
@@ -44,28 +45,32 @@ func (f *DefaultObstacleFactory) Create(obstableType ObstacleType) (body.Obstacl
 const wallWidth = 20
 
 func NewWallTop() *ObstacleRect {
-	return NewObstacleRect(
-		NewRect(0, 0, config.Get().ScreenWidth, wallWidth),
-	).AddCollision(
-		NewCollisionArea(
-			NewRect(0, 0, config.Get().ScreenWidth, wallWidth),
-		),
-	)
+	rect := NewRect(0, 0, config.Get().ScreenWidth, wallWidth)
+	o := NewObstacleRect(rect)
+	o.SetID("WALL-TOP")
+	// o.AddCollisionBodies()
+	return o
 }
 
 func NewWallLeft() *ObstacleRect {
-	return NewObstacleRect(
-		NewRect(0, 0, wallWidth, config.Get().ScreenHeight),
-	).AddCollision()
+	rect := NewRect(0, 0, wallWidth, config.Get().ScreenHeight)
+	o := NewObstacleRect(rect)
+	o.SetID("WALL-LEFT")
+	// o.AddCollisionBodies()
+	return o
 }
 
 func NewWallRight() *ObstacleRect {
-	return NewObstacleRect(
-		NewRect(config.Get().ScreenWidth-wallWidth, 0, wallWidth, config.Get().ScreenHeight),
-	).AddCollision()
+	rect := NewRect(config.Get().ScreenWidth-wallWidth, 0, wallWidth, config.Get().ScreenHeight)
+	o := NewObstacleRect(rect)
+	o.SetID("WALL-RIGHT")
+	// o.AddCollisionBodies()
+	return o
 }
 func NewWallDown() *ObstacleRect {
-	return NewObstacleRect(
-		NewRect(0, config.Get().ScreenHeight-wallWidth, config.Get().ScreenWidth, wallWidth),
-	).AddCollision()
+	rect := NewRect(0, config.Get().ScreenHeight-wallWidth, config.Get().ScreenWidth, wallWidth)
+	o := NewObstacleRect(rect)
+	o.SetID("WALL-DOWN")
+	// o.AddCollisionBodies()
+	return o
 }

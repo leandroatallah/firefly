@@ -6,46 +6,77 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
+type FacingDirectionEnum int
+
+const (
+	FaceDirectionRight FacingDirectionEnum = iota
+	FaceDirectionLeft
+)
+
 type Shape interface {
-	Position() image.Rectangle
+	Width() int
+	Height() int
 }
 
 // Movable is a Shape but with movement
 type Movable interface {
-	Shape
-	ApplyValidMovement(velocity int, isXAxis bool, space BodiesSpace)
+	Body
+
+	MoveX(distance int)
+	MoveY(distance int)
+	OnMoveLeft(distance int)
+	OnMoveUpLeft(distance int)
+	OnMoveDownLeft(distance int)
+	OnMoveRight(distance int)
+	OnMoveUpRight(distance int)
+	OnMoveDownRight(distance int)
+	OnMoveUp(distance int)
+	OnMoveDown(distance int)
+
+	Velocity() (vx16, vy16 int)
+	SetVelocity(vx16, vy16 int)
+	Acceleration() (accX, accY int)
+	SetAcceleration(accX, accY int)
 
 	SetSpeed(speed int) error
 	SetMaxSpeed(maxSpeed int) error
 	Speed() int
+	MaxSpeed() int
 	Immobile() bool
 	SetImmobile(immobile bool)
+	FaceDirection() FacingDirectionEnum
+	SetFaceDirection(value FacingDirectionEnum)
+	IsIdle() bool
+	IsWalking() bool
+	IsFalling() bool
+	IsGoingUp() bool
+	CheckMovementDirectionX()
 
-	OnMoveUp(distance int)
-	OnMoveDown(distance int)
-	OnMoveLeft(distance int)
-	OnMoveRight(distance int)
-	OnMoveUpLeft(distance int)
-	OnMoveUpRight(distance int)
-	OnMoveDownLeft(distance int)
-	OnMoveDownRight(distance int)
-
+	// Platform methods
 	TryJump(force int)
 }
 
 type Collidable interface {
-	Shape
+	Body
 	Touchable
+
 	GetTouchable() Touchable
 	DrawCollisionBox(screen *ebiten.Image, position image.Rectangle)
 	CollisionPosition() []image.Rectangle
+	CollisionShapes() []Collidable
 	IsObstructive() bool
 	SetIsObstructive(value bool)
+	AddCollision(list ...Collidable)
+	ClearCollisions()
+	SetPosition(x int, y int)
+	SetTouchable(t Touchable)
+	ApplyValidPosition(distance16 int, isXAxis bool, space BodiesSpace) (x, y int, wasBlocked bool)
 }
 
 // TODO: Should it be merge with Collidable?
 type Obstacle interface {
 	Body
+	Collidable
 	Drawable
 	DrawCollisionBox(screen *ebiten.Image, position image.Rectangle)
 	ImageCollisionBox() *ebiten.Image
@@ -55,14 +86,16 @@ type Obstacle interface {
 type Drawable interface {
 	Image() *ebiten.Image
 	ImageOptions() *ebiten.DrawImageOptions
+	UpdateImageOptions()
 }
 
 type Touchable interface {
-	OnTouch(other Body)
-	OnBlock(other Body)
+	OnTouch(other Collidable)
+	OnBlock(other Collidable)
 }
 
 type Alive interface {
+	Body
 	Health() int
 	MaxHealth() int
 	SetHealth(health int)
@@ -70,23 +103,21 @@ type Alive interface {
 	LoseHealth(damage int)
 	RestoreHealth(heal int)
 	Invulnerable() bool
-	SetInvulnerable(value bool)
+	SetInvulnerability(value bool)
 }
 
-// Body is a Shape with collision, movable and alive
 type Body interface {
-	Shape
-	Movable
-	Collidable
-	Alive
-
 	ID() string
+	SetID(id string)
+	Position() image.Rectangle
 	SetPosition(x, y int)
+	GetPositionMin() (x, y int)
+	GetShape() Shape
 }
 
 type BodiesSpace interface {
-	AddBody(body Body)
-	Bodies() []Body
-	RemoveBody(body Body)
-	ResolveCollisions(body Body) (touching bool, blocking bool)
+	AddBody(body Collidable)
+	Bodies() []Collidable
+	RemoveBody(body Collidable)
+	ResolveCollisions(body Collidable) (touching bool, blocking bool)
 }

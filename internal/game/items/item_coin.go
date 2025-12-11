@@ -29,17 +29,17 @@ func NewCollectibleCoinItem(x, y int) *CollectibleCoinItem {
 
 	// TODO: It should be set in a better place (frameRate)
 	frameRate := 10
-	base := items.NewBaseItem(sprites, frameRate)
 	rect := physics.NewRect(x, y-(frameHeight/2), frameWidth, frameHeight)
-	collisionRect := rect
-	base.SetBody(rect)
-	base.SetCollisionArea(collisionRect)
+	base := items.NewBaseItem(sprites, frameRate, rect)
+	// TODO: Remove this
+	base.SetID("COIN-")
+	base.SetCollisionArea(rect)
 	base.SetTouchable(base)
 
 	return &CollectibleCoinItem{BaseItem: *base}
 }
 
-func (c *CollectibleCoinItem) OnTouch(other body.Body) {
+func (c *CollectibleCoinItem) OnTouch(other body.Collidable) {
 	if c.IsRemoved() {
 		return
 	}

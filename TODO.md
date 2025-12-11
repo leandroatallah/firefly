@@ -4,12 +4,12 @@
 
 ### Technical debits and wishlist
 
+- Refator shape to shape Shape
 - Create shape package to split some things from physics package.
-- Review player platform and top down. Maybe it should be removed.
 - Add cam movement command to sequence
-- Change physics in a real time sandbox control
 - reduce repeated scene contents
 - change sprite animation when jumping
+- remove gap on horizontal collisions when walking to the left.
 
 ### 4. UI/HUD System
 

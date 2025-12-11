@@ -113,7 +113,7 @@ func (t *Tilemap) ParseBase(layer *Layer, result *ebiten.Image) {
 }
 
 func (t *Tilemap) ParseItems(layer *Layer, result *ebiten.Image) {
-	if layer == nil || result == nil {
+	if layer == nil || result == nil || !layer.Visible {
 		return
 	}
 
@@ -138,9 +138,6 @@ func (t *Tilemap) ParseItems(layer *Layer, result *ebiten.Image) {
 
 func (t *Tilemap) Reset(screen *ebiten.Image) {
 	t.imageOptions.GeoM.Reset()
-	sh := screen.Bounds().Dy()
-	mapHeight := t.Layers[0].Height * t.Tileheight
-	t.imageOptions.GeoM.Translate(0, float64(sh-mapHeight))
 }
 
 func LoadTilemap(path string) (*Tilemap, error) {
@@ -188,8 +185,4 @@ func loadImage(path string) (*ebiten.Image, error) {
 	}
 
 	return ebiten.NewImageFromImage(img), nil
-}
-
-func (t *Tilemap) ImageOptions() *ebiten.DrawImageOptions {
-	return t.imageOptions
 }

@@ -4,7 +4,6 @@ import (
 	"image/color"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
 )
 
 func (s *LevelsScene) CamDebug() {
@@ -28,11 +27,19 @@ func (s *LevelsScene) CamDebug() {
 }
 
 func (s *LevelsScene) SetCamTargetPointToSpace() {
-	tPos := s.cam.Target().Position()
-	targetRect := physics.NewObstacleRect(physics.NewRect(tPos.Min.X, tPos.Min.Y, tPos.Dx(), tPos.Dy()))
-	targetBody := physics.NewPhysicsBody(targetRect)
-	targetBody.SetID("TARGET")
-	s.PhysicsSpace().AddBody(targetBody)
+	// tPos := s.cam.Target().Position()
+	// rect := physics.NewRect(tPos.Min.X, tPos.Min.Y, tPos.Dx(), tPos.Dy())
+	// targetRect := physics.NewObstacleRect(rect)
+	// targetRect.SetBody(rect)
+	// targetBody := physics.NewMovableBody(targetRect.Body)
+	// // FIX: Uncomment and fix this
+	// // targetBody := &actors.Character{
+	// // 	MovableCollidableAliveBody: *physics.NewMovableCollidableAliveBody(targetRect),
+	// // }
+	// targetBody.SetID("TARGET")
+	// // NOTE: Camera target should be added to space for debugging purpose.
+	// // s.PhysicsSpace().AddBody(targetBody)
+	// s.PhysicsSpace().AddBody(s.player)
 }
 
 func (s *LevelsScene) DrawCamTargetPoint(screen *ebiten.Image) {

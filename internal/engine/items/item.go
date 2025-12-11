@@ -8,12 +8,11 @@ import (
 
 type Item interface {
 	// TODO: Move al these repeated Character method to a new struct/interface
-	body.Body
+	body.MovableCollidable
+	body.Drawable
+
 	Update(space body.BodiesSpace) error
-	SetBody(rect *physics.Rect) Item
-	SetCollisionArea(rect *physics.Rect) Item
-	SetTouchable(t body.Touchable)
-	OnTouch(other body.Body)
+	SetCollisionArea(rect *physics.Rect)
 	Image() *ebiten.Image
 	ImageCollisionBox() *ebiten.Image
 	ImageOptions() *ebiten.DrawImageOptions

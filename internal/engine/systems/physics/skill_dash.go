@@ -4,6 +4,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/leandroatallah/firefly/internal/config"
+	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 )
 
 // DashSkill implements a dash and air dash ability.
@@ -43,8 +44,10 @@ func (d *DashSkill) HandleInput(body *PhysicsBody, model *PlatformMovementModel)
 }
 
 // Update manages the skill's state, timers, and applies its effects.
-func (d *DashSkill) Update(body *PhysicsBody, model *PlatformMovementModel) {
-	d.SkillBase.Update(body, model)
+func (d *DashSkill) Update(b body.MovableCollidable, model *PlatformMovementModel) {
+	d.SkillBase.Update(b, model)
+
+	vx16, vy16 := b.Velocity()
 
 	// Reset air dash capability when the player lands.
 	if model.onGround {
@@ -57,16 +60,17 @@ func (d *DashSkill) Update(body *PhysicsBody, model *PlatformMovementModel) {
 		if d.timer <= 0 {
 			d.state = StateCooldown
 			d.timer = d.cooldown
-			body.vx16 = 0 // Stop horizontal movement after dash
+			vx16 = 0 // Stop horizontal movement after dash
 		} else {
 			// Apply dash movement
 			var dirX int = 1
-			if body.FaceDirection() == FaceDirectionLeft {
+			if b.FaceDirection() == body.FaceDirectionLeft {
 				dirX = -1
 			}
-			body.vx16 = d.speed * dirX
-			body.vy16 = 0 // Maintain horizontal trajectory
+			vx16 = d.speed * dirX
+			vy16 = 0 // Maintain horizontal trajectory
 		}
+		b.SetVelocity(vx16, vy16)
 	case StateCooldown:
 		d.timer--
 		if d.timer <= 0 {

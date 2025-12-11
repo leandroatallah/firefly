@@ -4,7 +4,6 @@ import (
 	"log"
 
 	"github.com/leandroatallah/firefly/internal/engine/actors"
-	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/items"
 	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
 	"github.com/leandroatallah/firefly/internal/engine/systems/sprites"
@@ -27,14 +26,12 @@ func NewSignpostItem(x, y int) *SignpostItem {
 
 	// TODO: It should be set in a better place (frameRate)
 	frameRate := 10
-	base := items.NewBaseItem(sprites, frameRate)
 	rect := physics.NewRect(x, y-(frameHeight/2), frameWidth, frameHeight)
-	collisionRect := rect
-	base.SetBody(rect)
-	base.SetCollisionArea(collisionRect)
+	base := items.NewBaseItem(sprites, frameRate, rect)
+	// TODO: Remove this
+	base.SetID("SIGN-")
+	base.SetCollisionArea(rect)
 	base.SetTouchable(base)
 
 	return &SignpostItem{BaseItem: *base}
 }
-
-func (i *SignpostItem) OnTouch(other body.Body) {}

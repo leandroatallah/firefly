@@ -63,7 +63,6 @@ func (s *LevelsScene) OnStart() {
 		log.Fatal(err)
 	}
 	s.player = p
-	s.player.SetID("player")
 	s.AppContext.ActorManager.Register(s.player)
 	s.PhysicsSpace().AddBody(s.player)
 
@@ -84,8 +83,6 @@ func (s *LevelsScene) OnStart() {
 	s.cam = gamecamera.New(pPos.X, pPos.Y)
 	s.cam.SetFollowTarget(s.player)
 
-	s.SetCamTargetPointToSpace()
-
 	// Init collisions bodies and touch trigger for endpoints
 	endpointTrigger := physics.NewTouchTrigger(s.finishLevel, s.player)
 	s.Tilemap().CreateCollisionBodies(s.PhysicsSpace(), endpointTrigger)
@@ -94,7 +91,7 @@ func (s *LevelsScene) OnStart() {
 }
 
 func (s *LevelsScene) Update() error {
-	// Remove this
+	// TODO: It should be enabled based on a flag
 	s.CamDebug()
 
 	s.count++
@@ -104,21 +101,22 @@ func (s *LevelsScene) Update() error {
 	// Execute bodies updates
 	space := s.PhysicsSpace()
 	for _, i := range space.Bodies() {
-		if item, ok := i.(items.Item); ok {
+		switch b := i.(type) {
+		case items.Item:
 			// Remove items marked as removed
-			if item.IsRemoved() {
+			if b.IsRemoved() {
 				s.PhysicsSpace().RemoveBody(i)
 				continue
 			}
-		}
-
-		// Update actors and items that are not actors
-		if actor, ok := i.(actors.ActorEntity); ok {
-			if err := actor.Update(space); err != nil {
+			if err := b.Update(space); err != nil {
 				return err
 			}
-		} else if item, ok := i.(items.Item); ok {
-			item.Update(space)
+		case body.Obstacle:
+			continue
+		case actors.ActorEntity:
+			if err := b.Update(space); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -135,35 +133,28 @@ func (s *LevelsScene) Draw(screen *ebiten.Image) {
 	}
 	s.cam.Draw(tilemap, s.Tilemap().ImageOptions(), screen)
 
-	// Draw collisions based on camera
+	// Draw bodies based on camera
 	space := s.PhysicsSpace()
 	for _, b := range space.Bodies() {
 		switch sb := b.(type) {
 		case actors.ActorEntity:
-			// Draw player based on camera
-			if img := s.player.Image(); img != nil {
-				opts := *s.player.ImageOptions()
-				s.cam.Draw(img, &opts, screen)
-			}
+			opts := s.player.ImageOptions()
+			sb.UpdateImageOptions()
+			// s.cam.Draw(sb.ImageWithCollisionBox(), opts, screen)
+			s.cam.Draw(sb.Image(), opts, screen)
 		case items.Item:
 			if sb.IsRemoved() {
 				continue
 			}
 			opts := sb.ImageOptions()
-			opts.GeoM.Reset()
-			pos := sb.Position().Min
-			opts.GeoM.Translate(float64(pos.X), float64(pos.Y))
+			sb.UpdateImageOptions()
 			s.cam.Draw(sb.Image(), opts, screen)
 		case body.Obstacle:
-			opts := sb.ImageOptions()
-			opts.GeoM.Reset()
-			pos := sb.Position().Min
-			opts.GeoM.Translate(float64(pos.X), float64(pos.Y))
-			s.cam.Draw(sb.Image(), opts, screen)
-		default:
-			if b.ID() == "TARGET" {
-				s.DrawCamTargetPoint(screen)
-			}
+			// NOTE: Uncomment to show obstacles collision box
+			//
+			// opts := sb.ImageOptions()
+			// sb.UpdateImageOptions()
+			// s.cam.Draw(sb.ImageCollisionBox(), opts, screen)
 			continue
 		}
 	}

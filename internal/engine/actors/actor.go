@@ -28,7 +28,7 @@ type Stateful interface {
 	SetState(state ActorState)
 	SetMovementState(
 		state movement.MovementStateEnum,
-		target body.Body,
+		target body.MovableCollidable,
 		options ...movement.MovementStateOption,
 	)
 	SwitchMovementState(state movement.MovementStateEnum)
@@ -43,19 +43,20 @@ type Damageable interface {
 // ActorEntity is the master interface for all game actors.
 // It is composed of smaller interfaces that define specific behaviors.
 type ActorEntity interface {
-	body.Body
+	// TODO:Review these embbedings
+
+	// body.Body
 	Identifiable
 	body.Drawable
 	Controllable
 	Stateful
 	Damageable
 
+	body.MovableCollidableAlive
+
 	Update(space body.BodiesSpace) error
 	MovementModel() physics.MovementModel
 	SetMovementModel(model physics.MovementModel)
-	SetBody(rect *physics.Rect) ActorEntity
-	SetCollisionArea(rect *physics.Rect) ActorEntity
-	SetTouchable(t body.Touchable)
 
 	ImageWithCollisionBox() *ebiten.Image
 }

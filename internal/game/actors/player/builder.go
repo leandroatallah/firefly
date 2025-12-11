@@ -3,6 +3,7 @@ package gameplayer
 import (
 	"fmt"
 
+	"github.com/leandroatallah/firefly/internal/config"
 	"github.com/leandroatallah/firefly/internal/engine/actors"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/animation"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
@@ -19,7 +20,9 @@ func getSprites(assets map[string]actors.AssetData) (sprites.SpriteMap, error) {
 		case "idle":
 			state = actors.Idle
 		case "walk":
-			state = actors.Walk
+			state = actors.Walking
+		case "fall":
+			state = actors.Falling
 		case "hurt":
 			state = actors.Hurted
 		default:
@@ -41,7 +44,8 @@ func CreateAnimatedCharacter(data actors.SpriteData) (*actors.Character, error) 
 		return nil, err
 	}
 
-	c := actors.NewCharacter(assets)
+	rect := physics.NewRect(data.BodyRect.Rect())
+	c := actors.NewCharacter(assets, rect)
 	c.SetFaceDirection(data.FacingDirection)
 	c.SetFrameRate(data.FrameRate)
 
@@ -49,16 +53,29 @@ func CreateAnimatedCharacter(data actors.SpriteData) (*actors.Character, error) 
 }
 
 type collisionRectSetter interface {
-	AddCollisionRect(state actors.ActorStateEnum, rect *physics.Rect)
+	AddCollisionRect(state actors.ActorStateEnum, rect body.Collidable)
 }
 
+// SetPlayerBodies
 func SetPlayerBodies(player actors.ActorEntity, data actors.SpriteData) error {
-	bodyRect := physics.NewRect(data.BodyRect.Rect())
-	// Set initial collision area for idle state
-	collisionRect := physics.NewRect(data.Assets["idle"].CollisionRect.Rect())
+	player.SetID("player")
+	cfg := config.Get()
 
-	player.SetBody(bodyRect)
-	player.SetCollisionArea(collisionRect)
+	x16, y16 := player.GetPositionMin()
+	x, y := x16/cfg.Unit, y16/cfg.Unit
+
+	collisions := []body.Collidable{}
+	for i, r := range data.Assets["idle"].CollisionRects {
+		c := physics.NewCollidableBodyFromRect(physics.NewRect(r.Rect()))
+		c.SetPosition(x+r.X, y+r.Y)
+		c.SetID(fmt.Sprintf("%v_COLLISION_%d", player.ID(), i))
+		collisions = append(collisions, c)
+	}
+
+	if len(collisions) > 0 {
+		player.AddCollision(collisions...)
+	}
+
 	player.SetTouchable(player)
 
 	setter, ok := player.(collisionRectSetter)
@@ -72,20 +89,29 @@ func SetPlayerBodies(player actors.ActorEntity, data actors.SpriteData) error {
 		case "idle":
 			state = actors.Idle
 		case "walk":
-			state = actors.Walk
+			state = actors.Walking
+		case "fall":
+			state = actors.Falling
 		case "hurt":
 			state = actors.Hurted
 		default:
 			continue
 		}
-		rect := physics.NewRect(assetData.CollisionRect.Rect())
-		setter.AddCollisionRect(state, rect)
+
+		for i, r := range assetData.CollisionRects {
+			rect := physics.NewCollidableBody(
+				physics.NewBody(physics.NewRect(r.Rect())),
+			)
+			rect.SetPosition(r.X, r.Y)
+			rect.SetID(fmt.Sprintf("PLAYER-COLLISION-RECT-%d", i))
+			setter.AddCollisionRect(state, rect)
+		}
 	}
 
 	return nil
 }
 
-func SetPlayerStats(player body.Body, data actors.StatData) error {
+func SetPlayerStats(player actors.ActorEntity, data actors.StatData) error {
 	// TODO: Create set stats method
 	// player.SetStats(statData)
 	player.SetMaxHealth(data.Health)

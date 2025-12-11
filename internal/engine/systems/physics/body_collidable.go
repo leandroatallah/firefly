@@ -1,21 +1,37 @@
 package physics
 
 import (
+	"fmt"
 	"image"
 	"image/color"
+	"log"
+	"runtime/debug"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/vector"
+	"github.com/leandroatallah/firefly/internal/config"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 )
 
 type CollidableBody struct {
-	body.Shape
-	body.Touchable
+	*Body
 
+	// TODO: Review this
+	Touchable     body.Touchable
+	collisionList []body.Collidable
 	isObstructive bool
-	collisionList []*CollisionArea
-	invulnerable  bool
+}
+
+func NewCollidableBody(body *Body) *CollidableBody {
+	if body == nil {
+		panic("NewCollidableBody: body must not be nil")
+	}
+	return &CollidableBody{Body: body}
+}
+
+func NewCollidableBodyFromRect(rect body.Shape) *CollidableBody {
+	b := NewBody(rect)
+	return NewCollidableBody(b)
 }
 
 func (b *CollidableBody) SetTouchable(t body.Touchable) {
@@ -61,4 +77,122 @@ func (b *CollidableBody) SetIsObstructive(value bool) {
 
 func (b *CollidableBody) IsObstructive() bool {
 	return b.isObstructive
+}
+
+func (b *CollidableBody) OnTouch(other body.Collidable) {
+	if b.Touchable != nil {
+		b.Touchable.OnTouch(other)
+	}
+}
+func (b *CollidableBody) OnBlock(other body.Collidable) {
+	if b.Touchable != nil {
+		b.Touchable.OnBlock(other)
+	}
+}
+func (b *CollidableBody) AddCollision(list ...body.Collidable) {
+	if b.ID() == "" {
+		debug.PrintStack()
+		log.Fatal("(*CollidableBody).AddCollision: A body must have an ID")
+	}
+
+	if b.GetShape() == nil {
+		log.Fatal("(*CollidableBody).AddCollision: A body must have a shape")
+	}
+
+	for d, i := range list {
+		i.SetID(fmt.Sprintf("%v_COLLISION_%d", b.ID(), d))
+		b.collisionList = append(b.collisionList, i)
+	}
+}
+func (b *CollidableBody) CollisionShapes() []body.Collidable {
+	return b.collisionList
+}
+
+func (b *CollidableBody) ClearCollisions() {
+	b.collisionList = nil
+}
+
+// SetPosition overrides Body.SetPosition method to updates the body position and its collisions
+// TODO: Reduce duplicate code with Body.SetPosition
+func (b *CollidableBody) SetPosition(x, y int) {
+	// NOTE: For now, it only accepts rect shape.
+	_, ok := b.Body.GetShape().(*Rect)
+	if !ok {
+		log.Fatal("SetPosition expects a *Rect instance")
+	}
+
+	cfg := config.Get()
+	x16 := x * cfg.Unit
+	y16 := y * cfg.Unit
+
+	// Calculate the difference to move the collision areas as well
+	diffX16 := x16 - b.Body.x16
+	diffY16 := y16 - b.Body.y16
+
+	b.Body.x16 = x16
+	b.Body.y16 = y16
+
+	for _, c := range b.collisionList {
+		x, y := c.GetPositionMin()
+		x16, y16 := x*cfg.Unit, y*cfg.Unit
+		c.SetPosition((x16+diffX16)/cfg.Unit, (y16+diffY16)/cfg.Unit)
+	}
+}
+
+// ApplyValidPosition moves the body by a given distance, ensuring it stops at the first collision.
+// It works by moving one pixel at a time to avoid truncation issues with sub-pixel velocities
+// and guarantees the body will be perfectly flush with any obstacle it collides with.
+// Might update: Body x16 and y16
+func (b *CollidableBody) ApplyValidPosition(distance16 int, isXAxis bool, space body.BodiesSpace) (int, int, bool) {
+	if distance16 == 0 || space == nil {
+		x, y := b.GetPositionMin()
+		return x, y, false
+	}
+
+	cfg := config.Get()
+	var isBlocking bool
+
+	// Determine the direction of movement (step is one pixel).
+	step := 1
+	if distance16 < 0 {
+		step = -1
+	}
+
+	// Calculate how many pixels we need to move.
+	// We use ceiling division to ensure that any velocity, no matter how small,
+	// results in at least a 1-pixel check.
+	pixelDistance := (abs(distance16) + cfg.Unit - 1) / cfg.Unit
+
+	// Move pixel by pixel and check for collisions.
+	for i := 0; i < pixelDistance; i++ {
+		lastX, lastY := b.GetPositionMin()
+
+		// Move one pixel.
+		if isXAxis {
+			b.SetPosition(lastX+step, lastY)
+		} else {
+			b.SetPosition(lastX, lastY+step)
+		}
+
+		// Check if this new position causes a collision.
+		_, blocking := space.ResolveCollisions(b)
+		if blocking {
+			// A collision occurred. We should only undo the movement if the collision
+			// is on the same axis we are currently moving on.
+			// It does. The last position was the correct one.
+			b.SetPosition(lastX, lastY)
+			isBlocking = true
+			break
+		}
+	}
+
+	x, y := b.GetPositionMin()
+	return x, y, isBlocking
+}
+
+func abs(n int) int {
+	if n < 0 {
+		return -n
+	}
+	return n
 }

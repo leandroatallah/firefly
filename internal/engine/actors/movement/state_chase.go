@@ -12,7 +12,7 @@ type ChaseMovementState struct {
 	BaseMovementState
 	count     int
 	path      []image.Point
-	obstacles []body.Body
+	obstacles []body.MovableCollidable
 }
 
 func NewChaseMovementState(base BaseMovementState) *ChaseMovementState {

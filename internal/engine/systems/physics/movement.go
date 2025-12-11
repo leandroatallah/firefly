@@ -76,39 +76,11 @@ func clampAxisVelocity(velocity, limit int) int {
 	}
 }
 
-// applyAxisMovement moves the body by a given distance along a single axis (X or Y).
-// It checks for collisions with other objects in the space.
-// It returns true if the movement was blocked by a collision.
-func applyAxisMovement(body *PhysicsBody, distance int, isXAxis bool, space body.BodiesSpace) bool {
-	if distance == 0 {
-		return false
-	}
-
-	rect, ok := body.Shape.(*Rect)
-	var before int
-	if ok {
-		if isXAxis {
-			before = rect.x16
-		} else {
-			before = rect.y16
-		}
-	}
-
-	body.ApplyValidMovement(distance, isXAxis, space)
-
-	if !ok {
-		return false
-	}
-
-	if isXAxis {
-		return rect.x16 == before
-	}
-	return rect.y16 == before
-}
-
+// TODO: Unused.
+//
 // applyGravity simulates gravity by increasing the vertical velocity of the body
 // downwards, up to a terminal velocity specified by `ground`.
-func applyGravity(body *PhysicsBody, ground int) {
+func applyGravity(body *MovableBody, ground int) {
 	if body.vy16 < ground {
 		body.vy16 += gravityForce
 	}
@@ -118,42 +90,53 @@ func applyGravity(body *PhysicsBody, ground int) {
 // It adjusts the body's position if it goes beyond the edges of the screen.
 // It returns true if the body is touching or has gone past the bottom of the screen,
 // which can be interpreted as being on the ground for platformer.
-func clampToPlayArea(body *PhysicsBody, space *Space) bool {
-	rect, ok := body.Shape.(*Rect)
+func clampToPlayArea(body body.MovableCollidable, space *Space) bool {
+	rect, ok := body.GetShape().(*Rect)
 	if !ok {
 		return false
 	}
 
-	if rect.x16 < 0 {
-		body.ApplyValidMovement(-rect.x16, true, nil)
+	cfg := config.Get()
+	x, y := body.GetPositionMin()
+
+	if x < 0 {
+		x, y, _ = body.ApplyValidPosition(-x*cfg.Unit, true, nil)
 	}
 
-	rightEdge := rect.x16 + rect.width*config.Get().Unit
-	maxRight := config.Get().ScreenWidth * config.Get().Unit
+	x16, y16 := x*cfg.Unit, y*cfg.Unit
+
+	// TODO: Duplicated
+	x16 = body.Position().Min.X * cfg.Unit
+	rightEdge := x16 + rect.width*cfg.Unit
+	maxRight := cfg.ScreenWidth * cfg.Unit
 	provider := space.GetTilemapDimensionsProvider()
 	if provider != nil {
-		maxRight = provider.GetTilemapWidth() * config.Get().Unit
+		maxRight = provider.GetTilemapWidth() * cfg.Unit
 	}
 	if rightEdge > maxRight {
-		body.ApplyValidMovement(maxRight-rightEdge, true, nil)
+		x, y, _ = body.ApplyValidPosition(maxRight-rightEdge, true, nil)
+		x16, y16 = x*cfg.Unit, y*cfg.Unit
 	}
 
 	// Vertical clamping
 	minTop := 0
-	maxBottom := config.Get().ScreenHeight * config.Get().Unit
+	maxBottom := cfg.ScreenHeight * cfg.Unit
 	if provider != nil {
-		minTop = (config.Get().ScreenHeight - provider.GetTilemapHeight()) * config.Get().Unit
-		maxBottom = provider.GetTilemapHeight() * config.Get().Unit
+		minTop = (cfg.ScreenHeight - provider.GetTilemapHeight()) * cfg.Unit
+		maxBottom = provider.GetTilemapHeight() * cfg.Unit
 	}
 
-	if rect.y16 < minTop {
-		body.ApplyValidMovement(minTop-rect.y16, false, nil)
+	if y16 < minTop {
+		x, y, _ = body.ApplyValidPosition(minTop-y16, false, nil)
+		x16, y16 = x*cfg.Unit, y*cfg.Unit
 	}
 
-	bottom := rect.y16 + rect.height*config.Get().Unit
+	// TODO: Should repeat?
+	y16 = body.Position().Min.Y * cfg.Unit
+	bottom := y16 + rect.height*cfg.Unit
 	if bottom >= maxBottom {
 		if bottom > maxBottom {
-			body.ApplyValidMovement(maxBottom-bottom, false, nil)
+			_, _, _ = body.ApplyValidPosition(maxBottom-bottom, false, nil)
 		}
 		return true
 	}

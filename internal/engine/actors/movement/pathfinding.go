@@ -74,7 +74,7 @@ func reconstructPath(endNode *Node) []image.Point {
 
 // Functional Options Pattern
 // WithObstacles is an option to provide obstacles for pathfinding states.
-func WithObstacles(obstacles []body.Body) MovementStateOption {
+func WithObstacles(obstacles []body.MovableCollidable) MovementStateOption {
 	return func(ms MovementState) {
 		if chaseState, ok := ms.(*ChaseMovementState); ok {
 			chaseState.obstacles = obstacles

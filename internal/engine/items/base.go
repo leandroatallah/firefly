@@ -1,6 +1,8 @@
 package items
 
 import (
+	"fmt"
+	"image"
 	"image/color"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -10,9 +12,9 @@ import (
 )
 
 type BaseItem struct {
-	// TODO: Item is not alive. Try to split PhysicsBody to not inherit AliveBody methods
-	physics.PhysicsBody
 	sprites.SpriteEntity
+	*physics.CollidableBody
+	*physics.MovableBody
 
 	count        int
 	frameRate    int
@@ -20,29 +22,50 @@ type BaseItem struct {
 	imageOptions *ebiten.DrawImageOptions
 }
 
-func NewBaseItem(s sprites.SpriteMap, frameRate int) *BaseItem {
+func NewBaseItem(s sprites.SpriteMap, frameRate int, bodyRect *physics.Rect) *BaseItem {
 	spriteEntity := sprites.NewSpriteEntity(s)
+	b := physics.NewBody(bodyRect)
+	movable := physics.NewMovableBody(b)
+	collidable := physics.NewCollidableBody(b)
 	return &BaseItem{
+		MovableBody:    movable,
+		CollidableBody: collidable,
+
 		imageOptions: &ebiten.DrawImageOptions{},
 		SpriteEntity: spriteEntity,
 		frameRate:    frameRate,
 	}
 }
 
-func (b *BaseItem) SetBody(rect *physics.Rect) Item {
-	b.PhysicsBody = *physics.NewPhysicsBody(rect)
-	b.PhysicsBody.SetTouchable(b)
-	return b
+// Forwarding methods for Body to avoid ambiguous selector
+// Always route via the MovableBody component
+func (b *BaseItem) ID() string {
+	return b.MovableBody.ID()
+}
+func (b *BaseItem) SetID(id string) {
+	b.MovableBody.SetID(id)
+}
+func (b *BaseItem) Position() image.Rectangle {
+	return b.MovableBody.Position()
+}
+func (b *BaseItem) SetPosition(x, y int) {
+	b.MovableBody.SetPosition(x, y)
+}
+func (b *BaseItem) GetPositionMin() (int, int) {
+	return b.MovableBody.GetPositionMin()
+}
+func (b *BaseItem) GetShape() body.Shape {
+	return b.MovableBody.GetShape()
 }
 
-func (b *BaseItem) SetCollisionArea(rect *physics.Rect) Item {
-	collisionArea := &physics.CollisionArea{Shape: rect}
-	b.PhysicsBody.AddCollision(collisionArea)
-	return b
+func (b *BaseItem) SetCollisionArea(rect *physics.Rect) {
+	collision := physics.NewCollidableBodyFromRect(rect)
+	collision.SetID(fmt.Sprintf("%v_COLLISION_0", b.ID()))
+	b.AddCollision(collision)
 }
 
 func (b *BaseItem) SetTouchable(t body.Touchable) {
-	b.PhysicsBody.Touchable = t
+	b.Touchable = t
 }
 
 func (b *BaseItem) Update(space body.BodiesSpace) error {
@@ -54,19 +77,13 @@ func (b *BaseItem) Update(space body.BodiesSpace) error {
 func (b *BaseItem) UpdateImageOptions() {
 	b.imageOptions.GeoM.Reset()
 
-	pos := b.Position()
-	minX, minY := pos.Min.X, pos.Min.Y
-
-	// Apply character position
-	b.imageOptions.GeoM.Translate(
-		float64(minX),
-		float64(minY),
-	)
+	x, y := b.GetPositionMin()
+	b.imageOptions.GeoM.Translate(float64(x), float64(y))
 }
 
-func (b *BaseItem) OnBlock(other body.Body) {}
+func (b *BaseItem) OnBlock(other body.Collidable) {}
 
-func (b *BaseItem) OnTouch(other body.Body) {}
+func (b *BaseItem) OnTouch(other body.Collidable) {}
 
 func (b *BaseItem) Image() *ebiten.Image {
 	pos := b.Position()

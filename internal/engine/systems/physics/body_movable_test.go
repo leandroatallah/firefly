@@ -7,12 +7,6 @@ import (
 	"github.com/leandroatallah/firefly/internal/config"
 )
 
-func NewMovableBody() *MovableBody {
-	return &MovableBody{
-		Shape: NewRect(0, 0, 10, 10),
-	}
-}
-
 type accVect struct {
 	accelerationX int
 	accelerationY int
@@ -28,7 +22,7 @@ func (v accVect) String() string {
 
 func TestMovableBody_Movement(t *testing.T) {
 	cfg := config.Get()
-	b := NewMovableBody()
+	b := NewMovableBody(NewBody(NewRect(0, 0, 10, 10)))
 
 	distance := 5
 	distancex16 := distance * cfg.Unit

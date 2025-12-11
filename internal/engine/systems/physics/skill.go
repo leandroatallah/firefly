@@ -2,6 +2,7 @@ package physics
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 )
 
 // SkillState represents the possible states of a skill.
@@ -15,14 +16,14 @@ const (
 
 // Skill defines the interface for a passive player ability.
 type Skill interface {
-	Update(body *PhysicsBody, model *PlatformMovementModel)
+	Update(body body.MovableCollidable, model *PlatformMovementModel)
 	IsActive() bool
 }
 
 // ActiveSkill defines the interface for a skill that requires user input.
 type ActiveSkill interface {
 	Skill
-	HandleInput(body *PhysicsBody, model *PlatformMovementModel)
+	HandleInput(body body.MovableCollidable, model *PlatformMovementModel)
 	ActivationKey() ebiten.Key
 }
 
@@ -35,7 +36,7 @@ type SkillBase struct {
 	timer    int
 }
 
-func (s *SkillBase) Update(body *PhysicsBody, model *PlatformMovementModel) {}
+func (s *SkillBase) Update(body body.MovableCollidable, model *PlatformMovementModel) {}
 
 // IsActive returns true if the skill is currently in its active phase.
 func (s *SkillBase) IsActive() bool {
