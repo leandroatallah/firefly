@@ -2,6 +2,7 @@ package tilemap
 
 import (
 	_ "image/png"
+	"log"
 	"math"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -97,19 +98,17 @@ func (t *Tilemap) GetPlayerStartPosition() (x, y int, found bool) {
 	mapHeight := t.Height * t.Tileheight
 	yOffset := mapHeight - cfg.ScreenHeight - 100
 
-	// TODO: Layers should be parsed one time to not loop more than one time
-	for _, layer := range t.Layers {
-		if layer.Name == "PlayerStart" && layer.Type == "objectgroup" && len(layer.Objects) > 0 {
-			obj := layer.Objects[0]
-			px := int(math.Round(obj.X))
-			py := int(math.Round(obj.Y)) + yOffset
-
-			// return px * cfg.Unit, py * cfg.Unit, true
-			return px, py, true
-		}
+	layer, err := t.FindLayerByName("PlayerStart")
+	if err != nil {
+		log.Printf("failed to get player start position: %v", err)
+		return 0, 0, false
 	}
 
-	return 0, 0, false
+	obj := layer.Objects[0]
+	px := int(math.Round(obj.X))
+	py := int(math.Round(obj.Y)) + yOffset
+
+	return px, py, true
 }
 
 type ItemPosition struct {
@@ -127,32 +126,38 @@ func (t *Tilemap) GetItemsPositionID() []*ItemPosition {
 	var firstgid int
 	var ts *Tileset
 
-	for _, layer := range t.Layers {
-		if layer.Name == "Items" && layer.Type == "objectgroup" && layer.Visible && len(layer.Objects) > 0 {
-			for _, obj := range layer.Objects {
-				x16 := int(math.Round(obj.X))
-				yValue := obj.Y
-				if obj.Gid > 0 {
-					yValue -= obj.Height
-				}
-				y16 := int(math.Round(yValue))
-				if firstgid == 0 {
-					firstgid = obj.Gid
-					ts = t.findTileset(firstgid)
-				}
-				itemType := tilesetSourceID(ts, obj.Gid)
+	layer, err := t.FindLayerByName("Items")
+	if err != nil {
+		log.Printf("failed to get items position: %v", err)
+		return nil
+	}
 
-				var id string
-				for _, p := range obj.Properties {
-					if p.Name == "body_id" {
-						id = p.Value
-						break
-					}
-				}
-				// o.SetID(fmt.Sprintf("%v_%v", prefix, id))
-				res = append(res, &ItemPosition{X: x16, Y: y16, ItemType: itemType, ID: id})
+	if len(layer.Objects) > 0 {
+		return nil
+	}
+
+	for _, obj := range layer.Objects {
+		x16 := int(math.Round(obj.X))
+		yValue := obj.Y
+		if obj.Gid > 0 {
+			yValue -= obj.Height
+		}
+		y16 := int(math.Round(yValue))
+		if firstgid == 0 {
+			firstgid = obj.Gid
+			ts = t.findTileset(firstgid)
+		}
+		itemType := tilesetSourceID(ts, obj.Gid)
+
+		var id string
+		for _, p := range obj.Properties {
+			if p.Name == "body_id" {
+				id = p.Value
+				break
 			}
 		}
+		// o.SetID(fmt.Sprintf("%v_%v", prefix, id))
+		res = append(res, &ItemPosition{X: x16, Y: y16, ItemType: itemType, ID: id})
 	}
 
 	return res

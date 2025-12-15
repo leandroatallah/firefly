@@ -164,6 +164,7 @@ func (b *MovableBody) IsFalling() bool {
 
 // Platform methods
 func (b *MovableBody) TryJump(force int) {
+	// TODO: Should check if has a collision below the player
 	b.vy16 = -force * config.Get().Unit
 }
 

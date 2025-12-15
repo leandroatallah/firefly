@@ -26,33 +26,23 @@ var LayerNameMap = map[string]LayerNameID{
 }
 
 func (t *Tilemap) CreateCollisionBodies(space *physics.Space, triggerEndpoint body.Touchable) error {
-	if t == nil {
-		return fmt.Errorf("the tilemap was not initialized")
+	endpointLayer, err := t.FindLayerByName("Endpoint")
+	if err != nil {
+		return err
+	}
+	for _, obj := range endpointLayer.Objects {
+		obstacle := t.NewObstacleRect(obj, "Endpoint", false)
+		obstacle.SetTouchable(triggerEndpoint)
+		space.AddBody(obstacle)
 	}
 
-	for _, layer := range t.Layers {
-		// CreateCollisionBodies only handles layers of objectgroup type
-		if !layer.Visible || layer.Type != "objectgroup" {
-			continue
-		}
-
-		switch LayerNameMap[layer.Name] {
-		// TODO: Move endpoint to the scene and create as Item Coin
-		case EndpointLayer:
-			for _, obj := range layer.Objects {
-				obstacle := t.NewObstacleRect(obj, "ENDPOINT", false)
-				obstacle.SetTouchable(triggerEndpoint)
-				space.AddBody(obstacle)
-			}
-		// TODO: Move obstacles to the scene and create as Item Coin
-		case ObstaclesLayer:
-			for _, obj := range layer.Objects {
-				obstacle := t.NewObstacleRect(obj, "OBSTACLE", true)
-				space.AddBody(obstacle)
-			}
-		default:
-			continue
-		}
+	obstacleLayer, err := t.FindLayerByName("Obstacles")
+	if err != nil {
+		return err
+	}
+	for _, obj := range obstacleLayer.Objects {
+		obstacle := t.NewObstacleRect(obj, "OBSTACLE", true)
+		space.AddBody(obstacle)
 	}
 
 	return nil

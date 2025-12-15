@@ -13,11 +13,8 @@ import (
 )
 
 func (t *Tilemap) ParseToImage(screen *ebiten.Image) (*ebiten.Image, error) {
-	if t == nil {
-		return nil, fmt.Errorf("the tilemap was not initialized")
-	}
-	if len(t.Layers) == 0 || len(t.Tilesets) == 0 {
-		return nil, fmt.Errorf("tilemap is not valid")
+	if _, err := t.isTilemapValid(); err != nil {
+		return nil, err
 	}
 
 	// Use the first layer to determine map dimensions. This assumes all layers are the same size.
@@ -185,4 +182,33 @@ func loadImage(path string) (*ebiten.Image, error) {
 	}
 
 	return ebiten.NewImageFromImage(img), nil
+}
+
+func (t *Tilemap) isTilemapValid() (bool, error) {
+	if t == nil {
+		return false, fmt.Errorf("the tilemap was not initialized")
+	}
+	if len(t.Layers) == 0 || len(t.Tilesets) == 0 {
+		return false, fmt.Errorf("tilemap is not valid")
+	}
+
+	return true, nil
+}
+
+func (t *Tilemap) FindLayerByName(name string) (*Layer, error) {
+	if valid, err := t.isTilemapValid(); !valid {
+		return nil, err
+	}
+
+	for _, layer := range t.Layers {
+		if !layer.Visible {
+			continue
+		}
+
+		if layer.Name == name {
+			return layer, nil
+		}
+	}
+
+	return nil, fmt.Errorf("FindLayerByName could not find: %v", name)
 }

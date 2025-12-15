@@ -201,6 +201,12 @@
                  "height":16,
                  "id":70,
                  "name":"",
+                 "properties":[
+                        {
+                         "name":"body_id",
+                         "type":"string",
+                         "value":"COIN_1"
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -213,6 +219,12 @@
                  "height":16,
                  "id":74,
                  "name":"",
+                 "properties":[
+                        {
+                         "name":"body_id",
+                         "type":"string",
+                         "value":"COIN_2"
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -225,6 +237,12 @@
                  "height":16,
                  "id":76,
                  "name":"",
+                 "properties":[
+                        {
+                         "name":"body_id",
+                         "type":"string",
+                         "value":"COIN_3"
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -237,6 +255,12 @@
                  "height":16,
                  "id":77,
                  "name":"",
+                 "properties":[
+                        {
+                         "name":"body_id",
+                         "type":"string",
+                         "value":"COIN_4"
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -249,6 +273,12 @@
                  "height":16,
                  "id":78,
                  "name":"",
+                 "properties":[
+                        {
+                         "name":"body_id",
+                         "type":"string",
+                         "value":"COIN_5"
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -261,6 +291,12 @@
                  "height":16,
                  "id":79,
                  "name":"",
+                 "properties":[
+                        {
+                         "name":"body_id",
+                         "type":"string",
+                         "value":"COIN_6"
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -273,6 +309,12 @@
                  "height":16,
                  "id":80,
                  "name":"",
+                 "properties":[
+                        {
+                         "name":"body_id",
+                         "type":"string",
+                         "value":"COIN_7"
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -285,6 +327,12 @@
                  "height":16,
                  "id":81,
                  "name":"",
+                 "properties":[
+                        {
+                         "name":"body_id",
+                         "type":"string",
+                         "value":"COIN_8"
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -297,6 +345,12 @@
                  "height":16,
                  "id":88,
                  "name":"",
+                 "properties":[
+                        {
+                         "name":"body_id",
+                         "type":"string",
+                         "value":"COIN_9"
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -309,6 +363,12 @@
                  "height":16,
                  "id":90,
                  "name":"",
+                 "properties":[
+                        {
+                         "name":"body_id",
+                         "type":"string",
+                         "value":"COIN_10"
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -321,6 +381,12 @@
                  "height":16,
                  "id":92,
                  "name":"",
+                 "properties":[
+                        {
+                         "name":"body_id",
+                         "type":"string",
+                         "value":"COIN_11"
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -333,6 +399,12 @@
                  "height":16,
                  "id":99,
                  "name":"",
+                 "properties":[
+                        {
+                         "name":"body_id",
+                         "type":"string",
+                         "value":"COIN_12"
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -345,6 +417,12 @@
                  "height":16,
                  "id":100,
                  "name":"",
+                 "properties":[
+                        {
+                         "name":"body_id",
+                         "type":"string",
+                         "value":"COIN_13"
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -357,6 +435,12 @@
                  "height":16,
                  "id":101,
                  "name":"",
+                 "properties":[
+                        {
+                         "name":"body_id",
+                         "type":"string",
+                         "value":"COIN_14"
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -369,6 +453,12 @@
                  "height":16,
                  "id":102,
                  "name":"",
+                 "properties":[
+                        {
+                         "name":"body_id",
+                         "type":"string",
+                         "value":"COIN_15"
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -381,6 +471,12 @@
                  "height":16,
                  "id":103,
                  "name":"",
+                 "properties":[
+                        {
+                         "name":"body_id",
+                         "type":"string",
+                         "value":"COIN_16"
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -393,6 +489,12 @@
                  "height":16,
                  "id":104,
                  "name":"",
+                 "properties":[
+                        {
+                         "name":"body_id",
+                         "type":"string",
+                         "value":"COIN_17"
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
