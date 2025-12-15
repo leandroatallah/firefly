@@ -16,17 +16,27 @@ This separation allows the engine to be developed independently from the game's 
 ```
 .
 ├── assets/              # Game assets (images, sounds, etc.)
-├── cmd/game/            # Application entry point
+├── main.go            # Application entry point
 ├── internal/
 │   ├── config/          # Game configuration
-│   ├── engine/          # Core game engine
-│   │   ├── actors/      # Base actor components
-│   │   ├── core/        # Scene management, game loop
-│   │   └── systems/     # Physics, audio, input
+│   ├── engine/          # Core game engine components
+│   │   ├── actors/      # Actor management and movement (e.g., characters, enemies)
+│   │   ├── assets/      # Asset loading and management
+│   │   ├── camera/      # Camera control and rendering
+│   │   ├── contracts/   # Interfaces and contracts for engine components
+│   │   ├── core/        # Game loop, scene management, and core utilities
+│   │   ├── items/       # Item management
+│   │   ├── sequences/   # Game sequences and command processing
+│   │   └── systems/     # Various game systems (audio, physics, input, speech, etc.)
 │   └── game/            # Game-specific implementation
-│       ├── scenes/      # Game scenes
-│       ├── actors/      # Game characters
-│       └── items/       # Game items
+│       ├── actors/      # Game-specific characters and enemies
+│       ├── camera/      # Game-specific camera settings
+│       ├── hud/         # Game-specific HUD elements
+│       ├── items/       # Game-specific items
+│       ├── scenes/      # Game scenes and levels
+│       ├── setup/       # Game setup and initialization
+│       ├── speech/      # Game-specific speech bubbles and dialogues
+│       └── state/       # Game state management
 ├── go.mod               # Go module definition
 └── README.md
 ```
@@ -34,4 +44,6 @@ This separation allows the engine to be developed independently from the game's 
 ## Dependencies
 
 -   **Ebitengine**: A dead simple 2D game engine for Go.
+-   **EbitenUI**: A UI library for Ebitengine.
+-   **Kamera/v2**: A camera library for Ebitengine.
 -   **Go**: The programming language.
