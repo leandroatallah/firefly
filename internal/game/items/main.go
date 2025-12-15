@@ -1,6 +1,7 @@
 package gameitems
 
 import (
+	"github.com/leandroatallah/firefly/internal/engine/core"
 	"github.com/leandroatallah/firefly/internal/engine/items"
 )
 
@@ -9,14 +10,14 @@ const (
 	SignpostType
 )
 
-func InitItemMap() items.ItemMap {
-	enemyMap := map[items.ItemType]func(x, y int) items.Item{
+func InitItemMap(ctx *core.AppContext) items.ItemMap {
+	itemMap := map[items.ItemType]func(x, y int) items.Item{
 		CollectibleCoinType: func(x, y int) items.Item {
-			return NewCollectibleCoinItem(x, y)
+			return NewCollectibleCoinItem(ctx, x, y)
 		},
 		SignpostType: func(x, y int) items.Item {
-			return NewSignpostItem(x, y)
+			return NewSignpostItem(ctx, x, y)
 		},
 	}
-	return enemyMap
+	return itemMap
 }

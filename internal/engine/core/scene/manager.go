@@ -82,6 +82,7 @@ func (m *SceneManager) NavigateTo(
 	}
 }
 
+// TODO: Move to a shareable method-only struct
 func (m *SceneManager) SetAppContext(appContext *core.AppContext) {
 	m.appContext = appContext
 	m.factory.SetAppContext(appContext)

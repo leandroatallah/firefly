@@ -73,7 +73,7 @@ func (s *LevelsScene) OnStart() {
 	}
 
 	// Set items position from tilemap
-	f := items.NewItemFactory(gameitems.InitItemMap())
+	f := items.NewItemFactory(gameitems.InitItemMap(s.AppContext))
 	s.InitItems(itemsMap, f)
 
 	s.SetPlayerStartPosition(s.player)

@@ -7,6 +7,11 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
 )
 
+type CoinCollector interface {
+	AddCoinCount(amount int)
+	CoinCount() int
+}
+
 type CherryPlayer struct {
 	actors.Character
 

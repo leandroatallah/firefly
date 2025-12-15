@@ -3,7 +3,6 @@ package scene
 import (
 	"fmt"
 	"log"
-	"time"
 
 	"github.com/leandroatallah/firefly/internal/config"
 	"github.com/leandroatallah/firefly/internal/engine/actors"
@@ -76,7 +75,7 @@ func (s *TilemapScene) InitItems(items map[int]items.ItemType, factory *items.It
 
 	if len(itemsPos) > 0 {
 		for _, i := range itemsPos {
-			itemType, found := items[i.ID]
+			itemType, found := items[i.ItemType]
 			if !found {
 				return fmt.Errorf("Unable to find item by ID.")
 			}
@@ -85,12 +84,8 @@ func (s *TilemapScene) InitItems(items map[int]items.ItemType, factory *items.It
 			if err != nil {
 				return err
 			}
-			// TODO: Improve this
-			if item.ID() == "" {
-				item.SetID(fmt.Sprintf("ITEM-%d", time.Now().Nanosecond()))
-			} else {
-				item.SetID(fmt.Sprintf("%vITEM-%d", item.ID(), time.Now().Nanosecond()))
-			}
+
+			item.SetID(fmt.Sprintf("ITEM_%v", i.ID))
 			s.PhysicsSpace().AddBody(item)
 		}
 	}

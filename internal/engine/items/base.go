@@ -7,6 +7,7 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
+	"github.com/leandroatallah/firefly/internal/engine/core"
 	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
 	"github.com/leandroatallah/firefly/internal/engine/systems/sprites"
 )
@@ -20,6 +21,7 @@ type BaseItem struct {
 	frameRate    int
 	removed      bool
 	imageOptions *ebiten.DrawImageOptions
+	appContext   *core.AppContext
 }
 
 func NewBaseItem(s sprites.SpriteMap, frameRate int, bodyRect *physics.Rect) *BaseItem {
@@ -60,7 +62,9 @@ func (b *BaseItem) GetShape() body.Shape {
 
 func (b *BaseItem) SetCollisionArea(rect *physics.Rect) {
 	collision := physics.NewCollidableBodyFromRect(rect)
+	x, y := b.GetPositionMin()
 	collision.SetID(fmt.Sprintf("%v_COLLISION_0", b.ID()))
+	collision.SetPosition(x, y)
 	b.AddCollision(collision)
 }
 
@@ -112,4 +116,12 @@ func (b *BaseItem) IsRemoved() bool {
 
 func (b *BaseItem) SetRemoved(value bool) {
 	b.removed = value
+}
+
+func (b *BaseItem) SetAppContext(appContext *core.AppContext) {
+	b.appContext = appContext
+}
+
+func (b *BaseItem) AppContext() *core.AppContext {
+	return b.appContext
 }

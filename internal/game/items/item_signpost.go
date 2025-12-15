@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/leandroatallah/firefly/internal/engine/actors"
+	"github.com/leandroatallah/firefly/internal/engine/core"
 	"github.com/leandroatallah/firefly/internal/engine/items"
 	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
 	"github.com/leandroatallah/firefly/internal/engine/systems/sprites"
@@ -13,7 +14,7 @@ type SignpostItem struct {
 	items.BaseItem
 }
 
-func NewSignpostItem(x, y int) *SignpostItem {
+func NewSignpostItem(ctx *core.AppContext, x, y int) *SignpostItem {
 	frameWidth, frameHeight := 32, 36
 
 	var assets sprites.SpriteAssets
