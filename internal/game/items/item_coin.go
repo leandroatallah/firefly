@@ -3,7 +3,6 @@ package gameitems
 import (
 	"fmt"
 
-	"github.com/leandroatallah/firefly/internal/engine/actors"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/core"
 	"github.com/leandroatallah/firefly/internal/engine/items"
@@ -17,13 +16,14 @@ type CollectibleCoinItem struct {
 
 func NewCollectibleCoinItem(ctx *core.AppContext, x, y int) (*CollectibleCoinItem, error) {
 	// TODO: It must not use actors package
-	// TODO: items.ParseJsonPlayer should returns a ID
-	spriteData, statData, err := actors.ParseJsonPlayer("internal/game/items/coin.json")
+	spriteData, statData, err := items.ParseJsonItem("internal/game/items/coin.json")
 	if err != nil {
 		return nil, err
 	}
 
-	base, err := CreateAnimatedItem(spriteData)
+	// FIX:
+	id := "TEMP"
+	base, err := CreateAnimatedItem(id, spriteData)
 	if err != nil {
 		return nil, err
 	}
@@ -35,6 +35,7 @@ func NewCollectibleCoinItem(ctx *core.AppContext, x, y int) (*CollectibleCoinIte
 	// SetPosition must be before SetItemBodies
 	coinItem.SetPosition(x, y)
 	coinItem.SetAppContext(ctx)
+	// TODO: Review this to have unique ids
 
 	if err = SetItemBodies(coinItem, spriteData); err != nil {
 		return nil, fmt.Errorf("SetItemBodies: %w", err)

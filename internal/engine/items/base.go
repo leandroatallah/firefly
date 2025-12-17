@@ -1,9 +1,11 @@
 package items
 
 import (
+	"fmt"
 	"image"
 	"image/color"
 	"log"
+	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
@@ -26,7 +28,7 @@ type BaseItem struct {
 	collisionBodies map[ItemStateEnum][]body.Collidable
 }
 
-func NewBaseItem(s sprites.SpriteMap, bodyRect *physics.Rect) *BaseItem {
+func NewBaseItem(id string, s sprites.SpriteMap, bodyRect *physics.Rect) *BaseItem {
 	spriteEntity := sprites.NewSpriteEntity(s)
 	b := physics.NewBody(bodyRect)
 	movable := physics.NewMovableBody(b)
@@ -39,6 +41,7 @@ func NewBaseItem(s sprites.SpriteMap, bodyRect *physics.Rect) *BaseItem {
 		SpriteEntity:    spriteEntity,
 		collisionBodies: make(map[ItemStateEnum][]body.Collidable), // Character collisions based on state
 	}
+	base.SetID(id)
 
 	state, err := NewItemState(base, Idle)
 	if err != nil {
@@ -158,8 +161,8 @@ func (b *BaseItem) RefreshCollisionBasedOnState() {
 				y+relativePos.Max.Y,
 			)
 			newCollisionBody.SetPosition(newPos.Min.X, newPos.Min.Y)
-			// FIX: It should not set a new ID
-			newCollisionBody.SetID("MEW-COLLISION-BODY")
+			// FIX: It should not use Nanosecond
+			newCollisionBody.SetID(fmt.Sprintf("%v_COLLISION_%v", b.ID(), time.Now().Nanosecond()))
 			b.AddCollision(newCollisionBody)
 		}
 	}

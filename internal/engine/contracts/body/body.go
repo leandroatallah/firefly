@@ -73,7 +73,6 @@ type Collidable interface {
 	ApplyValidPosition(distance16 int, isXAxis bool, space BodiesSpace) (x, y int, wasBlocked bool)
 }
 
-// TODO: Should it be merge with Collidable?
 type Obstacle interface {
 	Body
 	Collidable

@@ -44,6 +44,8 @@ func NewCherryPlayer() (actors.ActorEntity, error) {
 		return nil, fmt.Errorf("SetMovementModel: %w", err)
 	}
 
+	character.RefreshCollisionBasedOnState()
+
 	return player, nil
 }
 

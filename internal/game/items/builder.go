@@ -3,7 +3,6 @@ package gameitems
 import (
 	"fmt"
 
-	"github.com/leandroatallah/firefly/internal/engine/actors"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/animation"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/items"
@@ -13,7 +12,7 @@ import (
 
 // TODO: It should be in a sprite related package.
 // TODO: Remove actors package from here
-func getSprites(assets map[string]actors.AssetData) (sprites.SpriteMap, error) {
+func getSprites(assets map[string]items.AssetData) (sprites.SpriteMap, error) {
 	var s sprites.SpriteAssets
 	for key, value := range assets {
 		var state animation.SpriteState
@@ -35,14 +34,14 @@ func getSprites(assets map[string]actors.AssetData) (sprites.SpriteMap, error) {
 
 // TODO: SpriteData should be in a sprite related package.
 // TODO: Remove actors package from here
-func CreateAnimatedItem(data actors.SpriteData) (*items.BaseItem, error) {
+func CreateAnimatedItem(id string, data items.SpriteData) (*items.BaseItem, error) {
 	assets, err := getSprites(data.Assets)
 	if err != nil {
 		return nil, err
 	}
 
 	rect := physics.NewRect(data.BodyRect.Rect())
-	b := items.NewBaseItem(assets, rect)
+	b := items.NewBaseItem(id, assets, rect)
 	b.SetFaceDirection(data.FacingDirection)
 	b.SetFrameRate(data.FrameRate)
 
@@ -55,10 +54,7 @@ type collisionRectSetter interface {
 }
 
 // TODO: Remove actors package from here
-func SetItemBodies(item items.Item, data actors.SpriteData) error {
-	// TODO: Improve this. tmj file has body_id for coins but its complex to bring it here. Maybe it could have a incremental index.
-	item.SetID("TEMP")
-
+func SetItemBodies(item items.Item, data items.SpriteData) error {
 	item.SetTouchable(item)
 
 	setter, ok := item.(collisionRectSetter)
@@ -88,6 +84,6 @@ func SetItemBodies(item items.Item, data actors.SpriteData) error {
 }
 
 // TODO: Remove actors package from here
-func SetItemStats(item items.Item, data actors.StatData) error {
+func SetItemStats(item items.Item, data items.StatData) error {
 	return nil
 }
