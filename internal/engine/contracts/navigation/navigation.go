@@ -12,12 +12,13 @@ type Scene interface {
 	Update() error
 	OnStart()
 	OnFinish()
-	// Use any to prevent import cycle error
+
 	SetAppContext(appContext any)
 }
 
 type SceneFactory interface {
 	Create(sceneType SceneType, freshInstance bool) (Scene, error)
+
 	SetAppContext(appContext any)
 }
 

@@ -10,11 +10,12 @@ import (
 )
 
 type SceneManager struct {
+	core.AppContextHolder
+
 	current      navigation.Scene
 	factory      SceneFactory
 	nextScene    navigation.Scene
 	transitioner navigation.Transition
-	appContext   *core.AppContext
 }
 
 func NewSceneManager() *SceneManager {
@@ -82,12 +83,6 @@ func (m *SceneManager) NavigateTo(
 	}
 }
 
-// TODO: Move to a shareable method-only struct
-func (m *SceneManager) SetAppContext(appContext *core.AppContext) {
-	m.appContext = appContext
-	m.factory.SetAppContext(appContext)
-}
-
 func (m *SceneManager) AudioManager() *audiomanager.AudioManager {
-	return m.appContext.AudioManager
+	return m.AppContext().AudioManager
 }

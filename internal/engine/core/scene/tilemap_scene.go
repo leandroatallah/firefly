@@ -19,20 +19,17 @@ type TilemapScene struct {
 	cam     *camera.Controller
 }
 
-func NewTilemapScene(context *core.AppContext) *TilemapScene {
+func NewTilemapScene(ctx *core.AppContext) *TilemapScene {
 	scene := TilemapScene{}
-	scene.SetAppContext(context)
+	scene.SetAppContext(ctx)
 	return &scene
 }
 
 func (s *TilemapScene) OnStart() {
 	s.BaseScene.OnStart()
 
-	// Init audio manager
-	s.audiomanager = s.AppContext.AudioManager
-
 	// Load levels from context
-	level, err := s.AppContext.LevelManager.GetCurrentLevel()
+	level, err := s.AppContext().LevelManager.GetCurrentLevel()
 	if err != nil {
 		log.Fatalf("failed to get current level: %v", err)
 	}
@@ -67,7 +64,7 @@ func (s *TilemapScene) Tilemap() *tilemap.Tilemap {
 }
 
 func (s *TilemapScene) Audiomanager() *audiomanager.AudioManager {
-	return s.audiomanager
+	return s.AppContext().AudioManager
 }
 
 func (s *TilemapScene) InitItems(items map[int]items.ItemType, factory *items.ItemFactory) error {

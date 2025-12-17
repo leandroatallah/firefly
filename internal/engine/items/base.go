@@ -15,6 +15,7 @@ import (
 )
 
 type BaseItem struct {
+	core.AppContextHolder
 	sprites.SpriteEntity
 	*physics.CollidableBody
 	*physics.MovableBody
@@ -23,7 +24,6 @@ type BaseItem struct {
 	frameRate       int
 	removed         bool
 	imageOptions    *ebiten.DrawImageOptions
-	appContext      *core.AppContext
 	state           ItemState
 	collisionBodies map[ItemStateEnum][]body.Collidable
 }
@@ -121,14 +121,6 @@ func (b *BaseItem) IsRemoved() bool {
 
 func (b *BaseItem) SetRemoved(value bool) {
 	b.removed = value
-}
-
-func (b *BaseItem) SetAppContext(appContext *core.AppContext) {
-	b.appContext = appContext
-}
-
-func (b *BaseItem) AppContext() *core.AppContext {
-	return b.appContext
 }
 
 func (b *BaseItem) State() ItemStateEnum {

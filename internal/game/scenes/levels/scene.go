@@ -53,8 +53,9 @@ func (s *LevelsScene) OnStart() {
 
 	go func() {
 		time.Sleep(1 * time.Second)
-		s.Audiomanager().SetVolume(0.25)
-		s.Audiomanager().PlayMusic(bgSound)
+		am := s.AppContext().AudioManager
+		am.SetVolume(0.25)
+		am.PlayMusic(bgSound)
 	}()
 
 	// Create player and register to space and context
@@ -63,7 +64,7 @@ func (s *LevelsScene) OnStart() {
 		log.Fatal(err)
 	}
 	s.player = p
-	s.AppContext.ActorManager.Register(s.player)
+	s.AppContext().ActorManager.Register(s.player)
 	s.PhysicsSpace().AddBody(s.player)
 
 	// Set items map to factory creation process
@@ -72,7 +73,7 @@ func (s *LevelsScene) OnStart() {
 	}
 
 	// Set items position from tilemap
-	f := items.NewItemFactory(gameitems.InitItemMap(s.AppContext))
+	f := items.NewItemFactory(gameitems.InitItemMap(s.AppContext()))
 	s.InitItems(itemsMap, f)
 
 	s.SetPlayerStartPosition(s.player)
@@ -173,5 +174,5 @@ func (s *LevelsScene) finishLevel() {
 	}
 
 	s.levelCompleted = true
-	s.AppContext.SceneManager.NavigateTo(scenestypes.SceneSummary, transition.NewFader(), true)
+	s.AppContext().SceneManager.NavigateTo(scenestypes.SceneSummary, transition.NewFader(), true)
 }

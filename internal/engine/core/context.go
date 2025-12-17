@@ -26,3 +26,16 @@ type AppContext struct {
 	LevelManager    *levels.Manager
 	Assets          fs.FS
 }
+
+// AppContextHolder is a reusable component for embedding app context
+type AppContextHolder struct {
+	appContext *AppContext
+}
+
+func (c *AppContextHolder) SetAppContext(appContext any) {
+	c.appContext = appContext.(*AppContext)
+}
+
+func (c *AppContextHolder) AppContext() *AppContext {
+	return c.appContext
+}

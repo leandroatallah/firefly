@@ -11,7 +11,6 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/core"
 	"github.com/leandroatallah/firefly/internal/engine/core/scene"
 	"github.com/leandroatallah/firefly/internal/engine/core/transition"
-	"github.com/leandroatallah/firefly/internal/engine/systems/audiomanager"
 	scenestypes "github.com/leandroatallah/firefly/internal/game/scenes/types"
 )
 
@@ -22,8 +21,7 @@ const (
 type MenuScene struct {
 	scene.BaseScene
 
-	audiomanager *audiomanager.AudioManager
-	fontText     *font.FontText
+	fontText *font.FontText
 }
 
 func NewMenuScene(context *core.AppContext) *MenuScene {
@@ -39,14 +37,14 @@ func NewMenuScene(context *core.AppContext) *MenuScene {
 
 func (s *MenuScene) OnStart() {
 	// Init audio
-	s.audiomanager = s.Manager.AudioManager()
-	s.audiomanager.SetVolume(1)
+	am := s.AppContext().SceneManager.AudioManager()
+	am.SetVolume(1)
 	// s.audiomanager.PlayMusic(kickBackBG)
 }
 
 func (s *MenuScene) Update() error {
 	if ebiten.IsKeyPressed(ebiten.KeyEnter) {
-		s.Manager.NavigateTo(scenestypes.SceneLevels, transition.NewFader(), true)
+		s.AppContext().SceneManager.NavigateTo(scenestypes.SceneLevels, transition.NewFader(), true)
 	}
 
 	return nil
@@ -71,5 +69,5 @@ func (s *MenuScene) Draw(screen *ebiten.Image) {
 }
 
 func (s *MenuScene) OnFinish() {
-	s.audiomanager.PauseMusic(kickBackBG)
+	s.AppContext().AudioManager.PauseMusic(kickBackBG)
 }

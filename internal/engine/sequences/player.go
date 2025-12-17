@@ -6,7 +6,8 @@ import (
 
 // SequencePlayer manages the execution of a sequence.
 type SequencePlayer struct {
-	appContext          *core.AppContext
+	core.AppContextHolder
+
 	currentSequence     Sequence
 	currentCommandIndex int
 	isPlaying           bool
@@ -14,9 +15,9 @@ type SequencePlayer struct {
 
 // NewSequencePlayer creates a new player.
 func NewSequencePlayer(appContext *core.AppContext) *SequencePlayer {
-	return &SequencePlayer{
-		appContext: appContext,
-	}
+	ctx := core.AppContextHolder{}
+	ctx.SetAppContext(appContext)
+	return &SequencePlayer{AppContextHolder: ctx}
 }
 
 // Play starts executing a sequence.
@@ -29,7 +30,7 @@ func (p *SequencePlayer) Play(sequence Sequence) {
 	p.isPlaying = true
 
 	if sequence.BlockPlayerMovement {
-		if player, found := p.appContext.ActorManager.GetPlayer(); found {
+		if player, found := p.AppContext().ActorManager.GetPlayer(); found {
 			player.BlockMovement()
 		}
 	}
@@ -67,13 +68,13 @@ func (p *SequencePlayer) advanceToNextCommand() {
 	}
 
 	nextCommand := p.currentSequence.Commands[p.currentCommandIndex]
-	nextCommand.Init(p.appContext)
+	nextCommand.Init(p.AppContext())
 }
 
 func (p *SequencePlayer) endSequence() {
 	p.isPlaying = false
 	if p.currentSequence.BlockPlayerMovement {
-		if player, found := p.appContext.ActorManager.GetPlayer(); found {
+		if player, found := p.AppContext().ActorManager.GetPlayer(); found {
 			player.UnblockMovement()
 		}
 	}

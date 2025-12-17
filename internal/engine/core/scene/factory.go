@@ -9,14 +9,13 @@ import (
 
 type SceneFactory interface {
 	Create(sceneType navigation.SceneType, freshInstance bool) (navigation.Scene, error)
-	SetAppContext(appContext any)
 }
 
 type DefaultSceneFactory struct {
-	manager      navigation.SceneManager
+	core.AppContextHolder
+
 	sceneMap     navigation.SceneMap
 	cachedScenes map[navigation.SceneType]navigation.Scene
-	appContext   *core.AppContext
 }
 
 func NewDefaultSceneFactory(sceneMap navigation.SceneMap) *DefaultSceneFactory {
@@ -24,11 +23,6 @@ func NewDefaultSceneFactory(sceneMap navigation.SceneMap) *DefaultSceneFactory {
 		sceneMap:     sceneMap,
 		cachedScenes: make(map[navigation.SceneType]navigation.Scene),
 	}
-}
-
-func (f *DefaultSceneFactory) SetAppContext(appContext any) {
-	f.appContext = appContext.(*core.AppContext)
-	f.manager = f.appContext.SceneManager
 }
 
 func (f *DefaultSceneFactory) Create(sceneType navigation.SceneType, freshInstance bool) (navigation.Scene, error) {
@@ -44,7 +38,7 @@ func (f *DefaultSceneFactory) Create(sceneType navigation.SceneType, freshInstan
 	}
 
 	scene := sceneFunc()
-	scene.SetAppContext(f.appContext)
+	scene.SetAppContext(f.AppContext())
 
 	if !freshInstance {
 		f.cachedScenes[sceneType] = scene
