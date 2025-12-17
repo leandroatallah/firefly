@@ -15,7 +15,6 @@ type CollectibleCoinItem struct {
 }
 
 func NewCollectibleCoinItem(ctx *core.AppContext, x, y int) (*CollectibleCoinItem, error) {
-	// TODO: It must not use actors package
 	spriteData, statData, err := items.ParseJsonItem("internal/game/items/coin.json")
 	if err != nil {
 		return nil, err
@@ -35,7 +34,6 @@ func NewCollectibleCoinItem(ctx *core.AppContext, x, y int) (*CollectibleCoinIte
 	// SetPosition must be before SetItemBodies
 	coinItem.SetPosition(x, y)
 	coinItem.SetAppContext(ctx)
-	// TODO: Review this to have unique ids
 
 	if err = SetItemBodies(coinItem, spriteData); err != nil {
 		return nil, fmt.Errorf("SetItemBodies: %w", err)
