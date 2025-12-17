@@ -76,16 +76,6 @@ func clampAxisVelocity(velocity, limit int) int {
 	}
 }
 
-// TODO: Unused.
-//
-// applyGravity simulates gravity by increasing the vertical velocity of the body
-// downwards, up to a terminal velocity specified by `ground`.
-func applyGravity(body *MovableBody, ground int) {
-	if body.vy16 < ground {
-		body.vy16 += gravityForce
-	}
-}
-
 // clampToPlayArea ensures the body stays within the screen boundaries.
 // It adjusts the body's position if it goes beyond the edges of the screen.
 // It returns true if the body is touching or has gone past the bottom of the screen,

@@ -85,7 +85,6 @@ func drawTileOpts(i, layerWidth, tileWidth, tileHeight int) *ebiten.DrawImageOpt
 	return op
 }
 
-// TODO: Prevent parse base image more than once. It's unchangeable.
 func (t *Tilemap) ParseBase(layer *Layer, result *ebiten.Image) {
 	if layer == nil || result == nil {
 		return

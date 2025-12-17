@@ -16,7 +16,6 @@ import (
 type CollidableBody struct {
 	*Body
 
-	// TODO: Review this
 	Touchable     body.Touchable
 	collisionList []body.Collidable
 	isObstructive bool

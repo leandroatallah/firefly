@@ -4,7 +4,6 @@ import (
 	"image"
 	"log"
 
-	"github.com/google/uuid"
 	"github.com/leandroatallah/firefly/internal/config"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 )
@@ -63,22 +62,4 @@ func (b *Body) SetPosition(x, y int) {
 
 func (b *Body) GetShape() body.Shape {
 	return b.shape
-}
-
-// TODO: REMOVE THIS STRUCT AND METHODSETS
-type PhysicsBody struct {
-	shape body.Shape
-
-	CollidableBody
-
-	id            string
-	invulnerable  bool
-	movementModel MovementModel
-}
-
-func NewPhysicsBody(shape body.Shape) *PhysicsBody {
-	return &PhysicsBody{
-		shape: shape,
-		id:    uuid.New().String(),
-	}
 }

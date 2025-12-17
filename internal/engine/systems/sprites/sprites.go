@@ -50,10 +50,10 @@ func (s *SpriteEntity) AnimatedSpriteImage(sprite *ebiten.Image, rect image.Rect
 
 }
 
-// TODO: Add a description
+// SpriteMap represents a collection of Ebiten images, keyed by their animation state.
 type SpriteMap map[animation.SpriteState]*ebiten.Image
 
-// TODO: Add a description
+// SpriteAssets maps an animation state to the file path of the corresponding sprite image.
 type SpriteAssets map[animation.SpriteState]string
 
 func (s SpriteAssets) AddSprite(state animation.SpriteState, path string) SpriteAssets {

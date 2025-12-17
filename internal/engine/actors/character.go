@@ -17,10 +17,8 @@ const (
 )
 
 type Character struct {
-	// TODO: Should it be a interface?
 	sprites.SpriteEntity
 
-	// TODO: Review this types
 	*physics.MovableBody
 	*physics.CollidableBody
 	*physics.AliveBody
@@ -226,7 +224,6 @@ func (c *Character) handleState() {
 
 	state := c.state.State()
 
-	// TODO: Prevent to call if state is the same
 	switch {
 	case state != Falling && c.IsFalling():
 		setNewState(Falling)
@@ -236,7 +233,6 @@ func (c *Character) handleState() {
 		setNewState(Idle)
 	case state == Hurted:
 		// TODO: The player should be recover the mobility before becomes vulnerable again
-		// TODO: Should add a panic checking here?
 		isRecovered := c.state.(*HurtState).CheckRecovery()
 		if isRecovered {
 			setNewState(Idle)

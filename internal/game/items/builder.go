@@ -11,7 +11,6 @@ import (
 )
 
 // TODO: It should be in a sprite related package.
-// TODO: Remove actors package from here
 func getSprites(assets map[string]items.AssetData) (sprites.SpriteMap, error) {
 	var s sprites.SpriteAssets
 	for key, value := range assets {
@@ -33,7 +32,6 @@ func getSprites(assets map[string]items.AssetData) (sprites.SpriteMap, error) {
 }
 
 // TODO: SpriteData should be in a sprite related package.
-// TODO: Remove actors package from here
 func CreateAnimatedItem(id string, data items.SpriteData) (*items.BaseItem, error) {
 	assets, err := getSprites(data.Assets)
 	if err != nil {
@@ -53,7 +51,6 @@ type collisionRectSetter interface {
 	AddCollisionRect(state items.ItemStateEnum, rect body.Collidable)
 }
 
-// TODO: Remove actors package from here
 func SetItemBodies(item items.Item, data items.SpriteData) error {
 	item.SetTouchable(item)
 
@@ -83,7 +80,6 @@ func SetItemBodies(item items.Item, data items.SpriteData) error {
 	return nil
 }
 
-// TODO: Remove actors package from here
 func SetItemStats(item items.Item, data items.StatData) error {
 	return nil
 }

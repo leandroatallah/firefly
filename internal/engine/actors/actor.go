@@ -7,12 +7,6 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
 )
 
-// Identifiable represents any object with a string ID.
-type Identifiable interface {
-	ID() string
-	SetID(id string)
-}
-
 // Controllable defines methods for an actor that can be moved or have its movement blocked.
 type Controllable interface {
 	OnMoveLeft(force int)
@@ -43,10 +37,6 @@ type Damageable interface {
 // ActorEntity is the master interface for all game actors.
 // It is composed of smaller interfaces that define specific behaviors.
 type ActorEntity interface {
-	// TODO:Review these embbedings
-
-	// body.Body
-	Identifiable
 	body.Drawable
 	Controllable
 	Stateful
