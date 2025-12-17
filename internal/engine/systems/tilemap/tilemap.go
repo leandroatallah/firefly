@@ -71,10 +71,12 @@ type Tileset struct {
 }
 
 func (t *Tilemap) Image(screen *ebiten.Image) (*ebiten.Image, error) {
-	var err error
-	t.image, err = t.ParseToImage(screen)
-	if err != nil {
-		return nil, err
+	if t.image == nil {
+		img, err := t.ParseToImage(screen)
+		if err != nil {
+			return nil, err
+		}
+		t.image = img
 	}
 
 	t.Reset(screen)
