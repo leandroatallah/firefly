@@ -6,12 +6,13 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/contracts/animation"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/items"
+	"github.com/leandroatallah/firefly/internal/engine/schemas"
 	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
 	"github.com/leandroatallah/firefly/internal/engine/systems/sprites"
 )
 
 // TODO: It should be in a sprite related package.
-func getSprites(assets map[string]items.AssetData) (sprites.SpriteMap, error) {
+func getSprites(assets map[string]schemas.AssetData) (sprites.SpriteMap, error) {
 	var s sprites.SpriteAssets
 	for key, value := range assets {
 		var state animation.SpriteState
@@ -32,7 +33,7 @@ func getSprites(assets map[string]items.AssetData) (sprites.SpriteMap, error) {
 }
 
 // TODO: SpriteData should be in a sprite related package.
-func CreateAnimatedItem(id string, data items.SpriteData) (*items.BaseItem, error) {
+func CreateAnimatedItem(id string, data schemas.SpriteData) (*items.BaseItem, error) {
 	assets, err := getSprites(data.Assets)
 	if err != nil {
 		return nil, err
@@ -51,7 +52,7 @@ type collisionRectSetter interface {
 	AddCollisionRect(state items.ItemStateEnum, rect body.Collidable)
 }
 
-func SetItemBodies(item items.Item, data items.SpriteData) error {
+func SetItemBodies(item items.Item, data schemas.SpriteData) error {
 	item.SetTouchable(item)
 
 	setter, ok := item.(collisionRectSetter)
