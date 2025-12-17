@@ -1,14 +1,12 @@
 package gameitems
 
 import (
-	"log"
+	"fmt"
 
 	"github.com/leandroatallah/firefly/internal/engine/actors"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/core"
 	"github.com/leandroatallah/firefly/internal/engine/items"
-	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
-	"github.com/leandroatallah/firefly/internal/engine/systems/sprites"
 	gameplayer "github.com/leandroatallah/firefly/internal/game/actors/player"
 )
 
@@ -17,29 +15,37 @@ type CollectibleCoinItem struct {
 	items.BaseItem
 }
 
-func NewCollectibleCoinItem(ctx *core.AppContext, x, y int) *CollectibleCoinItem {
-	frameWidth, frameHeight := 16, 16
-
-	var assets sprites.SpriteAssets
-	assets = assets.AddSprite(actors.Idle, "assets/images/collectible-coin.png")
-
-	sprites, err := sprites.LoadSprites(assets)
+func NewCollectibleCoinItem(ctx *core.AppContext, x, y int) (*CollectibleCoinItem, error) {
+	// TODO: It must not use actors package
+	// TODO: items.ParseJsonPlayer should returns a ID
+	spriteData, statData, err := actors.ParseJsonPlayer("internal/game/items/coin.json")
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
-	// TODO: It should be set in a better place (frameRate)
-	frameRate := 10
-	rect := physics.NewRect(x, y-(frameHeight/2), frameWidth, frameHeight)
-	base := items.NewBaseItem(sprites, frameRate, rect)
-	// TODO: Improve this. tmj file has body_id for coins but its complex to bring it here. Maybe it could have a incremental index.
-	base.SetID("TEMP")
-	base.SetPosition(x, y)
-	base.SetCollisionArea(rect)
-	base.SetTouchable(base)
-	base.SetAppContext(ctx)
+	base, err := CreateAnimatedItem(spriteData)
+	if err != nil {
+		return nil, err
+	}
 
-	return &CollectibleCoinItem{BaseItem: *base}
+	coinItem := &CollectibleCoinItem{
+		BaseItem: *base,
+	}
+
+	// SetPosition must be before SetItemBodies
+	coinItem.SetPosition(x, y)
+	coinItem.SetAppContext(ctx)
+
+	if err = SetItemBodies(coinItem, spriteData); err != nil {
+		return nil, fmt.Errorf("SetItemBodies: %w", err)
+	}
+	if err = SetItemStats(coinItem, statData); err != nil {
+		return nil, fmt.Errorf("SetItemStats: %w", err)
+	}
+
+	coinItem.RefreshCollisionBasedOnState()
+
+	return coinItem, nil
 }
 
 func (c *CollectibleCoinItem) OnTouch(other body.Collidable) {

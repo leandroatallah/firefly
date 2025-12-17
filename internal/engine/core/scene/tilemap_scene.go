@@ -73,21 +73,19 @@ func (s *TilemapScene) Audiomanager() *audiomanager.AudioManager {
 func (s *TilemapScene) InitItems(items map[int]items.ItemType, factory *items.ItemFactory) error {
 	itemsPos := s.tilemap.GetItemsPositionID()
 
-	if len(itemsPos) > 0 {
-		for _, i := range itemsPos {
-			itemType, found := items[i.ItemType]
-			if !found {
-				return fmt.Errorf("Unable to find item by ID.")
-			}
-
-			item, err := factory.Create(itemType, i.X, i.Y)
-			if err != nil {
-				return err
-			}
-
-			item.SetID(fmt.Sprintf("ITEM_%v", i.ID))
-			s.PhysicsSpace().AddBody(item)
+	for _, i := range itemsPos {
+		itemType, found := items[i.ItemType]
+		if !found {
+			return fmt.Errorf("Unable to find item by ID.")
 		}
+
+		item, err := factory.Create(itemType, i.X, i.Y)
+		if err != nil {
+			return err
+		}
+
+		item.SetID(fmt.Sprintf("ITEM_%v", i.ID))
+		s.PhysicsSpace().AddBody(item)
 	}
 
 	return nil

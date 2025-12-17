@@ -1,4 +1,4 @@
 package animation
 
-// Change interface{} to a real type that can be swaped for a int enum
+// NOTE: SpriteState is a any type to represent an int enum.
 type SpriteState interface{}

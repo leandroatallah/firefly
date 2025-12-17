@@ -56,6 +56,7 @@ func NewCharacter(s sprites.SpriteMap, bodyRect *physics.Rect) *Character { // M
 		SpriteEntity: spriteEntity,
 		imageOptions: &ebiten.DrawImageOptions{},
 		// TODO: Rename this, and review
+		// TODO: Maybe it shoud live inside the state
 		collisionBodies: make(map[ActorStateEnum][]body.Collidable), // Character collisions based on state
 	}
 	state, err := NewActorState(c, Idle)
@@ -63,6 +64,7 @@ func NewCharacter(s sprites.SpriteMap, bodyRect *physics.Rect) *Character { // M
 		log.Fatal(err)
 	}
 	c.SetState(state)
+	c.RefreshCollisionBasedOnState()
 	return c
 }
 
@@ -95,8 +97,13 @@ func (c *Character) State() ActorStateEnum {
 // SetState set a new Character state and update current collision shapes.
 func (c *Character) SetState(state ActorState) {
 	c.state = state
+	c.RefreshCollisionBasedOnState()
+	c.state.OnStart()
+}
 
-	if rects, ok := c.collisionBodies[state.State()]; ok {
+func (c *Character) RefreshCollisionBasedOnState() {
+	// TODO: Duplicated
+	if rects, ok := c.collisionBodies[c.state.State()]; ok {
 		c.ClearCollisions()
 		x, y := c.GetPositionMin()
 		for _, r := range rects {
@@ -113,13 +120,14 @@ func (c *Character) SetState(state ActorState) {
 				y+relativePos.Max.Y,
 			)
 			newCollisionBody.SetPosition(newPos.Min.X, newPos.Min.Y)
+			// FIX: It should not set a new ID
 			newCollisionBody.SetID("MEW-COLLISION-BODY")
 			c.AddCollision(newCollisionBody)
 		}
 	}
-	c.state.OnStart()
 }
 
+// TODO: Duplicated
 func (c *Character) AddCollisionRect(state ActorStateEnum, rect body.Collidable) {
 	c.collisionBodies[state] = append(c.collisionBodies[state], rect)
 }
@@ -218,6 +226,7 @@ func (c *Character) handleState() {
 
 	state := c.state.State()
 
+	// TODO: Prevent to call if state is the same
 	switch {
 	case state != Falling && c.IsFalling():
 		setNewState(Falling)
@@ -308,6 +317,7 @@ func (c *Character) ImageOptions() *ebiten.DrawImageOptions {
 	return c.imageOptions
 }
 
+// TODO: Duplicated
 func (c *Character) SetFrameRate(value int) {
 	c.frameRate = value
 }

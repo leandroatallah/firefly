@@ -1,0 +1,26 @@
+{
+  "sprites": {
+    "body_rect": {
+      "x": 0,
+      "y": 0,
+      "width": 16,
+      "height": 16
+    },
+    "assets": {
+      "idle": {
+        "path": "assets/images/collectible-coin.png",
+        "collision_rect": [
+          {
+            "x": 0,
+            "y": 0,
+            "width": 16,
+            "height": 16
+          }
+        ]
+      }
+    },
+    "facing_direction": 0,
+    "frame_rate": 10
+  },
+  "stats": {}
+}

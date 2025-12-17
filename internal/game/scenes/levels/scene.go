@@ -69,7 +69,6 @@ func (s *LevelsScene) OnStart() {
 	// Set items map to factory creation process
 	itemsMap := map[int]items.ItemType{
 		0: gameitems.CollectibleCoinType,
-		1: gameitems.SignpostType,
 	}
 
 	// Set items position from tilemap

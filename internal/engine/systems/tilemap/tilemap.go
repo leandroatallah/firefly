@@ -132,10 +132,6 @@ func (t *Tilemap) GetItemsPositionID() []*ItemPosition {
 		return nil
 	}
 
-	if len(layer.Objects) > 0 {
-		return nil
-	}
-
 	for _, obj := range layer.Objects {
 		x16 := int(math.Round(obj.X))
 		yValue := obj.Y

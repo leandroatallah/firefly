@@ -3,7 +3,6 @@ package gameplayer
 import (
 	"fmt"
 
-	"github.com/leandroatallah/firefly/internal/config"
 	"github.com/leandroatallah/firefly/internal/engine/actors"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/animation"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
@@ -11,7 +10,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/systems/sprites"
 )
 
-// TODO: Move to the right place
+// TODO: It should be in a sprite related package.
 func getSprites(assets map[string]actors.AssetData) (sprites.SpriteMap, error) {
 	var s sprites.SpriteAssets
 	for key, value := range assets {
@@ -38,6 +37,7 @@ func getSprites(assets map[string]actors.AssetData) (sprites.SpriteMap, error) {
 	return result, nil
 }
 
+// TODO: SpriteData should be in a sprite related package.
 func CreateAnimatedCharacter(data actors.SpriteData) (*actors.Character, error) {
 	assets, err := getSprites(data.Assets)
 	if err != nil {
@@ -52,6 +52,7 @@ func CreateAnimatedCharacter(data actors.SpriteData) (*actors.Character, error) 
 	return c, nil
 }
 
+// TODO: Duplicated
 type collisionRectSetter interface {
 	AddCollisionRect(state actors.ActorStateEnum, rect body.Collidable)
 }
@@ -59,23 +60,6 @@ type collisionRectSetter interface {
 // SetPlayerBodies
 func SetPlayerBodies(player actors.ActorEntity, data actors.SpriteData) error {
 	player.SetID("player")
-	cfg := config.Get()
-
-	x16, y16 := player.GetPositionMin()
-	x, y := x16/cfg.Unit, y16/cfg.Unit
-
-	collisions := []body.Collidable{}
-	for i, r := range data.Assets["idle"].CollisionRects {
-		c := physics.NewCollidableBodyFromRect(physics.NewRect(r.Rect()))
-		c.SetPosition(x+r.X, y+r.Y)
-		c.SetID(fmt.Sprintf("%v_COLLISION_%d", player.ID(), i))
-		collisions = append(collisions, c)
-	}
-
-	if len(collisions) > 0 {
-		player.AddCollision(collisions...)
-	}
-
 	player.SetTouchable(player)
 
 	setter, ok := player.(collisionRectSetter)
@@ -83,6 +67,7 @@ func SetPlayerBodies(player actors.ActorEntity, data actors.SpriteData) error {
 		return fmt.Errorf("player must implement collisionRectSetter")
 	}
 
+	// Map collisions from sprite data to handle based on state
 	for key, assetData := range data.Assets {
 		var state actors.ActorStateEnum
 		switch key {
@@ -99,11 +84,9 @@ func SetPlayerBodies(player actors.ActorEntity, data actors.SpriteData) error {
 		}
 
 		for i, r := range assetData.CollisionRects {
-			rect := physics.NewCollidableBody(
-				physics.NewBody(physics.NewRect(r.Rect())),
-			)
+			rect := physics.NewCollidableBodyFromRect(physics.NewRect(r.Rect()))
 			rect.SetPosition(r.X, r.Y)
-			rect.SetID(fmt.Sprintf("PLAYER-COLLISION-RECT-%d", i))
+			rect.SetID(fmt.Sprintf("PLAYER_COLLISION_RECT_%d", i))
 			setter.AddCollisionRect(state, rect)
 		}
 	}

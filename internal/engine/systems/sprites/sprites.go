@@ -8,7 +8,6 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/contracts/animation"
 )
 
-// ?
 type SpriteEntity struct {
 	sprites SpriteMap
 }
@@ -34,6 +33,7 @@ func (s *SpriteEntity) Sprites() SpriteMap {
 	return s.sprites
 }
 
+// TODO: Should use this for player?
 func (s *SpriteEntity) AnimatedSpriteImage(sprite *ebiten.Image, rect image.Rectangle, count int, frameRate int) *ebiten.Image {
 	frameOX, frameOY := 0, 0
 	width := rect.Dx()
@@ -50,10 +50,10 @@ func (s *SpriteEntity) AnimatedSpriteImage(sprite *ebiten.Image, rect image.Rect
 
 }
 
-// ?
+// TODO: Add a description
 type SpriteMap map[animation.SpriteState]*ebiten.Image
 
-// ?
+// TODO: Add a description
 type SpriteAssets map[animation.SpriteState]string
 
 func (s SpriteAssets) AddSprite(state animation.SpriteState, path string) SpriteAssets {
