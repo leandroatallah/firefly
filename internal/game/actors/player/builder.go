@@ -13,10 +13,10 @@ import (
 
 func CreateAnimatedCharacter(data schemas.SpriteData) (*actors.Character, error) {
 	stateMap := map[string]animation.SpriteState{
-		"idle":   actors.Idle,
-		"walk":   actors.Walking,
-		"fall":   actors.Falling,
-		"hurt":   actors.Hurted,
+		"idle": actors.Idle,
+		"walk": actors.Walking,
+		"fall": actors.Falling,
+		"hurt": actors.Hurted,
 	}
 	assets, err := sprites.GetSpritesFromAssets(data.Assets, stateMap)
 	if err != nil {
@@ -45,10 +45,10 @@ func SetPlayerBodies(player actors.ActorEntity, data schemas.SpriteData) error {
 	}
 
 	stateMap := map[string]animation.SpriteState{
-		"idle":   actors.Idle,
-		"walk":   actors.Walking,
-		"fall":   actors.Falling,
-		"hurt":   actors.Hurted,
+		"idle": actors.Idle,
+		"walk": actors.Walking,
+		"fall": actors.Falling,
+		"hurt": actors.Hurted,
 	}
 
 	idProvider := func(assetKey string, index int) string {
@@ -69,8 +69,6 @@ func SetPlayerBodies(player actors.ActorEntity, data schemas.SpriteData) error {
 }
 
 func SetPlayerStats(player actors.ActorEntity, data actors.StatData) error {
-	// TODO: Create set stats method
-	// player.SetStats(statData)
 	player.SetMaxHealth(data.Health)
 	var err error
 	err = player.SetSpeed(data.Speed)
