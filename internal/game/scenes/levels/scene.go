@@ -102,6 +102,11 @@ func (s *LevelsScene) Update() error {
 	space := s.PhysicsSpace()
 	for _, i := range space.Bodies() {
 		switch b := i.(type) {
+		// ActorEntity case should came first. It can be confused with body.Obstacle
+		case actors.ActorEntity:
+			if err := b.Update(space); err != nil {
+				return err
+			}
 		case items.Item:
 			// Remove items marked as removed
 			if b.IsRemoved() {
@@ -113,10 +118,6 @@ func (s *LevelsScene) Update() error {
 			}
 		case body.Obstacle:
 			continue
-		case actors.ActorEntity:
-			if err := b.Update(space); err != nil {
-				return err
-			}
 		}
 	}
 
@@ -140,7 +141,7 @@ func (s *LevelsScene) Draw(screen *ebiten.Image) {
 		case actors.ActorEntity:
 			opts := s.player.ImageOptions()
 			sb.UpdateImageOptions()
-			// s.cam.Draw(sb.ImageWithCollisionBox(), opts, screen)
+			// s.cam.Draw(sb.ImageCollisionBox(), opts, screen)
 			s.cam.Draw(sb.Image(), opts, screen)
 		case items.Item:
 			if sb.IsRemoved() {

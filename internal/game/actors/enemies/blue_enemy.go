@@ -62,7 +62,6 @@ func (e *BlueEnemy) Update(space body.BodiesSpace) error {
 func (e *BlueEnemy) OnTouch(other body.Collidable) {
 	player := e.MovementState().Target()
 	if other.ID() == player.ID() {
-		// TODO: Replace the condition of hurting
 		player.(*actors.Character).Hurt(1)
 	}
 }

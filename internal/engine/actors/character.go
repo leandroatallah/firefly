@@ -23,9 +23,6 @@ type Character struct {
 	*physics.CollidableBody
 	*physics.AliveBody
 
-	// TODO: Should this be here?
-	// body.Drawable
-
 	Touchable body.Touchable
 
 	count            int
@@ -46,15 +43,12 @@ func NewCharacter(s sprites.SpriteMap, bodyRect *physics.Rect) *Character { // M
 	collidable := physics.NewCollidableBody(b)
 	alive := physics.NewAliveBody(b)
 	c := &Character{
-		// Body variations
 		MovableBody:    movable,
 		CollidableBody: collidable,
 		AliveBody:      alive,
 
-		SpriteEntity: spriteEntity,
-		imageOptions: &ebiten.DrawImageOptions{},
-		// TODO: Rename this, and review
-		// TODO: Maybe it shoud live inside the state
+		SpriteEntity:    spriteEntity,
+		imageOptions:    &ebiten.DrawImageOptions{},
 		collisionBodies: make(map[ActorStateEnum][]body.Collidable), // Character collisions based on state
 	}
 	state, err := NewActorState(c, Idle)
@@ -297,7 +291,7 @@ func (c *Character) Image() *ebiten.Image {
 }
 
 // WithCollisionBox extend Image method to show a rect with the collision area
-func (c *Character) ImageWithCollisionBox() *ebiten.Image {
+func (c *Character) ImageCollisionBox() *ebiten.Image {
 	img := c.Image()
 	pos := c.Position()
 
