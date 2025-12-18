@@ -11,30 +11,11 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/systems/sprites"
 )
 
-// TODO: It should be in a sprite related package.
-func getSprites(assets map[string]schemas.AssetData) (sprites.SpriteMap, error) {
-	var s sprites.SpriteAssets
-	for key, value := range assets {
-		var state animation.SpriteState
-		switch key {
-		case "idle":
-			state = items.Idle
-		default:
-			continue
-		}
-		s = s.AddSprite(state, value.Path)
-	}
-	result, err := sprites.LoadSprites(s)
-	if err != nil {
-		return nil, err
-	}
-
-	return result, nil
-}
-
-// TODO: SpriteData should be in a sprite related package.
 func CreateAnimatedItem(id string, data schemas.SpriteData) (*items.BaseItem, error) {
-	assets, err := getSprites(data.Assets)
+	stateMap := map[string]animation.SpriteState{
+		"idle": items.Idle,
+	}
+	assets, err := sprites.GetSpritesFromAssets(data.Assets, stateMap)
 	if err != nil {
 		return nil, err
 	}
@@ -47,37 +28,34 @@ func CreateAnimatedItem(id string, data schemas.SpriteData) (*items.BaseItem, er
 	return b, nil
 }
 
-// TODO: Duplicated
 type collisionRectSetter interface {
 	AddCollisionRect(state items.ItemStateEnum, rect body.Collidable)
 }
 
 func SetItemBodies(item items.Item, data schemas.SpriteData) error {
-	item.SetTouchable(item)
-
 	setter, ok := item.(collisionRectSetter)
 	if !ok {
 		return fmt.Errorf("item must implement collisionRectSetter")
 	}
 
-	// Map collisions from sprite data to handle based on state
-	for key, assetData := range data.Assets {
-		var state items.ItemStateEnum
-		switch key {
-		case "idle":
-			state = items.Idle
-		default:
-			continue
-		}
-
-		for i, r := range assetData.CollisionRects {
-			rect := physics.NewCollidableBodyFromRect(physics.NewRect(r.Rect()))
-			rect.SetPosition(r.X, r.Y)
-			rect.SetID(fmt.Sprintf("%v_COLLISION_RECT_%d", item.ID(), i))
-			setter.AddCollisionRect(state, rect)
-		}
+	stateMap := map[string]animation.SpriteState{
+		"idle": items.Idle,
 	}
 
+	idProvider := func(assetKey string, index int) string {
+		return fmt.Sprintf("%v_COLLISION_RECT_%s_%d", item.ID(), assetKey, index)
+	}
+
+	addCollisionRect := func(state animation.SpriteState, rect body.Collidable) {
+		itemState, ok := state.(items.ItemStateEnum)
+		if !ok {
+			// This should not happen if the stateMap is correct
+			return
+		}
+		setter.AddCollisionRect(itemState, rect)
+	}
+
+	physics.SetCollisionBodies(item, data, stateMap, idProvider, addCollisionRect)
 	return nil
 }
 

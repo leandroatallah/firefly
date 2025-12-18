@@ -11,36 +11,14 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/systems/sprites"
 )
 
-// TODO: It should be in a sprite related package.
-func getSprites(assets map[string]schemas.AssetData) (sprites.SpriteMap, error) {
-	var s sprites.SpriteAssets
-	for key, value := range assets {
-		var state animation.SpriteState
-		switch key {
-		case "idle":
-			state = actors.Idle
-		case "walk":
-			state = actors.Walking
-		case "fall":
-			state = actors.Falling
-		case "hurt":
-			state = actors.Hurted
-		default:
-			continue
-		}
-		s = s.AddSprite(state, value.Path)
-	}
-	result, err := sprites.LoadSprites(s)
-	if err != nil {
-		return nil, err
-	}
-
-	return result, nil
-}
-
-// TODO: SpriteData should be in a sprite related package.
 func CreateAnimatedCharacter(data schemas.SpriteData) (*actors.Character, error) {
-	assets, err := getSprites(data.Assets)
+	stateMap := map[string]animation.SpriteState{
+		"idle":   actors.Idle,
+		"walk":   actors.Walking,
+		"fall":   actors.Falling,
+		"hurt":   actors.Hurted,
+	}
+	assets, err := sprites.GetSpritesFromAssets(data.Assets, stateMap)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +31,6 @@ func CreateAnimatedCharacter(data schemas.SpriteData) (*actors.Character, error)
 	return c, nil
 }
 
-// TODO: Duplicated
 type collisionRectSetter interface {
 	AddCollisionRect(state actors.ActorStateEnum, rect body.Collidable)
 }
@@ -61,37 +38,33 @@ type collisionRectSetter interface {
 // SetPlayerBodies
 func SetPlayerBodies(player actors.ActorEntity, data schemas.SpriteData) error {
 	player.SetID("player")
-	player.SetTouchable(player)
 
 	setter, ok := player.(collisionRectSetter)
 	if !ok {
 		return fmt.Errorf("player must implement collisionRectSetter")
 	}
 
-	// Map collisions from sprite data to handle based on state
-	for key, assetData := range data.Assets {
-		var state actors.ActorStateEnum
-		switch key {
-		case "idle":
-			state = actors.Idle
-		case "walk":
-			state = actors.Walking
-		case "fall":
-			state = actors.Falling
-		case "hurt":
-			state = actors.Hurted
-		default:
-			continue
-		}
-
-		for i, r := range assetData.CollisionRects {
-			rect := physics.NewCollidableBodyFromRect(physics.NewRect(r.Rect()))
-			rect.SetPosition(r.X, r.Y)
-			rect.SetID(fmt.Sprintf("PLAYER_COLLISION_RECT_%d", i))
-			setter.AddCollisionRect(state, rect)
-		}
+	stateMap := map[string]animation.SpriteState{
+		"idle":   actors.Idle,
+		"walk":   actors.Walking,
+		"fall":   actors.Falling,
+		"hurt":   actors.Hurted,
 	}
 
+	idProvider := func(assetKey string, index int) string {
+		return fmt.Sprintf("PLAYER_COLLISION_RECT_%s_%d", assetKey, index)
+	}
+
+	addCollisionRect := func(state animation.SpriteState, rect body.Collidable) {
+		actorState, ok := state.(actors.ActorStateEnum)
+		if !ok {
+			// This should not happen if the stateMap is correct
+			return
+		}
+		setter.AddCollisionRect(actorState, rect)
+	}
+
+	physics.SetCollisionBodies(player, data, stateMap, idProvider, addCollisionRect)
 	return nil
 }
 
