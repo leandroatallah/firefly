@@ -56,8 +56,8 @@ func (b *Body) SetPosition(x, y int) {
 		log.Fatal("SetPosition expects a *Rect instance")
 	}
 	cfg := config.Get()
-	b.x16 = x * cfg.Unit
-	b.y16 = y * cfg.Unit
+	b.x16 = cfg.To16(x)
+	b.y16 = cfg.To16(y)
 }
 
 func (b *Body) GetShape() body.Shape {

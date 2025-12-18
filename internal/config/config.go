@@ -46,6 +46,13 @@ type AppConfig struct {
 	MainFontFace string
 }
 
+func (c *AppConfig) To16(value int) int {
+	return value * c.Unit
+}
+func (c *AppConfig) From16(value int) int {
+	return value / c.Unit
+}
+
 var cfg AppConfig
 
 func init() {

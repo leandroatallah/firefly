@@ -33,7 +33,6 @@ func NewMovementState(
 	}
 
 	// Apply options
-	// TODO: Improve this to handle variadict/optitonbal parameter
 	for _, option := range options {
 		if option != nil {
 			option(movementState)

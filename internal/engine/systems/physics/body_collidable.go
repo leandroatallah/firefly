@@ -114,27 +114,18 @@ func (b *CollidableBody) ClearCollisions() {
 // SetPosition overrides Body.SetPosition method to updates the body position and its collisions
 // TODO: Reduce duplicate code with Body.SetPosition
 func (b *CollidableBody) SetPosition(x, y int) {
-	// NOTE: For now, it only accepts rect shape.
-	_, ok := b.Body.GetShape().(*Rect)
-	if !ok {
-		log.Fatal("SetPosition expects a *Rect instance")
-	}
-
 	cfg := config.Get()
-	x16 := x * cfg.Unit
-	y16 := y * cfg.Unit
 
 	// Calculate the difference to move the collision areas as well
-	diffX16 := x16 - b.Body.x16
-	diffY16 := y16 - b.Body.y16
+	diffX16 := cfg.To16(x) - b.Body.x16
+	diffY16 := cfg.To16(y) - b.Body.y16
 
-	b.Body.x16 = x16
-	b.Body.y16 = y16
+	b.Body.SetPosition(x, y)
 
 	for _, c := range b.collisionList {
 		x, y := c.GetPositionMin()
-		x16, y16 := x*cfg.Unit, y*cfg.Unit
-		c.SetPosition((x16+diffX16)/cfg.Unit, (y16+diffY16)/cfg.Unit)
+		x16, y16 := cfg.To16(x), cfg.To16(y)
+		c.SetPosition(cfg.From16(x16+diffX16), cfg.From16(y16+diffY16))
 	}
 }
 
