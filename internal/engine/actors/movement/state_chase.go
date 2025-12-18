@@ -5,6 +5,7 @@ import (
 	"image"
 
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
+	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
 )
 
 // ChaseMovementState implements the A* pathfinding algorithm to chase a target.
@@ -138,19 +139,37 @@ func (s *ChaseMovementState) calculatePath() {
 
 // isTraversable checks if a given point is a valid and unoccupied position.
 func (s *ChaseMovementState) isTraversable(point image.Point, size image.Point) bool {
-	// Basic bounds checking
-	if point.X < 0 || point.Y < 0 {
-		// TODO: Check against map boundaries if they exist
-		return false
+	actorRect := image.Rect(point.X, point.Y, point.X+size.X, point.Y+size.Y)
+	var boundsChecked bool
+
+	// Check against map boundaries if the actor has a physics space.
+	if sa, ok := s.actor.(interface{ Space() *physics.Space }); ok {
+		if space := sa.Space(); space != nil {
+			if provider := space.GetTilemapDimensionsProvider(); provider != nil {
+				boundsChecked = true
+				width := provider.GetTilemapWidth()
+				height := provider.GetTilemapHeight()
+				bounds := image.Rect(0, 0, width, height)
+				if !actorRect.In(bounds) {
+					return false
+				}
+			}
+		}
+	}
+
+	// If bounds were not checked, perform a basic check for negative coordinates.
+	if !boundsChecked {
+		if point.X < 0 || point.Y < 0 {
+			return false
+		}
 	}
 
 	// Obstacle detection
-	neighborRect := image.Rect(point.X, point.Y, point.X+size.X, point.Y+size.Y)
 	for _, obstacle := range s.obstacles {
 		if obstacle == s.target {
 			continue
 		}
-		if obstacle != nil && obstacle.Position().Overlaps(neighborRect) {
+		if obstacle != nil && obstacle.Position().Overlaps(actorRect) {
 			return false
 		}
 	}
