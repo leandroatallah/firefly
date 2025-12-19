@@ -1,11 +1,9 @@
 package items
 
 import (
-	"fmt"
 	"image"
 	"image/color"
 	"log"
-	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
@@ -19,13 +17,12 @@ type BaseItem struct {
 	sprites.SpriteEntity
 	*physics.CollidableBody
 	*physics.MovableBody
+	*physics.StateCollisionManager[ItemStateEnum]
 
-	count           int
-	frameRate       int
-	removed         bool
-	imageOptions    *ebiten.DrawImageOptions
-	state           ItemState
-	collisionBodies map[ItemStateEnum][]body.Collidable
+	count        int
+	removed      bool
+	imageOptions *ebiten.DrawImageOptions
+	state        ItemState
 }
 
 func NewBaseItem(id string, s sprites.SpriteMap, bodyRect *physics.Rect) *BaseItem {
@@ -35,13 +32,13 @@ func NewBaseItem(id string, s sprites.SpriteMap, bodyRect *physics.Rect) *BaseIt
 	collidable := physics.NewCollidableBody(b)
 
 	base := &BaseItem{
-		MovableBody:     movable,
-		CollidableBody:  collidable,
-		imageOptions:    &ebiten.DrawImageOptions{},
-		SpriteEntity:    spriteEntity,
-		collisionBodies: make(map[ItemStateEnum][]body.Collidable), // Character collisions based on state
+		MovableBody:    movable,
+		CollidableBody: collidable,
+		imageOptions:   &ebiten.DrawImageOptions{},
+		SpriteEntity:   spriteEntity,
 	}
 	base.SetID(id)
+	base.StateCollisionManager = physics.NewStateCollisionManager[ItemStateEnum](base)
 
 	state, err := NewItemState(base, Idle)
 	if err != nil {
@@ -97,7 +94,7 @@ func (b *BaseItem) OnTouch(other body.Collidable) {}
 func (b *BaseItem) Image() *ebiten.Image {
 	pos := b.Position()
 	img := b.GetFirstSprite()
-	img = b.AnimatedSpriteImage(img, pos, b.count, b.frameRate)
+	img = b.AnimatedSpriteImage(img, pos, b.count, b.SpriteEntity.FrameRate())
 	return img
 }
 
@@ -130,42 +127,6 @@ func (b *BaseItem) State() ItemStateEnum {
 // SetState set a new Character state and update current collision shapes.
 func (b *BaseItem) SetState(state ItemState) {
 	b.state = state
-	b.RefreshCollisionBasedOnState()
+	b.StateCollisionManager.RefreshCollisions()
 	b.state.OnStart()
-}
-
-func (b *BaseItem) RefreshCollisionBasedOnState() {
-	// TODO: Duplicated
-	if rects, ok := b.collisionBodies[b.state.State()]; ok {
-		b.ClearCollisions()
-		x, y := b.GetPositionMin()
-		for _, r := range rects {
-			// Create a deep copy of the collision body to avoid mutating the template
-			template := r.(*physics.CollidableBody)
-			newCollisionBody := physics.NewCollidableBody(
-				physics.NewBody(template.GetShape()),
-			)
-			relativePos := template.Position()
-			newPos := image.Rect(
-				x+relativePos.Min.X,
-				y+relativePos.Min.Y,
-				x+relativePos.Max.X,
-				y+relativePos.Max.Y,
-			)
-			newCollisionBody.SetPosition(newPos.Min.X, newPos.Min.Y)
-			// FIX: It should not use Nanosecond
-			newCollisionBody.SetID(fmt.Sprintf("%v_COLLISION_%v", b.ID(), time.Now().Nanosecond()))
-			b.AddCollision(newCollisionBody)
-		}
-	}
-}
-
-// TODO: Duplicated
-func (b *BaseItem) AddCollisionRect(state ItemStateEnum, rect body.Collidable) {
-	b.collisionBodies[state] = append(b.collisionBodies[state], rect)
-}
-
-// TODO: Duplicated
-func (b *BaseItem) SetFrameRate(value int) {
-	b.frameRate = value
 }

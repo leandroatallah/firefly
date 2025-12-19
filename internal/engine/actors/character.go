@@ -22,6 +22,7 @@ type Character struct {
 	*physics.MovableBody
 	*physics.CollidableBody
 	*physics.AliveBody
+	*physics.StateCollisionManager[ActorStateEnum]
 
 	Touchable body.Touchable
 
@@ -31,9 +32,7 @@ type Character struct {
 	movementModel    physics.MovementModel
 	movementBlockers int
 	animationCount   int
-	frameRate        int
 	imageOptions     *ebiten.DrawImageOptions
-	collisionBodies  map[ActorStateEnum][]body.Collidable
 }
 
 func NewCharacter(s sprites.SpriteMap, bodyRect *physics.Rect) *Character { // Modified signature
@@ -49,14 +48,14 @@ func NewCharacter(s sprites.SpriteMap, bodyRect *physics.Rect) *Character { // M
 
 		SpriteEntity:    spriteEntity,
 		imageOptions:    &ebiten.DrawImageOptions{},
-		collisionBodies: make(map[ActorStateEnum][]body.Collidable), // Character collisions based on state
 	}
+	c.StateCollisionManager = physics.NewStateCollisionManager[ActorStateEnum](c)
+
 	state, err := NewActorState(c, Idle)
 	if err != nil {
 		log.Fatal(err)
 	}
 	c.SetState(state)
-	c.RefreshCollisionBasedOnState()
 	return c
 }
 
@@ -89,39 +88,8 @@ func (c *Character) State() ActorStateEnum {
 // SetState set a new Character state and update current collision shapes.
 func (c *Character) SetState(state ActorState) {
 	c.state = state
-	c.RefreshCollisionBasedOnState()
+	c.StateCollisionManager.RefreshCollisions()
 	c.state.OnStart()
-}
-
-func (c *Character) RefreshCollisionBasedOnState() {
-	// TODO: Duplicated
-	if rects, ok := c.collisionBodies[c.state.State()]; ok {
-		c.ClearCollisions()
-		x, y := c.GetPositionMin()
-		for _, r := range rects {
-			// Create a deep copy of the collision body to avoid mutating the template
-			template := r.(*physics.CollidableBody)
-			newCollisionBody := physics.NewCollidableBody(
-				physics.NewBody(template.GetShape()),
-			)
-			relativePos := template.Position()
-			newPos := image.Rect(
-				x+relativePos.Min.X,
-				y+relativePos.Min.Y,
-				x+relativePos.Max.X,
-				y+relativePos.Max.Y,
-			)
-			newCollisionBody.SetPosition(newPos.Min.X, newPos.Min.Y)
-			// FIX: It should not set a new ID
-			newCollisionBody.SetID("MEW-COLLISION-BODY")
-			c.AddCollision(newCollisionBody)
-		}
-	}
-}
-
-// TODO: Duplicated
-func (c *Character) AddCollisionRect(state ActorStateEnum, rect body.Collidable) {
-	c.collisionBodies[state] = append(c.collisionBodies[state], rect)
 }
 
 func (c *Character) SetMovementState(
@@ -281,7 +249,7 @@ func (c *Character) Image() *ebiten.Image {
 		return img
 	}
 
-	i := (c.count / c.frameRate) % frameCount
+	i := (c.count / c.SpriteEntity.FrameRate()) % frameCount
 
 	sx, sy := frameOX+i*width, frameOY
 
@@ -305,11 +273,6 @@ func (c *Character) ImageCollisionBox() *ebiten.Image {
 
 func (c *Character) ImageOptions() *ebiten.DrawImageOptions {
 	return c.imageOptions
-}
-
-// TODO: Duplicated
-func (c *Character) SetFrameRate(value int) {
-	c.frameRate = value
 }
 
 // BlockMovement increases the count of systems blocking movement.

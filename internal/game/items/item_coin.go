@@ -42,7 +42,7 @@ func NewCollectibleCoinItem(ctx *core.AppContext, x, y int) (*CollectibleCoinIte
 		return nil, fmt.Errorf("SetItemStats: %w", err)
 	}
 
-	coinItem.RefreshCollisionBasedOnState()
+	coinItem.StateCollisionManager.RefreshCollisions()
 
 	return coinItem, nil
 }

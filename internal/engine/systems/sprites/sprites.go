@@ -10,10 +10,11 @@ import (
 
 type SpriteEntity struct {
 	sprites SpriteMap
+	frameRate int
 }
 
 func NewSpriteEntity(sprites SpriteMap) SpriteEntity {
-	return SpriteEntity{sprites: sprites}
+	return SpriteEntity{sprites: sprites, frameRate: 1} // Default frame rate to 1
 }
 
 // GetFirstSprite returns the first sprite. Useful when have only one sprite.
@@ -48,6 +49,14 @@ func (s *SpriteEntity) AnimatedSpriteImage(sprite *ebiten.Image, rect image.Rect
 		image.Rect(sx, sy, sx+width, sy+height),
 	).(*ebiten.Image)
 
+}
+
+func (s *SpriteEntity) SetFrameRate(value int) {
+	s.frameRate = value
+}
+
+func (s *SpriteEntity) FrameRate() int {
+	return s.frameRate
 }
 
 // SpriteMap represents a collection of Ebiten images, keyed by their animation state.
