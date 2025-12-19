@@ -91,8 +91,9 @@ func (s *LevelsScene) OnStart() {
 }
 
 func (s *LevelsScene) Update() error {
-	// TODO: It should be enabled based on a flag
-	s.CamDebug()
+	if config.Get().CamDebug {
+		s.CamDebug()
+	}
 
 	s.count++
 

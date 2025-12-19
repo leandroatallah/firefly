@@ -1,5 +1,7 @@
 package config
 
+import "flag"
+
 const (
 	ScreenWidth   = 320
 	ScreenHeight  = 180
@@ -44,6 +46,7 @@ type AppConfig struct {
 	DefaultVolume float64
 
 	MainFontFace string
+	CamDebug     bool
 }
 
 func (c *AppConfig) To16(value int) int {
@@ -79,6 +82,12 @@ func init() {
 
 		MainFontFace: MainFontFace,
 	}
+
+	Parse()
+}
+
+func Parse() {
+	flag.BoolVar(&cfg.CamDebug, "cam-debug", false, "Enable camera debug")
 }
 
 func Get() AppConfig {

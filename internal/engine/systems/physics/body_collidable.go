@@ -112,7 +112,6 @@ func (b *CollidableBody) ClearCollisions() {
 }
 
 // SetPosition overrides Body.SetPosition method to updates the body position and its collisions
-// TODO: Reduce duplicate code with Body.SetPosition
 func (b *CollidableBody) SetPosition(x, y int) {
 	cfg := config.Get()
 
