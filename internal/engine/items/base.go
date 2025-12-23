@@ -92,10 +92,17 @@ func (b *BaseItem) OnBlock(other body.Collidable) {}
 func (b *BaseItem) OnTouch(other body.Collidable) {}
 
 func (b *BaseItem) Image() *ebiten.Image {
+	img := b.GetSpriteByState(b.state.State())
+	if img == nil {
+		// Try to fallback to idle sprite
+		img = b.GetSpriteByState(Idle)
+	}
+	if img == nil {
+		img = b.GetFirstSprite()
+	}
+
 	pos := b.Position()
-	img := b.GetFirstSprite()
-	img = b.AnimatedSpriteImage(img, pos, b.count, b.SpriteEntity.FrameRate())
-	return img
+	return b.AnimatedSpriteImage(img, pos, b.count, b.SpriteEntity.FrameRate())
 }
 
 func (b *BaseItem) ImageCollisionBox() *ebiten.Image {

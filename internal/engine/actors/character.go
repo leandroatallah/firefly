@@ -11,10 +11,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/systems/sprites"
 )
 
-const (
-	frameOX = 0
-	frameOY = 0
-)
+
 
 type Character struct {
 	sprites.SpriteEntity
@@ -46,8 +43,8 @@ func NewCharacter(s sprites.SpriteMap, bodyRect *physics.Rect) *Character { // M
 		CollidableBody: collidable,
 		AliveBody:      alive,
 
-		SpriteEntity:    spriteEntity,
-		imageOptions:    &ebiten.DrawImageOptions{},
+		SpriteEntity: spriteEntity,
+		imageOptions: &ebiten.DrawImageOptions{},
 	}
 	c.StateCollisionManager = physics.NewStateCollisionManager[ActorStateEnum](c)
 
@@ -229,34 +226,20 @@ func (c *Character) SetTouchable(t body.Touchable) {
 }
 
 func (c *Character) Image() *ebiten.Image {
-	pos := c.Position()
-	width := pos.Dx()
-	height := pos.Dy()
-
 	img := c.GetSpriteByState(c.state.State())
 	if img == nil {
 		// Try to fallback to idle sprite
 		img = c.GetSpriteByState(Idle)
 	}
-
-	characterWidth := img.Bounds().Dx()
-
-	if width <= 0 {
-		return img
-	}
-	frameCount := characterWidth / width
-	if frameCount <= 1 {
-		return img
+	if img == nil {
+		img = c.GetFirstSprite()
 	}
 
-	i := (c.count / c.SpriteEntity.FrameRate()) % frameCount
-
-	sx, sy := frameOX+i*width, frameOY
-
-	return img.SubImage(
-		image.Rect(sx, sy, sx+width, sy+height),
-	).(*ebiten.Image)
+	pos := c.Position()
+	return c.AnimatedSpriteImage(img, pos, c.count, c.SpriteEntity.FrameRate())
 }
+
+
 
 // WithCollisionBox extend Image method to show a rect with the collision area
 func (c *Character) ImageCollisionBox() *ebiten.Image {

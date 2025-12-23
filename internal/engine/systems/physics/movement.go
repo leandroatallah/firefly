@@ -95,7 +95,6 @@ func clampToPlayArea(body body.MovableCollidable, space *Space) bool {
 
 	x16, y16 := x*cfg.Unit, y*cfg.Unit
 
-	// TODO: Duplicated
 	x16 = body.Position().Min.X * cfg.Unit
 	rightEdge := x16 + rect.width*cfg.Unit
 	maxRight := cfg.ScreenWidth * cfg.Unit
@@ -121,7 +120,6 @@ func clampToPlayArea(body body.MovableCollidable, space *Space) bool {
 		x16, y16 = x*cfg.Unit, y*cfg.Unit
 	}
 
-	// TODO: Should repeat?
 	y16 = body.Position().Min.Y * cfg.Unit
 	bottom := y16 + rect.height*cfg.Unit
 	if bottom >= maxBottom {

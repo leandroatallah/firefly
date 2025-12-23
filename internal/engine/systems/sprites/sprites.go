@@ -34,21 +34,32 @@ func (s *SpriteEntity) Sprites() SpriteMap {
 	return s.sprites
 }
 
-// TODO: Should use this for player?
 func (s *SpriteEntity) AnimatedSpriteImage(sprite *ebiten.Image, rect image.Rectangle, count int, frameRate int) *ebiten.Image {
+	if sprite == nil {
+		return nil
+	}
+
 	frameOX, frameOY := 0, 0
 	width := rect.Dx()
 	height := rect.Dy()
 
 	elementWidth := sprite.Bounds().Dx()
+
+	if width <= 0 {
+		return sprite
+	}
+
 	frameCount := elementWidth / width
+	if frameCount <= 1 {
+		return sprite
+	}
+
 	i := (count / frameRate) % frameCount
 	sx, sy := frameOX+i*width, frameOY
 
 	return sprite.SubImage(
 		image.Rect(sx, sy, sx+width, sy+height),
 	).(*ebiten.Image)
-
 }
 
 func (s *SpriteEntity) SetFrameRate(value int) {
