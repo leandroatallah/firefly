@@ -8,6 +8,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/config"
 	"github.com/leandroatallah/firefly/internal/engine/actors"
+	"github.com/leandroatallah/firefly/internal/engine/actors/enemies"
 	"github.com/leandroatallah/firefly/internal/engine/assets/font"
 	"github.com/leandroatallah/firefly/internal/engine/camera"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
@@ -16,6 +17,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/core/transition"
 	"github.com/leandroatallah/firefly/internal/engine/items"
 	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
+	gameenemies "github.com/leandroatallah/firefly/internal/game/actors/enemies"
 	gamecamera "github.com/leandroatallah/firefly/internal/game/camera"
 	gameitems "github.com/leandroatallah/firefly/internal/game/items"
 	scenestypes "github.com/leandroatallah/firefly/internal/game/scenes/types"
@@ -75,6 +77,10 @@ func (s *LevelsScene) OnStart() {
 	// Set items position from tilemap
 	f := items.NewItemFactory(gameitems.InitItemMap(s.AppContext()))
 	s.InitItems(itemsMap, f)
+
+	// Set enemies position from tilemap
+	enemyFactory := enemies.NewEnemyFactory(gameenemies.InitEnemyMap(s.AppContext()))
+	s.InitEnemies(enemyFactory)
 
 	s.SetPlayerStartPosition(s.player)
 

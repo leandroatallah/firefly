@@ -24,6 +24,20 @@ func (s *LevelsScene) CamDebug() {
 	if ebiten.IsKeyPressed(ebiten.KeyE) { // zoom in
 		s.cam.Kamera().ZoomFactor *= 1.02
 	}
+
+	if ebiten.IsKeyPressed(ebiten.KeyJ) {
+		s.cam.Kamera().CenterOffsetX *= 1.02
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyL) {
+		s.cam.Kamera().CenterOffsetX /= 1.02
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyK) {
+		s.cam.Kamera().CenterOffsetY /= 1.02
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyI) {
+		s.cam.Kamera().CenterOffsetY *= 1.02
+	}
+
 }
 
 func (s *LevelsScene) SetCamTargetPointToSpace() {

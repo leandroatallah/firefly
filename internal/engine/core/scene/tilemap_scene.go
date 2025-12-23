@@ -6,6 +6,7 @@ import (
 
 	"github.com/leandroatallah/firefly/internal/config"
 	"github.com/leandroatallah/firefly/internal/engine/actors"
+	"github.com/leandroatallah/firefly/internal/engine/actors/enemies"
 	"github.com/leandroatallah/firefly/internal/engine/camera"
 	"github.com/leandroatallah/firefly/internal/engine/core"
 	"github.com/leandroatallah/firefly/internal/engine/items"
@@ -83,6 +84,21 @@ func (s *TilemapScene) InitItems(items map[int]items.ItemType, factory *items.It
 
 		item.SetID(fmt.Sprintf("ITEM_%v", i.ID))
 		s.PhysicsSpace().AddBody(item)
+	}
+
+	return nil
+}
+
+func (s *TilemapScene) InitEnemies(factory *enemies.EnemyFactory) error {
+	enemiesPos := s.tilemap.GetEnemiesPositionID()
+
+	for _, e := range enemiesPos {
+		enemy, err := factory.Create(enemies.EnemyType(e.EnemyType), e.X, e.Y, e.ID)
+		if err != nil {
+			return err
+		}
+
+		s.PhysicsSpace().AddBody(enemy)
 	}
 
 	return nil

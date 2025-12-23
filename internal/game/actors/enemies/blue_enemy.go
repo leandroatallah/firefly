@@ -4,9 +4,9 @@ import (
 	"log"
 
 	"github.com/leandroatallah/firefly/internal/engine/actors"
+	"github.com/leandroatallah/firefly/internal/engine/actors/enemies"
+	"github.com/leandroatallah/firefly/internal/engine/actors/movement"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
-	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
-	"github.com/leandroatallah/firefly/internal/engine/systems/sprites"
 )
 
 type BlueEnemy struct {
@@ -14,43 +14,33 @@ type BlueEnemy struct {
 	count int
 }
 
-func NewBlueEnemy() (*BlueEnemy, error) {
-	// NOTE: Ignore for now. Set logic to initial position
-	x, y := 0, 0
-	const (
-		frameWidth  = 32
-		frameHeight = 32
-	)
-
-	var assets sprites.SpriteAssets
-	assets = assets.AddSprite(actors.Idle, "assets/images/blue-enemy.png").
-		AddSprite(actors.Walking, "assets/images/blue-enemy.png")
-
-	sprites, err := sprites.LoadSprites(assets)
+func NewBlueEnemy(x, y int, id string) (*BlueEnemy, error) {
+	spriteData, statData, err := enemies.ParseJsonEnemy("internal/game/actors/enemies/blue_enemy.json")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	rect := physics.NewRect(x, y, frameWidth, frameHeight)
-	character := actors.NewCharacter(sprites, rect)
+	character, err := CreateAnimatedCharacter(spriteData)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	collisionRect := physics.NewRect(x, y, frameWidth, frameHeight)
-
+	character.SetPosition(x, y)
 	enemy := &BlueEnemy{Character: *character}
-	// TODO: Handle repeated IDs
-	enemy.SetID("BLUEENEMY")
-	err = enemy.SetSpeed(2)
-	if err != nil {
+
+	if err = SetEnemyStats(enemy, statData); err != nil {
 		return nil, err
 	}
-	err = enemy.SetMaxSpeed(2)
-	if err != nil {
+	if err = SetEnemyBodies(enemy, spriteData, id); err != nil {
 		return nil, err
 	}
-	enemy.AddCollision(physics.NewCollidableBodyFromRect(collisionRect))
 	enemy.SetTouchable(enemy)
 
 	return enemy, nil
+}
+
+func (e *BlueEnemy) SetTarget(target body.MovableCollidable) {
+	e.Character.SetMovementState(movement.DumbChase, target)
 }
 
 // Character Methods

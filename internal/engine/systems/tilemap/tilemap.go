@@ -160,3 +160,45 @@ func (t *Tilemap) GetItemsPositionID() []*ItemPosition {
 
 	return res
 }
+
+type EnemyPosition struct {
+	X, Y      int
+	EnemyType string
+	ID        string
+}
+
+func (t *Tilemap) GetEnemiesPositionID() []*EnemyPosition {
+	if t == nil {
+		return nil
+	}
+
+	res := []*EnemyPosition{}
+
+	layer, err := t.FindLayerByName("Enemies")
+	if err != nil {
+		log.Printf("failed to get enemies position: %v", err)
+		return nil
+	}
+
+	for _, obj := range layer.Objects {
+		x16 := int(math.Round(obj.X))
+		yValue := obj.Y
+		if obj.Gid > 0 {
+			yValue -= obj.Height
+		}
+		y16 := int(math.Round(yValue))
+
+		var id, enemyType string
+		for _, p := range obj.Properties {
+			if p.Name == "body_id" {
+				id = p.Value
+			}
+			if p.Name == "enemy_type" {
+				enemyType = p.Value
+			}
+		}
+		res = append(res, &EnemyPosition{X: x16, Y: y16, EnemyType: enemyType, ID: id})
+	}
+
+	return res
+}

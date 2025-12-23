@@ -6,10 +6,6 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/actors"
 )
 
-// To be initialized on game package.
-type EnemyType int
-type EnemyMap map[EnemyType]actors.ActorEntity
-
 type EnemyFactory struct {
 	enemyMap EnemyMap
 }
@@ -18,11 +14,14 @@ func NewEnemyFactory(enemyMap EnemyMap) *EnemyFactory {
 	return &EnemyFactory{enemyMap: enemyMap}
 }
 
-func (f *EnemyFactory) Create(enemyType EnemyType) (actors.ActorEntity, error) {
-	enemy, ok := f.enemyMap[enemyType]
+func (f *EnemyFactory) Create(enemyType EnemyType, x, y int, id string) (actors.ActorEntity, error) {
+	enemyFunc, ok := f.enemyMap[enemyType]
 	if !ok {
-		return nil, fmt.Errorf("unknown enemy type")
+		return nil, fmt.Errorf("unknown enemy type: %s", enemyType)
 	}
+
+	enemy := enemyFunc(x, y, id)
 
 	return enemy, nil
 }
+

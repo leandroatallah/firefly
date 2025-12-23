@@ -5,6 +5,10 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 )
 
+// To be initialized on game package.
+type EnemyType string
+type EnemyMap map[EnemyType]func(x, y int, id string) actors.ActorEntity
+
 type BaseEnemy struct {
 	actors.Character
 }

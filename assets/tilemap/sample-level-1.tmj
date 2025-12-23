@@ -510,6 +510,63 @@
         }, 
         {
          "draworder":"topdown",
+         "id":9,
+         "name":"Enemies",
+         "objects":[
+                {
+                 "gid":336,
+                 "height":16,
+                 "id":106,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"body_id",
+                         "type":"string",
+                         "value":"MINION_1"
+                        }, 
+                        {
+                         "name":"enemy_type",
+                         "type":"string",
+                         "value":"BLUE"
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":320,
+                 "y":480
+                }, 
+                {
+                 "gid":336,
+                 "height":16,
+                 "id":107,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"body_id",
+                         "type":"string",
+                         "value":"MINION_2"
+                        }, 
+                        {
+                         "name":"enemy_type",
+                         "type":"string",
+                         "value":"BLUE"
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":432,
+                 "y":480
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
          "id":4,
          "name":"PlayerStart",
          "objects":[
@@ -558,8 +615,8 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":9,
- "nextobjectid":105,
+ "nextlayerid":10,
+ "nextobjectid":108,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
@@ -587,6 +644,20 @@
          "imagewidth":84,
          "margin":0,
          "name":"sample-rewards",
+         "spacing":1,
+         "tilecount":15,
+         "tileheight":16,
+         "tilewidth":16,
+         "transparentcolor":"#ff00f6"
+        }, 
+        {
+         "columns":5,
+         "firstgid":331,
+         "image":"sample-enemies.png",
+         "imageheight":50,
+         "imagewidth":84,
+         "margin":0,
+         "name":"sample-enemies",
          "spacing":1,
          "tilecount":15,
          "tileheight":16,
