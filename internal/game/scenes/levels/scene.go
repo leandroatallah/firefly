@@ -146,9 +146,8 @@ func (s *LevelsScene) Draw(screen *ebiten.Image) {
 	for _, b := range space.Bodies() {
 		switch sb := b.(type) {
 		case actors.ActorEntity:
-			opts := s.player.ImageOptions()
+			opts := sb.ImageOptions()
 			sb.UpdateImageOptions()
-			// s.cam.Draw(sb.ImageCollisionBox(), opts, screen)
 			s.cam.Draw(sb.Image(), opts, screen)
 		case items.Item:
 			if sb.IsRemoved() {

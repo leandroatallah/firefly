@@ -27,11 +27,12 @@ func NewBlueEnemy(x, y int, id string) (*BlueEnemy, error) {
 
 	character.SetPosition(x, y)
 	enemy := &BlueEnemy{Character: *character}
+	enemy.SetID(id)
 
 	if err = SetEnemyStats(enemy, statData); err != nil {
 		return nil, err
 	}
-	if err = SetEnemyBodies(enemy, spriteData, id); err != nil {
+	if err = SetEnemyBodies(enemy, spriteData); err != nil {
 		return nil, err
 	}
 	enemy.SetTouchable(enemy)

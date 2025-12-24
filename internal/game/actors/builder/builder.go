@@ -27,6 +27,7 @@ func CreateAnimatedCharacter(data schemas.SpriteData, stateMap map[string]animat
 
 type collisionRectSetter interface {
 	AddCollisionRect(state actors.ActorStateEnum, rect body.Collidable)
+	RefreshCollisions()
 }
 
 func SetCharacterBodies(
@@ -50,6 +51,7 @@ func SetCharacterBodies(
 			return
 		}
 		setter.AddCollisionRect(actorState, rect)
+		setter.RefreshCollisions()
 	}
 
 	physics.SetCollisionBodies(character, data, stateMap, idProvider, addCollisionRect)

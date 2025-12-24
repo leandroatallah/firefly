@@ -86,6 +86,7 @@ type Drawable interface {
 	Image() *ebiten.Image
 	ImageOptions() *ebiten.DrawImageOptions
 	UpdateImageOptions()
+	ImageCollisionBox() *ebiten.Image
 }
 
 type Touchable interface {

@@ -16,9 +16,7 @@ func CreateAnimatedCharacter(data schemas.SpriteData) (*actors.Character, error)
 }
 
 // SetEnemyBodies
-func SetEnemyBodies(enemy actors.ActorEntity, data schemas.SpriteData, id string) error {
-	enemy.SetID(id)
-
+func SetEnemyBodies(enemy actors.ActorEntity, data schemas.SpriteData) error {
 	stateMap := map[string]animation.SpriteState{
 		"idle": actors.Idle,
 		"walk": actors.Walking,

@@ -11,8 +11,6 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/systems/sprites"
 )
 
-
-
 type Character struct {
 	sprites.SpriteEntity
 
@@ -68,7 +66,7 @@ func (c *Character) Position() image.Rectangle {
 	return c.MovableBody.Position()
 }
 func (c *Character) SetPosition(x, y int) {
-	c.MovableBody.SetPosition(x, y)
+	c.CollidableBody.SetPosition(x, y)
 }
 func (c *Character) GetPositionMin() (int, int) {
 	return c.MovableBody.GetPositionMin()
@@ -80,6 +78,10 @@ func (c *Character) GetShape() body.Shape {
 // Builder methods
 func (c *Character) State() ActorStateEnum {
 	return c.state.State()
+}
+
+func (c *Character) AddCollisionRect(state ActorStateEnum, rect body.Collidable) {
+	c.StateCollisionManager.AddCollisionRect(state, rect)
 }
 
 // SetState set a new Character state and update current collision shapes.
@@ -238,8 +240,6 @@ func (c *Character) Image() *ebiten.Image {
 	pos := c.Position()
 	return c.AnimatedSpriteImage(img, pos, c.count, c.SpriteEntity.FrameRate())
 }
-
-
 
 // WithCollisionBox extend Image method to show a rect with the collision area
 func (c *Character) ImageCollisionBox() *ebiten.Image {
