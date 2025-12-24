@@ -47,6 +47,7 @@ type AppConfig struct {
 
 	MainFontFace string
 	CamDebug     bool
+	CollisionBox bool
 }
 
 func (c *AppConfig) To16(value int) int {
@@ -88,6 +89,7 @@ func init() {
 
 func Parse() {
 	flag.BoolVar(&cfg.CamDebug, "cam-debug", false, "Enable camera debug")
+	flag.BoolVar(&cfg.CollisionBox, "collision-box", false, "Enable collision box debug")
 }
 
 func Get() AppConfig {

@@ -148,21 +148,28 @@ func (s *LevelsScene) Draw(screen *ebiten.Image) {
 		case actors.ActorEntity:
 			opts := sb.ImageOptions()
 			sb.UpdateImageOptions()
-			s.cam.Draw(sb.Image(), opts, screen)
+			if config.Get().CollisionBox {
+				s.cam.Draw(sb.ImageCollisionBox(), opts, screen)
+			} else {
+				s.cam.Draw(sb.Image(), opts, screen)
+			}
 		case items.Item:
 			if sb.IsRemoved() {
 				continue
 			}
 			opts := sb.ImageOptions()
 			sb.UpdateImageOptions()
-			s.cam.Draw(sb.Image(), opts, screen)
+			if config.Get().CollisionBox {
+				s.cam.Draw(sb.ImageCollisionBox(), opts, screen)
+			} else {
+				s.cam.Draw(sb.Image(), opts, screen)
+			}
 		case body.Obstacle:
-			// NOTE: Uncomment to show obstacles collision box
-			//
-			// opts := sb.ImageOptions()
-			// sb.UpdateImageOptions()
-			// s.cam.Draw(sb.ImageCollisionBox(), opts, screen)
-			continue
+			if config.Get().CollisionBox {
+				opts := sb.ImageOptions()
+				sb.UpdateImageOptions()
+				s.cam.Draw(sb.ImageCollisionBox(), opts, screen)
+			}
 		}
 	}
 
