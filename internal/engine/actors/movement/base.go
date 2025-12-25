@@ -15,6 +15,7 @@ type MovementStateEnum int
 
 const (
 	Input MovementStateEnum = iota
+	Idle
 	Rand
 	Chase
 	DumbChase

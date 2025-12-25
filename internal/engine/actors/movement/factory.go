@@ -20,6 +20,8 @@ func NewMovementState(
 	var movementState MovementState
 
 	switch state {
+	case Idle:
+		movementState = NewIdleMovementState(b)
 	case Chase:
 		movementState = NewChaseMovementState(b)
 	case DumbChase:
