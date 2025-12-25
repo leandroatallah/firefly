@@ -124,7 +124,9 @@ func (m *PlatformMovementModel) Update(body body.MovableCollidable, space body.B
 	cfg := config.Get()
 
 	// Handle input for player movement. This needs to be done before physics calculations.
-	m.InputHandler(body, space)
+	if m.playerMovementBlocker != nil {
+		m.InputHandler(body, space)
+	}
 
 	vx16, vy16 := body.Velocity()
 
@@ -178,8 +180,11 @@ func (m *PlatformMovementModel) SetIsScripted(isScripted bool) {
 // InputHandler processes player input for movement.
 // TODO: Move movement behavior to physics.MovableBody
 func (m *PlatformMovementModel) InputHandler(body body.MovableCollidable, space body.BodiesSpace) {
-	if m.isScripted || m.playerMovementBlocker.IsMovementBlocked() {
-		return // Ignore player input when scripted or movement is blocked
+	if m.isScripted {
+		return // Ignore player input when scripted
+	}
+	if m.playerMovementBlocker != nil && m.playerMovementBlocker.IsMovementBlocked() {
+		return // Ignore player input when movement is blocked
 	}
 
 	// TODO: Should this be check here?

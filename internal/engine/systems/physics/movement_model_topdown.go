@@ -24,7 +24,9 @@ func (m *TopDownMovementModel) Update(body body.MovableCollidable, space body.Bo
 	cfg := config.Get()
 
 	// Handle input for player movement
-	m.InputHandler(body, space)
+	if m.playerMovementBlocker != nil {
+		m.InputHandler(body, space)
+	}
 
 	vx16, vy16 := body.Velocity()
 
@@ -85,8 +87,11 @@ func (m *TopDownMovementModel) SetIsScripted(isScripted bool) {
 // InputHandler processes player input for movement.
 // Top-Down player can move for all directions and diagonals.
 func (m *TopDownMovementModel) InputHandler(body body.MovableCollidable, space body.BodiesSpace) {
-	if m.isScripted || m.playerMovementBlocker.IsMovementBlocked() {
-		return // Ignore player input when scripted or movement is blocked
+	if m.isScripted {
+		return // Ignore player input when scripted
+	}
+	if m.playerMovementBlocker != nil && m.playerMovementBlocker.IsMovementBlocked() {
+		return // Ignore player input when movement is blocked
 	}
 	if body.Immobile() {
 		return

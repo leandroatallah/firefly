@@ -42,3 +42,7 @@ func NewZacPlayer(
 
 	return player, nil
 }
+
+func (p *ZacPlayer) GetCharacter() *actors.Character {
+	return &p.Character
+}

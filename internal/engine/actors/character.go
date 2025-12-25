@@ -84,6 +84,10 @@ func (c *Character) AddCollisionRect(state ActorStateEnum, rect body.Collidable)
 	c.StateCollisionManager.AddCollisionRect(state, rect)
 }
 
+func (c *Character) GetCharacter() *Character {
+	return c
+}
+
 // SetState set a new Character state and update current collision shapes.
 func (c *Character) SetState(state ActorState) {
 	c.state = state

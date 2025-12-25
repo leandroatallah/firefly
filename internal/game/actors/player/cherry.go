@@ -49,6 +49,10 @@ func NewCherryPlayer() (actors.ActorEntity, error) {
 	return player, nil
 }
 
+func (p *CherryPlayer) GetCharacter() *actors.Character {
+	return &p.Character
+}
+
 func (p *CherryPlayer) AddCoinCount(amount int) {
 	p.coinCount += amount
 }

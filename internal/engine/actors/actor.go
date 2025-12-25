@@ -46,4 +46,5 @@ type ActorEntity interface {
 	Update(space body.BodiesSpace) error
 	MovementModel() physics.MovementModel
 	SetMovementModel(model physics.MovementModel)
+	GetCharacter() *Character
 }
