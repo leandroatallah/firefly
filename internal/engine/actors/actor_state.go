@@ -6,7 +6,8 @@ import (
 
 type ActorState interface {
 	State() ActorStateEnum
-	OnStart()
+	OnStart(currentCount int)
+	GetAnimationCount(currentCount int) int
 }
 
 type ActorStateEnum int
@@ -19,15 +20,22 @@ const (
 )
 
 type BaseState struct {
-	actor ActorEntity
-	state ActorStateEnum
+	actor      ActorEntity
+	state      ActorStateEnum
+	entryCount int
 }
 
 func (s *BaseState) State() ActorStateEnum {
 	return s.state
 }
 
-func (s *BaseState) OnStart() {}
+func (s *BaseState) OnStart(currentCount int) {
+	s.entryCount = currentCount
+}
+
+func (s *BaseState) GetAnimationCount(currentCount int) int {
+	return currentCount - s.entryCount
+}
 
 // State factory method
 func NewActorState(actor ActorEntity, state ActorStateEnum) (ActorState, error) {

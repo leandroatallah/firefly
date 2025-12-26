@@ -19,6 +19,7 @@ func (s ShapeRect) Rect() (x, y, width, height int) {
 type AssetData struct {
 	Path           string      `json:"path"`
 	CollisionRects []ShapeRect `json:"collision_rect"`
+	Loop           *bool       `json:"loop,omitempty"`
 }
 
 // SpriteData contains all data related to a sprite's appearance and behavior,

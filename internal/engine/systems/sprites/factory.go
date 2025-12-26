@@ -11,7 +11,11 @@ func GetSpritesFromAssets(assets map[string]schemas.AssetData, stateMap map[stri
 	s := make(SpriteAssets)
 	for key, value := range assets {
 		if state, ok := stateMap[key]; ok {
-			s = s.AddSprite(state, value.Path)
+			loop := true // Default to true
+			if value.Loop != nil {
+				loop = *value.Loop
+			}
+			s = s.AddSprite(state, value.Path, loop)
 		}
 	}
 	return LoadSprites(s)

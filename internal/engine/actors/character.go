@@ -90,9 +90,11 @@ func (c *Character) GetCharacter() *Character {
 
 // SetState set a new Character state and update current collision shapes.
 func (c *Character) SetState(state ActorState) {
-	c.state = state
-	c.StateCollisionManager.RefreshCollisions()
-	c.state.OnStart()
+	if c.state == nil || c.state.State() != state.State() {
+		c.state = state
+		c.state.OnStart(c.count)
+		c.StateCollisionManager.RefreshCollisions()
+	}
 }
 
 func (c *Character) SetMovementState(
@@ -190,20 +192,26 @@ func (c *Character) handleState() {
 	state := c.state.State()
 
 	switch {
+	case state == Hurted:
+		hurtState := c.state.(*HurtState)
+		// The player should be recover the mobility before becomes vulnerable again
+		isRecovered := hurtState.CheckRecovery()
+		if isRecovered {
+			c.SetImmobile(false)
+		}
+
+		isInvulnerabilityOver := hurtState.CheckInvulnerability()
+		if isInvulnerabilityOver {
+			setNewState(Idle)
+			c.SetInvulnerability(false)
+		}
+
 	case state != Falling && c.IsFalling():
 		setNewState(Falling)
 	case state != Walking && c.IsWalking():
 		setNewState(Walking)
 	case state != Idle && c.IsIdle():
 		setNewState(Idle)
-	case state == Hurted:
-		// TODO: The player should be recover the mobility before becomes vulnerable again
-		isRecovered := c.state.(*HurtState).CheckRecovery()
-		if isRecovered {
-			setNewState(Idle)
-			c.SetImmobile(false)
-			c.SetInvulnerability(false)
-		}
 	}
 }
 
@@ -232,17 +240,18 @@ func (c *Character) SetTouchable(t body.Touchable) {
 }
 
 func (c *Character) Image() *ebiten.Image {
-	img := c.GetSpriteByState(c.state.State())
-	if img == nil {
+	sprite := c.GetSpriteByState(c.state.State())
+	if sprite == nil || sprite.Image == nil {
 		// Try to fallback to idle sprite
-		img = c.GetSpriteByState(Idle)
+		sprite = c.GetSpriteByState(Idle)
 	}
-	if img == nil {
-		img = c.GetFirstSprite()
+	if sprite == nil || sprite.Image == nil {
+		sprite = c.GetFirstSprite()
 	}
 
 	pos := c.Position()
-	return c.AnimatedSpriteImage(img, pos, c.count, c.SpriteEntity.FrameRate())
+	stateDurationCount := c.state.GetAnimationCount(c.count)
+	return c.AnimatedSpriteImage(sprite, pos, stateDurationCount, c.SpriteEntity.FrameRate())
 }
 
 // WithCollisionBox extend Image method to show a rect with the collision area

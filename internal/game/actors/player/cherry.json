@@ -9,6 +9,7 @@
     "assets": {
       "idle": {
         "path": "assets/images/cherry-idle.png",
+        "loop": true,
         "collision_rect": [
           {
             "x": 5,
@@ -20,6 +21,7 @@
       },
       "walk": {
         "path": "assets/images/cherry-walk.png",
+        "loop": true,
         "collision_rect": [
           {
             "x": 5,
@@ -30,7 +32,20 @@
         ]
       },
       "fall": {
-        "path": "assets/images/cherry-walk.png",
+        "path": "assets/images/cherry-fall.png",
+        "loop": false,
+        "collision_rect": [
+          {
+            "x": 5,
+            "y": 14,
+            "width": 20,
+            "height": 17
+          }
+        ]
+      },
+      "hurt": {
+        "path": "assets/images/cherry-hurt.png",
+        "loop": false,
         "collision_rect": [
           {
             "x": 5,

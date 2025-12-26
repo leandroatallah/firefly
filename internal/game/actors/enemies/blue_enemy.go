@@ -47,7 +47,7 @@ func NewBlueEnemy(x, y int, id string) (*BlueEnemy, error) {
 }
 
 func (e *BlueEnemy) SetTarget(target body.MovableCollidable) {
-	e.Character.SetMovementState(movement.Avoid, target)
+	e.Character.SetMovementState(movement.Idle, target)
 }
 
 // Character Methods
