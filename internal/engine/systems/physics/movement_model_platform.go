@@ -27,7 +27,6 @@ func NewPlatformMovementModel(playerMovementBlocker PlayerMovementBlocker) *Plat
 	return m
 }
 
-// TODO: Maybe I should update the method named, because this handle the acceleration only
 func (m *PlatformMovementModel) UpdateHorizontalVelocity(body body.MovableCollidable) (int, int) {
 	cfg := config.Get()
 
@@ -137,7 +136,6 @@ func (m *PlatformMovementModel) Update(body body.MovableCollidable, space body.B
 		vx16 = 0
 	}
 
-	// TODO: Check if it should get rid of wasOnGround
 	wasOnGround := m.onGround
 	// Apply vertical movement to the body and check for collisions.
 	_, _, isBlockingY := body.ApplyValidPosition(vy16, false, space)
@@ -178,7 +176,6 @@ func (m *PlatformMovementModel) SetIsScripted(isScripted bool) {
 }
 
 // InputHandler processes player input for movement.
-// TODO: Move movement behavior to physics.MovableBody
 func (m *PlatformMovementModel) InputHandler(body body.MovableCollidable, space body.BodiesSpace) {
 	if m.isScripted {
 		return // Ignore player input when scripted
@@ -187,7 +184,6 @@ func (m *PlatformMovementModel) InputHandler(body body.MovableCollidable, space 
 		return // Ignore player input when movement is blocked
 	}
 
-	// TODO: Should this be check here?
 	_, vy16 := body.Velocity()
 	if body.Immobile() {
 		_, accY := body.Acceleration()
@@ -228,7 +224,7 @@ func (m *PlatformMovementModel) InputHandlerHorizontal(body body.MovableCollidab
 	body.SetVelocity(vx16, vy16)
 }
 
-func (m *PlatformMovementModel) InputHandlerJump(body body.MovableCollidable, space body.BodiesSpace) (int, int) {
+func (m *PlatformMovementModel) InputHandlerJump(body body.MovableCollidable, space body.BodiesSpace) {
 	cfg := config.Get()
 
 	if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
@@ -240,11 +236,6 @@ func (m *PlatformMovementModel) InputHandlerJump(body body.MovableCollidable, sp
 
 			for _, other := range space.Bodies() {
 				if other == nil || other.ID() == body.ID() {
-					continue
-				}
-
-				// TODO: Evaluate this condition
-				if other.ID() == "OBSTACLE_GROUND" {
 					continue
 				}
 
@@ -261,10 +252,6 @@ func (m *PlatformMovementModel) InputHandlerJump(body body.MovableCollidable, sp
 			m.onGround = false
 			m.coyoteTimeCounter = 0
 			m.jumpBufferCounter = 0
-
-			// check collision
-			// TODO: Should return?
-			return body.Velocity()
 		} else {
 			m.jumpBufferCounter = cfg.Physics.JumpBufferFrames
 		}
@@ -278,6 +265,4 @@ func (m *PlatformMovementModel) InputHandlerJump(body body.MovableCollidable, sp
 	}
 
 	body.SetVelocity(vx16, vy16)
-	// TODO: Should return?
-	return vx16, vy16
 }

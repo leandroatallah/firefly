@@ -39,9 +39,8 @@ func SetPlayerStats(player actors.ActorEntity, data actors.StatData) error {
 func SetMovementModel(
 	player actors.ActorEntity,
 	movementModel physics.MovementModelEnum,
-	movementBlocker physics.PlayerMovementBlocker,
 ) error {
-	model, err := physics.NewMovementModel(movementModel, movementBlocker)
+	model, err := physics.NewMovementModel(movementModel, player)
 	if err != nil {
 		return err
 	}

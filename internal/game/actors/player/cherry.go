@@ -40,7 +40,7 @@ func NewCherryPlayer() (actors.ActorEntity, error) {
 		return nil, fmt.Errorf("SetPlayerStats: %w", err)
 	}
 	// Pass player itself
-	if err = SetMovementModel(player, physics.Platform, player); err != nil {
+	if err = SetMovementModel(player, physics.Platform); err != nil {
 		return nil, fmt.Errorf("SetMovementModel: %w", err)
 	}
 

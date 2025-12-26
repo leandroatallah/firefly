@@ -77,7 +77,7 @@ func (s *TilemapScene) InitItems(items map[int]items.ItemType, factory *items.It
 			return fmt.Errorf("Unable to find item by ID.")
 		}
 
-		item, err := factory.Create(itemType, i.X, i.Y)
+		item, err := factory.Create(itemType, i.X, i.Y, i.ID)
 		if err != nil {
 			return err
 		}

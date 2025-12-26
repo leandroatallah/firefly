@@ -14,14 +14,12 @@ type CollectibleCoinItem struct {
 	items.BaseItem
 }
 
-func NewCollectibleCoinItem(ctx *core.AppContext, x, y int) (*CollectibleCoinItem, error) {
+func NewCollectibleCoinItem(ctx *core.AppContext, x, y int, id string) (*CollectibleCoinItem, error) {
 	spriteData, statData, err := items.ParseJsonItem("internal/game/items/coin.json")
 	if err != nil {
 		return nil, err
 	}
 
-	// FIX:
-	id := "TEMP"
 	base, err := CreateAnimatedItem(id, spriteData)
 	if err != nil {
 		return nil, err

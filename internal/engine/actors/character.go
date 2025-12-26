@@ -204,7 +204,6 @@ func (c *Character) handleState() {
 		isAnimationOver := c.state.(*HurtState).IsAnimationFinished()
 		if isAnimationOver {
 			setNewState(Idle)
-			c.SetImmobile(false)
 		}
 	case state != Falling && c.IsFalling():
 		setNewState(Falling)
@@ -228,7 +227,6 @@ func (c *Character) Hurt(damage int) {
 		log.Fatal(err)
 	}
 	c.SetState(state)
-	c.SetImmobile(true)
 	c.SetInvulnerability(true)
 	c.invulnerabilityTimer = 120 // 2 seconds at 60fps
 }
