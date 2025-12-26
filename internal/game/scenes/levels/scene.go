@@ -9,10 +9,10 @@ import (
 	"github.com/leandroatallah/firefly/internal/config"
 	"github.com/leandroatallah/firefly/internal/engine/actors"
 	"github.com/leandroatallah/firefly/internal/engine/actors/enemies"
+	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/assets/font"
 	"github.com/leandroatallah/firefly/internal/engine/camera"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
-	"github.com/leandroatallah/firefly/internal/engine/core"
 	"github.com/leandroatallah/firefly/internal/engine/core/scene"
 	"github.com/leandroatallah/firefly/internal/engine/core/transition"
 	"github.com/leandroatallah/firefly/internal/engine/items"
@@ -36,7 +36,7 @@ type LevelsScene struct {
 	mainText       *font.FontText
 }
 
-func NewLevelsScene(context *core.AppContext) *LevelsScene {
+func NewLevelsScene(context *app.AppContext) *LevelsScene {
 	mainText, err := font.NewFontText(config.Get().MainFontFace)
 	if err != nil {
 		log.Fatal(err)

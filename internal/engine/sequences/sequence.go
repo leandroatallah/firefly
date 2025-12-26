@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"os"
 
-	"github.com/leandroatallah/firefly/internal/engine/core"
+	"github.com/leandroatallah/firefly/internal/engine/app"
 )
 
 // Command is an action to be executed in a sequence.
@@ -12,7 +12,7 @@ import (
 type Command interface {
 	// Init is called once when the command begins.
 	// It can be used to set up initial state and get resources from the app context.
-	Init(appContext *core.AppContext)
+	Init(appContext *app.AppContext)
 
 	// Update is called every frame.
 	// It should return true when the command is finished.

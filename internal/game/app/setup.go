@@ -8,8 +8,8 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/config"
 	"github.com/leandroatallah/firefly/internal/engine/actors"
+	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/assets/font"
-	"github.com/leandroatallah/firefly/internal/engine/core"
 	"github.com/leandroatallah/firefly/internal/engine/core/game"
 	"github.com/leandroatallah/firefly/internal/engine/core/levels"
 	"github.com/leandroatallah/firefly/internal/engine/core/scene"
@@ -51,7 +51,7 @@ func Setup(assets fs.FS) error {
 	levelManager.AddLevel(level2)
 	levelManager.SetCurrentLevel(1)
 
-	appContext := &core.AppContext{
+	appContext := &app.AppContext{
 		AudioManager:    audioManager,
 		DialogueManager: dialogueManager,
 		ActorManager:    actorManager,

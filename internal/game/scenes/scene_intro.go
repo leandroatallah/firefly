@@ -6,8 +6,8 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/config"
+	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/assets/font"
-	"github.com/leandroatallah/firefly/internal/engine/core"
 	"github.com/leandroatallah/firefly/internal/engine/core/scene"
 	"github.com/leandroatallah/firefly/internal/engine/core/screenutil"
 	"github.com/leandroatallah/firefly/internal/engine/core/transition"
@@ -45,7 +45,7 @@ type IntroScene struct {
 	audiomanager   *audiomanager.AudioManager
 }
 
-func NewIntroScene(context *core.AppContext) *IntroScene {
+func NewIntroScene(context *app.AppContext) *IntroScene {
 	fontText, err := font.NewFontText(config.Get().MainFontFace)
 	if err != nil {
 		log.Fatal(err)

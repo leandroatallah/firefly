@@ -1,9 +1,9 @@
 package context
 
-import "github.com/leandroatallah/firefly/internal/engine/core"
+import "github.com/leandroatallah/firefly/internal/engine/app"
 
 type ContextProvider interface {
 	// Use any to prevent life cycle imports
 	SetAppContext(appContext any)
-	AppContext() *core.AppContext
+	AppContext() *app.AppContext
 }

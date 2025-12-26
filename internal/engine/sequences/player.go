@@ -1,12 +1,10 @@
 package sequences
 
-import (
-	"github.com/leandroatallah/firefly/internal/engine/core"
-)
+import "github.com/leandroatallah/firefly/internal/engine/app"
 
 // SequencePlayer manages the execution of a sequence.
 type SequencePlayer struct {
-	core.AppContextHolder
+	app.AppContextHolder
 
 	currentSequence     Sequence
 	currentCommandIndex int
@@ -14,8 +12,8 @@ type SequencePlayer struct {
 }
 
 // NewSequencePlayer creates a new player.
-func NewSequencePlayer(appContext *core.AppContext) *SequencePlayer {
-	ctx := core.AppContextHolder{}
+func NewSequencePlayer(appContext *app.AppContext) *SequencePlayer {
+	ctx := app.AppContextHolder{}
 	ctx.SetAppContext(appContext)
 	return &SequencePlayer{AppContextHolder: ctx}
 }

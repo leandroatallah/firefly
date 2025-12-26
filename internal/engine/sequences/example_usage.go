@@ -16,11 +16,11 @@ import (
 // The following is an example of how to integrate the SequencePlayer into a scene.
 
 // 1. Add SequencePlayer to your scene struct.
-// Make sure your scene has access to *core.AppContext
+// Make sure your scene has access to *app.AppContext
 type SceneWithSequence struct {
 	// ... other scene fields
 	sequencePlayer *SequencePlayer
-	AppContext     *core.AppContext
+	AppContext     *app.AppContext
 }
 
 // 2. Initialize the SequencePlayer in your scene's startup method.

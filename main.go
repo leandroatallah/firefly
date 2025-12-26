@@ -5,7 +5,7 @@ import (
 	"flag"
 	"log"
 
-	gamesetup "github.com/leandroatallah/firefly/internal/game/setup"
+	gamesetup "github.com/leandroatallah/firefly/internal/game/app"
 )
 
 //go:embed assets/*

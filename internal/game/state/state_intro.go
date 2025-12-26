@@ -8,7 +8,7 @@ type IntroState struct {
 	state.BaseState
 }
 
-// func NewIntroState(ctx *core.AppContext) *IntroState {
+// func NewIntroState(ctx *app.AppContext) *IntroState {
 // 	return &IntroState{BaseState: state.BaseState{ctx: ctx}}
 // }
 

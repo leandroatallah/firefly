@@ -1,8 +1,8 @@
 package gameobstacles
 
 import (
+	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
-	"github.com/leandroatallah/firefly/internal/engine/core"
 	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
 )
 
@@ -13,7 +13,7 @@ const (
 	ObstacleWallDown
 )
 
-func InitObstacleMap(ctx *core.AppContext) physics.ObstacleMap {
+func InitObstacleMap(ctx *app.AppContext) physics.ObstacleMap {
 	obstacleMap := map[physics.ObstacleType]func() body.Obstacle{
 		ObstacleWallTop: func() body.Obstacle {
 			return NewWallTop()

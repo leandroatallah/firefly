@@ -8,7 +8,7 @@ type MainMenuState struct {
 	state.BaseState
 }
 
-// func NewMainMenuState(ctx *core.AppContext) *MainMenuState {
+// func NewMainMenuState(ctx *app.AppContext) *MainMenuState {
 // 	return &MainMenuState{BaseState: BaseState{ctx: ctx}}
 // }
 

@@ -3,8 +3,8 @@ package gameitems
 import (
 	"fmt"
 
+	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
-	"github.com/leandroatallah/firefly/internal/engine/core"
 	"github.com/leandroatallah/firefly/internal/engine/items"
 	gameplayer "github.com/leandroatallah/firefly/internal/game/actors/player"
 )
@@ -14,7 +14,7 @@ type CollectibleCoinItem struct {
 	items.BaseItem
 }
 
-func NewCollectibleCoinItem(ctx *core.AppContext, x, y int, id string) (*CollectibleCoinItem, error) {
+func NewCollectibleCoinItem(ctx *app.AppContext, x, y int, id string) (*CollectibleCoinItem, error) {
 	spriteData, statData, err := items.ParseJsonItem("internal/game/items/coin.json")
 	if err != nil {
 		return nil, err

@@ -1,13 +1,13 @@
 package gamescene
 
 import (
+	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/navigation"
-	"github.com/leandroatallah/firefly/internal/engine/core"
 	gamescenelevels "github.com/leandroatallah/firefly/internal/game/scenes/levels"
 	scenestypes "github.com/leandroatallah/firefly/internal/game/scenes/types"
 )
 
-func InitSceneMap(context *core.AppContext) navigation.SceneMap {
+func InitSceneMap(context *app.AppContext) navigation.SceneMap {
 	sceneMap := navigation.SceneMap{
 		scenestypes.SceneIntro: func() navigation.Scene {
 			return NewIntroScene(context)

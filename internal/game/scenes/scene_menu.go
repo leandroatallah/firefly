@@ -7,8 +7,8 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
 	"github.com/leandroatallah/firefly/internal/config"
+	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/assets/font"
-	"github.com/leandroatallah/firefly/internal/engine/core"
 	"github.com/leandroatallah/firefly/internal/engine/core/scene"
 	"github.com/leandroatallah/firefly/internal/engine/core/transition"
 	scenestypes "github.com/leandroatallah/firefly/internal/game/scenes/types"
@@ -24,7 +24,7 @@ type MenuScene struct {
 	fontText *font.FontText
 }
 
-func NewMenuScene(context *core.AppContext) *MenuScene {
+func NewMenuScene(context *app.AppContext) *MenuScene {
 	fontText, err := font.NewFontText(config.Get().MainFontFace)
 	if err != nil {
 		log.Fatal(err)

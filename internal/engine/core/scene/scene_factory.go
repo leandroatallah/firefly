@@ -3,8 +3,8 @@ package scene
 import (
 	"fmt"
 
+	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/navigation"
-	"github.com/leandroatallah/firefly/internal/engine/core"
 )
 
 type SceneFactory interface {
@@ -12,7 +12,7 @@ type SceneFactory interface {
 }
 
 type DefaultSceneFactory struct {
-	core.AppContextHolder
+	app.AppContextHolder
 
 	sceneMap     navigation.SceneMap
 	cachedScenes map[navigation.SceneType]navigation.Scene

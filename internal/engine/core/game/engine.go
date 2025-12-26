@@ -9,19 +9,19 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text"
 	"github.com/leandroatallah/firefly/internal/config"
-	"github.com/leandroatallah/firefly/internal/engine/core"
+	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/core/game/state"
 	"golang.org/x/image/font"
 )
 
 type Game struct {
-	AppContext    *core.AppContext
+	AppContext    *app.AppContext
 	state         state.GameState
 	debugVisible  bool
 	debugFontFace font.Face
 }
 
-func NewGame(ctx *core.AppContext) *Game {
+func NewGame(ctx *app.AppContext) *Game {
 	return &Game{
 		AppContext: ctx,
 	}

@@ -7,8 +7,8 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/leandroatallah/firefly/internal/config"
+	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/assets/font"
-	"github.com/leandroatallah/firefly/internal/engine/core"
 	"github.com/leandroatallah/firefly/internal/engine/core/scene"
 	"github.com/leandroatallah/firefly/internal/engine/core/screenutil"
 	"github.com/leandroatallah/firefly/internal/engine/core/transition"
@@ -23,7 +23,7 @@ type SummaryScene struct {
 	fontText     *font.FontText
 }
 
-func NewSummaryScene(context *core.AppContext) *SummaryScene {
+func NewSummaryScene(context *app.AppContext) *SummaryScene {
 	fontText, err := font.NewFontText(config.Get().MainFontFace)
 	if err != nil {
 		log.Fatal(err)

@@ -7,8 +7,8 @@ import (
 	"github.com/leandroatallah/firefly/internal/config"
 	"github.com/leandroatallah/firefly/internal/engine/actors"
 	"github.com/leandroatallah/firefly/internal/engine/actors/enemies"
+	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/camera"
-	"github.com/leandroatallah/firefly/internal/engine/core"
 	"github.com/leandroatallah/firefly/internal/engine/items"
 	"github.com/leandroatallah/firefly/internal/engine/systems/audiomanager"
 	"github.com/leandroatallah/firefly/internal/engine/systems/tilemap"
@@ -20,7 +20,7 @@ type TilemapScene struct {
 	cam     *camera.Controller
 }
 
-func NewTilemapScene(ctx *core.AppContext) *TilemapScene {
+func NewTilemapScene(ctx *app.AppContext) *TilemapScene {
 	scene := TilemapScene{}
 	scene.SetAppContext(ctx)
 	return &scene

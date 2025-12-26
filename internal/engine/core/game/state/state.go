@@ -1,8 +1,6 @@
 package state
 
-import (
-	"github.com/leandroatallah/firefly/internal/engine/core"
-)
+import "github.com/leandroatallah/firefly/internal/engine/app"
 
 type GameState interface {
 	OnStart()
@@ -13,7 +11,7 @@ type GameStateEnum int
 type StateMap map[GameStateEnum]GameState
 
 type BaseState struct {
-	ctx *core.AppContext
+	ctx *app.AppContext
 
 	stateMap map[GameStateEnum]GameState
 }

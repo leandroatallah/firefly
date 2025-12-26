@@ -5,7 +5,7 @@ import (
 	"math"
 
 	"github.com/leandroatallah/firefly/internal/engine/actors"
-	"github.com/leandroatallah/firefly/internal/engine/core"
+	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/systems/speech"
 )
 
@@ -15,7 +15,7 @@ type DialogueCommand struct {
 	dialogueManager *speech.Manager
 }
 
-func (c *DialogueCommand) Init(appContext *core.AppContext) {
+func (c *DialogueCommand) Init(appContext *app.AppContext) {
 	c.dialogueManager = appContext.DialogueManager
 	c.dialogueManager.ShowMessages(c.Lines)
 }
@@ -31,7 +31,7 @@ type DelayCommand struct {
 	timer  int
 }
 
-func (c *DelayCommand) Init(appContext *core.AppContext) {
+func (c *DelayCommand) Init(appContext *app.AppContext) {
 	c.timer = 0
 }
 
@@ -50,7 +50,7 @@ type MoveActorCommand struct {
 	isDone      bool
 }
 
-func (c *MoveActorCommand) Init(appContext *core.AppContext) {
+func (c *MoveActorCommand) Init(appContext *app.AppContext) {
 	actor, found := appContext.ActorManager.Find(c.TargetID)
 	if !found {
 		fmt.Printf("MoveActorCommand: Actor with ID '%s' not found.\n", c.TargetID)

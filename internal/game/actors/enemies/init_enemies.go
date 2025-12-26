@@ -5,14 +5,14 @@ import (
 
 	"github.com/leandroatallah/firefly/internal/engine/actors"
 	"github.com/leandroatallah/firefly/internal/engine/actors/enemies"
-	"github.com/leandroatallah/firefly/internal/engine/core"
+	"github.com/leandroatallah/firefly/internal/engine/app"
 )
 
 const (
 	BlueEnemyType enemies.EnemyType = "BLUE"
 )
 
-func InitEnemyMap(ctx *core.AppContext) enemies.EnemyMap {
+func InitEnemyMap(ctx *app.AppContext) enemies.EnemyMap {
 	enemyMap := map[enemies.EnemyType]func(x, y int, id string) actors.ActorEntity{
 		BlueEnemyType: func(x, y int, id string) actors.ActorEntity {
 			enemy, err := NewBlueEnemy(x, y, id)

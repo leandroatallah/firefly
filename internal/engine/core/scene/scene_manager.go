@@ -4,13 +4,13 @@ import (
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/navigation"
-	"github.com/leandroatallah/firefly/internal/engine/core"
 	"github.com/leandroatallah/firefly/internal/engine/systems/audiomanager"
 )
 
 type SceneManager struct {
-	core.AppContextHolder
+	app.AppContextHolder
 
 	current      navigation.Scene
 	factory      SceneFactory

@@ -4,13 +4,13 @@ package scene
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
-	"github.com/leandroatallah/firefly/internal/engine/core"
 	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
 )
 
 type BaseScene struct {
-	core.AppContextHolder
+	app.AppContextHolder
 
 	count          int
 	space          *physics.Space
