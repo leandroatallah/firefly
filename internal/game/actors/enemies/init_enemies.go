@@ -26,4 +26,3 @@ func InitEnemyMap(ctx *core.AppContext) enemies.EnemyMap {
 	}
 	return enemyMap
 }
-
