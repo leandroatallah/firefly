@@ -21,13 +21,13 @@ type Character struct {
 
 	Touchable body.Touchable
 
-	count            int
-	state            ActorState
-	movementState    movement.MovementState
-	movementModel    physics.MovementModel
-	movementBlockers int
-	animationCount   int
-	imageOptions     *ebiten.DrawImageOptions
+	count                int
+	state                ActorState
+	movementState        movement.MovementState
+	movementModel        physics.MovementModel
+	movementBlockers     int
+	invulnerabilityTimer int
+	imageOptions         *ebiten.DrawImageOptions
 }
 
 func NewCharacter(s sprites.SpriteMap, bodyRect *physics.Rect) *Character { // Modified signature
@@ -181,6 +181,14 @@ func (c *Character) handleState() {
 		return
 	}
 
+	// Handle invulnerability timer
+	if c.invulnerabilityTimer > 0 {
+		c.invulnerabilityTimer--
+		if c.invulnerabilityTimer == 0 {
+			c.SetInvulnerability(false)
+		}
+	}
+
 	setNewState := func(s ActorStateEnum) {
 		state, err := NewActorState(c, s)
 		if err != nil {
@@ -193,19 +201,11 @@ func (c *Character) handleState() {
 
 	switch {
 	case state == Hurted:
-		hurtState := c.state.(*HurtState)
-		// The player should be recover the mobility before becomes vulnerable again
-		isRecovered := hurtState.CheckRecovery()
-		if isRecovered {
+		isAnimationOver := c.state.(*HurtState).IsAnimationFinished()
+		if isAnimationOver {
+			setNewState(Idle)
 			c.SetImmobile(false)
 		}
-
-		isInvulnerabilityOver := hurtState.CheckInvulnerability()
-		if isInvulnerabilityOver {
-			setNewState(Idle)
-			c.SetInvulnerability(false)
-		}
-
 	case state != Falling && c.IsFalling():
 		setNewState(Falling)
 	case state != Walking && c.IsWalking():
@@ -220,8 +220,7 @@ func (c *Character) Hurt(damage int) {
 		return
 	}
 
-	// TODO: Check condition to react to damage 0
-	// ...
+	c.LoseHealth(damage)
 
 	// Switch to Hurt state
 	state, err := NewActorState(c, Hurted)
@@ -231,8 +230,7 @@ func (c *Character) Hurt(damage int) {
 	c.SetState(state)
 	c.SetImmobile(true)
 	c.SetInvulnerability(true)
-
-	c.LoseHealth(damage)
+	c.invulnerabilityTimer = 120 // 2 seconds at 60fps
 }
 
 func (c *Character) SetTouchable(t body.Touchable) {

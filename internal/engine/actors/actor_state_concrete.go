@@ -30,34 +30,16 @@ func (s *FallState) OnStart(currentCount int) {
 // Hurt
 type HurtState struct {
 	BaseState
-	count                int
-	durationLimit        int
-	invulnerabilityCount int
-	invulnerabilityLimit int
+	count         int
+	durationLimit int
 }
 
 func (s *HurtState) OnStart(currentCount int) {
 	s.BaseState.OnStart(currentCount)
-	s.durationLimit = 30        // 0.5 sec
-	s.invulnerabilityLimit = 120 // 2 sec
+	s.durationLimit = 30 // 0.5 sec, duration of the hurt animation
 }
 
-func (s *HurtState) CheckRecovery() bool {
+func (s *HurtState) IsAnimationFinished() bool {
 	s.count++
-
-	if s.count > s.durationLimit {
-		return true
-	}
-
-	return false
-}
-
-func (s *HurtState) CheckInvulnerability() bool {
-	s.invulnerabilityCount++
-
-	if s.invulnerabilityCount > s.invulnerabilityLimit {
-		return true
-	}
-
-	return false
+	return s.count > s.durationLimit
 }
