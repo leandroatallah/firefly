@@ -11,7 +11,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/camera"
 	"github.com/leandroatallah/firefly/internal/engine/entity/items"
 	"github.com/leandroatallah/firefly/internal/engine/audiomanager"
-	"github.com/leandroatallah/firefly/internal/engine/systems/tilemap"
+	"github.com/leandroatallah/firefly/internal/engine/render/tilemap"
 )
 
 type TilemapScene struct {

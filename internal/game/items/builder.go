@@ -8,7 +8,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/entity/items"
 	"github.com/leandroatallah/firefly/internal/engine/data/schemas"
 	"github.com/leandroatallah/firefly/internal/engine/physics"
-	"github.com/leandroatallah/firefly/internal/engine/systems/sprites"
+	"github.com/leandroatallah/firefly/internal/engine/render/sprites"
 )
 
 func CreateAnimatedItem(id string, data schemas.SpriteData) (*items.BaseItem, error) {

@@ -8,7 +8,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/data/schemas"
 	"github.com/leandroatallah/firefly/internal/engine/physics"
-	"github.com/leandroatallah/firefly/internal/engine/systems/sprites"
+	"github.com/leandroatallah/firefly/internal/engine/render/sprites"
 )
 
 func CreateAnimatedCharacter(data schemas.SpriteData, stateMap map[string]animation.SpriteState) (*actors.Character, error) {
