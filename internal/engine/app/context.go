@@ -6,7 +6,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/navigation"
 	"github.com/leandroatallah/firefly/internal/engine/levels"
-	"github.com/leandroatallah/firefly/internal/engine/systems/audiomanager"
+	"github.com/leandroatallah/firefly/internal/engine/audiomanager"
 	"github.com/leandroatallah/firefly/internal/engine/systems/datamanager"
 	"github.com/leandroatallah/firefly/internal/engine/systems/imagemanager"
 	"github.com/leandroatallah/firefly/internal/engine/systems/speech"

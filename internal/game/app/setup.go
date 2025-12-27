@@ -12,7 +12,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/assets/font"
 	"github.com/leandroatallah/firefly/internal/engine/levels"
 	"github.com/leandroatallah/firefly/internal/engine/scene"
-	"github.com/leandroatallah/firefly/internal/engine/systems/audiomanager"
+	"github.com/leandroatallah/firefly/internal/engine/audiomanager"
 	"github.com/leandroatallah/firefly/internal/engine/systems/speech"
 	gamescene "github.com/leandroatallah/firefly/internal/game/scenes"
 	scenestypes "github.com/leandroatallah/firefly/internal/game/scenes/types"

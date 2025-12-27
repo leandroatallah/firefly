@@ -5,7 +5,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/leandroatallah/firefly/internal/config"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
-	"github.com/leandroatallah/firefly/internal/engine/systems/input"
+	"github.com/leandroatallah/firefly/internal/engine/input"
 )
 
 type PlatformMovementModel struct {

@@ -10,7 +10,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/camera"
 	"github.com/leandroatallah/firefly/internal/engine/entity/items"
-	"github.com/leandroatallah/firefly/internal/engine/systems/audiomanager"
+	"github.com/leandroatallah/firefly/internal/engine/audiomanager"
 	"github.com/leandroatallah/firefly/internal/engine/systems/tilemap"
 )
 

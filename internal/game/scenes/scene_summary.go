@@ -12,7 +12,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/core/screenutil"
 	"github.com/leandroatallah/firefly/internal/engine/core/transition"
 	"github.com/leandroatallah/firefly/internal/engine/scene"
-	"github.com/leandroatallah/firefly/internal/engine/systems/audiomanager"
+	"github.com/leandroatallah/firefly/internal/engine/audiomanager"
 	scenestypes "github.com/leandroatallah/firefly/internal/game/scenes/types"
 )
 
