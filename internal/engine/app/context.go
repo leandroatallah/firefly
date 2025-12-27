@@ -5,7 +5,7 @@ import (
 
 	"github.com/leandroatallah/firefly/internal/engine/actors"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/navigation"
-	"github.com/leandroatallah/firefly/internal/engine/core/levels"
+	"github.com/leandroatallah/firefly/internal/engine/levels"
 	"github.com/leandroatallah/firefly/internal/engine/systems/audiomanager"
 	"github.com/leandroatallah/firefly/internal/engine/systems/datamanager"
 	"github.com/leandroatallah/firefly/internal/engine/systems/imagemanager"
