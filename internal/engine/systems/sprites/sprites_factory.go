@@ -2,7 +2,7 @@ package sprites
 
 import (
 	"github.com/leandroatallah/firefly/internal/engine/contracts/animation"
-	"github.com/leandroatallah/firefly/internal/engine/schemas"
+	"github.com/leandroatallah/firefly/internal/engine/data/schemas"
 )
 
 // GetSpritesFromAssets converts asset data from a JSON schema into a SpriteMap,

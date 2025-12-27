@@ -3,7 +3,7 @@ package physics
 import (
 	"fmt"
 
-	"github.com/leandroatallah/firefly/internal/config"
+	"github.com/leandroatallah/firefly/internal/engine/data/config"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 )
 

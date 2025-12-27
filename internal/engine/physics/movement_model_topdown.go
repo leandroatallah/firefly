@@ -4,7 +4,7 @@ import (
 	"math"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/leandroatallah/firefly/internal/config"
+	"github.com/leandroatallah/firefly/internal/engine/data/config"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/input"
 )

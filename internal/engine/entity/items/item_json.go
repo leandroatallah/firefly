@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"os"
 
-	"github.com/leandroatallah/firefly/internal/engine/schemas"
+	"github.com/leandroatallah/firefly/internal/engine/data/schemas"
 )
 
 type StatData struct {

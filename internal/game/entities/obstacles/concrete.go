@@ -1,7 +1,7 @@
 package gameobstacles
 
 import (
-	"github.com/leandroatallah/firefly/internal/config"
+	"github.com/leandroatallah/firefly/internal/engine/data/config"
 	"github.com/leandroatallah/firefly/internal/engine/physics"
 )
 

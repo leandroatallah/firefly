@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/leandroatallah/firefly/internal/config"
+	"github.com/leandroatallah/firefly/internal/engine/data/config"
 )
 
 type accVect struct {

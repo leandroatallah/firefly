@@ -8,7 +8,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text"
-	"github.com/leandroatallah/firefly/internal/config"
+	"github.com/leandroatallah/firefly/internal/engine/data/config"
 	"golang.org/x/image/font"
 )
 

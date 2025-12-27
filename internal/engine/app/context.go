@@ -7,8 +7,8 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/contracts/navigation"
 	"github.com/leandroatallah/firefly/internal/engine/levels"
 	"github.com/leandroatallah/firefly/internal/engine/audiomanager"
-	"github.com/leandroatallah/firefly/internal/engine/systems/datamanager"
-	"github.com/leandroatallah/firefly/internal/engine/systems/imagemanager"
+	"github.com/leandroatallah/firefly/internal/engine/data/datamanager"
+	"github.com/leandroatallah/firefly/internal/engine/assets/imagemanager"
 	"github.com/leandroatallah/firefly/internal/engine/ui/speech"
 )
 
