@@ -16,7 +16,7 @@ type BlueEnemy struct {
 }
 
 func NewBlueEnemy(x, y int, id string) (*BlueEnemy, error) {
-	spriteData, statData, err := enemies.ParseJsonEnemy("internal/game/actors/enemies/blue_enemy.json")
+	spriteData, statData, err := enemies.ParseJsonEnemy("internal/game/entity/actors/enemies/blue_enemy.json")
 	if err != nil {
 		log.Fatal(err)
 	}

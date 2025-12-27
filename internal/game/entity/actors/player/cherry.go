@@ -20,7 +20,7 @@ type CherryPlayer struct {
 }
 
 func NewCherryPlayer() (actors.ActorEntity, error) {
-	spriteData, statData, err := actors.ParseJsonPlayer("internal/game/actors/player/cherry.json")
+	spriteData, statData, err := actors.ParseJsonPlayer("internal/game/entity/actors/player/cherry.json")
 	if err != nil {
 		return nil, err
 	}

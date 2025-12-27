@@ -4,7 +4,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/animation"
 	"github.com/leandroatallah/firefly/internal/engine/data/schemas"
-	"github.com/leandroatallah/firefly/internal/game/actors/builder"
+	"github.com/leandroatallah/firefly/internal/game/entity/actors/builder"
 )
 
 func CreateAnimatedCharacter(data schemas.SpriteData) (*actors.Character, error) {

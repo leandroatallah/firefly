@@ -6,7 +6,7 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
-	gameplayer "github.com/leandroatallah/firefly/internal/game/actors/player"
+	gameplayer "github.com/leandroatallah/firefly/internal/game/entity/actors/player"
 )
 
 func (s *LevelsScene) DrawHUD(screen *ebiten.Image) {

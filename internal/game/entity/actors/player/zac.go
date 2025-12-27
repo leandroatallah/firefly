@@ -16,7 +16,7 @@ type ZacPlayer struct {
 func NewZacPlayer(
 	movementBlocker physics.PlayerMovementBlocker,
 ) (actors.ActorEntity, error) {
-	spriteData, statData, err := actors.ParseJsonPlayer("internal/game/actors/player/zac.json")
+	spriteData, statData, err := actors.ParseJsonPlayer("internal/game/entity/actors/player/zac.json")
 	if err != nil {
 		return nil, err
 	}
