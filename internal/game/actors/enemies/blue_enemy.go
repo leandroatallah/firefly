@@ -3,9 +3,9 @@ package gameenemies
 import (
 	"log"
 
-	"github.com/leandroatallah/firefly/internal/engine/actors"
-	"github.com/leandroatallah/firefly/internal/engine/actors/enemies"
-	"github.com/leandroatallah/firefly/internal/engine/actors/movement"
+	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
+	"github.com/leandroatallah/firefly/internal/engine/entity/actors/enemies"
+	"github.com/leandroatallah/firefly/internal/engine/entity/actors/movement"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
 )

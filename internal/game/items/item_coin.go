@@ -5,7 +5,7 @@ import (
 
 	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
-	"github.com/leandroatallah/firefly/internal/engine/items"
+	"github.com/leandroatallah/firefly/internal/engine/entity/items"
 	gameplayer "github.com/leandroatallah/firefly/internal/game/actors/player"
 )
 

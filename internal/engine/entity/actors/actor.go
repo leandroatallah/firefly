@@ -1,7 +1,7 @@
 package actors
 
 import (
-	"github.com/leandroatallah/firefly/internal/engine/actors/movement"
+	"github.com/leandroatallah/firefly/internal/engine/entity/actors/movement"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
 )

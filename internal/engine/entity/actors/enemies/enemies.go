@@ -1,7 +1,7 @@
 package enemies
 
 import (
-	"github.com/leandroatallah/firefly/internal/engine/actors"
+	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 )
 

@@ -1,7 +1,7 @@
 package gameplayer
 
 import (
-	"github.com/leandroatallah/firefly/internal/engine/actors"
+	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/animation"
 	"github.com/leandroatallah/firefly/internal/engine/schemas"
 	"github.com/leandroatallah/firefly/internal/engine/systems/physics"

@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/leandroatallah/firefly/internal/engine/schemas"
-	"github.com/leandroatallah/firefly/internal/engine/actors"
+	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 )
 
 type EnemyData struct {

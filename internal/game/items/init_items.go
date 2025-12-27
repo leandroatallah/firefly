@@ -4,7 +4,7 @@ import (
 	"log"
 
 	"github.com/leandroatallah/firefly/internal/engine/app"
-	"github.com/leandroatallah/firefly/internal/engine/items"
+	"github.com/leandroatallah/firefly/internal/engine/entity/items"
 )
 
 const (

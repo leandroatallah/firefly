@@ -1,7 +1,7 @@
 package gamescenelevels
 
 import (
-	"github.com/leandroatallah/firefly/internal/engine/actors"
+	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 	gameplayer "github.com/leandroatallah/firefly/internal/game/actors/player"
 )
 
