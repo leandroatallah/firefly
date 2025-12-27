@@ -13,7 +13,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/assets/font"
 	"github.com/leandroatallah/firefly/internal/engine/camera"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
-	"github.com/leandroatallah/firefly/internal/engine/core/scene"
+	"github.com/leandroatallah/firefly/internal/engine/scene"
 	"github.com/leandroatallah/firefly/internal/engine/core/transition"
 	"github.com/leandroatallah/firefly/internal/engine/items"
 	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
