@@ -6,7 +6,7 @@ import (
 
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 	"github.com/leandroatallah/firefly/internal/engine/app"
-	"github.com/leandroatallah/firefly/internal/engine/systems/speech"
+	"github.com/leandroatallah/firefly/internal/engine/ui/speech"
 )
 
 // DialogueCommand displays one or more lines of text and waits for player input.

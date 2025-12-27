@@ -9,7 +9,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/audiomanager"
 	"github.com/leandroatallah/firefly/internal/engine/systems/datamanager"
 	"github.com/leandroatallah/firefly/internal/engine/systems/imagemanager"
-	"github.com/leandroatallah/firefly/internal/engine/systems/speech"
+	"github.com/leandroatallah/firefly/internal/engine/ui/speech"
 )
 
 // AppContext holds all major systems and services that are shared across the

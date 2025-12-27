@@ -10,7 +10,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
 	"github.com/leandroatallah/firefly/internal/config"
-	"github.com/leandroatallah/firefly/internal/engine/systems/speech"
+	"github.com/leandroatallah/firefly/internal/engine/ui/speech"
 )
 
 const (
