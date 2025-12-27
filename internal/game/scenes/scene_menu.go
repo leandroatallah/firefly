@@ -10,7 +10,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/assets/font"
 	"github.com/leandroatallah/firefly/internal/engine/scene"
-	"github.com/leandroatallah/firefly/internal/engine/core/transition"
+	"github.com/leandroatallah/firefly/internal/engine/scene/transition"
 	scenestypes "github.com/leandroatallah/firefly/internal/game/scenes/types"
 )
 

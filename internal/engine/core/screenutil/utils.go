@@ -9,12 +9,14 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/assets/font"
 )
 
+// TODO: Move
 func GetCenterOfScreenPosition(width, height int) (int, int) {
 	x := config.Get().ScreenWidth/2 - width/2
 	y := config.Get().ScreenHeight/2 - height/2
 	return x, y
 }
 
+// TODO: Move
 func DrawCenteredText(screen *ebiten.Image, fontText *font.FontText, str string, size float64, c color.Color) {
 	textOp := &text.DrawOptions{
 		LayoutOptions: text.LayoutOptions{
