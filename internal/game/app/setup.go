@@ -10,7 +10,6 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/actors"
 	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/assets/font"
-	"github.com/leandroatallah/firefly/internal/engine/core/game"
 	"github.com/leandroatallah/firefly/internal/engine/core/levels"
 	"github.com/leandroatallah/firefly/internal/engine/core/scene"
 	"github.com/leandroatallah/firefly/internal/engine/systems/audiomanager"
@@ -69,7 +68,7 @@ func Setup(assets fs.FS) error {
 	sceneManager.SetAppContext(appContext)
 
 	// Create and run the game
-	game := game.NewGame(appContext)
+	game := app.NewGame(appContext)
 
 	// Set initial game scene
 	game.AppContext.SceneManager.NavigateTo(scenestypes.SceneLevels, nil, false)

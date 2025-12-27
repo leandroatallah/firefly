@@ -1,4 +1,4 @@
-package game
+package app
 
 import (
 	"fmt"
@@ -9,19 +9,16 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text"
 	"github.com/leandroatallah/firefly/internal/config"
-	"github.com/leandroatallah/firefly/internal/engine/app"
-	"github.com/leandroatallah/firefly/internal/engine/core/game/state"
 	"golang.org/x/image/font"
 )
 
 type Game struct {
-	AppContext    *app.AppContext
-	state         state.GameState
+	AppContext    *AppContext
 	debugVisible  bool
 	debugFontFace font.Face
 }
 
-func NewGame(ctx *app.AppContext) *Game {
+func NewGame(ctx *AppContext) *Game {
 	return &Game{
 		AppContext: ctx,
 	}
@@ -57,18 +54,6 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	return config.Get().ScreenWidth, config.Get().ScreenHeight
-}
-
-func (g *Game) SetState(stateID state.GameStateEnum) error {
-	// state, err := state.NewGameState(stateID, g.AppContext)
-	// if err != nil {
-	// 	return err
-	// }
-	//
-	// g.state = state
-	// g.state.OnStart()
-
-	return nil
 }
 
 func (g *Game) DebugPhysics(screen *ebiten.Image) {
