@@ -3,7 +3,7 @@ package actors
 import (
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors/movement"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
-	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
+	"github.com/leandroatallah/firefly/internal/engine/physics"
 )
 
 // Controllable defines methods for an actor that can be moved or have its movement blocked.

@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
-	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
+	"github.com/leandroatallah/firefly/internal/engine/physics"
 )
 
 type CoinCollector interface {

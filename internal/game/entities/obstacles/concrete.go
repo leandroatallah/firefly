@@ -2,7 +2,7 @@ package gameobstacles
 
 import (
 	"github.com/leandroatallah/firefly/internal/config"
-	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
+	"github.com/leandroatallah/firefly/internal/engine/physics"
 )
 
 const wallWidth = 20

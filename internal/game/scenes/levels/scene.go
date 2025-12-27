@@ -16,7 +16,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/scene"
 	"github.com/leandroatallah/firefly/internal/engine/core/transition"
 	"github.com/leandroatallah/firefly/internal/engine/entity/items"
-	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
+	"github.com/leandroatallah/firefly/internal/engine/physics"
 	gameenemies "github.com/leandroatallah/firefly/internal/game/actors/enemies"
 	gamecamera "github.com/leandroatallah/firefly/internal/game/camera"
 	gameitems "github.com/leandroatallah/firefly/internal/game/items"

@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
-	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
+	"github.com/leandroatallah/firefly/internal/engine/physics"
 )
 
 type LayerNameID int

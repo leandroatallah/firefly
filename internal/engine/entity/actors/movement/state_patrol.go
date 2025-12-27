@@ -2,7 +2,7 @@
 package movement
 
 import (
-	"github.com/leandroatallah/firefly/internal/engine/systems/physics"
+	"github.com/leandroatallah/firefly/internal/engine/physics"
 )
 
 type patrolStateEnum int
