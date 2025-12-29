@@ -16,7 +16,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/ui/speech"
 	gamescene "github.com/leandroatallah/firefly/internal/game/scenes"
 	scenestypes "github.com/leandroatallah/firefly/internal/game/scenes/types"
-	gamespeech "github.com/leandroatallah/firefly/internal/game/speech"
+	gamespeech "github.com/leandroatallah/firefly/internal/game/ui/speech"
 )
 
 func Setup(assets fs.FS) error {
