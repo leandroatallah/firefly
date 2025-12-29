@@ -3,11 +3,11 @@ package builder
 import (
 	"fmt"
 
-	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/animation"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/data/schemas"
-	"github.com/leandroatallah/firefly/internal/engine/physics"
+	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
+	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
 	"github.com/leandroatallah/firefly/internal/engine/render/sprites"
 )
 
@@ -17,7 +17,7 @@ func CreateAnimatedCharacter(data schemas.SpriteData, stateMap map[string]animat
 		return nil, err
 	}
 
-	rect := physics.NewRect(data.BodyRect.Rect())
+	rect := bodyphysics.NewRect(data.BodyRect.Rect())
 	c := actors.NewCharacter(assets, rect)
 	c.SetFaceDirection(data.FacingDirection)
 	c.SetFrameRate(data.FrameRate)
@@ -54,7 +54,7 @@ func SetCharacterBodies(
 		setter.RefreshCollisions()
 	}
 
-	physics.SetCollisionBodies(character, data, stateMap, idProvider, addCollisionRect)
+	bodyphysics.SetCollisionBodies(character, data, stateMap, idProvider, addCollisionRect)
 	return nil
 }
 

@@ -1,10 +1,12 @@
-package physics
+package physicsmovement
 
 import (
 	"math"
 
-	"github.com/leandroatallah/firefly/internal/engine/data/config"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
+	"github.com/leandroatallah/firefly/internal/engine/data/config"
+	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
+	"github.com/leandroatallah/firefly/internal/engine/physics/space"
 )
 
 const (
@@ -80,8 +82,8 @@ func clampAxisVelocity(velocity, limit int) int {
 // It adjusts the body's position if it goes beyond the edges of the screen.
 // It returns true if the body is touching or has gone past the bottom of the screen,
 // which can be interpreted as being on the ground for platformer.
-func clampToPlayArea(body body.MovableCollidable, space *Space) bool {
-	rect, ok := body.GetShape().(*Rect)
+func clampToPlayArea(body body.MovableCollidable, space *space.Space) bool {
+	rect, ok := body.GetShape().(*bodyphysics.Rect)
 	if !ok {
 		return false
 	}
@@ -96,7 +98,7 @@ func clampToPlayArea(body body.MovableCollidable, space *Space) bool {
 	x16, y16 := x*cfg.Unit, y*cfg.Unit
 
 	x16 = body.Position().Min.X * cfg.Unit
-	rightEdge := x16 + rect.width*cfg.Unit
+	rightEdge := x16 + cfg.To16(rect.Width())
 	maxRight := cfg.ScreenWidth * cfg.Unit
 	provider := space.GetTilemapDimensionsProvider()
 	if provider != nil {
@@ -121,7 +123,7 @@ func clampToPlayArea(body body.MovableCollidable, space *Space) bool {
 	}
 
 	y16 = body.Position().Min.Y * cfg.Unit
-	bottom := y16 + rect.height*cfg.Unit
+	bottom := y16 + cfg.To16(rect.Height())
 	if bottom >= maxBottom {
 		if bottom > maxBottom {
 			_, _, _ = body.ApplyValidPosition(maxBottom-bottom, false, nil)

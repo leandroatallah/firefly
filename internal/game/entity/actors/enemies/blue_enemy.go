@@ -3,11 +3,11 @@ package gameenemies
 import (
 	"log"
 
+	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors/enemies"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors/movement"
-	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
-	"github.com/leandroatallah/firefly/internal/engine/physics"
+	physicsmovement "github.com/leandroatallah/firefly/internal/engine/physics/movement"
 )
 
 type BlueEnemy struct {
@@ -36,7 +36,7 @@ func NewBlueEnemy(x, y int, id string) (*BlueEnemy, error) {
 		return nil, err
 	}
 
-	model, err := physics.NewMovementModel(physics.Platform, nil)
+	model, err := physicsmovement.NewMovementModel(physicsmovement.Platform, nil)
 	if err != nil {
 		return nil, err
 	}

@@ -1,10 +1,11 @@
-package physics
+package skill
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
-	"github.com/leandroatallah/firefly/internal/engine/data/config"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
+	"github.com/leandroatallah/firefly/internal/engine/data/config"
+	physicsmovement "github.com/leandroatallah/firefly/internal/engine/physics/movement"
 )
 
 // DashSkill implements a dash and air dash ability.
@@ -37,20 +38,20 @@ func (d *DashSkill) ActivationKey() ebiten.Key {
 }
 
 // HandleInput checks for the dash activation key.
-func (d *DashSkill) HandleInput(body body.MovableCollidable, model *PlatformMovementModel) {
+func (d *DashSkill) HandleInput(body body.MovableCollidable, model *physicsmovement.PlatformMovementModel) {
 	if inpututil.IsKeyJustPressed(d.activationKey) {
 		d.tryActivate(body, model)
 	}
 }
 
 // Update manages the skill's state, timers, and applies its effects.
-func (d *DashSkill) Update(b body.MovableCollidable, model *PlatformMovementModel) {
+func (d *DashSkill) Update(b body.MovableCollidable, model *physicsmovement.PlatformMovementModel) {
 	d.SkillBase.Update(b, model)
 
 	vx16, vy16 := b.Velocity()
 
 	// Reset air dash capability when the player lands.
-	if model.onGround {
+	if model.OnGround() {
 		d.airDashUsed = false
 	}
 
@@ -79,13 +80,13 @@ func (d *DashSkill) Update(b body.MovableCollidable, model *PlatformMovementMode
 	}
 }
 
-func (d *DashSkill) tryActivate(body body.MovableCollidable, model *PlatformMovementModel) {
+func (d *DashSkill) tryActivate(body body.MovableCollidable, model *physicsmovement.PlatformMovementModel) {
 	if d.state != StateReady {
 		return
 	}
 
 	// Check for air dash conditions
-	if !model.onGround {
+	if !model.OnGround() {
 		if !d.canAirDash || d.airDashUsed {
 			return
 		}

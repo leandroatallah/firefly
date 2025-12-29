@@ -1,10 +1,10 @@
-package physics
+package bodyphysics
 
 import (
 	"fmt"
 
-	"github.com/leandroatallah/firefly/internal/engine/data/config"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
+	"github.com/leandroatallah/firefly/internal/engine/data/config"
 )
 
 type MovableBody struct {

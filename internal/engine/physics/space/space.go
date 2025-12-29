@@ -1,4 +1,4 @@
-package physics
+package space
 
 import (
 	"log"
@@ -84,7 +84,7 @@ func (s *Space) ResolveCollisions(body body.Collidable) (touching bool, blocking
 			continue
 		}
 
-		if !hasCollision(body, other) {
+		if !HasCollision(body, other) {
 			continue
 		}
 
@@ -103,7 +103,7 @@ func (s *Space) ResolveCollisions(body body.Collidable) (touching bool, blocking
 	return touching, blocking
 }
 
-func hasCollision(a, b body.Collidable) bool {
+func HasCollision(a, b body.Collidable) bool {
 	// Every body must have an ID
 	if a.ID() == "" || b.ID() == "" {
 		return false

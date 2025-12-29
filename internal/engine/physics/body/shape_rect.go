@@ -1,4 +1,4 @@
-package physics
+package bodyphysics
 
 type Rect struct {
 	width, height int

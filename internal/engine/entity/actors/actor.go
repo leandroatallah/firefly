@@ -1,9 +1,9 @@
 package actors
 
 import (
-	"github.com/leandroatallah/firefly/internal/engine/entity/actors/movement"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
-	"github.com/leandroatallah/firefly/internal/engine/physics"
+	"github.com/leandroatallah/firefly/internal/engine/entity/actors/movement"
+	physicsmovement "github.com/leandroatallah/firefly/internal/engine/physics/movement"
 )
 
 // Controllable defines methods for an actor that can be moved or have its movement blocked.
@@ -44,7 +44,7 @@ type ActorEntity interface {
 	body.MovableCollidableAlive
 
 	Update(space body.BodiesSpace) error
-	MovementModel() physics.MovementModel
-	SetMovementModel(model physics.MovementModel)
+	MovementModel() physicsmovement.MovementModel
+	SetMovementModel(model physicsmovement.MovementModel)
 	GetCharacter() *Character
 }

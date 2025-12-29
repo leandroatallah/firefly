@@ -8,16 +8,17 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
-	"github.com/leandroatallah/firefly/internal/engine/physics"
+	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
+	"github.com/leandroatallah/firefly/internal/engine/physics/space"
 	"github.com/leandroatallah/firefly/internal/engine/render/sprites"
 )
 
 type BaseItem struct {
 	app.AppContextHolder
 	sprites.SpriteEntity
-	*physics.CollidableBody
-	*physics.MovableBody
-	*physics.StateCollisionManager[ItemStateEnum]
+	*bodyphysics.CollidableBody
+	*bodyphysics.MovableBody
+	*space.StateCollisionManager[ItemStateEnum]
 
 	count        int
 	removed      bool
@@ -25,11 +26,11 @@ type BaseItem struct {
 	state        ItemState
 }
 
-func NewBaseItem(id string, s sprites.SpriteMap, bodyRect *physics.Rect) *BaseItem {
+func NewBaseItem(id string, s sprites.SpriteMap, bodyRect *bodyphysics.Rect) *BaseItem {
 	spriteEntity := sprites.NewSpriteEntity(s)
-	b := physics.NewBody(bodyRect)
-	movable := physics.NewMovableBody(b)
-	collidable := physics.NewCollidableBody(b)
+	b := bodyphysics.NewBody(bodyRect)
+	movable := bodyphysics.NewMovableBody(b)
+	collidable := bodyphysics.NewCollidableBody(b)
 
 	base := &BaseItem{
 		MovableBody:    movable,
@@ -38,7 +39,7 @@ func NewBaseItem(id string, s sprites.SpriteMap, bodyRect *physics.Rect) *BaseIt
 		SpriteEntity:   spriteEntity,
 	}
 	base.SetID(id)
-	base.StateCollisionManager = physics.NewStateCollisionManager[ItemStateEnum](base)
+	base.StateCollisionManager = space.NewStateCollisionManager[ItemStateEnum](base)
 
 	state, err := NewItemState(base, Idle)
 	if err != nil {

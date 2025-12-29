@@ -1,12 +1,13 @@
-package physics
+package physicsmovement
 
 import (
 	"math"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/leandroatallah/firefly/internal/engine/data/config"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
+	"github.com/leandroatallah/firefly/internal/engine/data/config"
 	"github.com/leandroatallah/firefly/internal/engine/input"
+	spacephysics "github.com/leandroatallah/firefly/internal/engine/physics/space"
 )
 
 type TopDownMovementModel struct {
@@ -38,7 +39,7 @@ func (m *TopDownMovementModel) Update(body body.MovableCollidable, space body.Bo
 	vx16, vy16 = body.Velocity()
 
 	// Prevents leaving the play area`
-	clampToPlayArea(body, space.(*Space))
+	clampToPlayArea(body, space.(*spacephysics.Space))
 
 	// Convert the raw input acceleration into a scaled and normalized vector.
 	accX, accY := body.Acceleration()

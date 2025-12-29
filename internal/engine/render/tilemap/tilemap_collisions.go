@@ -4,7 +4,8 @@ import (
 	"fmt"
 
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
-	"github.com/leandroatallah/firefly/internal/engine/physics"
+	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
+	"github.com/leandroatallah/firefly/internal/engine/physics/space"
 )
 
 type LayerNameID int
@@ -25,7 +26,7 @@ var LayerNameMap = map[string]LayerNameID{
 	"Endpoint":    EndpointLayer,
 }
 
-func (t *Tilemap) CreateCollisionBodies(space *physics.Space, triggerEndpoint body.Touchable) error {
+func (t *Tilemap) CreateCollisionBodies(space *space.Space, triggerEndpoint body.Touchable) error {
 	endpointLayer, err := t.FindLayerByName("Endpoint")
 	if err != nil {
 		return err
@@ -48,11 +49,11 @@ func (t *Tilemap) CreateCollisionBodies(space *physics.Space, triggerEndpoint bo
 	return nil
 }
 
-func (t *Tilemap) NewObstacleRect(obj *Obstacle, prefix string, isObstructive bool) *physics.ObstacleRect {
+func (t *Tilemap) NewObstacleRect(obj *Obstacle, prefix string, isObstructive bool) *bodyphysics.ObstacleRect {
 	y := int(obj.Y)
 
-	rect := physics.NewRect(int(obj.X), y, int(obj.Width), int(obj.Height))
-	o := physics.NewObstacleRect(rect)
+	rect := bodyphysics.NewRect(int(obj.X), y, int(obj.Width), int(obj.Height))
+	o := bodyphysics.NewObstacleRect(rect)
 	o.SetPosition(int(obj.X), y)
 	var id string
 	for _, p := range obj.Properties {

@@ -13,7 +13,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors/enemies"
 	"github.com/leandroatallah/firefly/internal/engine/entity/items"
-	"github.com/leandroatallah/firefly/internal/engine/physics"
+	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
 	"github.com/leandroatallah/firefly/internal/engine/render/camera"
 	"github.com/leandroatallah/firefly/internal/engine/scene"
 	"github.com/leandroatallah/firefly/internal/engine/scene/transition"
@@ -90,7 +90,7 @@ func (s *PhasesScene) OnStart() {
 	s.cam.SetFollowTarget(s.player)
 
 	// Init collisions bodies and touch trigger for endpoints
-	endpointTrigger := physics.NewTouchTrigger(s.finishPhase, s.player)
+	endpointTrigger := bodyphysics.NewTouchTrigger(s.finishPhase, s.player)
 	s.Tilemap().CreateCollisionBodies(s.PhysicsSpace(), endpointTrigger)
 
 	s.phaseCompleted = false

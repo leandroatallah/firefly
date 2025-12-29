@@ -1,4 +1,4 @@
-package physics
+package space
 
 type TilemapDimensionsProvider interface {
 	GetTilemapWidth() int

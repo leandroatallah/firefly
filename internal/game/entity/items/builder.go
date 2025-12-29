@@ -5,9 +5,9 @@ import (
 
 	"github.com/leandroatallah/firefly/internal/engine/contracts/animation"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
-	"github.com/leandroatallah/firefly/internal/engine/entity/items"
 	"github.com/leandroatallah/firefly/internal/engine/data/schemas"
-	"github.com/leandroatallah/firefly/internal/engine/physics"
+	"github.com/leandroatallah/firefly/internal/engine/entity/items"
+	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
 	"github.com/leandroatallah/firefly/internal/engine/render/sprites"
 )
 
@@ -20,7 +20,7 @@ func CreateAnimatedItem(id string, data schemas.SpriteData) (*items.BaseItem, er
 		return nil, err
 	}
 
-	rect := physics.NewRect(data.BodyRect.Rect())
+	rect := bodyphysics.NewRect(data.BodyRect.Rect())
 	b := items.NewBaseItem(id, assets, rect)
 	b.SetFaceDirection(data.FacingDirection)
 	b.SetFrameRate(data.FrameRate)
@@ -55,7 +55,7 @@ func SetItemBodies(item items.Item, data schemas.SpriteData) error {
 		setter.AddCollisionRect(itemState, rect)
 	}
 
-	physics.SetCollisionBodies(item, data, stateMap, idProvider, addCollisionRect)
+	bodyphysics.SetCollisionBodies(item, data, stateMap, idProvider, addCollisionRect)
 	return nil
 }
 

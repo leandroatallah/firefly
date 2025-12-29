@@ -6,19 +6,19 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
-	"github.com/leandroatallah/firefly/internal/engine/physics"
+	"github.com/leandroatallah/firefly/internal/engine/physics/space"
 )
 
 type BaseScene struct {
 	app.AppContextHolder
 
 	count          int
-	space          *physics.Space
+	space          *space.Space
 	IsKeysDisabled bool
 }
 
 func NewScene() *BaseScene {
-	return &BaseScene{space: physics.NewSpace()}
+	return &BaseScene{space: space.NewSpace()}
 }
 
 func (s *BaseScene) Draw(screen *ebiten.Image) {}
@@ -40,9 +40,9 @@ func (s *BaseScene) AddBoundaries(boundaries ...body.MovableCollidable) {
 	}
 }
 
-func (s *BaseScene) PhysicsSpace() *physics.Space {
+func (s *BaseScene) PhysicsSpace() *space.Space {
 	if s.space == nil {
-		s.space = physics.NewSpace()
+		s.space = space.NewSpace()
 	}
 	return s.space
 }

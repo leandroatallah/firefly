@@ -1,4 +1,4 @@
-package physics
+package space
 
 import (
 	"fmt"
@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
+	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
 )
 
 // StateEnum is a constraint for generic types that represent states, typically as integers.
@@ -48,12 +49,12 @@ func (m *StateCollisionManager[T]) RefreshCollisions() {
 		m.owner.ClearCollisions()
 		x, y := m.owner.GetPositionMin()
 		for _, r := range rects {
-			template, ok := r.(*CollidableBody)
+			template, ok := r.(*bodyphysics.CollidableBody)
 			if !ok {
 				continue
 			}
 
-			newCollisionBody := NewCollidableBody(NewBody(template.GetShape()))
+			newCollisionBody := bodyphysics.NewCollidableBody(bodyphysics.NewBody(template.GetShape()))
 			relativePos := template.Position()
 			newPos := image.Rect(
 				x+relativePos.Min.X,

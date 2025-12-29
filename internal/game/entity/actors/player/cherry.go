@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
-	"github.com/leandroatallah/firefly/internal/engine/physics"
+	physicsmovement "github.com/leandroatallah/firefly/internal/engine/physics/movement"
 )
 
 type CoinCollector interface {
@@ -40,7 +40,7 @@ func NewCherryPlayer() (actors.ActorEntity, error) {
 		return nil, fmt.Errorf("SetPlayerStats: %w", err)
 	}
 	// Pass player itself
-	if err = SetMovementModel(player, physics.Platform); err != nil {
+	if err = SetMovementModel(player, physicsmovement.Platform); err != nil {
 		return nil, fmt.Errorf("SetMovementModel: %w", err)
 	}
 

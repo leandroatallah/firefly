@@ -4,9 +4,9 @@ import (
 	"image"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/leandroatallah/firefly/internal/engine/data/config"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
-	"github.com/leandroatallah/firefly/internal/engine/physics"
+	"github.com/leandroatallah/firefly/internal/engine/data/config"
+	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
 	"github.com/setanarut/kamera/v2"
 )
 
@@ -26,7 +26,7 @@ func NewController(x, y float64) *Controller {
 
 	// Create a body to be the camera's direct target
 	// targetBody := physics.NewPhysicsBody(physics.NewRect(0, 0, 1, 1))
-	targetBody := physics.NewCollidableBodyFromRect(physics.NewRect(0, 0, 1, 1))
+	targetBody := bodyphysics.NewCollidableBodyFromRect(bodyphysics.NewRect(0, 0, 1, 1))
 
 	return &Controller{
 		cam:    cam,

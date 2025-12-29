@@ -1,9 +1,7 @@
 // Package movement provides the patrol movement behavior for actors.
 package movement
 
-import (
-	"github.com/leandroatallah/firefly/internal/engine/physics"
-)
+import bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
 
 type patrolStateEnum int
 
@@ -14,12 +12,12 @@ const (
 
 // WaypointConfig holds configuration for waypoint generation
 type WaypointConfig struct {
-	Predefined []*physics.Rect // Custom waypoints for Predefined type
-	IdleDelay  int             // Delay in frames between waypoint transitions
+	Predefined []*bodyphysics.Rect // Custom waypoints for Predefined type
+	IdleDelay  int                 // Delay in frames between waypoint transitions
 }
 
 // NewPredefinedWaypointConfig creates a predefined waypoint configuration
-func NewPredefinedWaypointConfig(waypoints []*physics.Rect, idleDelay int) *WaypointConfig {
+func NewPredefinedWaypointConfig(waypoints []*bodyphysics.Rect, idleDelay int) *WaypointConfig {
 	return &WaypointConfig{
 		Predefined: waypoints,
 		IdleDelay:  idleDelay,
@@ -30,7 +28,7 @@ type PatrolMovementState struct {
 	BaseMovementState
 	count              int
 	currentTargetIndex int
-	waypoints          []*physics.Rect
+	waypoints          []*bodyphysics.Rect
 	patrolState        patrolStateEnum
 	movementDirections MovementDirections
 	idleDelay          int
@@ -45,7 +43,7 @@ func NewPatrolMovementState(base BaseMovementState) *PatrolMovementState {
 func (s *PatrolMovementState) generateWaypoints() {
 	if s.waypointConfig == nil {
 		// Fallback to no waypoints if none are provided
-		s.waypoints = []*physics.Rect{}
+		s.waypoints = []*bodyphysics.Rect{}
 		return
 	}
 	s.waypoints = append(s.waypoints, s.waypointConfig.Predefined...)
@@ -55,7 +53,7 @@ func (s *PatrolMovementState) generateWaypoints() {
 func (s *PatrolMovementState) SetWaypointConfig(config *WaypointConfig) {
 	s.waypointConfig = config
 	// Regenerate waypoints with new configuration
-	s.waypoints = []*physics.Rect{}
+	s.waypoints = []*bodyphysics.Rect{}
 	s.generateWaypoints()
 }
 
@@ -75,7 +73,7 @@ func (s *PatrolMovementState) OnStart() {
 
 	if len(s.waypoints) > 0 {
 		target := s.CurrentWaypoint()
-		o := physics.NewObstacleRect(target)
+		o := bodyphysics.NewObstacleRect(target)
 		s.movementDirections = calculateMovementDirections(s.actor, o, false)
 		s.patrolState = patrolChase
 	}
@@ -99,7 +97,7 @@ func (s *PatrolMovementState) Move() {
 		if s.count > s.idleDelay {
 			s.currentTargetIndex = (s.currentTargetIndex + 1) % len(s.waypoints)
 			target := s.CurrentWaypoint()
-			o := physics.NewObstacleRect(target)
+			o := bodyphysics.NewObstacleRect(target)
 			s.movementDirections = calculateMovementDirections(s.actor, o, false)
 			s.patrolState = patrolChase
 			s.count = 0
@@ -113,7 +111,7 @@ func (s *PatrolMovementState) Move() {
 	}
 }
 
-func (s *PatrolMovementState) CurrentWaypoint() *physics.Rect {
+func (s *PatrolMovementState) CurrentWaypoint() *bodyphysics.Rect {
 	current := s.waypoints[s.currentTargetIndex]
 	return current
 }

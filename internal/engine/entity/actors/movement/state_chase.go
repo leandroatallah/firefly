@@ -5,7 +5,7 @@ import (
 	"image"
 
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
-	"github.com/leandroatallah/firefly/internal/engine/physics"
+	"github.com/leandroatallah/firefly/internal/engine/physics/space"
 )
 
 // ChaseMovementState implements the A* pathfinding algorithm to chase a target.
@@ -143,7 +143,7 @@ func (s *ChaseMovementState) isTraversable(point image.Point, size image.Point) 
 	var boundsChecked bool
 
 	// Check against map boundaries if the actor has a physics space.
-	if sa, ok := s.actor.(interface{ Space() *physics.Space }); ok {
+	if sa, ok := s.actor.(interface{ Space() *space.Space }); ok {
 		if space := sa.Space(); space != nil {
 			if provider := space.GetTilemapDimensionsProvider(); provider != nil {
 				boundsChecked = true

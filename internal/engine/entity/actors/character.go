@@ -5,37 +5,39 @@ import (
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/leandroatallah/firefly/internal/engine/entity/actors/movement"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
-	"github.com/leandroatallah/firefly/internal/engine/physics"
+	"github.com/leandroatallah/firefly/internal/engine/entity/actors/movement"
+	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
+	physicsmovement "github.com/leandroatallah/firefly/internal/engine/physics/movement"
+	"github.com/leandroatallah/firefly/internal/engine/physics/space"
 	"github.com/leandroatallah/firefly/internal/engine/render/sprites"
 )
 
 type Character struct {
 	sprites.SpriteEntity
 
-	*physics.MovableBody
-	*physics.CollidableBody
-	*physics.AliveBody
-	*physics.StateCollisionManager[ActorStateEnum]
+	*bodyphysics.MovableBody
+	*bodyphysics.CollidableBody
+	*bodyphysics.AliveBody
+	*space.StateCollisionManager[ActorStateEnum]
 
 	Touchable body.Touchable
 
 	count                int
 	state                ActorState
 	movementState        movement.MovementState
-	movementModel        physics.MovementModel
+	movementModel        physicsmovement.MovementModel
 	movementBlockers     int
 	invulnerabilityTimer int
 	imageOptions         *ebiten.DrawImageOptions
 }
 
-func NewCharacter(s sprites.SpriteMap, bodyRect *physics.Rect) *Character { // Modified signature
+func NewCharacter(s sprites.SpriteMap, bodyRect *bodyphysics.Rect) *Character { // Modified signature
 	spriteEntity := sprites.NewSpriteEntity(s)
-	b := physics.NewBody(bodyRect)
-	movable := physics.NewMovableBody(b)
-	collidable := physics.NewCollidableBody(b)
-	alive := physics.NewAliveBody(b)
+	b := bodyphysics.NewBody(bodyRect)
+	movable := bodyphysics.NewMovableBody(b)
+	collidable := bodyphysics.NewCollidableBody(b)
+	alive := bodyphysics.NewAliveBody(b)
 	c := &Character{
 		MovableBody:    movable,
 		CollidableBody: collidable,
@@ -44,7 +46,7 @@ func NewCharacter(s sprites.SpriteMap, bodyRect *physics.Rect) *Character { // M
 		SpriteEntity: spriteEntity,
 		imageOptions: &ebiten.DrawImageOptions{},
 	}
-	c.StateCollisionManager = physics.NewStateCollisionManager[ActorStateEnum](c)
+	c.StateCollisionManager = space.NewStateCollisionManager[ActorStateEnum](c)
 
 	state, err := NewActorState(c, Idle)
 	if err != nil {
@@ -291,10 +293,10 @@ func (c *Character) TryJump(force int) {
 }
 
 // Movement Model methods
-func (c *Character) SetMovementModel(model physics.MovementModel) {
+func (c *Character) SetMovementModel(model physicsmovement.MovementModel) {
 	c.movementModel = model
 }
 
-func (c *Character) MovementModel() physics.MovementModel {
+func (c *Character) MovementModel() physicsmovement.MovementModel {
 	return c.movementModel
 }

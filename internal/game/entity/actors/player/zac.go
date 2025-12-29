@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
-	"github.com/leandroatallah/firefly/internal/engine/physics"
+	physicsmovement "github.com/leandroatallah/firefly/internal/engine/physics/movement"
 )
 
 type ZacPlayer struct {
@@ -14,7 +14,7 @@ type ZacPlayer struct {
 }
 
 func NewZacPlayer(
-	movementBlocker physics.PlayerMovementBlocker,
+	movementBlocker physicsmovement.PlayerMovementBlocker,
 ) (actors.ActorEntity, error) {
 	spriteData, statData, err := actors.ParseJsonPlayer("internal/game/entity/actors/player/zac.json")
 	if err != nil {
@@ -36,7 +36,7 @@ func NewZacPlayer(
 		return nil, fmt.Errorf("SetPlayerStats: %w", err)
 	}
 	// Pass player itself
-	if err = SetMovementModel(player, physics.Platform); err != nil {
+	if err = SetMovementModel(player, physicsmovement.Platform); err != nil {
 		return nil, fmt.Errorf("SetMovementModel: %w", err)
 	}
 

@@ -1,10 +1,10 @@
 package gameplayer
 
 import (
-	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/animation"
 	"github.com/leandroatallah/firefly/internal/engine/data/schemas"
-	"github.com/leandroatallah/firefly/internal/engine/physics"
+	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
+	physicsmovement "github.com/leandroatallah/firefly/internal/engine/physics/movement"
 	"github.com/leandroatallah/firefly/internal/game/entity/actors/builder"
 )
 
@@ -38,9 +38,9 @@ func SetPlayerStats(player actors.ActorEntity, data actors.StatData) error {
 
 func SetMovementModel(
 	player actors.ActorEntity,
-	movementModel physics.MovementModelEnum,
+	movementModel physicsmovement.MovementModelEnum,
 ) error {
-	model, err := physics.NewMovementModel(movementModel, player)
+	model, err := physicsmovement.NewMovementModel(movementModel, player)
 	if err != nil {
 		return err
 	}

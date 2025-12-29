@@ -1,11 +1,11 @@
-package physics
+package bodyphysics
 
 import (
 	"image"
 	"log"
 
-	"github.com/leandroatallah/firefly/internal/engine/data/config"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
+	"github.com/leandroatallah/firefly/internal/engine/data/config"
 )
 
 type Body struct {

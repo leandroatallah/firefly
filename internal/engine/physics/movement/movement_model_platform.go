@@ -1,11 +1,12 @@
-package physics
+package physicsmovement
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
-	"github.com/leandroatallah/firefly/internal/engine/data/config"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
+	"github.com/leandroatallah/firefly/internal/engine/data/config"
 	"github.com/leandroatallah/firefly/internal/engine/input"
+	spacephysics "github.com/leandroatallah/firefly/internal/engine/physics/space"
 )
 
 type PlatformMovementModel struct {
@@ -151,7 +152,7 @@ func (m *PlatformMovementModel) Update(body body.MovableCollidable, space body.B
 		m.onGround = false
 	}
 
-	if clampToPlayArea(body, space.(*Space)) {
+	if clampToPlayArea(body, space.(*spacephysics.Space)) {
 		vy16 = cfg.Physics.DownwardGravity - 1
 		body.SetVelocity(vx16, vy16)
 	}
@@ -239,7 +240,7 @@ func (m *PlatformMovementModel) InputHandlerJump(body body.MovableCollidable, sp
 					continue
 				}
 
-				if !hasCollision(body, other) {
+				if !spacephysics.HasCollision(body, other) {
 					continue
 				}
 
@@ -265,4 +266,8 @@ func (m *PlatformMovementModel) InputHandlerJump(body body.MovableCollidable, sp
 	}
 
 	body.SetVelocity(vx16, vy16)
+}
+
+func (m *PlatformMovementModel) OnGround() bool {
+	return m.onGround
 }
