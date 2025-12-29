@@ -5,6 +5,6 @@ import "github.com/leandroatallah/firefly/internal/engine/contracts/navigation"
 const (
 	SceneIntro navigation.SceneType = iota
 	SceneMenu
-	SceneLevels
+	ScenePhases
 	SceneSummary
 )

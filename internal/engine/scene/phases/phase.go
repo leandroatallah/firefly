@@ -1,8 +1,8 @@
-package levels
+package phases
 
-type Level struct {
+type Phase struct {
 	ID          int
 	Name        string
 	TilemapPath string
-	NextLevelID int
+	NextPhaseID int
 }

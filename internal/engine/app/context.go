@@ -3,12 +3,12 @@ package app
 import (
 	"io/fs"
 
-	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
-	"github.com/leandroatallah/firefly/internal/engine/contracts/navigation"
-	"github.com/leandroatallah/firefly/internal/engine/levels"
-	"github.com/leandroatallah/firefly/internal/engine/audio"
-	"github.com/leandroatallah/firefly/internal/engine/data/datamanager"
 	"github.com/leandroatallah/firefly/internal/engine/assets/imagemanager"
+	"github.com/leandroatallah/firefly/internal/engine/audio"
+	"github.com/leandroatallah/firefly/internal/engine/contracts/navigation"
+	"github.com/leandroatallah/firefly/internal/engine/data/datamanager"
+	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
+	"github.com/leandroatallah/firefly/internal/engine/scene/phases"
 	"github.com/leandroatallah/firefly/internal/engine/ui/speech"
 )
 
@@ -23,7 +23,7 @@ type AppContext struct {
 	DialogueManager *speech.Manager
 	ActorManager    *actors.Manager
 	SceneManager    navigation.SceneManager
-	LevelManager    *levels.Manager
+	PhaseManager    *phases.Manager
 	Assets          fs.FS
 }
 

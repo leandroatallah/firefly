@@ -1,4 +1,4 @@
-package gamescenelevels
+package gamescenephases
 
 import (
 	"fmt"
@@ -9,7 +9,7 @@ import (
 	gameplayer "github.com/leandroatallah/firefly/internal/game/entity/actors/player"
 )
 
-func (s *LevelsScene) DrawHUD(screen *ebiten.Image) {
+func (s *PhasesScene) DrawHUD(screen *ebiten.Image) {
 	coinCount := 0
 
 	if p, ok := s.player.(*gameplayer.CherryPlayer); ok {

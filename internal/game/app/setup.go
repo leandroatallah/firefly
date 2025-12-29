@@ -6,13 +6,13 @@ import (
 	"strings"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/leandroatallah/firefly/internal/engine/data/config"
-	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/assets/font"
-	"github.com/leandroatallah/firefly/internal/engine/levels"
-	"github.com/leandroatallah/firefly/internal/engine/scene"
 	"github.com/leandroatallah/firefly/internal/engine/audio"
+	"github.com/leandroatallah/firefly/internal/engine/data/config"
+	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
+	"github.com/leandroatallah/firefly/internal/engine/scene"
+	"github.com/leandroatallah/firefly/internal/engine/scene/phases"
 	"github.com/leandroatallah/firefly/internal/engine/ui/speech"
 	gamescene "github.com/leandroatallah/firefly/internal/game/scenes"
 	scenestypes "github.com/leandroatallah/firefly/internal/game/scenes/types"
@@ -28,7 +28,7 @@ func Setup(assets fs.FS) error {
 	// Initialize all systems and managers
 	audioManager := audio.NewAudioManager()
 	sceneManager := scene.NewSceneManager()
-	levelManager := levels.NewManager()
+	phaseManager := phases.NewManager()
 	actorManager := actors.NewManager()
 
 	// Initialize Dialogue Manager
@@ -43,19 +43,19 @@ func Setup(assets fs.FS) error {
 	// Load audio assets
 	loadAudioAssetsFromFS(assets, audioManager)
 
-	// Load levels
-	level1 := levels.Level{ID: 1, Name: "Level 1", TilemapPath: "assets/tilemap/sample-level-1.tmj", NextLevelID: 2}
-	level2 := levels.Level{ID: 2, Name: "Level 2", TilemapPath: "assets/tilemap/sample-level-2.tmj", NextLevelID: 0} // 0 means no next level
-	levelManager.AddLevel(level1)
-	levelManager.AddLevel(level2)
-	levelManager.SetCurrentLevel(1)
+	// Load phases
+	phase1 := phases.Phase{ID: 1, Name: "Phase 1", TilemapPath: "assets/tilemap/sample-phase-1.tmj", NextPhaseID: 2}
+	phase2 := phases.Phase{ID: 2, Name: "Phase 2", TilemapPath: "assets/tilemap/sample-phase-2.tmj", NextPhaseID: 0} // 0 means no next phase
+	phaseManager.AddPhase(phase1)
+	phaseManager.AddPhase(phase2)
+	phaseManager.SetCurrentPhase(1)
 
 	appContext := &app.AppContext{
 		AudioManager:    audioManager,
 		DialogueManager: dialogueManager,
 		ActorManager:    actorManager,
 		SceneManager:    sceneManager,
-		LevelManager:    levelManager,
+		PhaseManager:    phaseManager,
 		ImageManager:    nil,
 		DataManager:     nil,
 		Assets:          assets,
@@ -71,7 +71,7 @@ func Setup(assets fs.FS) error {
 	game := app.NewGame(appContext)
 
 	// Set initial game scene
-	game.AppContext.SceneManager.NavigateTo(scenestypes.SceneLevels, nil, false)
+	game.AppContext.SceneManager.NavigateTo(scenestypes.ScenePhases, nil, false)
 
 	if err := ebiten.RunGame(game); err != nil {
 		return err

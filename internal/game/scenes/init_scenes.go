@@ -3,7 +3,7 @@ package gamescene
 import (
 	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/navigation"
-	gamescenelevels "github.com/leandroatallah/firefly/internal/game/scenes/levels"
+	gamescenephases "github.com/leandroatallah/firefly/internal/game/scenes/phases"
 	scenestypes "github.com/leandroatallah/firefly/internal/game/scenes/types"
 )
 
@@ -15,8 +15,8 @@ func InitSceneMap(context *app.AppContext) navigation.SceneMap {
 		scenestypes.SceneMenu: func() navigation.Scene {
 			return NewMenuScene(context)
 		},
-		scenestypes.SceneLevels: func() navigation.Scene {
-			return gamescenelevels.NewLevelsScene(context)
+		scenestypes.ScenePhases: func() navigation.Scene {
+			return gamescenephases.NewPhasesScene(context)
 		},
 		scenestypes.SceneSummary: func() navigation.Scene {
 			return NewSummaryScene(context)

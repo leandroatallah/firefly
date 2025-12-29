@@ -6,8 +6,8 @@ A 2D game built with Ebitengine, featuring a modular architecture.
 
 The project is structured into two main packages: `engine` and `game`.
 
--   **`internal/engine`**: The core game engine, providing reusable components for scenes, physics, actors, and other systems.
--   **`internal/game`**: The specific implementation of the game, including scenes, characters, and items.
+- **`internal/engine`**: The core game engine, providing reusable components for scenes, physics, actors, and other systems.
+- **`internal/game`**: The specific implementation of the game, including scenes, characters, and items.
 
 This separation allows the engine to be developed independently from the game's content.
 
@@ -33,7 +33,7 @@ This separation allows the engine to be developed independently from the game's 
 │       ├── camera/      # Game-specific camera settings
 │       ├── hud/         # Game-specific HUD elements
 │       ├── items/       # Game-specific items
-│       ├── scenes/      # Game scenes and levels
+│       ├── scenes/      # Game scenes and phases
 │       ├── setup/       # Game setup and initialization
 │       ├── speech/      # Game-specific speech bubbles and dialogues
 │       └── state/       # Game state management
@@ -43,7 +43,7 @@ This separation allows the engine to be developed independently from the game's 
 
 ## Dependencies
 
--   **Ebitengine**: A dead simple 2D game engine for Go.
--   **EbitenUI**: A UI library for Ebitengine.
--   **Kamera/v2**: A camera library for Ebitengine.
--   **Go**: The programming language.
+- **Ebitengine**: A dead simple 2D game engine for Go.
+- **EbitenUI**: A UI library for Ebitengine.
+- **Kamera/v2**: A camera library for Ebitengine.
+- **Go**: The programming language.

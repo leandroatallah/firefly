@@ -1,4 +1,4 @@
-package gamescenelevels
+package gamescenephases
 
 import (
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"

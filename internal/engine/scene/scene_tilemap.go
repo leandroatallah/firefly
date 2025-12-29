@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/leandroatallah/firefly/internal/engine/app"
+	"github.com/leandroatallah/firefly/internal/engine/audio"
+	"github.com/leandroatallah/firefly/internal/engine/camera"
 	"github.com/leandroatallah/firefly/internal/engine/data/config"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors/enemies"
-	"github.com/leandroatallah/firefly/internal/engine/app"
-	"github.com/leandroatallah/firefly/internal/engine/camera"
 	"github.com/leandroatallah/firefly/internal/engine/entity/items"
-	"github.com/leandroatallah/firefly/internal/engine/audio"
 	"github.com/leandroatallah/firefly/internal/engine/render/tilemap"
 )
 
@@ -29,14 +29,14 @@ func NewTilemapScene(ctx *app.AppContext) *TilemapScene {
 func (s *TilemapScene) OnStart() {
 	s.BaseScene.OnStart()
 
-	// Load levels from context
-	level, err := s.AppContext().LevelManager.GetCurrentLevel()
+	// Load phases from context
+	phase, err := s.AppContext().PhaseManager.GetCurrentPhase()
 	if err != nil {
-		log.Fatalf("failed to get current level: %v", err)
+		log.Fatalf("failed to get current phase: %v", err)
 	}
 
 	// Init tilemap
-	tm, err := tilemap.LoadTilemap(level.TilemapPath)
+	tm, err := tilemap.LoadTilemap(phase.TilemapPath)
 	if err != nil {
 		log.Fatal(err)
 	}

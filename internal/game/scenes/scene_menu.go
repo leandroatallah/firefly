@@ -44,7 +44,7 @@ func (s *MenuScene) OnStart() {
 
 func (s *MenuScene) Update() error {
 	if ebiten.IsKeyPressed(ebiten.KeyEnter) {
-		s.AppContext().SceneManager.NavigateTo(scenestypes.SceneLevels, transition.NewFader(), true)
+		s.AppContext().SceneManager.NavigateTo(scenestypes.ScenePhases, transition.NewFader(), true)
 	}
 
 	return nil

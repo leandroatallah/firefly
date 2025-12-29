@@ -1,4 +1,4 @@
-package gamescenelevels
+package gamescenephases
 
 import (
 	"image/color"
@@ -6,19 +6,19 @@ import (
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/leandroatallah/firefly/internal/engine/data/config"
-	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
-	"github.com/leandroatallah/firefly/internal/engine/entity/actors/enemies"
 	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/assets/font"
 	"github.com/leandroatallah/firefly/internal/engine/camera"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
-	"github.com/leandroatallah/firefly/internal/engine/scene"
-	"github.com/leandroatallah/firefly/internal/engine/scene/transition"
+	"github.com/leandroatallah/firefly/internal/engine/data/config"
+	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
+	"github.com/leandroatallah/firefly/internal/engine/entity/actors/enemies"
 	"github.com/leandroatallah/firefly/internal/engine/entity/items"
 	"github.com/leandroatallah/firefly/internal/engine/physics"
-	gameenemies "github.com/leandroatallah/firefly/internal/game/entity/actors/enemies"
+	"github.com/leandroatallah/firefly/internal/engine/scene"
+	"github.com/leandroatallah/firefly/internal/engine/scene/transition"
 	gamecamera "github.com/leandroatallah/firefly/internal/game/camera"
+	gameenemies "github.com/leandroatallah/firefly/internal/game/entity/actors/enemies"
 	gameitems "github.com/leandroatallah/firefly/internal/game/entity/items"
 	scenestypes "github.com/leandroatallah/firefly/internal/game/scenes/types"
 )
@@ -27,22 +27,22 @@ const (
 	bgSound = "assets/audio/Sketchbook.ogg"
 )
 
-type LevelsScene struct {
+type PhasesScene struct {
 	scene.TilemapScene
 	count          int
 	player         actors.ActorEntity
 	cam            *camera.Controller
-	levelCompleted bool
+	phaseCompleted bool
 	mainText       *font.FontText
 }
 
-func NewLevelsScene(context *app.AppContext) *LevelsScene {
+func NewPhasesScene(context *app.AppContext) *PhasesScene {
 	mainText, err := font.NewFontText(config.Get().MainFontFace)
 	if err != nil {
 		log.Fatal(err)
 	}
 	tilemapScene := scene.NewTilemapScene(context)
-	scene := LevelsScene{
+	scene := PhasesScene{
 		TilemapScene: *tilemapScene,
 		mainText:     mainText,
 	}
@@ -50,7 +50,7 @@ func NewLevelsScene(context *app.AppContext) *LevelsScene {
 	return &scene
 }
 
-func (s *LevelsScene) OnStart() {
+func (s *PhasesScene) OnStart() {
 	s.TilemapScene.OnStart()
 
 	go func() {
@@ -90,13 +90,13 @@ func (s *LevelsScene) OnStart() {
 	s.cam.SetFollowTarget(s.player)
 
 	// Init collisions bodies and touch trigger for endpoints
-	endpointTrigger := physics.NewTouchTrigger(s.finishLevel, s.player)
+	endpointTrigger := physics.NewTouchTrigger(s.finishPhase, s.player)
 	s.Tilemap().CreateCollisionBodies(s.PhysicsSpace(), endpointTrigger)
 
-	s.levelCompleted = false
+	s.phaseCompleted = false
 }
 
-func (s *LevelsScene) Update() error {
+func (s *PhasesScene) Update() error {
 	if config.Get().CamDebug {
 		s.CamDebug()
 	}
@@ -131,7 +131,7 @@ func (s *LevelsScene) Update() error {
 	return nil
 }
 
-func (s *LevelsScene) Draw(screen *ebiten.Image) {
+func (s *PhasesScene) Draw(screen *ebiten.Image) {
 	screen.Fill(color.RGBA{0x3c, 0xbc, 0xfc, 0xff})
 
 	// Get tilemap image and draw based on camera
@@ -176,17 +176,17 @@ func (s *LevelsScene) Draw(screen *ebiten.Image) {
 	s.DrawHUD(screen)
 }
 
-func (s *LevelsScene) OnFinish() {
+func (s *PhasesScene) OnFinish() {
 	s.TilemapScene.OnFinish()
 
 	s.Audiomanager().PauseMusic(bgSound)
 }
 
-func (s *LevelsScene) finishLevel() {
-	if s.levelCompleted {
+func (s *PhasesScene) finishPhase() {
+	if s.phaseCompleted {
 		return
 	}
 
-	s.levelCompleted = true
+	s.phaseCompleted = true
 	s.AppContext().SceneManager.NavigateTo(scenestypes.SceneSummary, transition.NewFader(), true)
 }

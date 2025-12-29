@@ -1,4 +1,4 @@
-package gamescenelevels
+package gamescenephases
 
 import (
 	"image/color"
@@ -6,7 +6,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-func (s *LevelsScene) CamDebug() {
+func (s *PhasesScene) CamDebug() {
 	if ebiten.IsKeyPressed(ebiten.KeyR) {
 		s.cam.Kamera().Angle += 0.02
 	}
@@ -40,7 +40,7 @@ func (s *LevelsScene) CamDebug() {
 
 }
 
-func (s *LevelsScene) DrawCamTargetPoint(screen *ebiten.Image) {
+func (s *PhasesScene) DrawCamTargetPoint(screen *ebiten.Image) {
 	tPos := s.cam.Target().Position()
 	targetImage := ebiten.NewImage(tPos.Dx(), tPos.Dy())
 	targetImage.Fill(color.RGBA{0xff, 0, 0, 0xff})
