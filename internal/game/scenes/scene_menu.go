@@ -39,7 +39,7 @@ func (s *MenuScene) OnStart() {
 	// Init audio
 	am := s.AppContext().SceneManager.AudioManager()
 	am.SetVolume(1)
-	// s.audiomanager.PlayMusic(kickBackBG)
+	// s.audio.PlayMusic(kickBackBG)
 }
 
 func (s *MenuScene) Update() error {

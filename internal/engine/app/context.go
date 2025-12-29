@@ -6,7 +6,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/navigation"
 	"github.com/leandroatallah/firefly/internal/engine/levels"
-	"github.com/leandroatallah/firefly/internal/engine/audiomanager"
+	"github.com/leandroatallah/firefly/internal/engine/audio"
 	"github.com/leandroatallah/firefly/internal/engine/data/datamanager"
 	"github.com/leandroatallah/firefly/internal/engine/assets/imagemanager"
 	"github.com/leandroatallah/firefly/internal/engine/ui/speech"
@@ -17,7 +17,7 @@ import (
 // the game to access systems like input, audio, and scene management without
 // relying on global variables.
 type AppContext struct {
-	AudioManager    *audiomanager.AudioManager
+	AudioManager    *audio.AudioManager
 	ImageManager    *imagemanager.ImageManager
 	DataManager     *datamanager.Manager
 	DialogueManager *speech.Manager

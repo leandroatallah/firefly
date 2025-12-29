@@ -2,7 +2,7 @@ package navigation
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/leandroatallah/firefly/internal/engine/audiomanager"
+	"github.com/leandroatallah/firefly/internal/engine/audio"
 )
 
 type SceneType int
@@ -25,7 +25,7 @@ type SceneFactory interface {
 type SceneMap map[SceneType]func() Scene
 
 type SceneManager interface {
-	AudioManager() *audiomanager.AudioManager
+	AudioManager() *audio.AudioManager
 	Draw(screen *ebiten.Image)
 	NavigateTo(sceneType SceneType, sceneTransition Transition, freshInstance bool)
 	// SetFactory(factory SceneFactory)

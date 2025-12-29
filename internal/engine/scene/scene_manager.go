@@ -6,7 +6,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/navigation"
-	"github.com/leandroatallah/firefly/internal/engine/audiomanager"
+	"github.com/leandroatallah/firefly/internal/engine/audio"
 )
 
 type SceneManager struct {
@@ -83,6 +83,6 @@ func (m *SceneManager) NavigateTo(
 	}
 }
 
-func (m *SceneManager) AudioManager() *audiomanager.AudioManager {
+func (m *SceneManager) AudioManager() *audio.AudioManager {
 	return m.AppContext().AudioManager
 }

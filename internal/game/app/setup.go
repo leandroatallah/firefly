@@ -12,7 +12,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/assets/font"
 	"github.com/leandroatallah/firefly/internal/engine/levels"
 	"github.com/leandroatallah/firefly/internal/engine/scene"
-	"github.com/leandroatallah/firefly/internal/engine/audiomanager"
+	"github.com/leandroatallah/firefly/internal/engine/audio"
 	"github.com/leandroatallah/firefly/internal/engine/ui/speech"
 	gamescene "github.com/leandroatallah/firefly/internal/game/scenes"
 	scenestypes "github.com/leandroatallah/firefly/internal/game/scenes/types"
@@ -26,7 +26,7 @@ func Setup(assets fs.FS) error {
 	ebiten.SetWindowTitle("Firefly")
 
 	// Initialize all systems and managers
-	audioManager := audiomanager.NewAudioManager()
+	audioManager := audio.NewAudioManager()
 	sceneManager := scene.NewSceneManager()
 	levelManager := levels.NewManager()
 	actorManager := actors.NewManager()
@@ -81,7 +81,7 @@ func Setup(assets fs.FS) error {
 }
 
 // loadAudioAssetsFromFS is a helper function to load all audio files from an fs.FS.
-func loadAudioAssetsFromFS(assets fs.FS, am *audiomanager.AudioManager) {
+func loadAudioAssetsFromFS(assets fs.FS, am *audio.AudioManager) {
 	dir := "assets/audio"
 	files, err := fs.ReadDir(assets, dir)
 	if err != nil {

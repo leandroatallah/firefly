@@ -10,7 +10,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/camera"
 	"github.com/leandroatallah/firefly/internal/engine/entity/items"
-	"github.com/leandroatallah/firefly/internal/engine/audiomanager"
+	"github.com/leandroatallah/firefly/internal/engine/audio"
 	"github.com/leandroatallah/firefly/internal/engine/render/tilemap"
 )
 
@@ -64,7 +64,7 @@ func (s *TilemapScene) Tilemap() *tilemap.Tilemap {
 	return s.tilemap
 }
 
-func (s *TilemapScene) Audiomanager() *audiomanager.AudioManager {
+func (s *TilemapScene) Audiomanager() *audio.AudioManager {
 	return s.AppContext().AudioManager
 }
 

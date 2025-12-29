@@ -12,14 +12,14 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/render/screenutil"
 	"github.com/leandroatallah/firefly/internal/engine/scene/transition"
 	"github.com/leandroatallah/firefly/internal/engine/scene"
-	"github.com/leandroatallah/firefly/internal/engine/audiomanager"
+	"github.com/leandroatallah/firefly/internal/engine/audio"
 	scenestypes "github.com/leandroatallah/firefly/internal/game/scenes/types"
 )
 
 type SummaryScene struct {
 	scene.BaseScene
 
-	audiomanager *audiomanager.AudioManager
+	audiomanager *audio.AudioManager
 	fontText     *font.FontText
 }
 

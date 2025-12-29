@@ -1,4 +1,4 @@
-package audiomanager
+package audio
 
 import (
 	"bytes"
