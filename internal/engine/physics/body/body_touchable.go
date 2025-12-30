@@ -1,4 +1,4 @@
-package bodyphysics
+package body
 
 import (
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"

@@ -1,4 +1,4 @@
-package bodyphysics
+package body
 
 import (
 	"fmt"

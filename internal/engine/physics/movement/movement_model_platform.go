@@ -1,4 +1,4 @@
-package physicsmovement
+package movement
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"

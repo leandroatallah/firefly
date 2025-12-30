@@ -1,4 +1,4 @@
-package physicsmovement
+package movement
 
 import (
 	"fmt"
