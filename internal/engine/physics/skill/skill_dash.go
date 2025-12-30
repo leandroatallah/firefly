@@ -4,8 +4,8 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
-	"github.com/leandroatallah/firefly/internal/engine/data/config"
 	physicsmovement "github.com/leandroatallah/firefly/internal/engine/physics/movement"
+	"github.com/leandroatallah/firefly/internal/engine/utils/fp16"
 )
 
 // DashSkill implements a dash and air dash ability.
@@ -24,7 +24,7 @@ func NewDashSkill() *DashSkill {
 			state:    StateReady,
 			duration: 8,  // 8 frames (short burst)
 			cooldown: 45, // 45 frames cooldown
-			speed:    10 * config.Get().Unit,
+			speed:    fp16.To16(10),
 		},
 		canAirDash:    true,
 		airDashUsed:   false,

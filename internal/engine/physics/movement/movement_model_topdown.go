@@ -5,9 +5,9 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
-	"github.com/leandroatallah/firefly/internal/engine/data/config"
 	"github.com/leandroatallah/firefly/internal/engine/input"
 	spacephysics "github.com/leandroatallah/firefly/internal/engine/physics/space"
+	"github.com/leandroatallah/firefly/internal/engine/utils/fp16"
 )
 
 type TopDownMovementModel struct {
@@ -22,8 +22,6 @@ func NewTopDownMovementModel(playerMovementBlocker PlayerMovementBlocker) *TopDo
 }
 
 func (m *TopDownMovementModel) Update(body body.MovableCollidable, space body.BodiesSpace) error {
-	cfg := config.Get()
-
 	// Handle input for player movement
 	if m.playerMovementBlocker != nil {
 		m.InputHandler(body, space)
@@ -52,7 +50,7 @@ func (m *TopDownMovementModel) Update(body body.MovableCollidable, space body.Bo
 	// This is crucial for preventing faster movement on diagonals.
 	// We need to check if the velocity magnitude `sqrt(vx² + vy²)` exceeds `speedMax16²`.
 	// To avoid a costly square root, we can compare the squared values:
-	speedMax16 := body.MaxSpeed() * cfg.Unit
+	speedMax16 := fp16.To16(body.MaxSpeed())
 	// Use int64 for squared values to prevent potential overflow.
 	velSq := int64(vx16) + int64(vy16)*int64(vy16)
 	maxSq := int64(speedMax16) * int64(speedMax16)

@@ -7,6 +7,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/data/config"
 	"github.com/leandroatallah/firefly/internal/engine/input"
 	spacephysics "github.com/leandroatallah/firefly/internal/engine/physics/space"
+	"github.com/leandroatallah/firefly/internal/engine/utils/fp16"
 )
 
 type PlatformMovementModel struct {
@@ -44,11 +45,11 @@ func (m *PlatformMovementModel) UpdateHorizontalVelocity(body body.MovableCollid
 		vx16, vy16 := body.Velocity()
 
 		vx16 = increaseVelocity(vx16, scaledAccX)
-		vx16 = clampAxisVelocity(vx16, body.MaxSpeed()*cfg.Unit)
+		vx16 = clampAxisVelocity(vx16, fp16.To16(body.MaxSpeed()))
 
 		// Apply friction if the player is not actively moving
 		if accX == 0 {
-			baseFriction := int(float64(cfg.Unit/4) * cfg.Physics.HorizontalInertia)
+			baseFriction := int(float64(fp16.To16(1)/4) * cfg.Physics.HorizontalInertia)
 			friction := baseFriction
 
 			// Apply air friction multiplier if the player is in the air
@@ -214,9 +215,9 @@ func (m *PlatformMovementModel) InputHandlerHorizontal(body body.MovableCollidab
 	} else {
 		switch {
 		case moveLeft:
-			vx16 = -body.Speed() * cfg.Unit
+			vx16 = -fp16.To16(body.Speed())
 		case moveRight:
-			vx16 = body.Speed() * cfg.Unit
+			vx16 = fp16.To16(body.Speed())
 		default:
 			vx16 = 0
 		}

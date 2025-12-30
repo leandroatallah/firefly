@@ -7,6 +7,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/data/config"
 	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
 	"github.com/leandroatallah/firefly/internal/engine/physics/space"
+	"github.com/leandroatallah/firefly/internal/engine/utils/fp16"
 )
 
 const (
@@ -23,7 +24,7 @@ func increaseVelocity(velocity, acceleration int) int {
 // reduceVelocity applies friction to the velocity for a single axis, slowing it down.
 // It brings the velocity to zero if it's smaller than the friction value to prevent jitter.
 func reduceVelocity(velocity int) int {
-	friction := config.Get().Unit / 4
+	friction := fp16.To16(1) / 4
 	if velocity > friction {
 		return velocity - friction
 	}
@@ -48,7 +49,7 @@ func smoothDiagonalMovement(accX, accY int) (int, int) {
 	// Friction is `config.Unit / 4`. The base input acceleration is 2.
 	// We'll use a factor of `config.Unit / 6` so that the final acceleration
 	// (2 * config.Unit / 6 = config.Unit / 3) is greater than friction.
-	accelerationFactor := float64(config.Get().Unit / 6)
+	accelerationFactor := float64(fp16.To16(1) / 6)
 
 	fAccX := float64(accX) * accelerationFactor
 	fAccY := float64(accY) * accelerationFactor
@@ -92,38 +93,38 @@ func clampToPlayArea(body body.MovableCollidable, space *space.Space) bool {
 	x, y := body.GetPositionMin()
 
 	if x < 0 {
-		x, y, _ = body.ApplyValidPosition(-x*cfg.Unit, true, nil)
+		x, y, _ = body.ApplyValidPosition(-fp16.To16(x), true, nil)
 	}
 
-	x16, y16 := x*cfg.Unit, y*cfg.Unit
+	x16, y16 := fp16.To16(x), fp16.To16(y)
 
-	x16 = body.Position().Min.X * cfg.Unit
-	rightEdge := x16 + cfg.To16(rect.Width())
-	maxRight := cfg.ScreenWidth * cfg.Unit
+	x16 = fp16.To16(body.Position().Min.X)
+	rightEdge := x16 + fp16.To16(rect.Width())
+	maxRight := fp16.To16(cfg.ScreenWidth)
 	provider := space.GetTilemapDimensionsProvider()
 	if provider != nil {
-		maxRight = provider.GetTilemapWidth() * cfg.Unit
+		maxRight = fp16.To16(provider.GetTilemapWidth())
 	}
 	if rightEdge > maxRight {
 		x, y, _ = body.ApplyValidPosition(maxRight-rightEdge, true, nil)
-		x16, y16 = x*cfg.Unit, y*cfg.Unit
+		x16, y16 = fp16.To16(x), fp16.To16(y)
 	}
 
 	// Vertical clamping
 	minTop := 0
-	maxBottom := cfg.ScreenHeight * cfg.Unit
+	maxBottom := fp16.To16(cfg.ScreenHeight)
 	if provider != nil {
-		minTop = (cfg.ScreenHeight - provider.GetTilemapHeight()) * cfg.Unit
-		maxBottom = provider.GetTilemapHeight() * cfg.Unit
+		minTop = fp16.To16(cfg.ScreenHeight - provider.GetTilemapHeight())
+		maxBottom = fp16.To16(provider.GetTilemapHeight())
 	}
 
 	if y16 < minTop {
 		x, y, _ = body.ApplyValidPosition(minTop-y16, false, nil)
-		x16, y16 = x*cfg.Unit, y*cfg.Unit
+		x16, y16 = fp16.To16(x), fp16.To16(y)
 	}
 
-	y16 = body.Position().Min.Y * cfg.Unit
-	bottom := y16 + cfg.To16(rect.Height())
+	y16 = fp16.To16(body.Position().Min.Y)
+	bottom := y16 + fp16.To16(rect.Height())
 	if bottom >= maxBottom {
 		if bottom > maxBottom {
 			_, _, _ = body.ApplyValidPosition(maxBottom-bottom, false, nil)

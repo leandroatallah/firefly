@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/leandroatallah/firefly/internal/engine/data/config"
+	"github.com/leandroatallah/firefly/internal/engine/utils/fp16"
 )
 
 type accVect struct {
@@ -21,11 +21,10 @@ func (v accVect) String() string {
 }
 
 func TestMovableBody_Movement(t *testing.T) {
-	cfg := config.Get()
 	b := NewMovableBody(NewBody(NewRect(0, 0, 10, 10)))
 
 	distance := 5
-	distancex16 := distance * cfg.Unit
+	distancex16 := fp16.To16(distance)
 
 	tests := []struct {
 		name string

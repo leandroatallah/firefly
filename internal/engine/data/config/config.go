@@ -1,11 +1,14 @@
 package config
 
-import "flag"
+import (
+	"flag"
+
+	"github.com/leandroatallah/firefly/internal/engine/utils/fp16"
+)
 
 const (
 	ScreenWidth   = 320
 	ScreenHeight  = 180
-	Unit          = 16
 	DefaultVolume = 0.5
 	MainFontFace  = "assets/fonts/pressstart2p.ttf"
 )
@@ -40,7 +43,6 @@ type PhysicsConfig struct {
 type AppConfig struct {
 	ScreenWidth  int
 	ScreenHeight int
-	Unit         int
 	Physics      PhysicsConfig
 
 	DefaultVolume float64
@@ -48,13 +50,6 @@ type AppConfig struct {
 	MainFontFace string
 	CamDebug     bool
 	CollisionBox bool
-}
-
-func (c *AppConfig) To16(value int) int {
-	return value * c.Unit
-}
-func (c *AppConfig) From16(value int) int {
-	return value / c.Unit
 }
 
 var cfg AppConfig
@@ -70,13 +65,12 @@ func init() {
 		JumpCutMultiplier:     0.5,
 		UpwardGravity:         6,
 		DownwardGravity:       6,
-		MaxFallSpeed:          4 * Unit,
+		MaxFallSpeed:          fp16.To16(4),
 	}
 
 	cfg = AppConfig{
 		ScreenWidth:  ScreenWidth,
 		ScreenHeight: ScreenHeight,
-		Unit:         Unit,
 		Physics:      defaultPhysics,
 
 		DefaultVolume: DefaultVolume,
@@ -92,6 +86,6 @@ func Parse() {
 	flag.BoolVar(&cfg.CollisionBox, "collision-box", false, "Enable collision box debug")
 }
 
-func Get() AppConfig {
-	return cfg
+func Get() *AppConfig {
+	return &cfg
 }

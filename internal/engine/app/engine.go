@@ -53,7 +53,8 @@ func (g *Game) Draw(screen *ebiten.Image) {
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
-	return config.Get().ScreenWidth, config.Get().ScreenHeight
+	cfg := g.AppContext.Config
+	return cfg.ScreenWidth, cfg.ScreenHeight
 }
 
 func (g *Game) DebugPhysics(screen *ebiten.Image) {

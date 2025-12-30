@@ -59,6 +59,7 @@ func Setup(assets fs.FS) error {
 		ImageManager:    nil,
 		DataManager:     nil,
 		Assets:          assets,
+		Config:          config.Get(),
 	}
 
 	sceneFactory := scene.NewDefaultSceneFactory(gamescene.InitSceneMap(appContext))

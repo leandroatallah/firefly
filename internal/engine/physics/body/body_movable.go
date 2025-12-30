@@ -5,6 +5,7 @@ import (
 
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/data/config"
+	"github.com/leandroatallah/firefly/internal/engine/utils/fp16"
 )
 
 type MovableBody struct {
@@ -28,11 +29,11 @@ func NewMovableBody(body *Body) *MovableBody {
 }
 
 func (b *MovableBody) MoveX(distance int) {
-	b.accelerationX = distance * config.Get().Unit
+	b.accelerationX = fp16.To16(distance)
 }
 
 func (b *MovableBody) MoveY(distance int) {
-	b.accelerationY = distance * config.Get().Unit
+	b.accelerationY = fp16.To16(distance)
 }
 
 func (b *MovableBody) OnMoveLeft(distance int) {
@@ -164,7 +165,7 @@ func (b *MovableBody) IsFalling() bool {
 
 // Platform methods
 func (b *MovableBody) TryJump(force int) {
-	b.vy16 = -force * config.Get().Unit
+	b.vy16 = -fp16.To16(force)
 }
 
 // CheckMovementDirectionX set face direction based on accelerationX

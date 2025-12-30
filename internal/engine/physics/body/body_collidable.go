@@ -10,7 +10,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/vector"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
-	"github.com/leandroatallah/firefly/internal/engine/data/config"
+	"github.com/leandroatallah/firefly/internal/engine/utils/fp16"
 )
 
 type CollidableBody struct {
@@ -113,18 +113,16 @@ func (b *CollidableBody) ClearCollisions() {
 
 // SetPosition overrides Body.SetPosition method to updates the body position and its collisions
 func (b *CollidableBody) SetPosition(x, y int) {
-	cfg := config.Get()
-
 	// Calculate the difference to move the collision areas as well
-	diffX16 := cfg.To16(x) - b.Body.x16
-	diffY16 := cfg.To16(y) - b.Body.y16
+	diffX16 := fp16.To16(x) - b.Body.x16
+	diffY16 := fp16.To16(y) - b.Body.y16
 
 	b.Body.SetPosition(x, y)
 
 	for _, c := range b.collisionList {
 		x, y := c.GetPositionMin()
-		x16, y16 := cfg.To16(x), cfg.To16(y)
-		c.SetPosition(cfg.From16(x16+diffX16), cfg.From16(y16+diffY16))
+		x16, y16 := fp16.To16(x), fp16.To16(y)
+		c.SetPosition(fp16.From16(x16+diffX16), fp16.From16(y16+diffY16))
 	}
 }
 
@@ -138,7 +136,6 @@ func (b *CollidableBody) ApplyValidPosition(distance16 int, isXAxis bool, space 
 		return x, y, false
 	}
 
-	cfg := config.Get()
 	var isBlocking bool
 
 	// Determine the direction of movement (step is one pixel).
@@ -150,7 +147,7 @@ func (b *CollidableBody) ApplyValidPosition(distance16 int, isXAxis bool, space 
 	// Calculate how many pixels we need to move.
 	// We use ceiling division to ensure that any velocity, no matter how small,
 	// results in at least a 1-pixel check.
-	pixelDistance := (abs(distance16) + cfg.Unit - 1) / cfg.Unit
+	pixelDistance := fp16.From16(abs(distance16) + fp16.To16(1) - 1)
 
 	// Move pixel by pixel and check for collisions.
 	for i := 0; i < pixelDistance; i++ {

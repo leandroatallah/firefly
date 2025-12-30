@@ -5,7 +5,7 @@ import (
 	"log"
 
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
-	"github.com/leandroatallah/firefly/internal/engine/data/config"
+	"github.com/leandroatallah/firefly/internal/engine/utils/fp16"
 )
 
 type Body struct {
@@ -18,11 +18,8 @@ type Body struct {
 }
 
 func NewBody(shape body.Shape) *Body {
-	// cfg := config.Get()
 	return &Body{
 		shape: shape,
-		// x16:    x * cfg.Unit,
-		// y16:    y * cfg.Unit,
 	}
 }
 
@@ -36,8 +33,8 @@ func (b *Body) SetID(id string) {
 
 // Position() returns the body coordinates as a image.Rectangle.
 func (b *Body) Position() image.Rectangle {
-	minX := b.x16 / config.Get().Unit
-	minY := b.y16 / config.Get().Unit
+	minX := fp16.From16(b.x16)
+	minY := fp16.From16(b.y16)
 	maxX := minX + b.shape.Width()
 	maxY := minY + b.shape.Height()
 	return image.Rect(minX, minY, maxX, maxY)
@@ -55,9 +52,8 @@ func (b *Body) SetPosition(x, y int) {
 	if !ok {
 		log.Fatal("SetPosition expects a *Rect instance")
 	}
-	cfg := config.Get()
-	b.x16 = cfg.To16(x)
-	b.y16 = cfg.To16(y)
+	b.x16 = fp16.To16(x)
+	b.y16 = fp16.To16(y)
 }
 
 func (b *Body) GetShape() body.Shape {
