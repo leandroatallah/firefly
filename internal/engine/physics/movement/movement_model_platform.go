@@ -1,10 +1,8 @@
 package movement
 
 import (
-	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/data/config"
-	"github.com/leandroatallah/firefly/internal/engine/input"
 	spacephysics "github.com/leandroatallah/firefly/internal/engine/physics/space"
 	"github.com/leandroatallah/firefly/internal/engine/utils/fp16"
 )
@@ -96,11 +94,6 @@ func (m *PlatformMovementModel) handleGravity(b body.MovableCollidable) (int, in
 func (m *PlatformMovementModel) Update(body body.MovableCollidable, space body.BodiesSpace) error {
 	cfg := config.Get()
 
-	// Handle input for player movement. This needs to be done before physics calculations.
-	if m.playerMovementBlocker != nil {
-		m.InputHandler(body, space)
-	}
-
 	vx16, vy16 := body.Velocity()
 
 	// Apply horizontal movement to the body and check for collisions.
@@ -144,54 +137,6 @@ func (m *PlatformMovementModel) Update(body body.MovableCollidable, space body.B
 // SetIsScripted sets the scripted mode for the movement model.
 func (m *PlatformMovementModel) SetIsScripted(isScripted bool) {
 	m.isScripted = isScripted
-}
-
-// InputHandler processes player input for movement.
-func (m *PlatformMovementModel) InputHandler(body body.MovableCollidable, space body.BodiesSpace) {
-	if m.isScripted {
-		return // Ignore player input when scripted
-	}
-	if m.playerMovementBlocker != nil && m.playerMovementBlocker.IsMovementBlocked() {
-		return // Ignore player input when movement is blocked
-	}
-
-	_, vy16 := body.Velocity()
-	if body.Immobile() {
-		_, accY := body.Acceleration()
-		body.SetVelocity(0, vy16)
-		body.SetAcceleration(0, accY)
-		return
-	}
-
-	m.InputHandlerHorizontal(body)
-}
-
-func (m *PlatformMovementModel) InputHandlerHorizontal(body body.MovableCollidable) {
-	cfg := config.Get()
-	vx16, vy16 := body.Velocity()
-
-	moveLeft := input.IsSomeKeyPressed(ebiten.KeyA, ebiten.KeyLeft)
-	moveRight := input.IsSomeKeyPressed(ebiten.KeyD, ebiten.KeyRight)
-
-	if cfg.Physics.HorizontalInertia > 0 {
-		if moveLeft {
-			body.OnMoveLeft(body.Speed())
-		}
-		if moveRight {
-			body.OnMoveRight(body.Speed())
-		}
-	} else {
-		switch {
-		case moveLeft:
-			vx16 = -fp16.To16(body.Speed())
-		case moveRight:
-			vx16 = fp16.To16(body.Speed())
-		default:
-			vx16 = 0
-		}
-	}
-
-	body.SetVelocity(vx16, vy16)
 }
 
 func (m *PlatformMovementModel) OnGround() bool {

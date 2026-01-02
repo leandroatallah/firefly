@@ -8,7 +8,6 @@ import (
 
 type MovementModel interface {
 	Update(body body.MovableCollidable, space body.BodiesSpace) error
-	InputHandler(body body.MovableCollidable, space body.BodiesSpace)
 	SetIsScripted(isScripted bool)
 }
 
