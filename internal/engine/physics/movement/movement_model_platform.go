@@ -2,7 +2,6 @@ package movement
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/data/config"
 	"github.com/leandroatallah/firefly/internal/engine/input"
@@ -15,9 +14,6 @@ type PlatformMovementModel struct {
 	onGround              bool
 	maxFallSpeed          int
 	isScripted            bool
-	coyoteTimeCounter     int
-	jumpBufferCounter     int
-	// skills                []Skill
 }
 
 // NewPlatformMovementModel creates a new PlatformMovementModel with default values.
@@ -72,30 +68,6 @@ func (m *PlatformMovementModel) UpdateHorizontalVelocity(body body.MovableCollid
 	return body.Velocity()
 }
 
-// Coyote Time & Jump Buffering
-func (m *PlatformMovementModel) handleCoyoteAndJumpBuffering(body body.MovableCollidable, wasOnGround bool) {
-	cfg := config.Get()
-
-	if m.onGround {
-		m.coyoteTimeCounter = cfg.Physics.CoyoteTimeFrames
-	} else {
-		if m.coyoteTimeCounter > 0 {
-			m.coyoteTimeCounter--
-		}
-	}
-
-	if m.jumpBufferCounter > 0 {
-		m.jumpBufferCounter--
-	}
-
-	if !wasOnGround && m.onGround && m.jumpBufferCounter > 0 {
-		body.TryJump(cfg.Physics.JumpForce)
-		m.onGround = false
-		m.jumpBufferCounter = 0
-		m.coyoteTimeCounter = 0
-	}
-}
-
 func (m *PlatformMovementModel) handleGravity(b body.MovableCollidable) (int, int) {
 	vx16, vy16 := b.Velocity()
 
@@ -138,7 +110,6 @@ func (m *PlatformMovementModel) Update(body body.MovableCollidable, space body.B
 		vx16 = 0
 	}
 
-	wasOnGround := m.onGround
 	// Apply vertical movement to the body and check for collisions.
 	_, _, isBlockingY := body.ApplyValidPosition(vy16, false, space)
 	vx16, vy16 = body.Velocity()
@@ -157,8 +128,6 @@ func (m *PlatformMovementModel) Update(body body.MovableCollidable, space body.B
 		vy16 = cfg.Physics.DownwardGravity - 1
 		body.SetVelocity(vx16, vy16)
 	}
-
-	m.handleCoyoteAndJumpBuffering(body, wasOnGround)
 
 	// --- Final State Updates ---
 	body.CheckMovementDirectionX()
@@ -195,7 +164,6 @@ func (m *PlatformMovementModel) InputHandler(body body.MovableCollidable, space 
 	}
 
 	m.InputHandlerHorizontal(body)
-	m.InputHandlerJump(body, space)
 }
 
 func (m *PlatformMovementModel) InputHandlerHorizontal(body body.MovableCollidable) {
@@ -226,49 +194,10 @@ func (m *PlatformMovementModel) InputHandlerHorizontal(body body.MovableCollidab
 	body.SetVelocity(vx16, vy16)
 }
 
-func (m *PlatformMovementModel) InputHandlerJump(body body.MovableCollidable, space body.BodiesSpace) {
-	cfg := config.Get()
-
-	if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
-		if m.onGround || m.coyoteTimeCounter > 0 {
-			// vx16, vy16 := body.Velocity()
-			body.TryJump(cfg.Physics.JumpForce)
-			// blocking := false
-			// n_vx16, n_vy16 := body.Velocity()
-
-			for _, other := range space.Bodies() {
-				if other == nil || other.ID() == body.ID() {
-					continue
-				}
-
-				if !spacephysics.HasCollision(body, other) {
-					continue
-				}
-
-				if other.IsObstructive() {
-					// blocking = true
-					break
-				}
-			}
-
-			m.onGround = false
-			m.coyoteTimeCounter = 0
-			m.jumpBufferCounter = 0
-		} else {
-			m.jumpBufferCounter = cfg.Physics.JumpBufferFrames
-		}
-	}
-
-	vx16, vy16 := body.Velocity()
-
-	// Variable Jump Height when release jump key
-	if !m.onGround && !input.IsSomeKeyPressed(ebiten.KeySpace) && vy16 < 0 {
-		vy16 = int(float64(vy16) * cfg.Physics.JumpCutMultiplier)
-	}
-
-	body.SetVelocity(vx16, vy16)
-}
-
 func (m *PlatformMovementModel) OnGround() bool {
 	return m.onGround
+}
+
+func (m *PlatformMovementModel) SetOnGround(value bool) {
+	m.onGround = value
 }

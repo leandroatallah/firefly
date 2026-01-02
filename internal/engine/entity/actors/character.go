@@ -9,6 +9,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors/movement"
 	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
 	physicsmovement "github.com/leandroatallah/firefly/internal/engine/physics/movement"
+	"github.com/leandroatallah/firefly/internal/engine/physics/skill"
 	"github.com/leandroatallah/firefly/internal/engine/physics/space"
 	"github.com/leandroatallah/firefly/internal/engine/render/sprites"
 )
@@ -30,6 +31,8 @@ type Character struct {
 	movementBlockers     int
 	invulnerabilityTimer int
 	imageOptions         *ebiten.DrawImageOptions
+
+	skills []skill.Skill
 }
 
 func NewCharacter(s sprites.SpriteMap, bodyRect *bodyphysics.Rect) *Character { // Modified signature
@@ -127,6 +130,13 @@ func (c *Character) MovementState() movement.MovementState {
 
 func (c *Character) Update(space body.BodiesSpace) error {
 	c.count++
+
+	for _, s := range c.skills {
+		if activeSkill, ok := s.(skill.ActiveSkill); ok {
+			activeSkill.HandleInput(c, c.movementModel.(*physicsmovement.PlatformMovementModel), space)
+		}
+		s.Update(c, c.movementModel.(*physicsmovement.PlatformMovementModel))
+	}
 
 	// Handle movement by Movement State - must happen BEFORE UpdateMovement
 	if c.movementState != nil {
@@ -287,11 +297,6 @@ func (p *Character) IsMovementBlocked() bool {
 	return p.movementBlockers > 0
 }
 
-// Platform methods
-func (c *Character) TryJump(force int) {
-	c.MovableBody.TryJump(force)
-}
-
 // Movement Model methods
 func (c *Character) SetMovementModel(model physicsmovement.MovementModel) {
 	c.movementModel = model
@@ -299,4 +304,12 @@ func (c *Character) SetMovementModel(model physicsmovement.MovementModel) {
 
 func (c *Character) MovementModel() physicsmovement.MovementModel {
 	return c.movementModel
+}
+
+func (c *Character) AddSkill(s skill.Skill) {
+	c.skills = append(c.skills, s)
+}
+
+func (c *Character) RemoveSkill(s skill.Skill) {
+	panic("implement me")
 }

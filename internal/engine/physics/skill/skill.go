@@ -17,14 +17,14 @@ const (
 
 // Skill defines the interface for a passive player ability.
 type Skill interface {
-	Update(body body.MovableCollidable, model *physicsmovement.PlatformMovementModel)
+	Update(actor body.MovableCollidable, model *physicsmovement.PlatformMovementModel)
 	IsActive() bool
 }
 
 // ActiveSkill defines the interface for a skill that requires user input.
 type ActiveSkill interface {
 	Skill
-	HandleInput(body body.MovableCollidable, model *physicsmovement.PlatformMovementModel)
+	HandleInput(body body.MovableCollidable, model *physicsmovement.PlatformMovementModel, space body.BodiesSpace)
 	ActivationKey() ebiten.Key
 }
 

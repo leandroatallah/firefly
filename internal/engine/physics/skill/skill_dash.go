@@ -38,9 +38,9 @@ func (d *DashSkill) ActivationKey() ebiten.Key {
 }
 
 // HandleInput checks for the dash activation key.
-func (d *DashSkill) HandleInput(body body.MovableCollidable, model *physicsmovement.PlatformMovementModel) {
+func (d *DashSkill) HandleInput(body body.MovableCollidable, model *physicsmovement.PlatformMovementModel, space body.BodiesSpace) {
 	if inpututil.IsKeyJustPressed(d.activationKey) {
-		d.tryActivate(body, model)
+		d.tryActivate(body, model, space)
 	}
 }
 
@@ -80,7 +80,7 @@ func (d *DashSkill) Update(b body.MovableCollidable, model *physicsmovement.Plat
 	}
 }
 
-func (d *DashSkill) tryActivate(body body.MovableCollidable, model *physicsmovement.PlatformMovementModel) {
+func (d *DashSkill) tryActivate(_ body.MovableCollidable, model *physicsmovement.PlatformMovementModel, _ body.BodiesSpace) {
 	if d.state != StateReady {
 		return
 	}

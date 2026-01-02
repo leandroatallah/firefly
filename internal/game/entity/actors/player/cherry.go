@@ -5,6 +5,7 @@ import (
 
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 	physicsmovement "github.com/leandroatallah/firefly/internal/engine/physics/movement"
+	"github.com/leandroatallah/firefly/internal/engine/physics/skill"
 )
 
 type CoinCollector interface {
@@ -29,6 +30,7 @@ func NewCherryPlayer() (actors.ActorEntity, error) {
 	if err != nil {
 		return nil, err
 	}
+	character.AddSkill(skill.NewJumpSkill())
 
 	player := &CherryPlayer{
 		Character: *character,
