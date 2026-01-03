@@ -32,6 +32,7 @@ func NewCherryPlayer() (actors.ActorEntity, error) {
 	}
 	character.AddSkill(skill.NewJumpSkill())
 	character.AddSkill(skill.NewHorizontalMovementSkill())
+	character.AddSkill(skill.NewDashSkill())
 
 	player := &CherryPlayer{
 		Character: *character,

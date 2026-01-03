@@ -48,8 +48,6 @@ func (d *DashSkill) HandleInput(body body.MovableCollidable, model *physicsmovem
 func (d *DashSkill) Update(b body.MovableCollidable, model *physicsmovement.PlatformMovementModel) {
 	d.SkillBase.Update(b, model)
 
-	vx16, vy16 := b.Velocity()
-
 	// Reset air dash capability when the player lands.
 	if model.OnGround() {
 		d.airDashUsed = false
@@ -61,17 +59,15 @@ func (d *DashSkill) Update(b body.MovableCollidable, model *physicsmovement.Plat
 		if d.timer <= 0 {
 			d.state = StateCooldown
 			d.timer = d.cooldown
-			vx16 = 0 // Stop horizontal movement after dash
+			model.SetDashActive(false, 0) // Signal to the movement model that dash is no longer active
 		} else {
-			// Apply dash movement
+			// Apply dash movement by setting it in the movement model
 			var dirX int = 1
 			if b.FaceDirection() == body.FaceDirectionLeft {
 				dirX = -1
 			}
-			vx16 = d.speed * dirX
-			vy16 = 0 // Maintain horizontal trajectory
+			model.SetDashActive(true, d.speed*dirX)
 		}
-		b.SetVelocity(vx16, vy16)
 	case StateCooldown:
 		d.timer--
 		if d.timer <= 0 {

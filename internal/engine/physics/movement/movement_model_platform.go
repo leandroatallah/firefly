@@ -12,6 +12,8 @@ type PlatformMovementModel struct {
 	onGround              bool
 	maxFallSpeed          int
 	isScripted            bool
+	dashActive            bool
+	dashVelocityX         int
 }
 
 // NewPlatformMovementModel creates a new PlatformMovementModel with default values.
@@ -96,8 +98,14 @@ func (m *PlatformMovementModel) Update(body body.MovableCollidable, space body.B
 
 	vx16, vy16 := body.Velocity()
 
+	// Handle horizontal movement based on dash state or normal acceleration/friction
+	if m.dashActive {
+		vx16 = m.dashVelocityX
+	} else {
+		vx16, _ = m.UpdateHorizontalVelocity(body)
+	}
+
 	// Apply horizontal movement to the body and check for collisions.
-	vx16, _ = m.UpdateHorizontalVelocity(body)
 	_, _, isBlockingX := body.ApplyValidPosition(vx16, true, space)
 	if isBlockingX {
 		vx16 = 0
@@ -145,4 +153,10 @@ func (m *PlatformMovementModel) OnGround() bool {
 
 func (m *PlatformMovementModel) SetOnGround(value bool) {
 	m.onGround = value
+}
+
+// SetDashActive sets the dash state and velocity for the movement model.
+func (m *PlatformMovementModel) SetDashActive(active bool, vx int) {
+	m.dashActive = active
+	m.dashVelocityX = vx
 }
