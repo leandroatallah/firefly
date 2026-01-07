@@ -6,11 +6,14 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/render/sprites"
 )
 
-type PlatformerActorEntity interface {
-	actors.ActorEntity
-
+type CoinCollector interface {
 	AddCoinCount(amount int)
 	CoinCount() int
+}
+
+type PlatformerActorEntity interface {
+	actors.ActorEntity
+	CoinCollector
 }
 
 type PlatformerCharacter struct {

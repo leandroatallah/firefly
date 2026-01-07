@@ -54,7 +54,7 @@ func (c *CollectibleCoinItem) OnTouch(other body.Collidable) {
 	if !found {
 		return
 	}
-	coinCollector, ok := player.(*gameentitytypes.PlatformerCharacter)
+	coinCollector, ok := player.(gameentitytypes.CoinCollector)
 	if ok {
 		c.SetRemoved(true)
 		coinCollector.AddCoinCount(1)
