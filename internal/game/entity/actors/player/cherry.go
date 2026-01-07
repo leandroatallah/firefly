@@ -6,21 +6,14 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 	physicsmovement "github.com/leandroatallah/firefly/internal/engine/physics/movement"
 	"github.com/leandroatallah/firefly/internal/engine/physics/skill"
+	gameentitytypes "github.com/leandroatallah/firefly/internal/game/entity/types"
 )
 
-type CoinCollector interface {
-	AddCoinCount(amount int)
-	CoinCount() int
-}
-
 type CherryPlayer struct {
-	actors.Character
-
-	coinCount        int
-	movementBlockers int
+	gameentitytypes.PlatformerCharacter
 }
 
-func NewCherryPlayer() (actors.ActorEntity, error) {
+func NewCherryPlayer() (gameentitytypes.PlatformerActorEntity, error) {
 	spriteData, statData, err := actors.ParseJsonPlayer("internal/game/entity/actors/player/cherry.json")
 	if err != nil {
 		return nil, err
@@ -35,7 +28,7 @@ func NewCherryPlayer() (actors.ActorEntity, error) {
 	character.AddSkill(skill.NewDashSkill())
 
 	player := &CherryPlayer{
-		Character: *character,
+		PlatformerCharacter: *character,
 	}
 	if err = SetPlayerBodies(player, spriteData); err != nil {
 		return nil, fmt.Errorf("SetPlayerBodies: %w", err)
@@ -55,11 +48,4 @@ func NewCherryPlayer() (actors.ActorEntity, error) {
 
 func (p *CherryPlayer) GetCharacter() *actors.Character {
 	return &p.Character
-}
-
-func (p *CherryPlayer) AddCoinCount(amount int) {
-	p.coinCount += amount
-}
-func (p *CherryPlayer) CoinCount() int {
-	return p.coinCount
 }

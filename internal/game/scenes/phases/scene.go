@@ -10,7 +10,6 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/assets/font"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/data/config"
-	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors/enemies"
 	"github.com/leandroatallah/firefly/internal/engine/entity/items"
 	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
@@ -19,6 +18,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/scene/transition"
 	gameenemies "github.com/leandroatallah/firefly/internal/game/entity/actors/enemies"
 	gameitems "github.com/leandroatallah/firefly/internal/game/entity/items"
+	gameentitytypes "github.com/leandroatallah/firefly/internal/game/entity/types"
 	gamecamera "github.com/leandroatallah/firefly/internal/game/render/camera"
 	scenestypes "github.com/leandroatallah/firefly/internal/game/scenes/types"
 )
@@ -30,7 +30,7 @@ const (
 type PhasesScene struct {
 	scene.TilemapScene
 	count          int
-	player         actors.ActorEntity
+	player         gameentitytypes.PlatformerActorEntity
 	cam            *camera.Controller
 	phaseCompleted bool
 	mainText       *font.FontText
@@ -110,7 +110,7 @@ func (s *PhasesScene) Update() error {
 	for _, i := range space.Bodies() {
 		switch b := i.(type) {
 		// ActorEntity case should came first. It can be confused with body.Obstacle
-		case actors.ActorEntity:
+		case gameentitytypes.PlatformerActorEntity:
 			if err := b.Update(space); err != nil {
 				return err
 			}
@@ -145,7 +145,7 @@ func (s *PhasesScene) Draw(screen *ebiten.Image) {
 	space := s.PhysicsSpace()
 	for _, b := range space.Bodies() {
 		switch sb := b.(type) {
-		case actors.ActorEntity:
+		case gameentitytypes.PlatformerActorEntity:
 			opts := sb.ImageOptions()
 			sb.UpdateImageOptions()
 			if config.Get().CollisionBox {

@@ -6,7 +6,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/entity/items"
-	gameplayer "github.com/leandroatallah/firefly/internal/game/entity/actors/player"
+	gameentitytypes "github.com/leandroatallah/firefly/internal/game/entity/types"
 )
 
 // Concrete
@@ -54,7 +54,7 @@ func (c *CollectibleCoinItem) OnTouch(other body.Collidable) {
 	if !found {
 		return
 	}
-	coinCollector, ok := player.(gameplayer.CoinCollector)
+	coinCollector, ok := player.(*gameentitytypes.PlatformerCharacter)
 	if ok {
 		c.SetRemoved(true)
 		coinCollector.AddCoinCount(1)

@@ -3,9 +3,9 @@ package gameenemies
 import (
 	"log"
 
-	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
-	"github.com/leandroatallah/firefly/internal/engine/entity/actors/enemies"
 	"github.com/leandroatallah/firefly/internal/engine/app"
+	"github.com/leandroatallah/firefly/internal/engine/entity/actors/enemies"
+	gameentitytypes "github.com/leandroatallah/firefly/internal/game/entity/types"
 )
 
 const (
@@ -13,8 +13,8 @@ const (
 )
 
 func InitEnemyMap(ctx *app.AppContext) enemies.EnemyMap {
-	enemyMap := map[enemies.EnemyType]func(x, y int, id string) actors.ActorEntity{
-		BlueEnemyType: func(x, y int, id string) actors.ActorEntity {
+	enemyMap := map[enemies.EnemyType]func(x, y int, id string) gameentitytypes.PlatformerActorEntity{
+		BlueEnemyType: func(x, y int, id string) gameentitytypes.PlatformerActorEntity {
 			enemy, err := NewBlueEnemy(x, y, id)
 			if err != nil {
 				log.Fatal(err)

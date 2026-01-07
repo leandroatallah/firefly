@@ -6,9 +6,10 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 	physicsmovement "github.com/leandroatallah/firefly/internal/engine/physics/movement"
 	"github.com/leandroatallah/firefly/internal/game/entity/actors/builder"
+	gameentitytypes "github.com/leandroatallah/firefly/internal/game/entity/types"
 )
 
-func CreateAnimatedCharacter(data schemas.SpriteData) (*actors.Character, error) {
+func CreateAnimatedCharacter(data schemas.SpriteData) (*gameentitytypes.PlatformerCharacter, error) {
 	stateMap := map[string]animation.SpriteState{
 		"idle": actors.Idle,
 		"walk": actors.Walking,
@@ -19,7 +20,7 @@ func CreateAnimatedCharacter(data schemas.SpriteData) (*actors.Character, error)
 }
 
 // SetPlayerBodies
-func SetPlayerBodies(player actors.ActorEntity, data schemas.SpriteData) error {
+func SetPlayerBodies(player gameentitytypes.PlatformerActorEntity, data schemas.SpriteData) error {
 	player.SetID("player")
 
 	stateMap := map[string]animation.SpriteState{
@@ -32,12 +33,12 @@ func SetPlayerBodies(player actors.ActorEntity, data schemas.SpriteData) error {
 	return builder.SetCharacterBodies(player, data, stateMap, "PLAYER")
 }
 
-func SetPlayerStats(player actors.ActorEntity, data actors.StatData) error {
+func SetPlayerStats(player gameentitytypes.PlatformerActorEntity, data actors.StatData) error {
 	return builder.SetCharacterStats(player, data)
 }
 
 func SetMovementModel(
-	player actors.ActorEntity,
+	player gameentitytypes.PlatformerActorEntity,
 	movementModel physicsmovement.MovementModelEnum,
 ) error {
 	model, err := physicsmovement.NewMovementModel(movementModel, player)

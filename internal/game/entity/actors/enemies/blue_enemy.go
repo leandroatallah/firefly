@@ -8,10 +8,11 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors/enemies"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors/movement"
 	physicsmovement "github.com/leandroatallah/firefly/internal/engine/physics/movement"
+	gameentitytypes "github.com/leandroatallah/firefly/internal/game/entity/types"
 )
 
 type BlueEnemy struct {
-	actors.Character
+	gameentitytypes.PlatformerCharacter
 	count int
 }
 
@@ -27,7 +28,7 @@ func NewBlueEnemy(x, y int, id string) (*BlueEnemy, error) {
 	}
 
 	character.SetPosition(x, y)
-	enemy := &BlueEnemy{Character: *character}
+	enemy := &BlueEnemy{PlatformerCharacter: *character}
 
 	if err = SetEnemyStats(enemy, statData); err != nil {
 		return nil, err
@@ -63,6 +64,6 @@ func (e *BlueEnemy) GetCharacter() *actors.Character {
 func (e *BlueEnemy) OnTouch(other body.Collidable) {
 	player := e.MovementState().Target()
 	if other.ID() == player.ID() {
-		player.(actors.ActorEntity).GetCharacter().Hurt(1)
+		player.(gameentitytypes.PlatformerActorEntity).GetCharacter().Hurt(1)
 	}
 }

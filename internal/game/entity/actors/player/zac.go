@@ -6,17 +6,18 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 	physicsmovement "github.com/leandroatallah/firefly/internal/engine/physics/movement"
 	"github.com/leandroatallah/firefly/internal/engine/physics/skill"
+	gameentitytypes "github.com/leandroatallah/firefly/internal/game/entity/types"
 )
 
 type ZacPlayer struct {
-	actors.Character
+	gameentitytypes.PlatformerCharacter
 
 	coinCount int
 }
 
 func NewZacPlayer(
 	movementBlocker physicsmovement.PlayerMovementBlocker,
-) (actors.ActorEntity, error) {
+) (gameentitytypes.PlatformerActorEntity, error) {
 	spriteData, statData, err := actors.ParseJsonPlayer("internal/game/entity/actors/player/zac.json")
 	if err != nil {
 		return nil, err
@@ -29,7 +30,7 @@ func NewZacPlayer(
 	character.AddSkill(skill.NewJumpSkill())
 
 	player := &ZacPlayer{
-		Character: *character,
+		PlatformerCharacter: *character,
 	}
 	if err = SetPlayerBodies(player, spriteData); err != nil {
 		return nil, fmt.Errorf("SetPlayerBodies: %w", err)

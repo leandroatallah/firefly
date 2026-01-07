@@ -9,20 +9,21 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
 	"github.com/leandroatallah/firefly/internal/engine/render/sprites"
+	gameentitytypes "github.com/leandroatallah/firefly/internal/game/entity/types"
 )
 
-func CreateAnimatedCharacter(data schemas.SpriteData, stateMap map[string]animation.SpriteState) (*actors.Character, error) {
+func CreateAnimatedCharacter(data schemas.SpriteData, stateMap map[string]animation.SpriteState) (*gameentitytypes.PlatformerCharacter, error) {
 	assets, err := sprites.GetSpritesFromAssets(data.Assets, stateMap)
 	if err != nil {
 		return nil, err
 	}
 
 	rect := bodyphysics.NewRect(data.BodyRect.Rect())
-	c := actors.NewCharacter(assets, rect)
-	c.SetFaceDirection(data.FacingDirection)
-	c.SetFrameRate(data.FrameRate)
+	p := gameentitytypes.NewPlatformerCharacter(assets, rect)
+	p.SetFaceDirection(data.FacingDirection)
+	p.SetFrameRate(data.FrameRate)
 
-	return c, nil
+	return p, nil
 }
 
 type collisionRectSetter interface {
@@ -31,7 +32,7 @@ type collisionRectSetter interface {
 }
 
 func SetCharacterBodies(
-	character actors.ActorEntity,
+	character gameentitytypes.PlatformerActorEntity,
 	data schemas.SpriteData,
 	stateMap map[string]animation.SpriteState,
 	idPrefix string,
@@ -58,7 +59,7 @@ func SetCharacterBodies(
 	return nil
 }
 
-func SetCharacterStats(character actors.ActorEntity, data actors.StatData) error {
+func SetCharacterStats(character gameentitytypes.PlatformerActorEntity, data actors.StatData) error {
 	character.SetMaxHealth(data.Health)
 	var err error
 	err = character.SetSpeed(data.Speed)
