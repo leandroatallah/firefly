@@ -80,7 +80,7 @@ func (s *PhasesScene) OnStart() {
 
 	// Set enemies position from tilemap
 	enemyFactory := enemies.NewEnemyFactory(gameenemies.InitEnemyMap(s.AppContext()))
-	s.InitEnemies(enemyFactory)
+	scene.InitEnemies(&s.TilemapScene, enemyFactory)
 
 	s.SetPlayerStartPosition(s.player)
 

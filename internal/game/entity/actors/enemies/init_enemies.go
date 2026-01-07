@@ -12,7 +12,7 @@ const (
 	BlueEnemyType enemies.EnemyType = "BLUE"
 )
 
-func InitEnemyMap(ctx *app.AppContext) enemies.EnemyMap {
+func InitEnemyMap(ctx *app.AppContext) enemies.EnemyMap[gameentitytypes.PlatformerActorEntity] {
 	enemyMap := map[enemies.EnemyType]func(x, y int, id string) gameentitytypes.PlatformerActorEntity{
 		BlueEnemyType: func(x, y int, id string) gameentitytypes.PlatformerActorEntity {
 			enemy, err := NewBlueEnemy(x, y, id)

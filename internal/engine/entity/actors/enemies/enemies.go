@@ -7,7 +7,7 @@ import (
 
 // To be initialized on game package.
 type EnemyType string
-type EnemyMap map[EnemyType]func(x, y int, id string) actors.ActorEntity
+type EnemyMap[T actors.ActorEntity] map[EnemyType]func(x, y int, id string) T
 
 type BaseEnemy struct {
 	actors.Character

@@ -90,8 +90,17 @@ func (s *TilemapScene) InitItems(items map[int]items.ItemType, factory *items.It
 	return nil
 }
 
-func (s *TilemapScene) InitEnemies(factory *enemies.EnemyFactory) error {
-	enemiesPos := s.tilemap.GetEnemiesPositionID()
+func (s *TilemapScene) SetPlayerStartPosition(p actors.ActorEntity) {
+	// Set player initial position from tilemap
+	if x, y, found := s.tilemap.GetPlayerStartPosition(); found {
+		// Update Y position based on player height
+		y -= fp16.To16(p.Position().Dy())
+		p.SetPosition(x, y)
+	}
+}
+
+func InitEnemies[T actors.ActorEntity](s *TilemapScene, factory *enemies.EnemyFactory[T]) error {
+	enemiesPos := s.Tilemap().GetEnemiesPositionID()
 
 	for _, e := range enemiesPos {
 		enemy, err := factory.Create(enemies.EnemyType(e.EnemyType), e.X, e.Y, e.ID)
@@ -103,13 +112,4 @@ func (s *TilemapScene) InitEnemies(factory *enemies.EnemyFactory) error {
 	}
 
 	return nil
-}
-
-func (s *TilemapScene) SetPlayerStartPosition(p actors.ActorEntity) {
-	// Set player initial position from tilemap
-	if x, y, found := s.tilemap.GetPlayerStartPosition(); found {
-		// Update Y position based on player height
-		y -= fp16.To16(p.Position().Dy())
-		p.SetPosition(x, y)
-	}
 }

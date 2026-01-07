@@ -6,22 +6,22 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 )
 
-type EnemyFactory struct {
-	enemyMap EnemyMap
+type EnemyFactory[T actors.ActorEntity] struct {
+	enemyMap EnemyMap[T]
 }
 
-func NewEnemyFactory(enemyMap EnemyMap) *EnemyFactory {
-	return &EnemyFactory{enemyMap: enemyMap}
+func NewEnemyFactory[T actors.ActorEntity](enemyMap EnemyMap[T]) *EnemyFactory[T] {
+	return &EnemyFactory[T]{enemyMap: enemyMap}
 }
 
-func (f *EnemyFactory) Create(enemyType EnemyType, x, y int, id string) (actors.ActorEntity, error) {
+func (f *EnemyFactory[T]) Create(enemyType EnemyType, x, y int, id string) (T, error) {
 	enemyFunc, ok := f.enemyMap[enemyType]
 	if !ok {
-		return nil, fmt.Errorf("unknown enemy type: %s", enemyType)
+		var zero T
+		return zero, fmt.Errorf("unknown enemy type: %s", enemyType)
 	}
 
 	enemy := enemyFunc(x, y, id)
 
 	return enemy, nil
 }
-
