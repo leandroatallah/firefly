@@ -2,6 +2,7 @@ package tilemap
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
@@ -26,27 +27,29 @@ var LayerNameMap = map[string]LayerNameID{
 	"Endpoint":    EndpointLayer,
 }
 
-func (t *Tilemap) CreateCollisionBodies(space *space.Space, triggerEndpoint body.Touchable) error {
-	endpointLayer, err := t.FindLayerByName("Endpoint")
-	if err != nil {
-		return err
+func (t *Tilemap) CreateCollisionBodies(space *space.Space, triggerEndpoint body.Touchable) {
+	endpointLayer, found := t.FindLayerByName("Endpoint")
+	if !found {
+		log.Printf("Endpoint layer not found in tilemap")
+		return
 	}
+
 	for _, obj := range endpointLayer.Objects {
 		obstacle := t.NewObstacleRect(obj, "Endpoint", false)
 		obstacle.SetTouchable(triggerEndpoint)
 		space.AddBody(obstacle)
 	}
 
-	obstacleLayer, err := t.FindLayerByName("Obstacles")
-	if err != nil {
-		return err
+	obstacleLayer, found := t.FindLayerByName("Obstacles")
+	if !found {
+		log.Printf("Obstacles layer not found in tilemap")
+		return
 	}
+
 	for _, obj := range obstacleLayer.Objects {
 		obstacle := t.NewObstacleRect(obj, "OBSTACLE", true)
 		space.AddBody(obstacle)
 	}
-
-	return nil
 }
 
 func (t *Tilemap) NewObstacleRect(obj *Obstacle, prefix string, isObstructive bool) *bodyphysics.ObstacleRect {

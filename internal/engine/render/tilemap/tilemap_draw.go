@@ -6,6 +6,7 @@ import (
 	"image"
 	_ "image/png"
 	"io"
+	"log"
 	"os"
 	"path/filepath"
 
@@ -194,9 +195,10 @@ func (t *Tilemap) isTilemapValid() (bool, error) {
 	return true, nil
 }
 
-func (t *Tilemap) FindLayerByName(name string) (*Layer, error) {
+func (t *Tilemap) FindLayerByName(name string) (*Layer, bool) {
 	if valid, err := t.isTilemapValid(); !valid {
-		return nil, err
+		log.Printf("tilemap is not valid: %v", err)
+		return nil, false
 	}
 
 	for _, layer := range t.Layers {
@@ -205,9 +207,9 @@ func (t *Tilemap) FindLayerByName(name string) (*Layer, error) {
 		}
 
 		if layer.Name == name {
-			return layer, nil
+			return layer, true
 		}
 	}
 
-	return nil, fmt.Errorf("FindLayerByName could not find: %v", name)
+	return nil, false
 }

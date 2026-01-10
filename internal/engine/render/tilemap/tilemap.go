@@ -100,9 +100,9 @@ func (t *Tilemap) GetPlayerStartPosition() (x, y int, found bool) {
 	mapHeight := t.Height * t.Tileheight
 	yOffset := mapHeight - cfg.ScreenHeight - 100
 
-	layer, err := t.FindLayerByName("PlayerStart")
-	if err != nil {
-		log.Printf("failed to get player start position: %v", err)
+	layer, found := t.FindLayerByName("PlayerStart")
+	if !found {
+		log.Printf("PlayerStart layer not found in tilemap")
 		return 0, 0, false
 	}
 
@@ -128,9 +128,9 @@ func (t *Tilemap) GetItemsPositionID() []*ItemPosition {
 	var firstgid int
 	var ts *Tileset
 
-	layer, err := t.FindLayerByName("Items")
-	if err != nil {
-		log.Printf("failed to get items position: %v", err)
+	layer, found := t.FindLayerByName("Items")
+	if !found {
+		log.Printf("Items layer not found in tilemap")
 		return nil
 	}
 
@@ -174,9 +174,9 @@ func (t *Tilemap) GetEnemiesPositionID() []*EnemyPosition {
 
 	res := []*EnemyPosition{}
 
-	layer, err := t.FindLayerByName("Enemies")
-	if err != nil {
-		log.Printf("failed to get enemies position: %v", err)
+	layer, found := t.FindLayerByName("Enemies")
+	if !found {
+		log.Printf("Enemies layer not found in tilemap")
 		return nil
 	}
 
