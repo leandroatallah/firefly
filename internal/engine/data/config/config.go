@@ -50,6 +50,7 @@ type AppConfig struct {
 	MainFontFace string
 	CamDebug     bool
 	CollisionBox bool
+	NoSound      bool
 }
 
 var cfg AppConfig
@@ -84,6 +85,7 @@ func init() {
 func Parse() {
 	flag.BoolVar(&cfg.CamDebug, "cam-debug", false, "Enable camera debug")
 	flag.BoolVar(&cfg.CollisionBox, "collision-box", false, "Enable collision box debug")
+	flag.BoolVar(&cfg.NoSound, "no-sound", false, "Disable game sound")
 }
 
 func Get() *AppConfig {

@@ -55,6 +55,9 @@ func (s *PhasesScene) OnStart() {
 
 	go func() {
 		time.Sleep(1 * time.Second)
+		if config.Get().NoSound {
+			return
+		}
 		am := s.AppContext().AudioManager
 		am.SetVolume(0.25)
 		am.PlayMusic(bgSound)

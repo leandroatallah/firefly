@@ -13,6 +13,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/audio/mp3"
 	"github.com/hajimehoshi/ebiten/v2/audio/vorbis"
 	"github.com/hajimehoshi/ebiten/v2/audio/wav"
+	"github.com/leandroatallah/firefly/internal/engine/data/config"
 )
 
 const (
@@ -38,10 +39,14 @@ type AudioManager struct {
 }
 
 func NewAudioManager() *AudioManager {
+	initialVolume := 1.0
+	if config.Get().NoSound {
+		initialVolume = 0.0
+	}
 	return &AudioManager{
 		audioContext: audio.NewContext(sampleRate),
 		audioPlayers: make(map[string]*audio.Player),
-		volume:       1.0,
+		volume:       initialVolume,
 	}
 }
 
