@@ -79,8 +79,8 @@ func clampAxisVelocity(velocity, limit int) int {
 	}
 }
 
-// clampToPlayArea ensures the body stays within the screen boundaries.
-// It adjusts the body's position if it goes beyond the edges of the screen.
+// clampToPlayArea ensures the body stays within the world boundaries.
+// It adjusts the body's position if it goes beyond the edges of the play area.
 // It returns true if the body is touching or has gone past the bottom of the screen,
 // which can be interpreted as being on the ground for platformer.
 func clampToPlayArea(body body.MovableCollidable, space *space.Space) bool {
@@ -91,46 +91,50 @@ func clampToPlayArea(body body.MovableCollidable, space *space.Space) bool {
 
 	cfg := config.Get()
 	x, y := body.GetPositionMin()
+	newX, newY := x, y
 
-	if x < 0 {
-		x, y, _ = body.ApplyValidPosition(-fp16.To16(x), true, nil)
-	}
-
-	x16, y16 := fp16.To16(x), fp16.To16(y)
-
-	x16 = fp16.To16(body.Position().Min.X)
-	rightEdge := x16 + fp16.To16(rect.Width())
-	maxRight := fp16.To16(cfg.ScreenWidth)
+	// --- Horizontal clamping ---
+	minX := 0
+	maxX := cfg.ScreenWidth
 	provider := space.GetTilemapDimensionsProvider()
 	if provider != nil {
-		maxRight = fp16.To16(provider.GetTilemapWidth())
-	}
-	if rightEdge > maxRight {
-		x, y, _ = body.ApplyValidPosition(maxRight-rightEdge, true, nil)
-		x16, y16 = fp16.To16(x), fp16.To16(y)
+		maxX = provider.GetTilemapWidth()
 	}
 
-	// Vertical clamping
-	minTop := 0
-	maxBottom := fp16.To16(cfg.ScreenHeight)
+	// Left edge
+	if x < minX {
+		newX = minX
+	}
+
+	// Right edge
+	if x+rect.Width() > maxX {
+		newX = maxX - rect.Width()
+	}
+
+	// --- Vertical clamping ---
+	minY := 0
+	maxY := cfg.ScreenHeight
 	if provider != nil {
-		minTop = fp16.To16(cfg.ScreenHeight - provider.GetTilemapHeight())
-		maxBottom = fp16.To16(provider.GetTilemapHeight())
+		maxY = provider.GetTilemapHeight()
 	}
 
-	if y16 < minTop {
-		x, y, _ = body.ApplyValidPosition(minTop-y16, false, nil)
-		x16, y16 = fp16.To16(x), fp16.To16(y)
+	// Top edge
+	if y < minY {
+		newY = minY
 	}
 
-	y16 = fp16.To16(body.Position().Min.Y)
-	bottom := y16 + fp16.To16(rect.Height())
-	if bottom >= maxBottom {
-		if bottom > maxBottom {
-			_, _, _ = body.ApplyValidPosition(maxBottom-bottom, false, nil)
+	// Bottom edge
+	isOnGround := false
+	if y+rect.Height() >= maxY {
+		if y+rect.Height() > maxY {
+			newY = maxY - rect.Height()
 		}
-		return true
+		isOnGround = true
 	}
 
-	return false
+	if newX != x || newY != y {
+		body.SetPosition(newX, newY)
+	}
+
+	return isOnGround
 }
