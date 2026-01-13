@@ -1,18 +1,5 @@
 package config
 
-import (
-	"flag"
-
-	"github.com/leandroatallah/firefly/internal/engine/utils/fp16"
-)
-
-const (
-	ScreenWidth   = 320
-	ScreenHeight  = 180
-	DefaultVolume = 0.5
-	MainFontFace  = "assets/fonts/pressstart2p.ttf"
-)
-
 type PhysicsConfig struct {
 	// HorizontalInertia controls the smoothness of horizontal movement. Higher values lead to more sliding.
 	// 0.0 means instant movement.
@@ -55,37 +42,8 @@ type AppConfig struct {
 
 var cfg AppConfig
 
-func init() {
-	defaultPhysics := PhysicsConfig{
-		HorizontalInertia:     2.0,
-		AirFrictionMultiplier: 0.5,
-		AirControlMultiplier:  0.25,
-		CoyoteTimeFrames:      6,
-		JumpBufferFrames:      6,
-		JumpForce:             6,
-		JumpCutMultiplier:     0.5,
-		UpwardGravity:         6,
-		DownwardGravity:       6,
-		MaxFallSpeed:          fp16.To16(4),
-	}
-
-	cfg = AppConfig{
-		ScreenWidth:  ScreenWidth,
-		ScreenHeight: ScreenHeight,
-		Physics:      defaultPhysics,
-
-		DefaultVolume: DefaultVolume,
-
-		MainFontFace: MainFontFace,
-	}
-
-	Parse()
-}
-
-func Parse() {
-	flag.BoolVar(&cfg.CamDebug, "cam-debug", false, "Enable camera debug")
-	flag.BoolVar(&cfg.CollisionBox, "collision-box", false, "Enable collision box debug")
-	flag.BoolVar(&cfg.NoSound, "no-sound", false, "Disable game sound")
+func Set(newCfg AppConfig) {
+	cfg = newCfg
 }
 
 func Get() *AppConfig {
