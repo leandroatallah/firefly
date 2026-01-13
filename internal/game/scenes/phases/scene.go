@@ -13,13 +13,11 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors/enemies"
 	"github.com/leandroatallah/firefly/internal/engine/entity/items"
 	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
-	"github.com/leandroatallah/firefly/internal/engine/render/camera"
 	"github.com/leandroatallah/firefly/internal/engine/scene"
 	"github.com/leandroatallah/firefly/internal/engine/scene/transition"
 	gameenemies "github.com/leandroatallah/firefly/internal/game/entity/actors/enemies"
 	gameitems "github.com/leandroatallah/firefly/internal/game/entity/items"
 	gameentitytypes "github.com/leandroatallah/firefly/internal/game/entity/types"
-	gamecamera "github.com/leandroatallah/firefly/internal/game/render/camera"
 	scenestypes "github.com/leandroatallah/firefly/internal/game/scenes/types"
 )
 
@@ -31,7 +29,6 @@ type PhasesScene struct {
 	scene.TilemapScene
 	count          int
 	player         gameentitytypes.PlatformerActorEntity
-	cam            *camera.Controller
 	phaseCompleted bool
 	mainText       *font.FontText
 }
@@ -88,9 +85,8 @@ func (s *PhasesScene) OnStart() {
 	s.SetPlayerStartPosition(s.player)
 
 	// Init camera target
-	pPos := s.player.Position().Min
-	s.cam = gamecamera.New(pPos.X, pPos.Y)
-	s.cam.SetFollowTarget(s.player)
+	s.SetCameraConfig(scene.CameraConfig{Mode: scene.CameraModeFollow})
+	s.Camera().SetFollowTarget(s.player)
 
 	// Init collisions bodies and touch trigger for endpoints
 	endpointTrigger := bodyphysics.NewTouchTrigger(s.finishPhase, s.player)
@@ -103,10 +99,9 @@ func (s *PhasesScene) Update() error {
 	if config.Get().CamDebug {
 		s.CamDebug()
 	}
+	s.TilemapScene.Update() // Update the camera if in follow mode
 
 	s.count++
-
-	s.cam.Update()
 
 	// Execute bodies updates
 	space := s.PhysicsSpace()
@@ -142,7 +137,7 @@ func (s *PhasesScene) Draw(screen *ebiten.Image) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	s.cam.Draw(tilemap, s.Tilemap().ImageOptions(), screen)
+	s.Camera().Draw(tilemap, s.Tilemap().ImageOptions(), screen)
 
 	// Draw bodies based on camera
 	space := s.PhysicsSpace()
@@ -152,9 +147,9 @@ func (s *PhasesScene) Draw(screen *ebiten.Image) {
 			opts := sb.ImageOptions()
 			sb.UpdateImageOptions()
 			if config.Get().CollisionBox {
-				s.cam.Draw(sb.ImageCollisionBox(), opts, screen)
+				s.Camera().Draw(sb.ImageCollisionBox(), opts, screen)
 			} else {
-				s.cam.Draw(sb.Image(), opts, screen)
+				s.Camera().Draw(sb.Image(), opts, screen)
 			}
 		case items.Item:
 			if sb.IsRemoved() {
@@ -163,15 +158,15 @@ func (s *PhasesScene) Draw(screen *ebiten.Image) {
 			opts := sb.ImageOptions()
 			sb.UpdateImageOptions()
 			if config.Get().CollisionBox {
-				s.cam.Draw(sb.ImageCollisionBox(), opts, screen)
+				s.Camera().Draw(sb.ImageCollisionBox(), opts, screen)
 			} else {
-				s.cam.Draw(sb.Image(), opts, screen)
+				s.Camera().Draw(sb.Image(), opts, screen)
 			}
 		case body.Obstacle:
 			if config.Get().CollisionBox {
 				opts := sb.ImageOptions()
 				sb.UpdateImageOptions()
-				s.cam.Draw(sb.ImageCollisionBox(), opts, screen)
+				s.Camera().Draw(sb.ImageCollisionBox(), opts, screen)
 			}
 		}
 	}

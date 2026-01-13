@@ -17,14 +17,32 @@ import (
 
 type TilemapScene struct {
 	BaseScene
-	tilemap *tilemap.Tilemap
-	cam     *camera.Controller
+	tilemap      *tilemap.Tilemap
+	cam          *camera.Controller
+	cameraConfig CameraConfig
 }
 
 func NewTilemapScene(ctx *app.AppContext) *TilemapScene {
-	scene := TilemapScene{}
+	scene := TilemapScene{
+		cam: camera.NewController(0, 0),
+	}
 	scene.SetAppContext(ctx)
 	return &scene
+}
+
+func (s *TilemapScene) SetCameraConfig(config CameraConfig) {
+	s.cameraConfig = config
+}
+
+func (s *TilemapScene) Update() error {
+	if s.cameraConfig.Mode == CameraModeFollow {
+		s.cam.Update()
+	}
+	return s.BaseScene.Update()
+}
+
+func (s *TilemapScene) Camera() *camera.Controller {
+	return s.cam
 }
 
 func (s *TilemapScene) OnStart() {
