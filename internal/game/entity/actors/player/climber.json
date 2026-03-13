@@ -12,10 +12,10 @@
         "loop": true,
         "collision_rect": [
           {
-            "x": 0,
-            "y": 0,
-            "width": 16,
-            "height": 16
+            "x": 4,
+            "y": 6,
+            "width": 8,
+            "height": 10
           }
         ]
       },
@@ -24,10 +24,10 @@
         "loop": true,
         "collision_rect": [
           {
-            "x": 0,
-            "y": 0,
-            "width": 16,
-            "height": 16
+            "x": 4,
+            "y": 6,
+            "width": 8,
+            "height": 10
           }
         ]
       },
@@ -36,10 +36,10 @@
         "loop": false,
         "collision_rect": [
           {
-            "x": 0,
-            "y": 0,
-            "width": 16,
-            "height": 16
+            "x": 4,
+            "y": 6,
+            "width": 8,
+            "height": 10
           }
         ]
       },
@@ -48,17 +48,24 @@
         "loop": false,
         "collision_rect": [
           {
-            "x": 0,
-            "y": 0,
-            "width": 16,
-            "height": 16
+            "x": 4,
+            "y": 6,
+            "width": 8,
+            "height": 10
           }
         ]
       },
       "land": {
         "path": "assets/images/climber-land.png",
         "loop": false,
-        "collision_rect": []
+        "collision_rect": [
+          {
+            "x": 4,
+            "y": 6,
+            "width": 8,
+            "height": 10
+          }
+        ]
       },
       "die": {
         "path": "assets/images/default-idle.png",

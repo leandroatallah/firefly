@@ -26,10 +26,10 @@ func NewConfig() *config.AppConfig {
 		AirControlMultiplier:  0.25,
 		CoyoteTimeFrames:      timing.FromDuration(100 * time.Millisecond), // 6 frames
 		JumpBufferFrames:      timing.FromDuration(100 * time.Millisecond), // 6 frames
-		JumpForce:             4,
+		JumpForce:             6,
 		JumpCutMultiplier:     0.5,
-		UpwardGravity:         4,
-		DownwardGravity:       4,
+		UpwardGravity:         6,
+		DownwardGravity:       8,
 		MaxFallSpeed:          fp16.To16(3),
 	}
 
