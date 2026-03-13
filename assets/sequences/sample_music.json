@@ -1,0 +1,38 @@
+{
+  "commands": [
+    {
+      "command": "play_music",
+      "path": "assets/audio/music/ambient.ogg",
+      "rewind": false,
+      "volume": 0.7,
+      "loop": true
+    },
+    {
+      "command": "delay",
+      "frames": 180
+    },
+    {
+      "command": "pause_all_music"
+    },
+    {
+      "command": "delay",
+      "frames": 60
+    },
+    {
+      "command": "play_music",
+      "path": "assets/audio/music/dramatic.ogg",
+      "rewind": true,
+      "volume": 0.8,
+      "loop": true
+    },
+    {
+      "command": "delay",
+      "frames": 300
+    },
+    {
+      "command": "fade_out_all_music",
+      "duration": 120
+    }
+  ],
+  "block_player_movement": false
+}

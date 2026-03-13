@@ -1,0 +1,52 @@
+package gamescene
+
+import (
+	"image/color"
+	"log"
+
+	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
+	"github.com/leandroatallah/firefly/internal/engine/app"
+	"github.com/leandroatallah/firefly/internal/engine/assets/font"
+	"github.com/leandroatallah/firefly/internal/engine/audio"
+	"github.com/leandroatallah/firefly/internal/engine/data/config"
+	"github.com/leandroatallah/firefly/internal/engine/render/screenutil"
+	"github.com/leandroatallah/firefly/internal/engine/scene"
+	"github.com/leandroatallah/firefly/internal/engine/scene/transition"
+)
+
+type SummaryScene struct {
+	scene.BaseScene
+
+	audiomanager *audio.AudioManager
+	fontText     *font.FontText
+}
+
+func NewSummaryScene(context *app.AppContext) *SummaryScene {
+	fontText, err := font.NewFontText(config.Get().MainFontFace)
+	if err != nil {
+		log.Fatal(err)
+	}
+	overlay := ebiten.NewImage(config.Get().ScreenWidth, config.Get().ScreenHeight)
+	overlay.Fill(color.Black)
+	scene := SummaryScene{fontText: fontText}
+	scene.SetAppContext(context)
+	return &scene
+}
+
+func (s *SummaryScene) Draw(screen *ebiten.Image) {
+	screen.Fill(color.RGBA{A: 255})
+	screenutil.DrawCenteredText(screen, s.fontText, "Summary screen", 10, color.White)
+}
+
+func (s *SummaryScene) Update() error {
+	if inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
+		s.AppContext().CompleteCurrentPhase(transition.NewFader(0, config.Get().FadeVisibleDuration), true)
+	}
+
+	return nil
+}
+
+func (s *SummaryScene) OnStart() {}
+
+func (s *SummaryScene) OnFinish() {}

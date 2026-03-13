@@ -1,0 +1,71 @@
+package gameitems
+
+import (
+	"fmt"
+
+	"github.com/leandroatallah/firefly/internal/engine/contracts/animation"
+	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
+	"github.com/leandroatallah/firefly/internal/engine/data/schemas"
+	"github.com/leandroatallah/firefly/internal/engine/entity/items"
+	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
+	"github.com/leandroatallah/firefly/internal/engine/render/sprites"
+)
+
+func CreateAnimatedItem(id string, data schemas.SpriteData, customStates map[string]animation.SpriteState) (*items.BaseItem, error) {
+	stateMap := map[string]animation.SpriteState{
+		"idle": items.Idle,
+	}
+	for k, v := range customStates {
+		stateMap[k] = v
+	}
+
+	assets, err := sprites.GetSpritesFromAssets(data.Assets, stateMap)
+	if err != nil {
+		return nil, err
+	}
+
+	rect := bodyphysics.NewRect(data.BodyRect.Rect())
+	b := items.NewBaseItem(id, assets, rect)
+	b.SetFaceDirection(data.FacingDirection)
+	b.SetFrameRate(data.FrameRate)
+
+	return b, nil
+}
+
+type collisionRectSetter interface {
+	AddCollisionRect(state items.ItemStateEnum, rect body.Collidable)
+}
+
+func SetItemBodies(item items.Item, data schemas.SpriteData, customStates map[string]animation.SpriteState) error {
+	setter, ok := item.(collisionRectSetter)
+	if !ok {
+		return fmt.Errorf("item must implement collisionRectSetter")
+	}
+
+	stateMap := map[string]animation.SpriteState{
+		"idle": items.Idle,
+	}
+	for k, v := range customStates {
+		stateMap[k] = v
+	}
+
+	idProvider := func(assetKey string, index int) string {
+		return fmt.Sprintf("%v_COLLISION_RECT_%s_%d", item.ID(), assetKey, index)
+	}
+
+	addCollisionRect := func(state animation.SpriteState, rect body.Collidable) {
+		itemState, ok := state.(items.ItemStateEnum)
+		if !ok {
+			// This should not happen if the stateMap is correct
+			return
+		}
+		setter.AddCollisionRect(itemState, rect)
+	}
+
+	bodyphysics.SetCollisionBodies(item, data, stateMap, idProvider, addCollisionRect)
+	return nil
+}
+
+func SetItemStats(item items.Item, data items.StatData) error {
+	return nil
+}

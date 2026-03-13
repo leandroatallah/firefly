@@ -1,0 +1,92 @@
+{
+  "sprites": {
+    "body_rect": {
+      "x": 0,
+      "y": 0,
+      "width": 24,
+      "height": 24
+    },
+    "assets": {
+      "idle": {
+        "path": "assets/images/default-idle.png",
+        "loop": true,
+        "collision_rect": [
+          {
+            "x": 7,
+            "y": 1,
+            "width": 14,
+            "height": 23
+          }
+        ]
+      },
+      "walk": {
+        "path": "assets/images/default-walk.png",
+        "loop": true,
+        "collision_rect": [
+          {
+            "x": 7,
+            "y": 1,
+            "width": 14,
+            "height": 23
+          }
+        ]
+      },
+      "jump": {
+        "path": "assets/images/default-idle.png",
+        "loop": false,
+        "collision_rect": [
+          {
+            "x": 7,
+            "y": 1,
+            "width": 14,
+            "height": 23
+          }
+        ]
+      },
+      "fall": {
+        "path": "assets/images/default-idle.png",
+        "loop": false,
+        "collision_rect": [
+          {
+            "x": 7,
+            "y": 1,
+            "width": 14,
+            "height": 23
+          }
+        ]
+      },
+      "land": {
+        "path": "assets/images/default-idle.png",
+        "loop": false,
+        "collision_rect": []
+      },
+      "die": {
+        "path": "assets/images/default-idle.png",
+        "loop": false,
+        "collision_rect": []
+      },
+      "exit": {
+        "path": "assets/images/default-idle.png",
+        "loop": false,
+        "collision_rect": []
+      },
+      "lie": {
+        "path": "assets/images/default-idle.png",
+        "loop": false,
+        "collision_rect": []
+      },
+      "rise": {
+        "path": "assets/images/default-idle.png",
+        "loop": false,
+        "collision_rect": []
+      }
+    },
+    "facing_direction": 0,
+    "frame_rate": 9
+  },
+  "stats": {
+    "health": 1,
+    "speed": 6,
+    "max_speed": 6
+  }
+}

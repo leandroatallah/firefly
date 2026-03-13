@@ -1,0 +1,40 @@
+{
+  "commands": [
+    {
+      "command": "spawn_text",
+      "target_id": "player",
+      "text": "Level Up!",
+      "duration": 120,
+      "type": "overhead"
+    },
+    {
+      "command": "delay",
+      "frames": 60
+    },
+    {
+      "command": "spawn_text",
+      "text": "Welcome to the Forest",
+      "x": 400,
+      "y": 100,
+      "duration": 180,
+      "type": "screen"
+    },
+    {
+      "command": "delay",
+      "frames": 90
+    },
+    {
+      "command": "quake",
+      "trauma": 0.8,
+      "duration": 60
+    },
+    {
+      "command": "spawn_text",
+      "target_id": "enemy-boss",
+      "text": "ROAR!",
+      "duration": 90,
+      "type": "overhead"
+    }
+  ],
+  "block_player_movement": true
+}

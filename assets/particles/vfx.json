@@ -1,0 +1,18 @@
+[
+  {
+    "type": "jump",
+    "image": "assets/images/jump-particles-24.png",
+    "frame_width": 24,
+    "frame_height": 24,
+    "frame_rate": 5,
+    "scale": 1.0
+  },
+  {
+    "type": "landing",
+    "image": "assets/images/land-particles-24.png",
+    "frame_width": 24,
+    "frame_height": 24,
+    "frame_rate": 5,
+    "scale": 1.0
+  }
+]

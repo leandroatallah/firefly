@@ -1,0 +1,13 @@
+{
+  "commands": [
+    {
+      "command": "camera_zoom",
+      "zoom": 1.5,
+      "duration": 0,
+      "delay": 40,
+      "out_duration": 30,
+      "target_id": "player"
+    }
+  ],
+  "block_player_movement": true
+}

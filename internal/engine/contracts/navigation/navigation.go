@@ -1,0 +1,43 @@
+package navigation
+
+import (
+	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/leandroatallah/firefly/internal/engine/audio"
+)
+
+type SceneType int
+
+type Scene interface {
+	Draw(screen *ebiten.Image)
+	Update() error
+	OnStart()
+	OnFinish()
+
+	SetAppContext(appContext any)
+}
+
+type SceneFactory interface {
+	Create(sceneType SceneType, freshInstance bool) (Scene, error)
+
+	SetAppContext(appContext any)
+}
+
+type SceneMap map[SceneType]func() Scene
+
+type SceneManager interface {
+	AudioManager() *audio.AudioManager
+	Draw(screen *ebiten.Image)
+	NavigateTo(sceneType SceneType, sceneTransition Transition, freshInstance bool)
+	NavigateBack(sceneTransition Transition)
+	// SetFactory(factory SceneFactory)
+	SwitchTo(scene Scene)
+	Update() error
+	CurrentScene() Scene
+}
+
+type Transition interface {
+	Update()
+	Draw(screen *ebiten.Image)
+	StartTransition(func())
+	EndTransition(func())
+}
