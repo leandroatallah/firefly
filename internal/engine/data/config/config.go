@@ -44,6 +44,7 @@ type AppConfig struct {
 	CamDebug     bool
 	CollisionBox bool
 	NoSound      bool
+	SkipIntro    bool
 
 	EnableSpeechSkip          bool
 	EnableTypingSounds        bool

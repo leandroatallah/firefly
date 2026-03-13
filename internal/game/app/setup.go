@@ -92,7 +92,18 @@ func Setup(assets fs.FS) error {
 	game := app.NewGame(appContext)
 
 	// Set initial game scene
-	game.AppContext.SceneManager.NavigateTo(scenestypes.SceneIntro, nil, false)
+	initialScene := scenestypes.SceneIntro
+	if cfg.SkipIntro {
+		// Catch the first scene phase
+		for _, p := range GetPhases() {
+			if p.SceneType == scenestypes.ScenePhases {
+				initialScene = p.SceneType
+				appContext.PhaseManager.SetCurrentPhase(p.ID)
+				break
+			}
+		}
+	}
+	game.AppContext.SceneManager.NavigateTo(initialScene, nil, false)
 
 	if err := ebiten.RunGame(game); err != nil {
 		return err

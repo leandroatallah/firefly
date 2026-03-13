@@ -55,6 +55,7 @@ func NewConfig() *config.AppConfig {
 	flag.BoolVar(&cfg.CamDebug, "cam-debug", false, "Enable camera debug")
 	flag.BoolVar(&cfg.CollisionBox, "collision-box", false, "Enable collision box debug")
 	flag.BoolVar(&cfg.NoSound, "no-sound", false, "Disable game sound")
+	flag.BoolVar(&cfg.SkipIntro, "skip-intro", false, "Skip all intros and start in phases")
 	// Temporary debug flags; only speech-skip is expected to remain as a global debug override.
 	flag.BoolVar(&cfg.EnableSpeechSkip, "speech-skip", true, "Enable skipping speech typing with Enter")
 	flag.BoolVar(&cfg.EnableTypingSounds, "typing-sounds", true, "Enable typing sound effects")
