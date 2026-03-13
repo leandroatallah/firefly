@@ -39,7 +39,7 @@ func climberStateTransitionLogic(c *actors.Character) bool {
 		return true
 	}
 
-	return true // We've handled the state, so the engine shouldn't.
+	return false
 }
 
 type ClimberPlayer struct {
