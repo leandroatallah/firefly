@@ -18,6 +18,17 @@ func (s *DyingState) OnStart(currentCount int) {
 	}
 }
 
+// Dead
+type DeadState struct {
+	actors.BaseState
+}
+
+func (s *DeadState) OnStart(currentCount int) {
+	s.BaseState.OnStart(currentCount)
+
+	s.GetActor().SetHealth(s.GetActor().MaxHealth())
+}
+
 // Exiting
 type ExitingState struct {
 	actors.BaseState
@@ -48,6 +59,7 @@ func (s *RisingState) OnStart(currentCount int) {
 
 var (
 	Dying   actors.ActorStateEnum
+	Dead    actors.ActorStateEnum
 	Exiting actors.ActorStateEnum
 	Lying   actors.ActorStateEnum
 	Rising  actors.ActorStateEnum
@@ -55,6 +67,7 @@ var (
 
 func init() {
 	Dying = actors.RegisterState("die", func(b actors.BaseState) actors.ActorState { return &DyingState{BaseState: b} })
+	Dead = actors.RegisterState("dead", func(b actors.BaseState) actors.ActorState { return &DeadState{BaseState: b} })
 	Exiting = actors.RegisterState("exit", func(b actors.BaseState) actors.ActorState { return &ExitingState{BaseState: b} })
 	Lying = actors.RegisterState("lie", func(b actors.BaseState) actors.ActorState { return &LyingState{BaseState: b} })
 	Rising = actors.RegisterState("rise", func(b actors.BaseState) actors.ActorState { return &RisingState{BaseState: b} })

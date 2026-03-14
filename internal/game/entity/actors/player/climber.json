@@ -72,6 +72,11 @@
         "loop": false,
         "collision_rect": []
       },
+      "dead": {
+        "path": "assets/images/climber-dead.png",
+        "loop": true,
+        "collision_rect": []
+      },
       "rise": {
         "path": "assets/images/climber-rise.png",
         "loop": false,
