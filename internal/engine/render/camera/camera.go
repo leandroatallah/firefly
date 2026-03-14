@@ -93,6 +93,16 @@ func (c *Controller) SetCenter(x, y float64) {
 	c.Kamera().SetCenter(x, y)
 }
 
+// GetCenter returns the current camera center position.
+func (c *Controller) GetCenter() (float64, float64) {
+	return c.centerX, c.centerY
+}
+
+// GetActualCenter returns the actual smoothed camera center position from kamera.
+func (c *Controller) GetActualCenter() (float64, float64) {
+	return c.cam.Center()
+}
+
 // SetPositionTopLeft positions the camera so that (x, y) appears at the top-left corner of the screen.
 func (c *Controller) SetPositionTopLeft(x, y float64) {
 	centerX := x + c.screenWidth/2
@@ -153,6 +163,9 @@ func (c *Controller) Update() {
 	}
 
 	c.cam.LookAt(targetX, targetY)
+	// Update stored center to match actual camera position
+	c.centerX = targetX
+	c.centerY = targetY
 }
 
 func (c *Controller) Draw(
