@@ -155,6 +155,39 @@ func (m *Manager) SpawnFallingRocks(x, y, width float64, count int) {
 	}
 }
 
+// SpawnDeathExplosion spawns an explosion effect at the specified location.
+// Particles explode outward and upward, then fall with gravity.
+func (m *Manager) SpawnDeathExplosion(x, y float64, count int) {
+	for i := 0; i < count; i++ {
+		// Spread particles around the death location
+		rx := x + (rand.Float64()-0.5)*40
+		ry := y + (rand.Float64()-0.5)*40
+
+		// Red color for 1-bit aesthetic
+		c := color.RGBA{255, 0, 0, 255}
+
+		// Explosion velocity: outward and upward
+		velX := (rand.Float64() - 0.5) * 4.0
+		velY := (rand.Float64() - 0.8) * 5.0 // Bias upward
+
+		scale := 1.0 + rand.Float64()*2.0
+
+		p := &particles.Particle{
+			X:           rx,
+			Y:           ry,
+			VelX:        velX,
+			VelY:        velY,
+			AccY:        0.15, // Gravity pulls particles down
+			Duration:    45 + rand.Intn(30),
+			MaxDuration: 90,
+			Scale:       scale,
+			Config:      m.pixelConfig,
+		}
+		p.ColorScale.ScaleWithColor(c)
+		m.system.Add(p)
+	}
+}
+
 // SpawnFloatingText spawns floating text at the specified location.
 func (m *Manager) SpawnFloatingText(msg string, x, y float64, duration int) {
 	ft := text.NewFloatingText(msg, x, y, duration)
