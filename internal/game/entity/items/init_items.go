@@ -9,16 +9,23 @@ import (
 
 const (
 	FallingPlatformType items.ItemType = "FALL_PLATFORM"
+	FreezePowerUpType   items.ItemType = "FREEZE_POWER_UP"
 )
+
+func itemFactoryOrFatal(item items.Item, err error) items.Item {
+	if err != nil {
+		log.Fatal(err)
+	}
+	return item
+}
 
 func InitItemMap(ctx *app.AppContext) items.ItemMap[items.Item] {
 	itemMap := map[items.ItemType]func(x, y int, id string) items.Item{
 		FallingPlatformType: func(x, y int, id string) items.Item {
-			item, err := NewFallingPlatformItem(ctx, x, y, id)
-			if err != nil {
-				log.Fatal(err)
-			}
-			return item
+			return itemFactoryOrFatal(NewFallingPlatformItem(ctx, x, y, id))
+		},
+		FreezePowerUpType: func(x, y int, id string) items.Item {
+			return itemFactoryOrFatal(NewCollectiblePowerItem(ctx, x, y, id))
 		},
 	}
 	return itemMap
