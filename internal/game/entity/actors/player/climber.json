@@ -68,22 +68,12 @@
         ]
       },
       "die": {
-        "path": "assets/images/default-idle.png",
-        "loop": false,
-        "collision_rect": []
-      },
-      "exit": {
-        "path": "assets/images/default-idle.png",
-        "loop": false,
-        "collision_rect": []
-      },
-      "lie": {
-        "path": "assets/images/default-idle.png",
+        "path": "assets/images/climber-die.png",
         "loop": false,
         "collision_rect": []
       },
       "rise": {
-        "path": "assets/images/default-idle.png",
+        "path": "assets/images/climber-rise.png",
         "loop": false,
         "collision_rect": []
       }
