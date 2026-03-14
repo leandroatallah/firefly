@@ -1,0 +1,26 @@
+{
+  "commands": [
+    {
+      "command": "delay",
+      "frames": 60
+    },
+    {
+      "command": "dialogue",
+      "lines": [
+        "Long ago… a cruel curse was cast. \nA young man’s love was taken from him. \nShe was locked away in a lonely stone tower.",
+        "The sky turned dark, the wind fell silent… \nand the world forgot her name."
+      ],
+      "position": "top",
+      "speech_speed": 1,
+      "speech_id": "story",
+      "speech_audio": [],
+      "enable_speech_skip": true,
+      "accumulative": true
+    },
+    {
+      "command": "delay",
+      "frames": 120
+    }
+  ],
+  "block_player_movement": true
+}
