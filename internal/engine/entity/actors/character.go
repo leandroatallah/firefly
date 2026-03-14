@@ -127,6 +127,14 @@ func (c *Character) NewState(state ActorStateEnum) (ActorState, error) {
 	return NewState(c, state)
 }
 
+func (c *Character) SetNewStateFatal(state ActorStateEnum) {
+	s, err := NewState(c, state)
+	if err != nil {
+		log.Fatalf("Failed to create new state %v: %v", s, err)
+	}
+	c.SetState(s)
+}
+
 // SetState set a new Character state and update current collision shapes.
 func (c *Character) SetState(state ActorState) {
 	if c.state == nil || c.state.State() != state.State() {
