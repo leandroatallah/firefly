@@ -30,6 +30,7 @@ import (
 	gamenpcs "github.com/leandroatallah/firefly/internal/game/entity/actors/npcs"
 	gameitems "github.com/leandroatallah/firefly/internal/game/entity/items"
 	gameentitytypes "github.com/leandroatallah/firefly/internal/game/entity/types"
+	gamecamera "github.com/leandroatallah/firefly/internal/game/render/camera"
 	scenestypes "github.com/leandroatallah/firefly/internal/game/scenes/types"
 )
 
@@ -63,6 +64,9 @@ type PhasesScene struct {
 	// sequencePlayer *sequences.SequencePlayer
 	sequencePlayer sequencestypes.Player
 	pauseScreen    *pause.PauseScreen
+
+	// Game-layer camera controller with vertical-only-upward constraint
+	gameCamera *gamecamera.Controller
 }
 
 func NewPhasesScene(ctx *app.AppContext) *PhasesScene {
@@ -126,9 +130,11 @@ func (s *PhasesScene) OnStart() {
 
 	if s.hasPlayer {
 		s.SetCameraConfig(scene.CameraConfig{Mode: scene.CameraModeFollow})
-		s.Camera().SetFollowTarget(s.player)
+		// Wrap base camera with game-layer controller that adds vertical-only-upward constraint
+		s.gameCamera = gamecamera.NewController(s.TilemapScene.Camera())
+		s.gameCamera.SetFollowTarget(s.player)
 
-		s.screenFlipper = scene.NewScreenFlipper(s.Camera(), s.player, s.Tilemap(), ctx)
+		s.screenFlipper = scene.NewScreenFlipper(s.gameCamera.Base(), s.player, s.Tilemap(), ctx)
 		tileWidth := s.Tilemap().Tilewidth
 		s.screenFlipper.PlayerPushDistance = float64(tileWidth / 2)
 		s.screenFlipper.FlipStrategy = func(dx, dy int) scene.FlipType {
@@ -202,6 +208,16 @@ func (s *PhasesScene) defaultCompletion() {
 	s.completionTrigger.Enable(timing.FromDuration(time.Second))
 }
 
+// Camera returns the game-layer camera controller with vertical-only-upward constraint.
+// Falls back to base camera if gameCamera is not set (e.g., when hasPlayer is false).
+func (s *PhasesScene) Camera() *gamecamera.Controller {
+	if s.gameCamera != nil {
+		return s.gameCamera
+	}
+	// Return a wrapper for base camera when gameCamera is not set
+	return gamecamera.NewController(s.TilemapScene.Camera())
+}
+
 func (s *PhasesScene) Update() error {
 	if s.pauseScreen != nil && s.canPause() {
 		s.pauseScreen.Update()
@@ -235,7 +251,7 @@ func (s *PhasesScene) Update() error {
 	}
 
 	if config.Get().CamDebug {
-		s.Camera().CamDebug()
+		s.gameCamera.CamDebug()
 	}
 
 	if s.rebootTrigger.Trigger() {
@@ -251,8 +267,15 @@ func (s *PhasesScene) Update() error {
 		s.AppContext().CompleteCurrentPhase(transition.NewFader(0, config.Get().FadeVisibleDuration), true)
 	}
 
-	// This calls TilemapScene.Update -> BaseScene.Update (handling Schedule)
-	if err := s.TilemapScene.Update(); err != nil {
+	// Update camera (use game-layer camera with vertical-only-upward constraint)
+	if s.gameCamera != nil {
+		s.gameCamera.Update()
+	} else {
+		// Fallback to base camera update
+		s.TilemapScene.Camera().Update()
+	}
+	// Call BaseScene.Update directly for Schedule handling (skip TilemapScene.Update to avoid double camera update)
+	if err := s.BaseScene.Update(); err != nil {
 		return err
 	}
 
@@ -331,7 +354,7 @@ func (s *PhasesScene) Draw(screen *ebiten.Image) {
 	}
 
 	if s.AppContext().VFX != nil {
-		s.AppContext().VFX.Draw(screen, s.Camera())
+		s.AppContext().VFX.Draw(screen, s.gameCamera.Base())
 	}
 
 	if s.pauseScreen.IsPaused() {

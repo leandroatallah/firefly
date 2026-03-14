@@ -11,8 +11,8 @@ import (
 
 const (
 	// Celeste is 320 x 180
-	ScreenWidth   = 320
-	ScreenHeight  = 224
+	ScreenWidth   = 256
+	ScreenHeight  = 240
 	DefaultVolume = 0.5
 	MainFontFace  = "assets/fonts/pressstart2p.ttf"
 	SmallFontFace = "assets/fonts/tiny5.ttf"
