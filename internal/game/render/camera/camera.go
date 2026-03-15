@@ -96,6 +96,12 @@ func (c *Controller) SetFollowTarget(b body.Body) {
 	c.initialized = true
 }
 
+// SetLastCameraY sets the last camera Y position for vertical constraint tracking.
+func (c *Controller) SetLastCameraY(y float64) {
+	c.lastCameraY = y
+	c.initialized = true
+}
+
 // SetBounds delegates to the base camera controller.
 func (c *Controller) SetBounds(bounds *image.Rectangle) {
 	c.base.SetBounds(bounds)

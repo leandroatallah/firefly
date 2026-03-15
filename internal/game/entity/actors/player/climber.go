@@ -1,8 +1,6 @@
 package gameplayer
 
 import (
-	"log"
-
 	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
@@ -18,20 +16,10 @@ func climberStateTransitionLogic(c *actors.Character) bool {
 		return true
 	}
 
-	setNewState := func(s actors.ActorStateEnum) {
-		state, err := c.NewState(s)
-		if err != nil {
-			// Log the error instead of crashing if a state is not registered.
-			log.Printf("Failed to create new state %v: %v", s, err)
-			return
-		}
-		c.SetState(state)
-	}
-
 	state := c.State()
 
 	if state == gamestates.Rising && c.IsAnimationFinished() {
-		setNewState(actors.Idle)
+		c.SetNewStateFatal(actors.Idle)
 		return true
 	}
 
@@ -97,9 +85,5 @@ func (p *ClimberPlayer) Hurt(damage int) {
 		return
 	}
 
-	state, err := p.NewState(gamestates.Dying)
-	if err != nil {
-		return
-	}
-	p.SetState(state)
+	p.SetNewStateFatal(gamestates.Dying)
 }

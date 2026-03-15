@@ -1,8 +1,10 @@
 package gamescenephases
 
 import (
+	"image"
 	"image/color"
 	"log"
+	"math"
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -18,6 +20,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors/platformer"
 	"github.com/leandroatallah/firefly/internal/engine/entity/items"
 	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
+	enginecamera "github.com/leandroatallah/firefly/internal/engine/render/camera"
 	"github.com/leandroatallah/firefly/internal/engine/render/screenutil"
 	"github.com/leandroatallah/firefly/internal/engine/scene"
 	"github.com/leandroatallah/firefly/internal/engine/scene/pause"
@@ -28,10 +31,10 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/utils/timing"
 	gameenemies "github.com/leandroatallah/firefly/internal/game/entity/actors/enemies"
 	gamenpcs "github.com/leandroatallah/firefly/internal/game/entity/actors/npcs"
+	gamestates "github.com/leandroatallah/firefly/internal/game/entity/actors/states"
 	gameitems "github.com/leandroatallah/firefly/internal/game/entity/items"
 	gameentitytypes "github.com/leandroatallah/firefly/internal/game/entity/types"
 	gamecamera "github.com/leandroatallah/firefly/internal/game/render/camera"
-	scenestypes "github.com/leandroatallah/firefly/internal/game/scenes/types"
 )
 
 const (
@@ -54,19 +57,19 @@ type PhasesScene struct {
 	goal            phases.Goal
 
 	// Navigation triggers
-	rebootTrigger     utils.DelayTrigger
 	completionTrigger utils.DelayTrigger
 
 	// UI effects
 	ShowDrawScreenFlash int
 
-	screenFlipper *scene.ScreenFlipper
-	// sequencePlayer *sequences.SequencePlayer
+	screenFlipper  *scene.ScreenFlipper
 	sequencePlayer sequencestypes.Player
 	pauseScreen    *pause.PauseScreen
 
 	// Game-layer camera controller with vertical-only-upward constraint
 	gameCamera *gamecamera.Controller
+
+	death deathSequence
 }
 
 func NewPhasesScene(ctx *app.AppContext) *PhasesScene {
@@ -208,6 +211,176 @@ func (s *PhasesScene) defaultCompletion() {
 	s.completionTrigger.Enable(timing.FromDuration(time.Second))
 }
 
+// checkPlayerFallDeath checks if the player fell out of camera view and triggers death.
+func (s *PhasesScene) checkPlayerFallDeath() {
+	if s.gameCamera == nil || s.player == nil {
+		return
+	}
+
+	// Don't trigger death during active death sequence
+	if s.death.active {
+		return
+	}
+
+	// Get camera center and player position
+	_, camY := s.gameCamera.Base().GetActualCenter()
+	_, playerY := s.player.GetPositionMin()
+
+	// Calculate bottom of camera viewport
+	// Camera center Y is the center of screen, so bottom is center + half screen height
+	cameraBottom := camY + s.gameCamera.Height()/2
+
+	// Check if player's top is below camera bottom (player fell out of view)
+	playerTop := float64(playerY)
+	if playerTop > cameraBottom {
+		s.startDeathSequence()
+	}
+}
+
+// clampCameraTarget clamps camera target position to camera bounds.
+func (s *PhasesScene) clampCameraTarget(x, y float64, bounds *image.Rectangle) (float64, float64) {
+	if bounds == nil {
+		return x, y
+	}
+
+	halfW := s.gameCamera.Width() / 2
+	halfH := s.gameCamera.Height() / 2
+	minX := float64(bounds.Min.X) + halfW
+	maxX := float64(bounds.Max.X) - halfW
+	minY := float64(bounds.Min.Y) + halfH
+	maxY := float64(bounds.Max.Y) - halfH
+
+	if x < minX {
+		x = minX
+	}
+	if x > maxX {
+		x = maxX
+	}
+	if y < minY {
+		y = minY
+	}
+	if y > maxY {
+		y = maxY
+	}
+	return x, y
+}
+
+// startDeathSequence initiates the death sequence: player dies, camera moves to start position.
+func (s *PhasesScene) startDeathSequence() {
+	if s.player == nil || !s.Tilemap().HasPlayerStartPosition() {
+		return
+	}
+
+	// Get player death position (for explosion VFX)
+	deathX, deathY := s.player.GetPositionMin()
+	deathW, deathH := s.player.GetShape().Width(), s.player.GetShape().Height()
+	deathCenterX := float64(deathX) + float64(deathW)/2
+	deathCenterY := float64(deathY) + float64(deathH)/2
+
+	// Get player start position from tilemap
+	startX, startY, found := s.Tilemap().GetPlayerStartPosition()
+	if !found {
+		return
+	}
+
+	// Call OnDie to set health to 0 and transition to Dying state
+	s.player.GetCharacter().SetNewStateFatal(gamestates.Dying)
+
+	// Spawn explosion VFX at death location
+	if s.AppContext().VFX != nil {
+		s.AppContext().VFX.SpawnDeathExplosion(deathCenterX, deathCenterY, 50)
+	}
+
+	// Disable player movement during death sequence
+	s.player.SetImmobile(true)
+
+	// Store player start position for teleport
+	s.death.playerStartX = float64(startX)
+	s.death.playerStartY = float64(startY)
+
+	// Get current camera position
+	baseCam := s.BaseCamera()
+	s.death.cameraStartX, s.death.cameraStartY = baseCam.GetActualCenter()
+
+	// Calculate camera target (clamped to bounds)
+	s.death.cameraTargetX, s.death.cameraTargetY = s.clampCameraTarget(float64(startX), float64(startY), baseCam.Bounds())
+
+	// Calculate dynamic duration based on distance
+	dx := s.death.cameraTargetX - s.death.cameraStartX
+	dy := s.death.cameraTargetY - s.death.cameraStartY
+	distance := math.Sqrt(dx*dx + dy*dy)
+
+	// Base duration + distance factor, capped between 30-60 frames
+	s.death.duration = int(30 + distance*0.15)
+	if s.death.duration > 60 {
+		s.death.duration = 60
+	}
+	if s.death.duration < 30 {
+		s.death.duration = 30
+	}
+
+	// Wait 1.5 seconds after explosion before moving camera
+	s.death.waitDuration = 90 // 1.5 seconds at 60fps
+	s.death.waitTimer = s.death.waitDuration
+	s.death.phase = deathSequencePhaseWaiting
+	s.death.timer = 0
+	s.death.active = true
+}
+
+// updateDeathSequence updates the death sequence state machine.
+func (s *PhasesScene) updateDeathSequence() {
+	switch s.death.phase {
+	case deathSequencePhaseWaiting:
+		s.updateDeathWaitPhase()
+	case deathSequencePhaseMoving:
+		s.updateDeathCameraPhase()
+	}
+}
+
+// updateDeathWaitPhase handles the waiting phase (explosion animation).
+func (s *PhasesScene) updateDeathWaitPhase() {
+	s.death.waitTimer--
+	if s.death.waitTimer <= 0 {
+		// Wait complete - teleport player to start position
+		if s.player != nil {
+			actorHeight := s.player.Position().Dy()
+			s.player.SetPosition(int(s.death.playerStartX), int(s.death.playerStartY)-actorHeight)
+		}
+		// Start camera movement
+		s.death.phase = deathSequencePhaseMoving
+		s.death.timer = 0
+	}
+}
+
+// updateDeathCameraPhase handles the camera movement phase.
+func (s *PhasesScene) updateDeathCameraPhase() {
+	s.death.timer++
+	progress := float64(s.death.timer) / float64(s.death.duration)
+	if progress >= 1.0 {
+		// Camera reached start position - transition player to Rising and unfreeze
+		if s.player != nil {
+			s.player.GetCharacter().SetNewStateFatal(gamestates.Rising)
+			s.player.SetImmobile(false)
+		}
+		// Snap camera to final position
+		baseCam := s.BaseCamera()
+		baseCam.SetCenter(s.death.cameraTargetX, s.death.cameraTargetY)
+
+		// Sync game camera's lastCameraY to prevent oscillation
+		_, camY := baseCam.GetActualCenter()
+		s.gameCamera.SetLastCameraY(camY)
+
+		s.death.active = false
+	} else {
+		// Ease-out quadratic interpolation: starts fast, slows down
+		easedProgress := progress * (2 - progress)
+		currentX := s.death.cameraStartX + (s.death.cameraTargetX-s.death.cameraStartX)*easedProgress
+		currentY := s.death.cameraStartY + (s.death.cameraTargetY-s.death.cameraStartY)*easedProgress
+		baseCam := s.BaseCamera()
+		baseCam.SetCenter(currentX, currentY)
+	}
+}
+
 // Camera returns the game-layer camera controller with vertical-only-upward constraint.
 // Falls back to base camera if gameCamera is not set (e.g., when hasPlayer is false).
 func (s *PhasesScene) Camera() *gamecamera.Controller {
@@ -216,6 +389,14 @@ func (s *PhasesScene) Camera() *gamecamera.Controller {
 	}
 	// Return a wrapper for base camera when gameCamera is not set
 	return gamecamera.NewController(s.TilemapScene.Camera())
+}
+
+// BaseCamera returns the underlying engine camera controller (bypasses game-layer constraint).
+func (s *PhasesScene) BaseCamera() *enginecamera.Controller {
+	if s.gameCamera != nil {
+		return s.gameCamera.Base()
+	}
+	return s.TilemapScene.Camera()
 }
 
 func (s *PhasesScene) Update() error {
@@ -241,8 +422,17 @@ func (s *PhasesScene) Update() error {
 		}
 	}
 
+	// Check if player fell out of camera view
+	if s.hasPlayer {
+		s.checkPlayerFallDeath()
+	}
+
+	// Update death sequence if active
+	if s.death.active {
+		s.updateDeathSequence()
+	}
+
 	// Update navigation triggers
-	s.rebootTrigger.Update()
 	s.completionTrigger.Update()
 
 	// Check goal completion
@@ -254,25 +444,19 @@ func (s *PhasesScene) Update() error {
 		s.gameCamera.CamDebug()
 	}
 
-	if s.rebootTrigger.Trigger() {
-		s.AppContext().SceneManager.NavigateTo(
-			scenestypes.ScenePhaseReboot,
-			transition.NewFader(0, 0),
-			true,
-		)
-		return nil
-	}
-
 	if s.completionTrigger.Trigger() {
 		s.AppContext().CompleteCurrentPhase(transition.NewFader(0, config.Get().FadeVisibleDuration), true)
 	}
 
 	// Update camera (use game-layer camera with vertical-only-upward constraint)
-	if s.gameCamera != nil {
-		s.gameCamera.Update()
-	} else {
-		// Fallback to base camera update
-		s.TilemapScene.Camera().Update()
+	// Skip during death sequence - camera is controlled by death sequence
+	if !s.death.active {
+		if s.gameCamera != nil {
+			s.gameCamera.Update()
+		} else {
+			// Fallback to base camera update
+			s.TilemapScene.Camera().Update()
+		}
 	}
 	// Call BaseScene.Update directly for Schedule handling (skip TilemapScene.Update to avoid double camera update)
 	if err := s.BaseScene.Update(); err != nil {
@@ -362,11 +546,6 @@ func (s *PhasesScene) Draw(screen *ebiten.Image) {
 	}
 }
 
-func (s *PhasesScene) Reboot() {
-	s.ShowDrawScreenFlash = timing.FromDuration(67 * time.Millisecond) // 4 frames
-	s.rebootTrigger.Enable(timing.FromDuration(1 * time.Second))       // 60 frames
-}
-
 func (s *PhasesScene) OnFinish() {
 	s.TilemapScene.OnFinish()
 	// Ensure we remove any movement block applied at phase start (for whichever actor is the current player)
@@ -385,7 +564,7 @@ func (s *PhasesScene) endpointTrigger(eventID string) {
 
 	switch eventID {
 	case "SPIKE":
-		s.player.OnDie()
+		s.startDeathSequence()
 		return
 	case "CUTSCENE":
 		// TODO: Implement this

@@ -4,7 +4,6 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/app"
 	actorevents "github.com/leandroatallah/firefly/internal/engine/entity/actors/events"
 	"github.com/leandroatallah/firefly/internal/engine/event"
-	"github.com/leandroatallah/firefly/internal/game/entity/actors/events"
 )
 
 func subscribeEvents(ctx *app.AppContext, scene *PhasesScene) {
@@ -12,9 +11,6 @@ func subscribeEvents(ctx *app.AppContext, scene *PhasesScene) {
 	em := ctx.EventManager
 
 	// Common events
-	em.Subscribe(events.CharacterDiedEventType, func(e event.Event) {
-		scene.Reboot()
-	})
 	em.Subscribe(actorevents.ActorJumpedType, func(e event.Event) {
 		if ctx.VFX == nil {
 			return
