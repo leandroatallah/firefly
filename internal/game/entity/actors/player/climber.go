@@ -8,6 +8,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors/platformer"
 	gameplayermethods "github.com/leandroatallah/firefly/internal/game/entity/actors/methods"
 	gamestates "github.com/leandroatallah/firefly/internal/game/entity/actors/states"
+	gameskill "github.com/leandroatallah/firefly/internal/game/physics/skill"
 )
 
 // climberStateTransitionLogic provides custom state handling for the ClimberPlayer,
@@ -32,7 +33,8 @@ func climberStateTransitionLogic(c *actors.Character) bool {
 
 type ClimberPlayer struct {
 	*platformer.PlatformerCharacter
-	baseSpeed int
+	baseSpeed   int
+	freezeSkill *gameskill.FreezeSkill
 
 	*gameplayermethods.PlayerDeathBehavior
 }
@@ -48,11 +50,14 @@ func NewClimberPlayer(ctx *app.AppContext) (platformer.PlatformerActorEntity, er
 
 	player := &ClimberPlayer{
 		PlatformerCharacter: character,
+		freezeSkill:         gameskill.NewFreezeSkill(),
 	}
 	// Set the owner on the embedded character so LastOwner() works correctly
 	player.SetOwner(player)
 	// Ensure the original character pointer (referenced by physics bodies) also points to the player
 	character.SetOwner(player)
+
+	character.AddSkill(player.freezeSkill)
 
 	if err = builder.ConfigureCharacter(player, spriteData, statData, stateMap, "player"); err != nil {
 		return nil, err
@@ -67,6 +72,12 @@ func NewClimberPlayer(ctx *app.AppContext) (platformer.PlatformerActorEntity, er
 	player.PlayerDeathBehavior = gameplayermethods.NewPlayerDeathBehavior(player)
 
 	return player, nil
+}
+
+func (p *ClimberPlayer) ActivateFreezeSkill() {
+	if p.freezeSkill != nil {
+		p.freezeSkill.RequestActivation()
+	}
 }
 
 func (p *ClimberPlayer) Update(space body.BodiesSpace) error {
