@@ -96,6 +96,10 @@ type CommandData struct {
 
 	// Fields for "camera_shake"
 	Trauma float64 `json:"trauma,omitempty"`
+
+	// Fields for "vignette_radius"
+	InitialRadius float64 `json:"initial_radius,omitempty"`
+	FinalRadius   float64 `json:"final_radius,omitempty"`
 }
 
 // SequenceData is a wrapper used for parsing a full sequence from JSON.
@@ -171,6 +175,12 @@ func (cd *CommandData) ToCommand() sequences.Command {
 	case "camera_shake":
 		return &CameraShakeCommand{
 			Trauma: cd.Trauma,
+		}
+	case "vignette_radius":
+		return &VignetteRadiusCommand{
+			InitialRadius: cd.InitialRadius,
+			FinalRadius:   cd.FinalRadius,
+			Duration:      cd.Duration,
 		}
 	case "quake":
 		return &QuakeCommand{
