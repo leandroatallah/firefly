@@ -35,6 +35,7 @@ import (
 	gameitems "github.com/leandroatallah/firefly/internal/game/entity/items"
 	gameentitytypes "github.com/leandroatallah/firefly/internal/game/entity/types"
 	gamecamera "github.com/leandroatallah/firefly/internal/game/render/camera"
+	gamevfx "github.com/leandroatallah/firefly/internal/game/render/vfx"
 )
 
 const (
@@ -69,6 +70,8 @@ type PhasesScene struct {
 	// Game-layer camera controller with vertical-only-upward constraint
 	gameCamera *gamecamera.Controller
 
+	vignette *gamevfx.Vignette
+
 	death deathSequence
 }
 
@@ -82,6 +85,7 @@ func NewPhasesScene(ctx *app.AppContext) *PhasesScene {
 		TilemapScene: tilemapScene,
 		mainText:     mainText,
 		bodyCounter:  &BodyCounter{},
+		vignette:     gamevfx.NewVignette(),
 	}
 	scene.SetAppContext(ctx)
 
@@ -546,6 +550,11 @@ func (s *PhasesScene) Draw(screen *ebiten.Image) {
 		s.AppContext().VFX.Draw(screen, s.gameCamera.Base())
 	}
 
+	// Darkness vignette should cover world (including VFX) but not UI.
+	if s.vignette != nil && s.hasPlayer && s.player != nil && s.gameCamera != nil {
+		s.vignette.Draw(screen, s.gameCamera.Base(), s.player)
+	}
+
 	if s.pauseScreen.IsPaused() {
 		s.drawPause(screen)
 	}
@@ -560,6 +569,23 @@ func (s *PhasesScene) OnFinish() {
 		}
 		s.AppContext().ActorManager.Unregister(s.player)
 	}
+}
+
+// EnableVignetteDarkness enables the world darkness overlay with the given radius in screen pixels.
+// The effect follows the player and is applied after world rendering (so UI remains visible).
+func (s *PhasesScene) EnableVignetteDarkness(radiusPx float64) {
+	if s.vignette == nil {
+		s.vignette = gamevfx.NewVignette()
+	}
+	s.vignette.Enable(radiusPx)
+}
+
+// DisableVignetteDarkness disables the world darkness overlay.
+func (s *PhasesScene) DisableVignetteDarkness() {
+	if s.vignette == nil {
+		return
+	}
+	s.vignette.Disable()
 }
 
 func (s *PhasesScene) endpointTrigger(eventID string) {
