@@ -15,11 +15,13 @@ type Body struct {
 
 	id       string
 	x16, y16 int
+	scale    float64
 }
 
 func NewBody(shape body.Shape) *Body {
 	return &Body{
 		shape: shape,
+		scale: 1.0,
 	}
 }
 
@@ -33,6 +35,14 @@ func (b *Body) SetID(id string) {
 
 func (b *Body) ID() string {
 	return b.id
+}
+
+func (b *Body) Scale() float64 {
+	return b.scale
+}
+
+func (b *Body) SetScale(scale float64) {
+	b.scale = scale
 }
 
 // Position() returns the body coordinates as a image.Rectangle.
@@ -72,4 +82,12 @@ func (b *Body) SetPosition16(x16, y16 int) {
 
 func (b *Body) GetPosition16() (int, int) {
 	return b.x16, b.y16
+}
+
+func (b *Body) SetSize(width, height int) {
+	if r, ok := b.shape.(*Rect); ok {
+		r.SetSize(width, height)
+	} else {
+		log.Printf("Warning: SetSize called on body with non-Rect shape: %T", b.shape)
+	}
 }

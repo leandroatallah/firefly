@@ -2,7 +2,6 @@ package space
 
 import (
 	"fmt"
-	"image"
 	"time"
 
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
@@ -21,6 +20,7 @@ type StateBasedCollisioner[T StateEnum] interface {
 	ClearCollisions()
 	AddCollision(...body.Collidable)
 	ID() string
+	Scale() float64
 }
 
 // StateCollisionManager manages state-based collision bodies for an entity.
@@ -48,13 +48,25 @@ func (m *StateCollisionManager[T]) RefreshCollisions() {
 	if rects, ok := m.collisionBodies[currentState]; ok {
 		m.owner.ClearCollisions()
 		x, y := m.owner.GetPositionMin()
+		scale := m.owner.Scale()
 		for _, r := range rects {
 			template, ok := r.(*bodyphysics.CollidableBody)
 			if !ok {
 				continue
 			}
 
-			newBody := bodyphysics.NewBody(template.GetShape())
+			shape := template.GetShape()
+			if scale != 0 && scale != 1.0 {
+				if rect, ok := shape.(*bodyphysics.Rect); ok {
+					shape = bodyphysics.NewRect(
+						0, 0,
+						int(float64(rect.Width())*scale),
+						int(float64(rect.Height())*scale),
+					)
+				}
+			}
+
+			newBody := bodyphysics.NewBody(shape)
 			// Set owner to movable? We don't have movable here.
 			// But m.owner is typically a Character.
 			// If we set newBody.Owner = m.owner directly, newBody.TopOwner() -> m.owner.TopOwner().
@@ -63,13 +75,13 @@ func (m *StateCollisionManager[T]) RefreshCollisions() {
 			newCollisionBody := bodyphysics.NewCollidableBody(newBody)
 			newCollisionBody.SetOwner(m.owner)
 			relativePos := template.Position()
-			newPos := image.Rect(
-				x+relativePos.Min.X,
-				y+relativePos.Min.Y,
-				x+relativePos.Max.X,
-				y+relativePos.Max.Y,
-			)
-			newCollisionBody.SetPosition(newPos.Min.X, newPos.Min.Y)
+			relMinX := relativePos.Min.X
+			relMinY := relativePos.Min.Y
+			if scale != 0 && scale != 1.0 {
+				relMinX = int(float64(relMinX) * scale)
+				relMinY = int(float64(relMinY) * scale)
+			}
+			newCollisionBody.SetPosition(x+relMinX, y+relMinY)
 			newCollisionBody.SetID(fmt.Sprintf("%s_collision_%d", m.owner.ID(), time.Now().UnixNano()))
 			m.owner.AddCollision(newCollisionBody)
 		}

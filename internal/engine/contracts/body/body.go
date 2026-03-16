@@ -116,6 +116,9 @@ type Body interface {
 	Position() image.Rectangle
 	SetPosition(x, y int)
 	SetPosition16(x16, y16 int)
+	SetSize(width, height int)
+	Scale() float64
+	SetScale(float64)
 	GetPosition16() (x16, y16 int)
 	GetPositionMin() (x, y int)
 	GetShape() Shape

@@ -18,3 +18,8 @@ func (r *Rect) Width() int {
 func (r *Rect) Height() int {
 	return r.height
 }
+
+func (r *Rect) SetSize(width, height int) {
+	r.width = width
+	r.height = height
+}

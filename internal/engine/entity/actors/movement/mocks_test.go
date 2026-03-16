@@ -31,6 +31,12 @@ func (m *mockActor) ID() string {
 func (m *mockActor) SetID(id string) { m.id = id }
 func (m *mockActor) Position() image.Rectangle { return m.pos }
 func (m *mockActor) SetPosition(x, y int) { m.pos = image.Rect(x, y, x+10, y+10) }
+func (m *mockActor) SetSize(w, h int) {
+	m.pos.Max.X = m.pos.Min.X + w
+	m.pos.Max.Y = m.pos.Min.Y + h
+}
+func (m *mockActor) Scale() float64 { return 1.0 }
+func (m *mockActor) SetScale(s float64) {}
 func (m *mockActor) SetPosition16(x16, y16 int) {}
 func (m *mockActor) GetPosition16() (int, int) { return m.pos.Min.X * 16, m.pos.Min.Y * 16 }
 func (m *mockActor) GetPositionMin() (int, int) { return m.pos.Min.X, m.pos.Min.Y }
@@ -147,6 +153,12 @@ func (m *mockCollidable) ID() string                                       { ret
 func (m *mockCollidable) SetID(id string)                                  { m.id = id }
 func (m *mockCollidable) Position() image.Rectangle                        { return m.rect }
 func (m *mockCollidable) SetPosition(x, y int)                             { m.rect = image.Rect(x, y, x+m.rect.Dx(), y+m.rect.Dy()) }
+func (m *mockCollidable) SetSize(w, h int) {
+	m.rect.Max.X = m.rect.Min.X + w
+	m.rect.Max.Y = m.rect.Min.Y + h
+}
+func (m *mockCollidable) Scale() float64 { return 1.0 }
+func (m *mockCollidable) SetScale(s float64) {}
 func (m *mockCollidable) SetPosition16(x16, y16 int)                       { m.pos16X = x16; m.pos16Y = y16 }
 func (m *mockCollidable) GetPosition16() (int, int)                        { return m.pos16X, m.pos16Y }
 func (m *mockCollidable) GetPositionMin() (int, int)                       { return m.rect.Min.X, m.rect.Min.Y }

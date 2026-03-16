@@ -43,6 +43,18 @@ func (c *testCollidable) SetPosition(x, y int) {
 	c.rect = image.Rect(x, y, x+dx, y+dy)
 }
 
+func (c *testCollidable) SetSize(w, h int) {
+	c.rect.Max.X = c.rect.Min.X + w
+	c.rect.Max.Y = c.rect.Min.Y + h
+}
+
+func (c *testCollidable) Scale() float64 {
+	return 1.0
+}
+
+func (c *testCollidable) SetScale(s float64) {
+}
+
 func (c *testCollidable) SetPosition16(x16, y16 int) {
 }
 

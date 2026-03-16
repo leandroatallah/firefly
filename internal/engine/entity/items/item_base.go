@@ -72,6 +72,15 @@ func (b *BaseItem) SetPosition(x, y int) {
 func (b *BaseItem) SetPosition16(x16, y16 int) {
 	b.MovableBody.SetPosition16(x16, y16)
 }
+func (b *BaseItem) SetSize(width, height int) {
+	b.MovableBody.SetSize(width, height)
+}
+func (b *BaseItem) Scale() float64 {
+	return b.MovableBody.Scale()
+}
+func (b *BaseItem) SetScale(scale float64) {
+	b.MovableBody.SetScale(scale)
+}
 func (b *BaseItem) GetPosition16() (int, int) {
 	return b.MovableBody.GetPosition16()
 }

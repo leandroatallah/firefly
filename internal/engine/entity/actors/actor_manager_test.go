@@ -36,6 +36,12 @@ func (m *mockActor) ID() string                                           { retu
 func (m *mockActor) SetID(id string)                                      { m.id = id }
 func (m *mockActor) Position() image.Rectangle                            { return m.pos }
 func (m *mockActor) SetPosition(x, y int)                                 { m.pos = image.Rect(x, y, x+10, y+10) }
+func (m *mockActor) SetSize(w, h int) {
+	m.pos.Max.X = m.pos.Min.X + w
+	m.pos.Max.Y = m.pos.Min.Y + h
+}
+func (m *mockActor) Scale() float64 { return 1.0 }
+func (m *mockActor) SetScale(s float64) {}
 func (m *mockActor) SetPosition16(x16, y16 int)                           { m.SetPosition(x16/16, y16/16) }
 func (m *mockActor) GetPosition16() (int, int)                            { return m.pos.Min.X * 16, m.pos.Min.Y * 16 }
 func (m *mockActor) GetPositionMin() (int, int)                           { return m.pos.Min.X, m.pos.Min.Y }

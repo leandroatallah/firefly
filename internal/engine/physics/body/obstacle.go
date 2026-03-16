@@ -58,6 +58,18 @@ func (o *ObstacleRect) SetPosition16(x16, y16 int) {
 	o.MovableBody.SetPosition16(x16, y16)
 }
 
+func (o *ObstacleRect) SetSize(width, height int) {
+	o.MovableBody.SetSize(width, height)
+}
+
+func (o *ObstacleRect) Scale() float64 {
+	return o.MovableBody.Scale()
+}
+
+func (o *ObstacleRect) SetScale(scale float64) {
+	o.MovableBody.SetScale(scale)
+}
+
 func (o *ObstacleRect) GetPosition16() (int, int) {
 	return o.MovableBody.GetPosition16()
 }

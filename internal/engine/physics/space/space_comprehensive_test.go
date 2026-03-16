@@ -439,7 +439,7 @@ func TestSpace_GetTilemapDimensionsProvider_Empty(t *testing.T) {
 // Test StateCollisionManager
 func TestStateCollisionManager_New(t *testing.T) {
 	owner := &mockStateBasedCollisioner{id: "test", state: 0}
-	m := NewStateCollisionManager(owner)
+	m := NewStateCollisionManager[int](owner)
 
 	if m == nil {
 		t.Fatal("NewStateCollisionManager returned nil")
@@ -451,7 +451,7 @@ func TestStateCollisionManager_New(t *testing.T) {
 
 func TestStateCollisionManager_AddCollisionRect(t *testing.T) {
 	owner := &mockStateBasedCollisioner{id: "test", state: 0}
-	m := NewStateCollisionManager(owner)
+	m := NewStateCollisionManager[int](owner)
 
 	rect := bodyphysics.NewCollidableBodyFromRect(bodyphysics.NewRect(0, 0, 5, 5))
 	m.AddCollisionRect(0, rect)
@@ -464,7 +464,7 @@ func TestStateCollisionManager_AddCollisionRect(t *testing.T) {
 
 func TestStateCollisionManager_AddCollisionRect_Multiple(t *testing.T) {
 	owner := &mockStateBasedCollisioner{id: "test", state: 0}
-	m := NewStateCollisionManager(owner)
+	m := NewStateCollisionManager[int](owner)
 
 	r1 := bodyphysics.NewCollidableBodyFromRect(bodyphysics.NewRect(0, 0, 5, 5))
 	r2 := bodyphysics.NewCollidableBodyFromRect(bodyphysics.NewRect(5, 5, 10, 10))
@@ -479,7 +479,7 @@ func TestStateCollisionManager_AddCollisionRect_Multiple(t *testing.T) {
 
 func TestStateCollisionManager_AddCollisionRect_DifferentStates(t *testing.T) {
 	owner := &mockStateBasedCollisioner{id: "test", state: 0}
-	m := NewStateCollisionManager(owner)
+	m := NewStateCollisionManager[int](owner)
 
 	r1 := bodyphysics.NewCollidableBodyFromRect(bodyphysics.NewRect(0, 0, 5, 5))
 	r2 := bodyphysics.NewCollidableBodyFromRect(bodyphysics.NewRect(5, 5, 10, 10))
@@ -496,7 +496,7 @@ func TestStateCollisionManager_AddCollisionRect_DifferentStates(t *testing.T) {
 
 func TestStateCollisionManager_RefreshCollisions(t *testing.T) {
 	owner := &mockStateBasedCollisioner{id: "test", state: 0, x: 10, y: 10}
-	m := NewStateCollisionManager(owner)
+	m := NewStateCollisionManager[int](owner)
 
 	r := bodyphysics.NewCollidableBodyFromRect(bodyphysics.NewRect(0, 0, 5, 5))
 	m.AddCollisionRect(0, r)
@@ -510,7 +510,7 @@ func TestStateCollisionManager_RefreshCollisions(t *testing.T) {
 
 func TestStateCollisionManager_RefreshCollisions_NoRectsForState(t *testing.T) {
 	owner := &mockStateBasedCollisioner{id: "test", state: 0, x: 10, y: 10}
-	m := NewStateCollisionManager(owner)
+	m := NewStateCollisionManager[int](owner)
 
 	// Add rect for different state
 	r := bodyphysics.NewCollidableBodyFromRect(bodyphysics.NewRect(0, 0, 5, 5))
@@ -525,7 +525,7 @@ func TestStateCollisionManager_RefreshCollisions_NoRectsForState(t *testing.T) {
 
 func TestStateCollisionManager_RefreshCollisions_PositionUpdate(t *testing.T) {
 	owner := &mockStateBasedCollisioner{id: "test", state: 0, x: 100, y: 200}
-	m := NewStateCollisionManager(owner)
+	m := NewStateCollisionManager[int](owner)
 
 	r := bodyphysics.NewCollidableBodyFromRect(bodyphysics.NewRect(0, 0, 5, 5))
 	m.AddCollisionRect(0, r)
@@ -561,6 +561,7 @@ func (m *mockStateBasedCollisioner) GetPositionMin() (int, int)    { return m.x,
 func (m *mockStateBasedCollisioner) ClearCollisions()              { m.collisions = nil }
 func (m *mockStateBasedCollisioner) AddCollision(c ...contractsbody.Collidable) { m.collisions = append(m.collisions, c...) }
 func (m *mockStateBasedCollisioner) ID() string                    { return m.id }
+func (m *mockStateBasedCollisioner) Scale() float64                 { return 1.0 }
 
 // dimsProvider for tilemap tests
 type dimsProvider struct{ w, h int }

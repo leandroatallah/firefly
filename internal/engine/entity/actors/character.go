@@ -35,6 +35,11 @@ type Character struct {
 
 	skills []skill.Skill
 
+	// Original sprite frame size for correct rendering when body size changes
+	// TODO: Turns it on a behavioral struct. It is too specific.
+	originalFrameWidth  int
+	originalFrameHeight int
+
 	StateTransitionHandler func(*Character) bool
 	OnStateChange          func(oldState, newState ActorStateEnum)
 	bodyphysics.Ownership
@@ -56,8 +61,10 @@ func NewCharacter(s sprites.SpriteMap, bodyRect *bodyphysics.Rect) *Character { 
 		CollidableBody: collidable,
 		AliveBody:      alive,
 
-		SpriteEntity: spriteEntity,
-		imageOptions: &ebiten.DrawImageOptions{},
+		SpriteEntity:        spriteEntity,
+		imageOptions:        &ebiten.DrawImageOptions{},
+		originalFrameWidth:  bodyRect.Width(),
+		originalFrameHeight: bodyRect.Height(),
 	}
 	// Set the owner for all body components to this Character
 	// Body.Owner -> MovableBody (chosen as the primary physical representation)
@@ -92,6 +99,15 @@ func (c *Character) SetPosition(x, y int) {
 }
 func (c *Character) SetPosition16(x16, y16 int) {
 	c.CollidableBody.SetPosition16(x16, y16)
+}
+func (c *Character) SetSize(width, height int) {
+	c.MovableBody.SetSize(width, height)
+}
+func (c *Character) Scale() float64 {
+	return c.MovableBody.Scale()
+}
+func (c *Character) SetScale(scale float64) {
+	c.MovableBody.SetScale(scale)
 }
 func (c *Character) GetPosition16() (int, int) {
 	return c.MovableBody.GetPosition16()
@@ -219,6 +235,10 @@ func (c *Character) UpdateImageOptions() {
 	}
 	c.imageOptions.GeoM.Reset()
 
+	if s := c.Scale(); s != 0 && s != 1.0 {
+		c.imageOptions.GeoM.Scale(s, s)
+	}
+
 	accX, _ := c.Acceleration()
 	fDirection := c.FaceDirection()
 
@@ -334,9 +354,12 @@ func (c *Character) Image() *ebiten.Image {
 		sprite = c.GetFirstSprite()
 	}
 
+	// Use original frame size for sprite extraction, not current body size
+	// This ensures correct sprite rendering when body size changes (e.g., grow skill)
 	pos := c.Position()
+	frameRect := image.Rect(pos.Min.X, pos.Min.Y, pos.Min.X+c.originalFrameWidth, pos.Min.Y+c.originalFrameHeight)
 	stateDurationCount := c.state.GetAnimationCount(c.count)
-	return c.AnimatedSpriteImage(sprite, pos, stateDurationCount, c.SpriteEntity.FrameRate())
+	return c.AnimatedSpriteImage(sprite, frameRect, stateDurationCount, c.SpriteEntity.FrameRate())
 }
 
 func (c *Character) ImageOptions() *ebiten.DrawImageOptions {

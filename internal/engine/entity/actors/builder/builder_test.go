@@ -54,6 +54,9 @@ func (m *mockActorWithCollision) ID() string { return m.id }
 func (m *mockActorWithCollision) SetID(id string) { m.id = id }
 func (m *mockActorWithCollision) Position() image.Rectangle { return image.Rect(m.x, m.y, m.x+m.width, m.y+m.height) }
 func (m *mockActorWithCollision) SetPosition(x, y int) { m.x, m.y = x, y }
+func (m *mockActorWithCollision) SetSize(w, h int) { m.width, m.height = w, h }
+func (m *mockActorWithCollision) Scale() float64 { return 1.0 }
+func (m *mockActorWithCollision) SetScale(s float64) {}
 func (m *mockActorWithCollision) SetPosition16(x16, y16 int) { m.x, m.y = x16/16, y16/16 }
 func (m *mockActorWithCollision) GetPosition16() (int, int) { return m.x * 16, m.y * 16 }
 func (m *mockActorWithCollision) GetPositionMin() (int, int) { return m.x, m.y }
@@ -169,6 +172,9 @@ func (m *minimalActor) ID() string { return m.id }
 func (m *minimalActor) SetID(id string) { m.id = id }
 func (m *minimalActor) Position() image.Rectangle { return image.Rect(0, 0, 16, 16) }
 func (m *minimalActor) SetPosition(x, y int) {}
+func (m *minimalActor) SetSize(w, h int) {}
+func (m *minimalActor) Scale() float64 { return 1.0 }
+func (m *minimalActor) SetScale(s float64) {}
 func (m *minimalActor) SetPosition16(x16, y16 int) {}
 func (m *minimalActor) GetPosition16() (int, int) { return 0, 0 }
 func (m *minimalActor) GetPositionMin() (int, int) { return 0, 0 }
