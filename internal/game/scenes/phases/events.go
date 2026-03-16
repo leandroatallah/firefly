@@ -4,6 +4,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/app"
 	actorevents "github.com/leandroatallah/firefly/internal/engine/entity/actors/events"
 	"github.com/leandroatallah/firefly/internal/engine/event"
+	gameplayer "github.com/leandroatallah/firefly/internal/game/entity/actors/player"
 )
 
 func subscribeEvents(ctx *app.AppContext, scene *PhasesScene) {
@@ -27,6 +28,13 @@ func subscribeEvents(ctx *app.AppContext, scene *PhasesScene) {
 		if evt, ok := e.(*actorevents.ActorLandedEvent); ok {
 			yOffset := 1.0
 			ctx.VFX.SpawnLandingPuff(evt.X, evt.Y+yOffset, 1)
+
+			// Trigger screen shake if player is grown
+			if player, found := ctx.ActorManager.GetPlayer(); found {
+				if climber, ok := player.(*gameplayer.ClimberPlayer); ok && climber.IsGrowActive() {
+					scene.Camera().Base().AddTrauma(0.3)
+				}
+			}
 		}
 	})
 }

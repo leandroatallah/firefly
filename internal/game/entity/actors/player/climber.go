@@ -89,6 +89,10 @@ func (p *ClimberPlayer) ActivateGrowSkill() {
 	}
 }
 
+func (p *ClimberPlayer) IsGrowActive() bool {
+	return p.growSkill != nil && p.growSkill.IsActive()
+}
+
 func (p *ClimberPlayer) Update(space body.BodiesSpace) error {
 	p.SetHorizontalInertia(-1.0)
 	p.SetSpeed(p.baseSpeed)
