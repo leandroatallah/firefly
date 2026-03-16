@@ -22,6 +22,7 @@ import (
 	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
 	enginecamera "github.com/leandroatallah/firefly/internal/engine/render/camera"
 	"github.com/leandroatallah/firefly/internal/engine/render/screenutil"
+	enginevfx "github.com/leandroatallah/firefly/internal/engine/render/vfx"
 	"github.com/leandroatallah/firefly/internal/engine/scene"
 	"github.com/leandroatallah/firefly/internal/engine/scene/pause"
 	"github.com/leandroatallah/firefly/internal/engine/scene/phases"
@@ -35,7 +36,6 @@ import (
 	gameitems "github.com/leandroatallah/firefly/internal/game/entity/items"
 	gameentitytypes "github.com/leandroatallah/firefly/internal/game/entity/types"
 	gamecamera "github.com/leandroatallah/firefly/internal/game/render/camera"
-	gamevfx "github.com/leandroatallah/firefly/internal/game/render/vfx"
 )
 
 const (
@@ -70,7 +70,7 @@ type PhasesScene struct {
 	// Game-layer camera controller with vertical-only-upward constraint
 	gameCamera *gamecamera.Controller
 
-	vignette *gamevfx.Vignette
+	vignette *enginevfx.Vignette
 
 	death deathSequence
 }
@@ -85,7 +85,7 @@ func NewPhasesScene(ctx *app.AppContext) *PhasesScene {
 		TilemapScene: tilemapScene,
 		mainText:     mainText,
 		bodyCounter:  &BodyCounter{},
-		vignette:     gamevfx.NewVignette(),
+		vignette:     enginevfx.NewVignette(),
 	}
 	scene.SetAppContext(ctx)
 
@@ -627,7 +627,7 @@ func (s *PhasesScene) OnFinish() {
 // The effect follows the player and is applied after world rendering (so UI remains visible).
 func (s *PhasesScene) EnableVignetteDarkness(radiusPx float64) {
 	if s.vignette == nil {
-		s.vignette = gamevfx.NewVignette()
+		s.vignette = enginevfx.NewVignette()
 	}
 	s.vignette.Enable(radiusPx)
 }
