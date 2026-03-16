@@ -8,7 +8,7 @@
     },
     "assets": {
       "idle": {
-        "path": "assets/images/item-power-freeze.png",
+        "path": "assets/images/item-power-grow.png",
         "collision_rect": [
           {
             "x": 0,

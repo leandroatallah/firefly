@@ -35,6 +35,7 @@ type ClimberPlayer struct {
 	*platformer.PlatformerCharacter
 	baseSpeed   int
 	freezeSkill *gameskill.FreezeSkill
+	growSkill   *gameskill.GrowSkill
 
 	*gameplayermethods.PlayerDeathBehavior
 }
@@ -51,6 +52,7 @@ func NewClimberPlayer(ctx *app.AppContext) (platformer.PlatformerActorEntity, er
 	player := &ClimberPlayer{
 		PlatformerCharacter: character,
 		freezeSkill:         gameskill.NewFreezeSkill(),
+		growSkill:           gameskill.NewGrowSkill(),
 	}
 	// Set the owner on the embedded character so LastOwner() works correctly
 	player.SetOwner(player)
@@ -58,6 +60,7 @@ func NewClimberPlayer(ctx *app.AppContext) (platformer.PlatformerActorEntity, er
 	character.SetOwner(player)
 
 	character.AddSkill(player.freezeSkill)
+	character.AddSkill(player.growSkill)
 
 	if err = builder.ConfigureCharacter(player, spriteData, statData, stateMap, "player"); err != nil {
 		return nil, err
@@ -77,6 +80,12 @@ func NewClimberPlayer(ctx *app.AppContext) (platformer.PlatformerActorEntity, er
 func (p *ClimberPlayer) ActivateFreezeSkill() {
 	if p.freezeSkill != nil {
 		p.freezeSkill.RequestActivation()
+	}
+}
+
+func (p *ClimberPlayer) ActivateGrowSkill() {
+	if p.growSkill != nil {
+		p.growSkill.RequestActivation()
 	}
 }
 
