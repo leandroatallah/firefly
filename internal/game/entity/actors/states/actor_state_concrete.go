@@ -26,7 +26,9 @@ type DeadState struct {
 func (s *DeadState) OnStart(currentCount int) {
 	s.BaseState.OnStart(currentCount)
 
-	s.GetActor().SetHealth(s.GetActor().MaxHealth())
+	actor := s.GetActor()
+	actor.SetFreeze(true)
+	actor.SetImmobile(true)
 }
 
 // Exiting
@@ -55,6 +57,14 @@ type RisingState struct {
 
 func (s *RisingState) OnStart(currentCount int) {
 	s.BaseState.OnStart(currentCount)
+
+	actor := s.GetActor()
+	actor.SetHealth(actor.MaxHealth())
+	actor.SetFreeze(false)
+}
+
+func (s *RisingState) OnFinish() {
+	s.GetActor().SetImmobile(false)
 }
 
 var (

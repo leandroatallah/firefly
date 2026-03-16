@@ -68,12 +68,12 @@
         ]
       },
       "die": {
-        "path": "assets/images/climber-die.png",
+        "path": "assets/images/empty.png",
         "loop": false,
         "collision_rect": []
       },
       "dead": {
-        "path": "assets/images/climber-dead.png",
+        "path": "assets/images/empty.png",
         "loop": true,
         "collision_rect": []
       },

@@ -364,7 +364,6 @@ func (s *PhasesScene) updateDeathCameraPhase() {
 		// Camera reached start position - transition player to Rising and unfreeze
 		if s.player != nil {
 			s.player.GetCharacter().SetNewStateFatal(gamestates.Rising)
-			s.player.SetImmobile(false)
 		}
 		// Snap camera to final position
 		baseCam := s.BaseCamera()
