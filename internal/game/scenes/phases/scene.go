@@ -427,6 +427,11 @@ func (s *PhasesScene) Update() error {
 		s.checkPlayerFallDeath()
 	}
 
+	// Check if player died (from any cause) and death sequence hasn't started
+	if s.hasPlayer && !s.death.active && s.player.State() == gamestates.Dying {
+		s.startDeathSequence()
+	}
+
 	// Update death sequence if active
 	if s.death.active {
 		s.updateDeathSequence()
