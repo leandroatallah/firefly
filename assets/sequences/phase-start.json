@@ -1,4 +1,18 @@
 {
-  "commands": [],
+  "commands": [
+    {
+      "command": "vignette_radius", 
+      "initial_radius": 0,
+      "final_radius": 48,
+      "duration": 30
+    },
+    { "command": "delay", "frames": 60 },
+    {
+      "command": "vignette_radius",
+      "initial_radius": 48,
+      "final_radius": -1,
+      "duration": 30
+    }
+  ],
   "block_player_movement": true
 }
