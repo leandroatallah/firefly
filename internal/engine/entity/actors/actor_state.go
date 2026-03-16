@@ -5,6 +5,7 @@ import "github.com/leandroatallah/firefly/internal/engine/entity"
 type ActorState interface {
 	State() ActorStateEnum
 	OnStart(currentCount int)
+	OnFinish()
 	GetAnimationCount(currentCount int) int
 	IsAnimationFinished() bool
 }
@@ -64,6 +65,8 @@ func (s *BaseState) OnStart(currentCount int) {
 func (s *BaseState) GetAnimationCount(currentCount int) int {
 	return currentCount - s.entryCount
 }
+
+func (s *BaseState) OnFinish() {}
 
 func (s *BaseState) IsAnimationFinished() bool {
 	s.tick++

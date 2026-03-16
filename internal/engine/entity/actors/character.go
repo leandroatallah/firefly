@@ -156,6 +156,7 @@ func (c *Character) SetState(state ActorState) {
 	if c.state == nil || c.state.State() != state.State() {
 		var oldState ActorStateEnum
 		if c.state != nil {
+			c.state.OnFinish()
 			oldState = c.state.State()
 		} else {
 			oldState = -1 // Unknown/First state
