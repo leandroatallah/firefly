@@ -89,6 +89,15 @@ func (p *ClimberPlayer) ActivateGrowSkill() {
 	}
 }
 
+func (p *ClimberPlayer) ResetSkills() {
+	if p.freezeSkill != nil {
+		p.freezeSkill.Reset()
+	}
+	if p.growSkill != nil {
+		p.growSkill.Reset(p)
+	}
+}
+
 func (p *ClimberPlayer) IsGrowActive() bool {
 	return p.growSkill != nil && p.growSkill.IsActive()
 }

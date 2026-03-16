@@ -47,6 +47,13 @@ func (s *FreezeSkill) RequestActivation() {
 	s.activationRequested = true
 }
 
+func (s *FreezeSkill) Reset() {
+	s.deactivate()
+	s.state = engineskill.StateReady
+	s.timer = 0
+	s.activationRequested = false
+}
+
 func (s *FreezeSkill) HandleInput(player body.MovableCollidable, model *physicsmovement.PlatformMovementModel, space body.BodiesSpace) {
 	if s.activationRequested {
 		s.activationRequested = false

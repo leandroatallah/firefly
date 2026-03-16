@@ -361,6 +361,9 @@ func (s *PhasesScene) updateDeathCameraPhase() {
 	s.death.timer++
 	progress := float64(s.death.timer) / float64(s.death.duration)
 	if progress >= 1.0 {
+		// Reset level entities (items, enemies, etc.)
+		s.resetLevelEntities()
+
 		// Camera reached start position - transition player to Rising and unfreeze
 		if s.player != nil {
 			s.player.GetCharacter().SetNewStateFatal(gamestates.Rising)
@@ -381,6 +384,56 @@ func (s *PhasesScene) updateDeathCameraPhase() {
 		currentY := s.death.cameraStartY + (s.death.cameraTargetY-s.death.cameraStartY)*easedProgress
 		baseCam := s.BaseCamera()
 		baseCam.SetCenter(currentX, currentY)
+	}
+}
+
+func (s *PhasesScene) resetLevelEntities() {
+	space := s.PhysicsSpace()
+	bodies := space.Bodies()
+	var toRemove []body.Collidable
+
+	for _, b := range bodies {
+		// Identify items
+		if _, ok := b.(items.Item); ok {
+			toRemove = append(toRemove, b)
+			continue
+		}
+
+		// Identify non-player actors (enemies, NPCs)
+		if actor, ok := b.(actors.ActorEntity); ok {
+			if s.player != nil && actor.ID() == s.player.ID() {
+				continue
+			}
+			toRemove = append(toRemove, b)
+			// Also unregister from ActorManager
+			if s.AppContext().ActorManager != nil {
+				s.AppContext().ActorManager.Unregister(actor)
+			}
+		}
+	}
+
+	// Remove from space
+	for _, b := range toRemove {
+		space.RemoveBody(b)
+	}
+	space.ProcessRemovals()
+
+	// Re-initialize from tilemap
+	s.initTilemap()
+
+	// Reset phase progress
+	s.reachedEndpoint = false
+
+	// Reset player skills
+	if s.player != nil {
+		if resetter, ok := s.player.(interface{ ResetSkills() }); ok {
+			resetter.ResetSkills()
+		}
+	}
+
+	// Reset body counter
+	if s.bodyCounter != nil {
+		s.bodyCounter.setBodyCounter(space)
 	}
 }
 

@@ -47,6 +47,15 @@ func (s *GrowSkill) RequestActivation() {
 	s.activationRequested = true
 }
 
+func (s *GrowSkill) Reset(player body.MovableCollidable) {
+	if s.state == engineskill.StateActive {
+		s.deactivate(player)
+	}
+	s.state = engineskill.StateReady
+	s.timer = 0
+	s.activationRequested = false
+}
+
 func (s *GrowSkill) HandleInput(player body.MovableCollidable, model *physicsmovement.PlatformMovementModel, space body.BodiesSpace) {
 	if s.activationRequested {
 		s.activationRequested = false

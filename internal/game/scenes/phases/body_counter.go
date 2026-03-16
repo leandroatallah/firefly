@@ -11,6 +11,8 @@ type BodyCounter struct {
 }
 
 func (b *BodyCounter) setBodyCounter(space body.BodiesSpace) {
+	b.wolf = 0
+	b.wolfKilled = 0
 	for _, sb := range space.Bodies() {
 		switch sb.(type) {
 		case *gameenemies.WolfEnemy:
