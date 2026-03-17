@@ -71,7 +71,20 @@ func (s *MenuScene) initMenus() {
 		s.mainMenu.SetVisible(true)
 	})
 	s.optionsMenu.AddItem("Language", func() {})
-	s.optionsMenu.AddItem("Fullscreen", func() {})
+
+	fullscreenLabel := func() string {
+		if config.Get().Fullscreen {
+			return "Fullscreen: ON"
+		}
+		return "Fullscreen: OFF"
+	}
+
+	s.optionsMenu.AddItem(fullscreenLabel(), func() {
+		cfg := config.Get()
+		cfg.Fullscreen = !cfg.Fullscreen
+		ebiten.SetFullscreen(cfg.Fullscreen)
+		s.optionsMenu.UpdateItemLabel(2, fullscreenLabel())
+	})
 }
 
 func (s *MenuScene) OnStart() {

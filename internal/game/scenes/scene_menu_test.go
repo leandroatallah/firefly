@@ -4,7 +4,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/engine/app"
+	"github.com/leandroatallah/firefly/internal/engine/data/config"
 	"github.com/leandroatallah/firefly/internal/engine/mocks"
 	"github.com/leandroatallah/firefly/internal/engine/utils/timing"
 )
@@ -96,5 +98,51 @@ func TestMenuScene_Interaction(t *testing.T) {
 	}
 	if s.optionsMenu.Visible() {
 		t.Error("optionsMenu should be hidden after Back")
+	}
+}
+
+func TestMenuScene_FullscreenToggle(t *testing.T) {
+	mockNav := &mocks.MockSceneManager{}
+	ctx := &app.AppContext{
+		SceneManager: mockNav,
+	}
+
+	// Initial config state - modify only Fullscreen
+	cfg := config.Get()
+	cfg.Fullscreen = false
+	config.Set(cfg)
+
+	s := NewMenuScene(ctx)
+	s.OnStart()
+
+	// Navigate to Options
+	s.mainMenu.NavigateDown()
+	s.mainMenu.Select()
+
+	if !s.optionsMenu.Visible() {
+		t.Fatal("optionsMenu should be visible")
+	}
+
+	// Navigate to Fullscreen (Index 2)
+	s.optionsMenu.NavigateDown() // Index 0 -> 1 ("Language")
+	s.optionsMenu.NavigateDown() // Index 1 -> 2 ("Fullscreen")
+
+	// Select Fullscreen
+	s.optionsMenu.Select()
+
+	if !config.Get().Fullscreen {
+		t.Error("Expected Fullscreen to be true after toggle")
+	}
+
+	if !ebiten.IsFullscreen() {
+		// Note: ebiten.IsFullscreen() might not reflect change in a headless test environment,
+		// but ebiten.SetFullscreen() should have been called.
+		t.Log("ebiten.IsFullscreen() is false, which is expected in headless tests")
+	}
+
+	// Toggle back
+	s.optionsMenu.Select()
+	if config.Get().Fullscreen {
+		t.Error("Expected Fullscreen to be false after second toggle")
 	}
 }

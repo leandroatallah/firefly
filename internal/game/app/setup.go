@@ -24,6 +24,7 @@ func Setup(assets fs.FS) error {
 	cfg := config.Get()
 	// Basic Ebiten setup
 	ebiten.SetWindowSize(cfg.ScreenWidth*3, cfg.ScreenHeight*3)
+	ebiten.SetFullscreen(cfg.Fullscreen)
 	ebiten.SetWindowTitle("The Higher I Climb, The Farther You Are")
 
 	// Initialize all systems and managers
