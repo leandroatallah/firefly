@@ -8,6 +8,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/data/config"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
+	"github.com/leandroatallah/firefly/internal/engine/entity/items"
 	"github.com/leandroatallah/firefly/internal/engine/mocks"
 )
 
@@ -131,10 +132,68 @@ func TestNewFallingPlatformItem(t *testing.T) {
 	fp.OnTouch(mockPlayer)
 }
 
+func TestNewPowerUpItems(t *testing.T) {
+	ctx := &app.AppContext{
+		ActorManager: actors.NewManager(),
+	}
+
+	tests := []struct {
+		name    string
+		factory func(ctx *app.AppContext, x, y int, id string) (items.Item, error)
+	}{
+		{"Freeze", func(ctx *app.AppContext, x, y int, id string) (items.Item, error) {
+			item, err := NewFreezePowerItem(ctx, x, y, id)
+			if err != nil {
+				return nil, err
+			}
+			return item, nil
+		}},
+		{"Grow", func(ctx *app.AppContext, x, y int, id string) (items.Item, error) {
+			item, err := NewGrowPowerItem(ctx, x, y, id)
+			if err != nil {
+				return nil, err
+			}
+			return item, nil
+		}},
+		{"Star", func(ctx *app.AppContext, x, y int, id string) (items.Item, error) {
+			item, err := NewStarPowerItem(ctx, x, y, id)
+			if err != nil {
+				return nil, err
+			}
+			return item, nil
+		}},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			id := tt.name + "-1"
+			item, err := tt.factory(ctx, 100, 100, id)
+			if err != nil {
+				t.Fatalf("failed to create %s power-up: %v", tt.name, err)
+			}
+			if item == nil {
+				t.Fatalf("New%sPowerItem returned nil", tt.name)
+			}
+			if item.ID() != id {
+				t.Errorf("expected ID %s, got %s", id, item.ID())
+			}
+		})
+	}
+}
+
 func TestInitItemMap(t *testing.T) {
 	ctx := &app.AppContext{}
 	m := InitItemMap(ctx)
 	if m == nil {
 		t.Fatal("InitItemMap returned nil")
+	}
+	if _, ok := m[FreezePowerUpType]; !ok {
+		t.Error("FreezePowerUpType missing from ItemMap")
+	}
+	if _, ok := m[GrowPowerUpType]; !ok {
+		t.Error("GrowPowerUpType missing from ItemMap")
+	}
+	if _, ok := m[StarPowerUpType]; !ok {
+		t.Error("StarPowerUpType missing from ItemMap")
 	}
 }

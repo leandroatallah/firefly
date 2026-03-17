@@ -7,3 +7,7 @@ type FreezeSkillUser interface {
 type GrowSkillUser interface {
 	ActivateGrowSkill()
 }
+
+type StarSkillUser interface {
+	ActivateStarSkill()
+}

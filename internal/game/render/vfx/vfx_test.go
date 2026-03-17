@@ -8,8 +8,8 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/engine/data/config"
 	"github.com/leandroatallah/firefly/internal/engine/mocks"
-	enginecamera "github.com/leandroatallah/firefly/internal/engine/render/camera"
 	"github.com/leandroatallah/firefly/internal/engine/render/camera"
+	enginevfx "github.com/leandroatallah/firefly/internal/engine/render/particles/vfx"
 )
 
 func TestMain(m *testing.M) {
@@ -60,7 +60,7 @@ func TestScreenText(t *testing.T) {
 
 func TestVignetteDisabledNoChanges(t *testing.T) {
 	cfg := config.Get()
-	baseCam := enginecamera.NewController(0, 0)
+	baseCam := camera.NewController(0, 0)
 	baseCam.SetCenter(float64(cfg.ScreenWidth)/2, float64(cfg.ScreenHeight)/2)
 
 	actor := &mocks.MockActor{
@@ -83,7 +83,7 @@ func TestVignetteDisabledNoChanges(t *testing.T) {
 
 func TestVignetteEnabledBlacksOutOutsideRadius(t *testing.T) {
 	cfg := config.Get()
-	baseCam := enginecamera.NewController(0, 0)
+	baseCam := camera.NewController(0, 0)
 	baseCam.SetCenter(float64(cfg.ScreenWidth)/2, float64(cfg.ScreenHeight)/2)
 
 	actor := &mocks.MockActor{
@@ -110,4 +110,17 @@ func TestVignetteEnabledBlacksOutOutsideRadius(t *testing.T) {
 			pixels[outIdx+0], pixels[outIdx+1], pixels[outIdx+2], pixels[outIdx+3],
 		)
 	}
+}
+
+func TestSpawnStarParticles(t *testing.T) {
+	// Should not panic with nil manager
+	SpawnStarParticles(nil, 100, 100, 1)
+
+	// Create a dummy vfx.json for Manager
+	vfxPath := "vfx_test.json"
+	os.WriteFile(vfxPath, []byte("[]"), 0644)
+	defer os.Remove(vfxPath)
+
+	m := enginevfx.NewManager(vfxPath)
+	SpawnStarParticles(m, 100, 100, 5)
 }

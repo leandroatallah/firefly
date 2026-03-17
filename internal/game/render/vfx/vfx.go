@@ -3,12 +3,58 @@ package vfx
 import (
 	"image/color"
 	"math"
+	"math/rand"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
 	"github.com/leandroatallah/firefly/internal/engine/data/config"
 	enginecamera "github.com/leandroatallah/firefly/internal/engine/render/camera"
+	"github.com/leandroatallah/firefly/internal/engine/render/particles"
+	"github.com/leandroatallah/firefly/internal/engine/render/particles/vfx"
 )
+
+// SpawnStarParticles spawns rainbow aura particles for the star power effect.
+func SpawnStarParticles(m *vfx.Manager, x, y float64, count int) {
+	if m == nil {
+		return
+	}
+
+	for i := 0; i < count; i++ {
+		// Spread particles around the location
+		rx := x + (rand.Float64()-0.5)*12
+		ry := y + (rand.Float64()-0.5)*20
+
+		// Vibrant rainbow colors
+		colors := []color.RGBA{
+			{255, 50, 50, 255},   // Red
+			{50, 255, 50, 255},   // Green
+			{50, 50, 255, 255},   // Blue
+			{255, 255, 50, 255},  // Yellow
+			{255, 50, 255, 255},  // Magenta
+			{50, 255, 255, 255},  // Cyan
+		}
+		c := colors[rand.Intn(len(colors))]
+
+		// Aura-like velocity: moving upward initially
+		velX := (rand.Float64() - 0.5) * 1.5
+		velY := -(1.0 + rand.Float64()*1.5)
+
+		p := &particles.Particle{
+			X:           rx,
+			Y:           ry,
+			VelX:        velX,
+			VelY:        velY,
+			AccY:        0.08, // Gravity will make them fall after the initial burst
+			Duration:    20 + rand.Intn(15),
+			MaxDuration: 40,
+			Scale:       1.5 + rand.Float64()*1.0,
+			ScaleSpeed:  -0.05, // Shrink over time
+			Config:      m.PixelConfig(),
+		}
+		p.ColorScale.ScaleWithColor(c)
+		m.AddParticle(p)
+	}
+}
 
 // Vignette draws a retro darkness overlay with a jagged circular opening.
 // The opening is computed per-screen pixel (1px blocks) so it naturally looks imperfect.

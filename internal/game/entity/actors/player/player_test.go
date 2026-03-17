@@ -8,6 +8,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/data/config"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
+	"github.com/leandroatallah/firefly/internal/engine/event"
 	"github.com/leandroatallah/firefly/internal/engine/physics/space"
 	_ "github.com/leandroatallah/firefly/internal/game/entity/actors/states"
 )
@@ -41,10 +42,11 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-func TestNewClimberPlayer(t *testing.T) {
+func TestClimberPlayer_Skills(t *testing.T) {
 	ctx := &app.AppContext{
 		ActorManager: actors.NewManager(),
 		Space:        space.NewSpace(),
+		EventManager: event.NewManager(),
 	}
 
 	p, err := NewClimberPlayer(ctx)
@@ -52,7 +54,22 @@ func TestNewClimberPlayer(t *testing.T) {
 		t.Fatalf("failed to create climber player: %v", err)
 	}
 
-	if p == nil {
-		t.Fatal("NewClimberPlayer returned nil")
+	climber := p.(*ClimberPlayer)
+
+	// Test Star Skill Activation
+	if climber.IsStarActive() {
+		t.Error("Star skill should not be active initially")
+	}
+	climber.ActivateStarSkill()
+	// Skill activation happens on next Update cycle through character.Update -> skill.HandleInput
+	climber.Update(ctx.Space)
+	if !climber.IsStarActive() {
+		t.Error("Star skill should be active after activation and update")
+	}
+
+	// Test ResetSkills
+	climber.ResetSkills()
+	if climber.IsStarActive() {
+		t.Error("Star skill should be inactive after reset")
 	}
 }

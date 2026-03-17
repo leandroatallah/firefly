@@ -95,3 +95,7 @@ func (e *SwarmEnemy) OnTouch(other body.Collidable) {
 }
 
 func (e *SwarmEnemy) OnDie() {}
+
+func (e *SwarmEnemy) IsEnemy() bool {
+	return true
+}

@@ -8,10 +8,12 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors/platformer"
 	gameplayermethods "github.com/leandroatallah/firefly/internal/game/entity/actors/methods"
 	gamestates "github.com/leandroatallah/firefly/internal/game/entity/actors/states"
+	gameentitytypes "github.com/leandroatallah/firefly/internal/game/entity/types"
 	gameskill "github.com/leandroatallah/firefly/internal/game/physics/skill"
+	gamevfx "github.com/leandroatallah/firefly/internal/game/render/vfx"
 )
 
-// climberStateTransitionLogic provides custom state handling for the ClimberPlayer,
+// climberStateTransitionLogic provides custom state handling for the ClimberPlayer.
 func climberStateTransitionLogic(c *actors.Character) bool {
 	if gameplayermethods.StandardStateTransitionLogic(c) {
 		return true
@@ -36,6 +38,7 @@ type ClimberPlayer struct {
 	baseSpeed   int
 	freezeSkill *gameskill.FreezeSkill
 	growSkill   *gameskill.GrowSkill
+	starSkill   *gameskill.StarSkill
 
 	*gameplayermethods.PlayerDeathBehavior
 }
@@ -53,14 +56,26 @@ func NewClimberPlayer(ctx *app.AppContext) (platformer.PlatformerActorEntity, er
 		PlatformerCharacter: character,
 		freezeSkill:         gameskill.NewFreezeSkill(),
 		growSkill:           gameskill.NewGrowSkill(),
+		starSkill:           gameskill.NewStarSkill(),
 	}
 	// Set the owner on the embedded character so LastOwner() works correctly
 	player.SetOwner(player)
 	// Ensure the original character pointer (referenced by physics bodies) also points to the player
 	character.SetOwner(player)
 
+	// Configure Star Skill VFX
+	player.starSkill.OnActive = func() {
+		if ctx.VFX != nil && ctx.FrameCount%4 == 0 {
+			rect := player.Position()
+			centerX := float64(rect.Min.X + rect.Dx()/2)
+			centerY := float64(rect.Min.Y + rect.Dy()/2)
+			gamevfx.SpawnStarParticles(ctx.VFX, centerX, centerY, 1)
+		}
+	}
+
 	character.AddSkill(player.freezeSkill)
 	character.AddSkill(player.growSkill)
+	character.AddSkill(player.starSkill)
 
 	if err = builder.ConfigureCharacter(player, spriteData, statData, stateMap, "player"); err != nil {
 		return nil, err
@@ -89,6 +104,12 @@ func (p *ClimberPlayer) ActivateGrowSkill() {
 	}
 }
 
+func (p *ClimberPlayer) ActivateStarSkill() {
+	if p.starSkill != nil {
+		p.starSkill.RequestActivation()
+	}
+}
+
 func (p *ClimberPlayer) ResetSkills() {
 	if p.freezeSkill != nil {
 		p.freezeSkill.Reset()
@@ -96,10 +117,17 @@ func (p *ClimberPlayer) ResetSkills() {
 	if p.growSkill != nil {
 		p.growSkill.Reset(p)
 	}
+	if p.starSkill != nil {
+		p.starSkill.Reset()
+	}
 }
 
 func (p *ClimberPlayer) IsGrowActive() bool {
 	return p.growSkill != nil && p.growSkill.IsActive()
+}
+
+func (p *ClimberPlayer) IsStarActive() bool {
+	return p.starSkill != nil && p.starSkill.IsActive()
 }
 
 func (p *ClimberPlayer) Update(space body.BodiesSpace) error {
@@ -114,9 +142,42 @@ func (p *ClimberPlayer) GetCharacter() *actors.Character {
 }
 
 func (p *ClimberPlayer) Hurt(damage int) {
+	if p.IsStarActive() {
+		return
+	}
 	if p.State() == gamestates.Dying {
 		return
 	}
 
 	p.SetNewStateFatal(gamestates.Dying)
+}
+
+func (p *ClimberPlayer) OnTouch(other body.Collidable) {
+	// Handle Star Skill collision with enemies
+	if p.IsStarActive() {
+		owner := other.LastOwner()
+		if enemy, ok := owner.(gameentitytypes.EnemyActor); ok && enemy.IsEnemy() {
+			// Kill enemy
+			pos := enemy.Position()
+			centerX := float64(pos.Min.X + pos.Dx()/2)
+			centerY := float64(pos.Min.Y + pos.Dy()/2)
+
+			if p.AppContext().VFX != nil {
+				p.AppContext().VFX.SpawnDeathExplosion(centerX, centerY, 15)
+			}
+
+			if p.AppContext().ActorManager != nil {
+				p.AppContext().ActorManager.Unregister(enemy)
+			}
+
+			// Remove from physics space
+			if space := p.AppContext().Space; space != nil {
+				space.QueueForRemoval(enemy)
+			}
+		}
+	}
+}
+
+func (p *ClimberPlayer) OnBlock(other body.Collidable) {
+	// Required to implement body.Touchable to avoid recursion if we rely on embedded CollidableBody.OnBlock
 }
