@@ -64,6 +64,14 @@ func (m *Menu) SetItemSpacing(spacing float64) {
 	m.itemSpacing = spacing
 }
 
+// UpdateItemLabel updates the label of a menu item at the given index.
+func (m *Menu) UpdateItemLabel(index int, label string) {
+	if index < 0 || index >= len(m.items) {
+		return
+	}
+	m.items[index].Label = label
+}
+
 // SetColor sets the color for unselected items.
 func (m *Menu) SetColor(c color.Color) {
 	m.color = c
