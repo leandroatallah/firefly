@@ -40,6 +40,7 @@ type AudioManager struct {
 	noSound      bool
 	fadeCancel   map[string]context.CancelFunc
 	paused       map[string]bool
+	currentTrack string
 }
 
 func NewAudioManager() *AudioManager {
@@ -155,6 +156,7 @@ func (am *AudioManager) PlayMusic(name string, loop bool) *audio.Player {
 	}
 
 	delete(am.paused, name)
+	am.currentTrack = name
 
 	player.SetVolume(am.volume)
 	player.Rewind()
@@ -214,6 +216,30 @@ func (am *AudioManager) ResumeMusic(name string) {
 	delete(am.paused, name)
 	player.SetVolume(am.volume)
 	player.Play()
+}
+
+// PauseCurrentMusic pauses the currently playing music track.
+func (am *AudioManager) PauseCurrentMusic() {
+	if am.currentTrack == "" {
+		return
+	}
+	am.PauseMusic(am.currentTrack)
+}
+
+// ResumeCurrentMusic resumes the currently paused music track.
+func (am *AudioManager) ResumeCurrentMusic() {
+	if am.currentTrack == "" {
+		return
+	}
+	am.ResumeMusic(am.currentTrack)
+}
+
+// FadeOutCurrentTrack fades out the currently playing music track.
+func (am *AudioManager) FadeOutCurrentTrack(duration time.Duration) {
+	if am.currentTrack == "" {
+		return
+	}
+	am.FadeOut(am.currentTrack, duration)
 }
 
 func (am *AudioManager) PlaySound(name string) *audio.Player {

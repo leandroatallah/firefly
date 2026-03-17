@@ -231,3 +231,21 @@ func TestAudioManagerPauseResume(t *testing.T) {
 		t.Error("expected test_pause.wav to be playing after resume")
 	}
 }
+
+func TestAudioManagerCurrentTrack(t *testing.T) {
+	am := getTestAudioManager()
+	wavData := createMinimalWAV()
+	am.Add("test_track.wav", wavData)
+
+	am.PlayMusic("test_track.wav", true)
+
+	am.PauseCurrentMusic()
+	if am.IsPlaying("test_track.wav") {
+		t.Error("expected test_track.wav to be paused after PauseCurrentMusic")
+	}
+
+	am.ResumeCurrentMusic()
+	if !am.IsPlaying("test_track.wav") {
+		t.Error("expected test_track.wav to be playing after ResumeCurrentMusic")
+	}
+}
