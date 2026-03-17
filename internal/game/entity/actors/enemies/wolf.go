@@ -73,3 +73,7 @@ func (e *WolfEnemy) OnTouch(other body.Collidable) {
 }
 
 func (e *WolfEnemy) OnDie() {}
+
+func (e *WolfEnemy) IsEnemy() bool {
+	return true
+}
