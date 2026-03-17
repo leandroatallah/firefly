@@ -21,6 +21,7 @@ type Menu struct {
 	selected    int
 	visible     bool
 	fontSize    float64
+	itemSpacing float64
 	color       color.Color
 	selectColor color.Color
 	onNavigate  func()
@@ -32,6 +33,7 @@ type Menu struct {
 func NewMenu() *Menu {
 	return &Menu{
 		fontSize:    24,
+		itemSpacing: 4,
 		color:       color.Gray{Y: 128},
 		selectColor: color.White,
 	}
@@ -55,6 +57,11 @@ func (m *Menu) Visible() bool {
 // SetFontSize sets the font size for menu items.
 func (m *Menu) SetFontSize(size float64) {
 	m.fontSize = size
+}
+
+// SetItemSpacing sets the spacing between menu items.
+func (m *Menu) SetItemSpacing(spacing float64) {
+	m.itemSpacing = spacing
 }
 
 // SetColor sets the color for unselected items.
@@ -168,11 +175,12 @@ func (m *Menu) Draw(screen *ebiten.Image, font *font.FontText, centerX, centerY 
 	}
 
 	// Calculate total height to center vertically
-	totalHeight := len(m.items) * int(m.fontSize)
+	itemHeight := int(m.fontSize + m.itemSpacing)
+	totalHeight := len(m.items)*itemHeight - int(m.itemSpacing)
 	startY := centerY - totalHeight/2
 
 	for i, item := range m.items {
-		y := startY + i*int(m.fontSize)
+		y := startY + i*itemHeight
 
 		op := &text.DrawOptions{}
 		if i == m.selected {
