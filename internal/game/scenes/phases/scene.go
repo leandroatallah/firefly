@@ -28,6 +28,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/scene/phases"
 	"github.com/leandroatallah/firefly/internal/engine/scene/transition"
 	"github.com/leandroatallah/firefly/internal/engine/sequences"
+	"github.com/leandroatallah/firefly/internal/engine/ui/menu"
 	"github.com/leandroatallah/firefly/internal/engine/utils"
 	"github.com/leandroatallah/firefly/internal/engine/utils/timing"
 	gameenemies "github.com/leandroatallah/firefly/internal/game/entity/actors/enemies"
@@ -36,10 +37,7 @@ import (
 	gameitems "github.com/leandroatallah/firefly/internal/game/entity/items"
 	gameentitytypes "github.com/leandroatallah/firefly/internal/game/entity/types"
 	gamecamera "github.com/leandroatallah/firefly/internal/game/render/camera"
-)
-
-const (
-	bgSound = "assets/audio/Goblins_Den_Regular.ogg"
+	scenestypes "github.com/leandroatallah/firefly/internal/game/scenes/types"
 )
 
 type PhasesScene struct {
@@ -169,6 +167,34 @@ func (s *PhasesScene) OnStart() {
 	}
 
 	s.pauseScreen = pause.NewPauseScreen(ebiten.KeyEnter, 250*time.Millisecond)
+
+	// Create pause menu
+	pauseMenu := menu.NewMenu()
+	pauseMenu.SetFontSize(8)
+	pauseMenu.AddItem("RESUME", func() {
+		s.pauseScreen.Toggle()
+	})
+	pauseMenu.AddItem("RESTART", func() {
+		s.pauseScreen.Toggle()
+		s.AppContext().SceneManager.NavigateTo(
+			scenestypes.ScenePhaseReboot,
+			transition.NewFader(0, config.Get().FadeVisibleDuration),
+			true,
+		)
+	})
+	s.pauseScreen.SetMenu(pauseMenu)
+	s.pauseScreen.SetFont(s.mainText)
+
+	s.pauseScreen.SetOnStart(func(p *pause.PauseScreen) {
+		if ctx.AudioManager != nil {
+			ctx.AudioManager.PauseCurrentMusic()
+		}
+	})
+	s.pauseScreen.SetOnFinish(func(p *pause.PauseScreen) {
+		if ctx.AudioManager != nil {
+			ctx.AudioManager.ResumeCurrentMusic()
+		}
+	})
 
 	phase, err := ctx.PhaseManager.GetCurrentPhase()
 	if err == nil && phase.SequencePath != "" {
@@ -702,4 +728,9 @@ func (s *PhasesScene) drawPause(screen *ebiten.Image) {
 	op.GeoM.Translate(-float64(w/2), -float64(h/2))
 	container.Fill(color.Black)
 	screen.DrawImage(container, op)
+
+	// Draw menu on top of background
+	if menu := s.pauseScreen.Menu(); menu != nil {
+		menu.Draw(screen, s.pauseScreen.Font(), cfg.ScreenWidth/2, cfg.ScreenHeight/2)
+	}
 }

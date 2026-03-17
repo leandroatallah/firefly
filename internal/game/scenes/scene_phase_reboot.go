@@ -7,6 +7,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/data/config"
+	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 	"github.com/leandroatallah/firefly/internal/engine/scene"
 	"github.com/leandroatallah/firefly/internal/engine/scene/transition"
 	"github.com/leandroatallah/firefly/internal/engine/utils"
@@ -33,7 +34,17 @@ func (s *PhaseRebootScene) Draw(screen *ebiten.Image) {
 }
 
 func (s *PhaseRebootScene) OnStart() {
+	// Freeze all actors and items to preserve state during reboot
+	s.freezeAllActors()
 	s.navigationTrigger.Enable(timing.FromDuration(167 * time.Millisecond))
+}
+
+func (s *PhaseRebootScene) freezeAllActors() {
+	if s.AppContext().ActorManager != nil {
+		s.AppContext().ActorManager.ForEach(func(actor actors.ActorEntity) {
+			actor.SetFreeze(true)
+		})
+	}
 }
 
 func (s *PhaseRebootScene) Update() error {

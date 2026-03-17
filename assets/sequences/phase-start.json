@@ -1,7 +1,12 @@
 {
   "commands": [
     {
-      "command": "vignette_radius", 
+      "command": "play_music",
+      "path": "assets/audio/Goblins_Dance_Battle.ogg",
+      "loop": true
+    },
+    {
+      "command": "vignette_radius",
       "initial_radius": 0,
       "final_radius": 48,
       "duration": 30

@@ -15,6 +15,6 @@ func (g *ReachEndpointGoal) IsCompleted() bool {
 
 func (g *ReachEndpointGoal) OnCompletion() {
 	g.scene.freezeAllActors()
-	g.scene.Audiomanager().FadeOut(bgSound, time.Second)
+	g.scene.Audiomanager().FadeOutCurrentTrack(time.Second)
 	g.scene.defaultCompletion()
 }
