@@ -39,6 +39,7 @@ type AudioManager struct {
 	volume       float64
 	noSound      bool
 	fadeCancel   map[string]context.CancelFunc
+	paused       map[string]bool
 }
 
 func NewAudioManager() *AudioManager {
@@ -53,6 +54,7 @@ func NewAudioManager() *AudioManager {
 		volume:       initialVolume,
 		noSound:      noSound,
 		fadeCancel:   make(map[string]context.CancelFunc),
+		paused:       make(map[string]bool),
 	}
 }
 
@@ -136,8 +138,7 @@ func (am *AudioManager) PlayMusic(name string, loop bool) *audio.Player {
 	if am.noSound {
 		return nil
 	}
-	
-	// Cancel any ongoing fades
+
 	if cancel, ok := am.fadeCancel[name]; ok {
 		cancel()
 		delete(am.fadeCancel, name)
@@ -146,25 +147,24 @@ func (am *AudioManager) PlayMusic(name string, loop bool) *audio.Player {
 		cancel()
 		delete(am.fadeCancel, "_all")
 	}
-	
+
 	player, ok := am.audioPlayers[name]
 	if !ok {
 		log.Printf("audio player not found: %s", name)
 		return nil
 	}
-	
+
+	delete(am.paused, name)
+
 	player.SetVolume(am.volume)
 	player.Rewind()
 	player.Play()
-	
-	// Start loop goroutine if loop is enabled
+
 	if loop {
 		go func() {
 			for {
-				// Wait for music to finish
 				for player.IsPlaying() {
 					time.Sleep(100 * time.Millisecond)
-					// Check if fade started
 					if _, exists := am.fadeCancel[name]; exists {
 						return
 					}
@@ -172,13 +172,23 @@ func (am *AudioManager) PlayMusic(name string, loop bool) *audio.Player {
 						return
 					}
 				}
-				// Rewind and play again
+				if am.paused[name] {
+					for am.paused[name] {
+						time.Sleep(100 * time.Millisecond)
+						if _, exists := am.fadeCancel[name]; exists {
+							delete(am.paused, name)
+							return
+						}
+					}
+					player.Play()
+					continue
+				}
 				player.Rewind()
 				player.Play()
 			}
 		}()
 	}
-	
+
 	return player
 }
 
@@ -188,7 +198,22 @@ func (am *AudioManager) PauseMusic(name string) {
 		log.Printf("audio player not found: %s", name)
 		return
 	}
+	am.paused[name] = true
 	player.Pause()
+}
+
+func (am *AudioManager) ResumeMusic(name string) {
+	if am.noSound {
+		return
+	}
+	player, ok := am.audioPlayers[name]
+	if !ok {
+		log.Printf("audio player not found: %s", name)
+		return
+	}
+	delete(am.paused, name)
+	player.SetVolume(am.volume)
+	player.Play()
 }
 
 func (am *AudioManager) PlaySound(name string) *audio.Player {
@@ -235,7 +260,6 @@ func (am *AudioManager) FadeOutAll(duration time.Duration) {
 		return
 	}
 
-	// Cancel any ongoing fade all
 	if am.fadeCancel["_all"] != nil {
 		am.fadeCancel["_all"]()
 	}
@@ -270,7 +294,6 @@ func (am *AudioManager) FadeOutAll(duration time.Duration) {
 				if newVolume < 0 {
 					newVolume = 0
 				}
-				// Set volume per player, not globally
 				for _, p := range am.audioPlayers {
 					p.SetVolume(newVolume)
 				}
@@ -294,7 +317,6 @@ func (am *AudioManager) FadeOut(name string, duration time.Duration) {
 		return
 	}
 
-	// Cancel any ongoing fades
 	if cancel, ok := am.fadeCancel[name]; ok {
 		cancel()
 		delete(am.fadeCancel, name)

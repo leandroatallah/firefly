@@ -201,8 +201,33 @@ func TestAudioManagerNoSound(t *testing.T) {
 	if am.PlaySound("any") != nil {
 		t.Error("expected nil player when noSound is true")
 	}
-	
-	am.SetVolume(0.5) // should do nothing
-	am.FadeOutAll(time.Second) // should do nothing
-	am.FadeOut("any", time.Second) // should do nothing
+
+	am.SetVolume(0.5)
+	am.FadeOutAll(time.Second)
+	am.FadeOut("any", time.Second)
+}
+
+func TestAudioManagerPauseResume(t *testing.T) {
+	am := getTestAudioManager()
+	wavData := createMinimalWAV()
+	am.Add("test_pause.wav", wavData)
+
+	p := am.PlayMusic("test_pause.wav", true)
+	if p == nil {
+		t.Fatal("expected player for test_pause.wav")
+	}
+
+	if !am.IsPlaying("test_pause.wav") {
+		t.Error("expected test_pause.wav to be playing")
+	}
+
+	am.PauseMusic("test_pause.wav")
+	if am.IsPlaying("test_pause.wav") {
+		t.Error("expected test_pause.wav to be paused")
+	}
+
+	am.ResumeMusic("test_pause.wav")
+	if !am.IsPlaying("test_pause.wav") {
+		t.Error("expected test_pause.wav to be playing after resume")
+	}
 }
