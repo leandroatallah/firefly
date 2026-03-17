@@ -50,6 +50,7 @@ This separation allows the engine to be developed independently from the game's 
 │       │   ├── actors/  # Game-specific characters (player, npcs, enemies) and state logic
 │       │   ├── items/   # Game-specific items (coins, falling platforms)
 │       │   └── obstacles/ # Game-specific obstacles (walls, hazards)
+│       ├── physics/     # Game-specific physics behaviors and skills
 │       ├── render/      # Game-specific rendering logic (vfx)
 │       ├── scenes/      # Game scenes and phases (intro, menu, story, summary)
 │       └── ui/          # Game's specific user interface (hud, speech)

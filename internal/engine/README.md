@@ -50,10 +50,12 @@ This module contains the core, reusable game engine components for the Firefly p
   - `loader.go`: Facilitates the loading of audio files into the engine.
 - `render/`: Responsible for all rendering tasks.
   - `camera/`: Controls the game camera's position and zoom.
-  - `particles/`: Manages particle systems.
-  - `sprites/`: Handles sprite rendering and layering.
+  - `particles/`: Manages particle systems and emitters.
+    - `vfx/`: Particle-based visual effects.
+  - `sprites/`: Handles sprite rendering, layering, and animations.
   - `tilemap/`: Renders tilemaps and handles tile-based collisions.
-  - `vfx/`: Provides visual effects, including a text subsystem for floating text.
+  - `vfx/`: Provides visual effects and screen-wide overlays.
+    - `text/`: Text-based visual effects (e.g., damage numbers, popups).
   - `screenutil/`: Utility functions for screen coordinates, rendering, and screen-wide effects like flashes.
 - `ui/`: Provides building blocks for user interface elements.
   - `hud/`: Base components for Heads-Up Displays.

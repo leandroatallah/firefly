@@ -8,10 +8,10 @@ Achieve **80%+ test coverage** across the codebase, prioritizing the engine's en
 
 ## 🔝 Priorities
 
-1. **Entity State Machine (`internal/engine/entity/actors`)**: 50.0% coverage. The `handleState` logic is the most critical and complex part of the engine and is currently under-tested.
+1. **Entity State Machine (`internal/engine/entity/actors`)**: 48.0% coverage. The `handleState` logic is the most critical and complex part of the engine and is currently under-tested.
 2. **Level Management (`internal/game/scenes/phases`)**: 0.0% coverage. This is the foundation for all game levels.
-3. **Player & Character Logic (`internal/game/entity/actors/player`)**: ~25% coverage. Core gameplay mechanics need regression tests.
-4. **Sequences (`internal/engine/sequences`)**: 67.5% coverage. Essential for cutscenes and scripted events.
+3. **Player & Character Logic (`internal/game/entity/actors/player`)**: 52.2% coverage. Good progress here, but still needs more integration tests.
+4. **Sequences (`internal/engine/sequences`)**: 60.8% coverage. Essential for cutscenes and scripted events.
 
 ## 🛠 Testing Strategy & Patterns
 
@@ -68,6 +68,7 @@ tests := []struct {
 
 ## ⚠️ Precautions
 
+- **Never commit changes**. Do not use `git commit` or attempt to stage/commit files. The user is responsible for all version control operations.
 - **Do not modify production code** unless you find a bug that makes it untestable (e.g., global state that needs to be injected).
 - **Keep tests fast**. Avoid long `time.Sleep` calls; use virtual time or frame counters.
 - **No Flaky Tests**. Ensure tests are deterministic.
@@ -97,9 +98,10 @@ func (t *Transition) Draw(_ *ebiten.Image) {}  // Use blank in param list
 
 | Package | Current Coverage | Focus Area |
 | :--- | :--- | :--- |
-| `entity/actors` | 50.0% | `handleState` state machine, animation logic |
+| `entity/actors` | 48.0% | `handleState` state machine, animation logic |
 | `game/scenes/phases` | 0.0% | `PhasesScene` life cycle, goal tracking |
-| `game/entity/actors/player` | 25.3% | Player input, physics integration, interactions |
-| `sequences` | 67.5% | Command execution and completion conditions |
-| `entity/items` | 54.1% | Item collection and state transitions |
+| `game/entity/actors/player` | 52.2% | Player input, physics integration, interactions |
+| `sequences` | 60.8% | Command execution and completion conditions |
+| `entity/items` | 52.3% | Item collection and state transitions |
 | `scene` | 73.0% | Scene transitions and tilemap initialization |
+| `game/physics/skill` | 78.0% | Game-specific power-ups (freeze, grow, star) |

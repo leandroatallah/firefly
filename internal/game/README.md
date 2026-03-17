@@ -13,6 +13,8 @@ This module contains the specific implementation and logic for the _Growbel_ gam
   - `items/`: Implements collectible items like `Coin` and interactive environmental items like `FallingPlatform`.
   - `obstacles/`: Defines game-specific obstacles like walls and movement-restricting boundaries.
   - `types/`: Custom types and interfaces related to game entities.
+- `physics/`: Implements game-specific physical behaviors and skills.
+  - `skill/`: Contains specific power-up logic (e.g., `freeze`, `grow`, `star`).
 - `scenes/`: Implements the actual game scenes, such as the `IntroScene`, `MenuScene`, and gameplay phases. It orchestrates actors, items, and UI.
   - `init_scenes.go`: Initializes the registry of all game scenes.
   - `scene_intro.go`: The introductory cinematic/tutorial scene.
