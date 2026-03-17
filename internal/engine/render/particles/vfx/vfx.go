@@ -160,8 +160,8 @@ func (m *Manager) SpawnFallingRocks(x, y, width float64, count int) {
 func (m *Manager) SpawnDeathExplosion(x, y float64, count int) {
 	for i := 0; i < count; i++ {
 		// Spread particles around the death location
-		rx := x + (rand.Float64()-0.5)*40
-		ry := y + (rand.Float64()-0.5)*40
+		rx := x + (rand.Float64()-0.5)*24
+		ry := y + (rand.Float64()-0.5)*24
 
 		// Red color for 1-bit aesthetic
 		c := color.RGBA{255, 0, 0, 255}
@@ -170,7 +170,7 @@ func (m *Manager) SpawnDeathExplosion(x, y float64, count int) {
 		velX := (rand.Float64() - 0.5) * 4.0
 		velY := (rand.Float64() - 0.8) * 5.0 // Bias upward
 
-		scale := 1.0 + rand.Float64()*2.0
+		scale := 1.0 + rand.Float64()*1.5
 
 		p := &particles.Particle{
 			X:           rx,
@@ -178,14 +178,24 @@ func (m *Manager) SpawnDeathExplosion(x, y float64, count int) {
 			VelX:        velX,
 			VelY:        velY,
 			AccY:        0.15, // Gravity pulls particles down
-			Duration:    45 + rand.Intn(30),
-			MaxDuration: 90,
+			Duration:    30 + rand.Intn(20),
+			MaxDuration: 60,
 			Scale:       scale,
 			Config:      m.pixelConfig,
 		}
 		p.ColorScale.ScaleWithColor(c)
 		m.system.Add(p)
 	}
+}
+
+// AddParticle adds a custom particle to the VFX system.
+func (m *Manager) AddParticle(p *particles.Particle) {
+	m.system.Add(p)
+}
+
+// PixelConfig returns the default 1x1 pixel particle configuration.
+func (m *Manager) PixelConfig() *particles.Config {
+	return m.pixelConfig
 }
 
 // SpawnFloatingText spawns floating text at the specified location.
