@@ -46,6 +46,7 @@ type AppConfig struct {
 	NoSound      bool
 	SkipIntro    bool
 	Fullscreen   bool
+	Language     string
 
 	EnableSpeechSkip          bool
 	EnableTypingSounds        bool
