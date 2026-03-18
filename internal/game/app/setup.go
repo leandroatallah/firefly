@@ -88,6 +88,8 @@ func Setup(assets fs.FS) error {
 	sceneManager.SetFactory(sceneFactory)
 	sceneManager.SetAppContext(appContext)
 
+	vfxManager.SetAppContext(appContext)
+
 	// Create and run the game
 	game := app.NewGame(appContext)
 
