@@ -69,7 +69,27 @@ func NewClimberPlayer(ctx *app.AppContext) (platformer.PlatformerActorEntity, er
 			rect := player.Position()
 			centerX := float64(rect.Min.X + rect.Dx()/2)
 			centerY := float64(rect.Min.Y + rect.Dy()/2)
-			gamevfx.SpawnStarParticles(ctx.VFX, centerX, centerY, 1)
+			gamevfx.SpawnStarParticles(ctx.VFX, centerX, centerY, 3)
+		}
+	}
+
+	// Configure Freeze Skill VFX
+	player.freezeSkill.OnActive = func() {
+		if ctx.VFX != nil && ctx.FrameCount%5 == 0 {
+			rect := player.Position()
+			centerX := float64(rect.Min.X + rect.Dx()/2)
+			centerY := float64(rect.Min.Y + rect.Dy()/2)
+			gamevfx.SpawnFreezeAuraParticles(ctx.VFX, centerX, centerY, 3)
+		}
+	}
+
+	// Configure Grow Skill VFX
+	player.growSkill.OnActive = func() {
+		if ctx.VFX != nil && ctx.FrameCount%5 == 0 {
+			rect := player.Position()
+			centerX := float64(rect.Min.X + rect.Dx()/2)
+			centerY := float64(rect.Min.Y + rect.Dy()/2)
+			gamevfx.SpawnGrowAuraParticles(ctx.VFX, centerX, centerY, 3)
 		}
 	}
 

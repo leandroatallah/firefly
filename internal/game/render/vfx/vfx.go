@@ -7,53 +7,110 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
+	contractvfx "github.com/leandroatallah/firefly/internal/engine/contracts/vfx"
 	"github.com/leandroatallah/firefly/internal/engine/data/config"
 	enginecamera "github.com/leandroatallah/firefly/internal/engine/render/camera"
 	"github.com/leandroatallah/firefly/internal/engine/render/particles"
-	"github.com/leandroatallah/firefly/internal/engine/render/particles/vfx"
 )
 
-// SpawnStarParticles spawns rainbow aura particles for the star power effect.
-func SpawnStarParticles(m *vfx.Manager, x, y float64, count int) {
+// SpawnAuraParticles spawns flame-shaped aura particles with a wave-like motion.
+// Particles initially move outward from center, then flow inward as they rise.
+// colors: palette to choose from for each particle
+// count: number of particles to spawn
+// width: horizontal spread width from center
+// speed: upward velocity magnitude
+func SpawnAuraParticles(m contractvfx.Manager, x, y float64, colors []color.RGBA, count int, width float64, speed float64) {
 	if m == nil {
 		return
 	}
 
 	for i := 0; i < count; i++ {
-		// Spread particles around the location
-		rx := x + (rand.Float64()-0.5)*12
-		ry := y + (rand.Float64()-0.5)*20
+		// Spread particles horizontally around the center (narrow spread)
+		rx := x + (rand.Float64()-0.5)*width*0.6
+		ry := y + (rand.Float64()-0.5)*width*0.3
 
-		// Vibrant rainbow colors
-		colors := []color.RGBA{
-			{255, 50, 50, 255},   // Red
-			{50, 255, 50, 255},   // Green
-			{50, 50, 255, 255},   // Blue
-			{255, 255, 50, 255},  // Yellow
-			{255, 50, 255, 255},  // Magenta
-			{50, 255, 255, 255},  // Cyan
+		// Initial outward velocity from center
+		direction := 1.0
+		if rx > x {
+			direction = 1.0
+		} else {
+			direction = -1.0
 		}
-		c := colors[rand.Intn(len(colors))]
+		initialVelX := direction * (0.3 + rand.Float64()*0.3)
 
-		// Aura-like velocity: moving upward initially
-		velX := (rand.Float64() - 0.5) * 1.5
-		velY := -(1.0 + rand.Float64()*1.5)
+		// Upward velocity
+		velY := -speed - rand.Float64()*speed*0.3
+
+		// Choose color from palette
+		c := colors[rand.Intn(len(colors))]
 
 		p := &particles.Particle{
 			X:           rx,
 			Y:           ry,
-			VelX:        velX,
+			VelX:        initialVelX,
 			VelY:        velY,
-			AccY:        0.08, // Gravity will make them fall after the initial burst
-			Duration:    20 + rand.Intn(15),
-			MaxDuration: 40,
-			Scale:       1.5 + rand.Float64()*1.0,
-			ScaleSpeed:  -0.05, // Shrink over time
+			AccX:        -direction * 0.04, // Acceleration inward (creates wave: out → slow → in)
+			AccY:        -0.02,             // Slight upward acceleration for flame effect
+			Duration:    12 + rand.Intn(8),
+			MaxDuration: 22,
+			Scale:       1.0 + rand.Float64()*0.5,
+			ScaleSpeed:  -0.04, // Shrink faster over time
 			Config:      m.PixelConfig(),
 		}
 		p.ColorScale.ScaleWithColor(c)
 		m.AddParticle(p)
 	}
+}
+
+// SpawnFreezeAuraParticles spawns blue aura particles for the freeze power effect.
+func SpawnFreezeAuraParticles(m contractvfx.Manager, x, y float64, count int) {
+	if m == nil {
+		return
+	}
+
+	// Blue color palette
+	colors := []color.RGBA{
+		{50, 100, 255, 255},  // Bright blue
+		{100, 150, 255, 255}, // Light blue
+		{50, 150, 255, 255},  // Sky blue
+	}
+
+	SpawnAuraParticles(m, x, y, colors, count, 16.0, 1.5)
+}
+
+// SpawnGrowAuraParticles spawns orange aura particles for the grow power effect.
+func SpawnGrowAuraParticles(m contractvfx.Manager, x, y float64, count int) {
+	if m == nil {
+		return
+	}
+
+	// Orange color palette
+	colors := []color.RGBA{
+		{255, 140, 0, 255}, // Orange
+		{255, 165, 0, 255}, // Standard orange
+		{255, 100, 0, 255}, // Deep orange
+	}
+
+	SpawnAuraParticles(m, x, y, colors, count, 16.0, 1.5)
+}
+
+// SpawnStarParticles spawns rainbow aura particles for the star power effect.
+func SpawnStarParticles(m contractvfx.Manager, x, y float64, count int) {
+	if m == nil {
+		return
+	}
+
+	// Vibrant rainbow colors
+	colors := []color.RGBA{
+		{255, 50, 50, 255},  // Red
+		{50, 255, 50, 255},  // Green
+		{50, 50, 255, 255},  // Blue
+		{255, 255, 50, 255}, // Yellow
+		{255, 50, 255, 255}, // Magenta
+		{50, 255, 255, 255}, // Cyan
+	}
+
+	SpawnAuraParticles(m, x, y, colors, count, 18.0, 1.8)
 }
 
 // Vignette draws a retro darkness overlay with a jagged circular opening.

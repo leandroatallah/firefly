@@ -22,6 +22,7 @@ type GrowSkill struct {
 
 	// Callbacks for external systems (audio, vfx)
 	OnActivate   func()
+	OnActive     func()
 	OnDeactivate func()
 }
 
@@ -69,6 +70,9 @@ func (s *GrowSkill) Update(actor body.MovableCollidable, model *physicsmovement.
 	switch s.state {
 	case engineskill.StateActive:
 		s.timer--
+		if s.OnActive != nil {
+			s.OnActive()
+		}
 		if s.timer <= 0 {
 			s.deactivate(actor)
 			s.state = engineskill.StateCooldown

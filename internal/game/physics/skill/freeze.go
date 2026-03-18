@@ -21,6 +21,7 @@ type FreezeSkill struct {
 
 	// Callbacks for external systems (audio, vfx)
 	OnActivate   func()
+	OnActive     func()
 	OnDeactivate func()
 }
 
@@ -67,6 +68,9 @@ func (s *FreezeSkill) Update(actor body.MovableCollidable, model *physicsmovemen
 	switch s.state {
 	case engineskill.StateActive:
 		s.timer--
+		if s.OnActive != nil {
+			s.OnActive()
+		}
 		if s.timer <= 0 {
 			s.deactivate()
 			s.state = engineskill.StateCooldown

@@ -15,6 +15,7 @@ import (
 type PowerUpItem struct {
 	items.BaseItem
 	activateSkill func()
+	onCollect     func()
 }
 
 // NewPowerUpItem creates a new power-up item with the given sprite config and skill activation callback.
@@ -51,6 +52,11 @@ func NewPowerUpItem(ctx *app.AppContext, x, y int, id string, spriteConfigPath s
 	return powerItem, nil
 }
 
+// SetOnCollect sets the callback to be called when the item is collected.
+func (p *PowerUpItem) SetOnCollect(fn func()) {
+	p.onCollect = fn
+}
+
 // OnTouch handles collision with the player and activates the skill.
 func (p *PowerUpItem) OnTouch(other body.Collidable) {
 	if p.IsRemoved() {
@@ -70,5 +76,10 @@ func (p *PowerUpItem) OnTouch(other body.Collidable) {
 	p.SetRemoved(true)
 	if p.activateSkill != nil {
 		p.activateSkill()
+	}
+	
+	// Call collection callback for feedback (sound, vfx)
+	if p.onCollect != nil {
+		p.onCollect()
 	}
 }
