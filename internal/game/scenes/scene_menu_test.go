@@ -1,22 +1,29 @@
 package gamescene
 
 import (
+	"os"
 	"testing"
 	"time"
 
-	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/data/config"
+	"github.com/leandroatallah/firefly/internal/engine/data/i18n"
 	"github.com/leandroatallah/firefly/internal/engine/mocks"
 	"github.com/leandroatallah/firefly/internal/engine/utils/timing"
 )
 
-func TestMenuScene_Structure(t *testing.T) {
+func createMenuSceneContext() *app.AppContext {
 	mockNav := &mocks.MockSceneManager{}
-	ctx := &app.AppContext{
+	i18nManager := i18n.NewI18nManager(os.DirFS("."))
+	i18nManager.Load("en")
+	return &app.AppContext{
 		SceneManager: mockNav,
+		I18n:         i18nManager,
 	}
+}
 
+func TestMenuScene_Structure(t *testing.T) {
+	ctx := createMenuSceneContext()
 	s := NewMenuScene(ctx)
 	if s == nil {
 		t.Fatal("NewMenuScene returned nil")
@@ -27,13 +34,6 @@ func TestMenuScene_Structure(t *testing.T) {
 	}
 	if s.optionsMenu == nil {
 		t.Error("optionsMenu is nil")
-	}
-
-	// Verify initial state (before OnStart)
-	// Menus are created but visibility logic is in OnStart
-	// Default visibility for Menu is false
-	if s.mainMenu.Visible() {
-		t.Log("mainMenu visible before OnStart (unexpected but allowed if init changed)")
 	}
 
 	s.OnStart()
@@ -47,10 +47,7 @@ func TestMenuScene_Structure(t *testing.T) {
 }
 
 func TestMenuScene_Interaction(t *testing.T) {
-	mockNav := &mocks.MockSceneManager{}
-	ctx := &app.AppContext{
-		SceneManager: mockNav,
-	}
+	ctx := createMenuSceneContext()
 	s := NewMenuScene(ctx)
 	s.OnStart()
 
@@ -61,7 +58,6 @@ func TestMenuScene_Interaction(t *testing.T) {
 	}
 
 	// Test 1: Select "Game Start" (Index 0)
-	// We manually trigger Select() as we can't mock input easily
 	s.mainMenu.Select()
 
 	if !s.isNavigating {
@@ -70,12 +66,6 @@ func TestMenuScene_Interaction(t *testing.T) {
 
 	// Reset for next test
 	s.OnStart()
-	// Need to simulate delay again?
-	// s.count is reset to 0 in OnStart.
-	// But for manual Select() calls, we don't strictly need s.count unless callbacks check it.
-	// The callback checks: if !s.isNavigating { ... }
-	// It does NOT check s.count. s.count is checked in Update before calling Update/Select.
-	// So manual Select() works regardless of count, but logic inside callback is what matters.
 
 	// Test 2: Navigate to "Options" (Index 1)
 	s.mainMenu.NavigateDown() // Selection 0 -> 1 ("Options")
@@ -89,8 +79,6 @@ func TestMenuScene_Interaction(t *testing.T) {
 	}
 
 	// Test 3: Back from Options (Index 0)
-	// Options menu items: Back, Language, Fullscreen.
-	// Selection defaults to 0 ("Back").
 	s.optionsMenu.Select()
 
 	if !s.mainMenu.Visible() {
@@ -102,11 +90,7 @@ func TestMenuScene_Interaction(t *testing.T) {
 }
 
 func TestMenuScene_FullscreenToggle(t *testing.T) {
-	mockNav := &mocks.MockSceneManager{}
-	ctx := &app.AppContext{
-		SceneManager: mockNav,
-	}
-
+	ctx := createMenuSceneContext()
 	// Initial config state - modify only Fullscreen
 	cfg := config.Get()
 	cfg.Fullscreen = false
@@ -134,15 +118,39 @@ func TestMenuScene_FullscreenToggle(t *testing.T) {
 		t.Error("Expected Fullscreen to be true after toggle")
 	}
 
-	if !ebiten.IsFullscreen() {
-		// Note: ebiten.IsFullscreen() might not reflect change in a headless test environment,
-		// but ebiten.SetFullscreen() should have been called.
-		t.Log("ebiten.IsFullscreen() is false, which is expected in headless tests")
-	}
-
 	// Toggle back
 	s.optionsMenu.Select()
 	if config.Get().Fullscreen {
 		t.Error("Expected Fullscreen to be false after second toggle")
+	}
+}
+
+func TestMenuScene_LanguageToggle(t *testing.T) {
+	ctx := createMenuSceneContext()
+	cfg := config.Get()
+	cfg.Language = "en"
+	config.Set(cfg)
+
+	s := NewMenuScene(ctx)
+	s.OnStart()
+
+	// Navigate to Options
+	s.mainMenu.NavigateDown()
+	s.mainMenu.Select()
+
+	// Navigate to Language (Index 1)
+	s.optionsMenu.NavigateDown() // Index 0 -> 1 ("Language")
+
+	// Select Language
+	s.optionsMenu.Select()
+
+	if config.Get().Language != "pt-br" {
+		t.Errorf("Expected Language to be pt-br, got %s", config.Get().Language)
+	}
+
+	// Toggle back
+	s.optionsMenu.Select()
+	if config.Get().Language != "en" {
+		t.Errorf("Expected Language to be en, got %s", config.Get().Language)
 	}
 }
