@@ -1,0 +1,1 @@
+- Add player to the bottom of credit scene
