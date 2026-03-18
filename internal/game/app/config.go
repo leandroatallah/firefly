@@ -45,6 +45,7 @@ func NewConfig() *config.AppConfig {
 		ScreenFlipSpeed:     1.0 / 60.0,
 		FadeHoldDuration:    0,
 		FadeVisibleDuration: 0,
+		Language:            "en",
 
 		EnableSpeechSkip:          false,
 		EnableTypingSounds:        true,
@@ -57,6 +58,7 @@ func NewConfig() *config.AppConfig {
 	flag.BoolVar(&cfg.NoSound, "no-sound", false, "Disable game sound")
 	flag.BoolVar(&cfg.SkipIntro, "skip-intro", false, "Skip all intros and start in phases")
 	flag.BoolVar(&cfg.Fullscreen, "fullscreen", false, "Start game in fullscreen mode")
+	flag.StringVar(&cfg.Language, "lang", "en", "Initial language (en, pt-br)")
 	// Temporary debug flags; only speech-skip is expected to remain as a global debug override.
 	flag.BoolVar(&cfg.EnableSpeechSkip, "speech-skip", true, "Enable skipping speech typing with Enter")
 	flag.BoolVar(&cfg.EnableTypingSounds, "typing-sounds", true, "Enable typing sound effects")
