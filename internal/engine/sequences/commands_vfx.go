@@ -5,9 +5,9 @@ import (
 	"math"
 
 	"github.com/leandroatallah/firefly/internal/engine/app"
+	contractvfx "github.com/leandroatallah/firefly/internal/engine/contracts/vfx"
 	"github.com/leandroatallah/firefly/internal/engine/data/config"
 	"github.com/leandroatallah/firefly/internal/engine/render/camera"
-	"github.com/leandroatallah/firefly/internal/engine/render/particles/vfx"
 )
 
 type SpawnTextCommand struct {
@@ -49,7 +49,7 @@ type QuakeCommand struct {
 	Trauma   float64
 	Duration int
 	camera   interface{ AddTrauma(float64) }
-	vfx      *vfx.Manager
+	vfx      contractvfx.Manager
 	timer    int
 }
 

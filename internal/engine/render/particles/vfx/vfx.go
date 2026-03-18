@@ -9,6 +9,7 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
+	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/assets/font"
 	"github.com/leandroatallah/firefly/internal/engine/data/schemas"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
@@ -24,6 +25,8 @@ type VFXConfig struct {
 
 // Manager handles all visual effects for the game (particles + floating text).
 type Manager struct {
+	app.AppContextHolder
+
 	system      *particles.System
 	configs     map[string]*particles.Config
 	textManager *text.Manager
@@ -234,4 +237,18 @@ func (m *Manager) Update() {
 func (m *Manager) Draw(screen *ebiten.Image, cam *camera.Controller) {
 	m.system.Draw(screen, cam)
 	m.textManager.Draw(screen, cam)
+}
+
+// TriggerScreenFlash triggers a screen flash effect on the current scene if it supports it.
+func (m *Manager) TriggerScreenFlash() {
+	if m.AppContext().SceneManager == nil {
+		return
+	}
+	// Type assertion to access PhasesScene-specific method
+	type screenFlasher interface {
+		TriggerScreenFlash()
+	}
+	if scene, ok := m.AppContext().SceneManager.CurrentScene().(screenFlasher); ok {
+		scene.TriggerScreenFlash()
+	}
 }

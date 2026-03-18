@@ -666,6 +666,11 @@ func (s *PhasesScene) DisableVignetteDarkness() {
 	s.vignette.Disable()
 }
 
+// TriggerScreenFlash triggers a white screen flash effect for feedback.
+func (s *PhasesScene) TriggerScreenFlash() {
+	s.ShowDrawScreenFlash = 2
+}
+
 func (s *PhasesScene) endpointTrigger(eventID string) {
 	if !s.hasPlayer {
 		return

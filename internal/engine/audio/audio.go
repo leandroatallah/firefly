@@ -252,6 +252,24 @@ func (am *AudioManager) PlaySound(name string) *audio.Player {
 		return nil
 	}
 	player.SetVolume(am.volume)
+	// Always rewind to ensure sound can replay from the beginning
+	player.Rewind()
+	player.Play()
+	return player
+}
+
+// PlaySoundAtVolume plays a sound effect at a specific volume (0.0 to 1.0).
+func (am *AudioManager) PlaySoundAtVolume(name string, volume float64) *audio.Player {
+	if am.noSound {
+		return nil
+	}
+	player, ok := am.audioPlayers[name]
+	if !ok {
+		log.Printf("audio player not found: %s", name)
+		return nil
+	}
+	player.SetVolume(volume)
+	// Always rewind to ensure sound can replay from the beginning
 	player.Rewind()
 	player.Play()
 	return player
