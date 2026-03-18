@@ -8,6 +8,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/assets/font"
 	"github.com/leandroatallah/firefly/internal/engine/audio"
 	"github.com/leandroatallah/firefly/internal/engine/data/config"
+	"github.com/leandroatallah/firefly/internal/engine/data/i18n"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 	"github.com/leandroatallah/firefly/internal/engine/event"
 	"github.com/leandroatallah/firefly/internal/engine/physics/space"
@@ -24,6 +25,7 @@ func Setup(assets fs.FS) error {
 	cfg := config.Get()
 	// Basic Ebiten setup
 	ebiten.SetWindowSize(cfg.ScreenWidth*3, cfg.ScreenHeight*3)
+	ebiten.SetFullscreen(cfg.Fullscreen)
 	ebiten.SetWindowTitle("The Higher I Climb, The Farther You Are")
 
 	// Initialize all systems and managers
@@ -31,6 +33,11 @@ func Setup(assets fs.FS) error {
 	sceneManager := scene.NewSceneManager()
 	phaseManager := phases.NewManager()
 	actorManager := actors.NewManager()
+
+	i18nManager := i18n.NewI18nManager(assets)
+	if err := i18nManager.Load(cfg.Language); err != nil {
+		return err
+	}
 
 	// Initialize Dialogue Manager
 	fontMain, err := font.NewFontText(cfg.MainFontFace)
@@ -73,6 +80,7 @@ func Setup(assets fs.FS) error {
 		ActorManager:    actorManager,
 		SceneManager:    sceneManager,
 		PhaseManager:    phaseManager,
+		I18n:            i18nManager,
 		ImageManager:    nil,
 		DataManager:     nil,
 		Assets:          assets,

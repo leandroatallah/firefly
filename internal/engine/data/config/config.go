@@ -45,6 +45,8 @@ type AppConfig struct {
 	CollisionBox bool
 	NoSound      bool
 	SkipIntro    bool
+	Fullscreen   bool
+	Language     string
 
 	EnableSpeechSkip          bool
 	EnableTypingSounds        bool

@@ -53,25 +53,61 @@ func (s *MenuScene) initMenus() {
 	s.optionsMenu.SetItemSpacing(12)
 
 	// Main Menu
-	s.mainMenu.AddItem("Game Start", func() {
+	s.mainMenu.AddItem("", func() {
 		if !s.isNavigating {
 			s.isNavigating = true
 			s.navigationTrigger.Enable(timing.FromDuration(time.Second))
 			s.mainMenu.SetVisible(false) // Hide menu to prevent double clicks
 		}
 	})
-	s.mainMenu.AddItem("Options", func() {
+	s.mainMenu.AddItem("", func() {
 		s.mainMenu.SetVisible(false)
 		s.optionsMenu.SetVisible(true)
 	})
 
 	// Options Menu
-	s.optionsMenu.AddItem("Back", func() {
+	s.optionsMenu.AddItem("", func() {
 		s.optionsMenu.SetVisible(false)
 		s.mainMenu.SetVisible(true)
 	})
-	s.optionsMenu.AddItem("Language", func() {})
-	s.optionsMenu.AddItem("Fullscreen", func() {})
+	s.optionsMenu.AddItem("", func() {
+		cfg := config.Get()
+		if cfg.Language == "en" {
+			cfg.Language = "pt-br"
+		} else {
+			cfg.Language = "en"
+		}
+		s.AppContext().I18n.Load(cfg.Language)
+		s.refreshMenuLabels()
+	})
+
+	s.optionsMenu.AddItem("", func() {
+		cfg := config.Get()
+		cfg.Fullscreen = !cfg.Fullscreen
+		ebiten.SetFullscreen(cfg.Fullscreen)
+		s.refreshMenuLabels()
+	})
+
+	s.refreshMenuLabels()
+}
+
+func (s *MenuScene) refreshMenuLabels() {
+	i18n := s.AppContext().I18n
+	cfg := config.Get()
+
+	// Main Menu
+	s.mainMenu.UpdateItemLabel(0, i18n.T("menu_game_start"))
+	s.mainMenu.UpdateItemLabel(1, i18n.T("menu_options"))
+
+	// Options Menu
+	s.optionsMenu.UpdateItemLabel(0, i18n.T("options_back"))
+	s.optionsMenu.UpdateItemLabel(1, i18n.T("options_language"))
+
+	fullscreenKey := "options_fullscreen_off"
+	if cfg.Fullscreen {
+		fullscreenKey = "options_fullscreen_on"
+	}
+	s.optionsMenu.UpdateItemLabel(2, i18n.T(fullscreenKey))
 }
 
 func (s *MenuScene) OnStart() {

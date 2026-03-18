@@ -12,6 +12,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/contracts/vfx"
 	"github.com/leandroatallah/firefly/internal/engine/data/config"
 	"github.com/leandroatallah/firefly/internal/engine/data/datamanager"
+	"github.com/leandroatallah/firefly/internal/engine/data/i18n"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 	"github.com/leandroatallah/firefly/internal/engine/event"
 	"github.com/leandroatallah/firefly/internal/engine/scene/phases"
@@ -31,6 +32,7 @@ type AppContext struct {
 	ActorManager    *actors.Manager
 	SceneManager    navigation.SceneManager
 	PhaseManager    *phases.Manager
+	I18n            *i18n.I18nManager
 	Assets          fs.FS
 	Config          *config.AppConfig
 	Space           body.BodiesSpace
