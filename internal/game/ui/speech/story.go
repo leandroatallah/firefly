@@ -5,6 +5,7 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/engine/data/config"
+	"github.com/leandroatallah/firefly/internal/engine/data/i18n"
 	"github.com/leandroatallah/firefly/internal/engine/ui/speech"
 )
 
@@ -12,13 +13,13 @@ type StorySpeech struct {
 	*baseSpeech
 }
 
-func NewStorySpeech(fontSource *speech.SpeechFont) *StorySpeech {
+func NewStorySpeech(fontSource *speech.SpeechFont, i18nManager *i18n.I18nManager) *StorySpeech {
 	// Create indicator image (a simple white square)
 	indicatorImg := ebiten.NewImage(8, 8)
 	indicatorImg.Fill(color.White)
 
 	s := &StorySpeech{
-		baseSpeech: newBaseSpeech(fontSource),
+		baseSpeech: newBaseSpeech(fontSource, i18nManager),
 	}
 	s.SetAccumulative(true)
 	s.indicator = indicatorImg

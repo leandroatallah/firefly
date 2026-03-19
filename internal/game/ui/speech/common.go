@@ -2,9 +2,11 @@ package gamespeech
 
 import (
 	"math"
+	"strings"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
+	"github.com/leandroatallah/firefly/internal/engine/data/i18n"
 	"github.com/leandroatallah/firefly/internal/engine/ui/speech"
 )
 
@@ -21,6 +23,7 @@ const (
 type baseSpeech struct {
 	*speech.SpeechBase
 
+	I18n      *i18n.I18nManager
 	delay     int
 	ending    bool
 	removed   bool
@@ -28,9 +31,10 @@ type baseSpeech struct {
 	indicator *ebiten.Image
 }
 
-func newBaseSpeech(fontSource *speech.SpeechFont) *baseSpeech {
+func newBaseSpeech(fontSource *speech.SpeechFont, i18nManager *i18n.I18nManager) *baseSpeech {
 	return &baseSpeech{
 		SpeechBase: speech.NewSpeechBase(fontSource),
+		I18n:       i18nManager,
 		removed:    true,
 		speedText:  speedText,
 	}
@@ -68,6 +72,15 @@ func (s *baseSpeech) Visible() bool {
 }
 
 func (s *baseSpeech) Text(msg string) string {
+	if s.I18n != nil {
+		// Split by double newline (accumulative messages)
+		lines := strings.Split(msg, "\n\n")
+		translatedLines := make([]string, len(lines))
+		for i, line := range lines {
+			translatedLines[i] = s.I18n.T(line)
+		}
+		msg = strings.Join(translatedLines, "\n\n")
+	}
 	return s.SpeechBase.Text(msg, s.GetSpeed())
 }
 

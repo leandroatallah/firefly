@@ -52,8 +52,8 @@ func Setup(assets fs.FS) error {
 	speechFontMain := speech.NewSpeechFont(fontMain, 8, 14)
 	speechFontSmall := speech.NewSpeechFont(fontSmall, 8, 12)
 
-	speechBubble := gamespeech.NewSpeechBubble(speechFontMain)
-	speechStory := gamespeech.NewStorySpeech(speechFontSmall)
+	speechBubble := gamespeech.NewSpeechBubble(speechFontMain, i18nManager)
+	speechStory := gamespeech.NewStorySpeech(speechFontSmall, i18nManager)
 	dialogueManager := speech.NewManager(speechBubble, speechStory)
 	dialogueManager.SetActiveSpeech(speech.BubbleSpeechID)
 	dialogueManager.SetAudioManager(audioManager)
