@@ -58,6 +58,16 @@ tests := []struct {
 - For tests that require an `ebiten.Image`, use `ebiten.NewImage(w, h)` in a headless environment.
 - Avoid tests that depend on human interaction or specific frame timings (use `timing` package mocks).
 
+### 6. Internationalization (i18n)
+
+- The `I18nManager` loads translations from `assets/lang/{langCode}.json` files.
+- Use `T(key, args...)` to retrieve translated strings with optional `fmt.Sprintf`-style formatting.
+- When testing i18n-dependent code:
+  - Create a mock `fs.FS` using `embed.FS` or `fstest.MapFS` for unit tests.
+  - Test missing keys (should return the key itself as fallback).
+  - Test formatting arguments: `T("key_with_%d", count)`.
+  - Test missing language files (should return an error from `Load()`).
+
 ## 📋 Standard Workflow for Agents
 
 1. **Analyze Coverage**: Run `go test ./internal/engine/[package] -coverprofile=coverage.out && go tool cover -func=coverage.out`.
@@ -105,3 +115,4 @@ func (t *Transition) Draw(_ *ebiten.Image) {}  // Use blank in param list
 | `entity/items` | 52.3% | Item collection and state transitions |
 | `scene` | 73.0% | Scene transitions and tilemap initialization |
 | `game/physics/skill` | 78.0% | Game-specific power-ups (freeze, grow, star) |
+| `data/i18n` | (new) | `I18nManager.Load()` and `T()` methods, error handling |

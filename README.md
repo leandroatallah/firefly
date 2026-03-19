@@ -31,6 +31,7 @@ This separation allows the engine to be developed independently from the game's 
 │   │   ├── contracts/   # Interfaces for engine components (animation, body, config, context, navigation, sequences, tilemaplayer)
 │   │   ├── data/        # Data loading, management, and configuration schemas
 │   │   │   └── config/  # Engine configuration
+│   │   │   └── i18n/    # Internationalization (i18n) manager and translation loading
 │   │   ├── entity/      # Foundational structures for in-game objects (actors, items)
 │   │   │   ├── actors/  # Actor management and movement (e.g., characters, enemies)
 │   │   │   └── items/   # Item management

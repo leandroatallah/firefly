@@ -9,6 +9,8 @@ This module contains the core, reusable game engine components for the Firefly p
 - `data/`: Handles data loading, management, and configuration schemas (e.g., from JSON files).
   - `config/`: Engine-specific configuration structures.
   - `datamanager/`: Centralized manager for loading and accessing game data.
+  - `i18n/`: Internationalization system for loading and managing translations.
+    - `i18n.go`: `I18nManager` that loads translations from `assets/lang/{langCode}.json` and provides `T(key, args...)` for translated strings with `fmt.Sprintf`-style formatting.
   - `jsonutil/`: Helpers for JSON parsing and schema validation.
   - `schemas/`: Definitions for data structures used in asset files.
 - `event/`: Provides a basic event handling system for inter-component communication.
