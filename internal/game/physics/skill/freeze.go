@@ -60,7 +60,14 @@ func (s *FreezeSkill) HandleInput(player body.MovableCollidable, model *physicsm
 		s.activationRequested = false
 		if s.state == engineskill.StateReady {
 			s.activate(player, space)
+		} else if s.state == engineskill.StateCooldown {
+			// Allow collecting power-up during cooldown to reset cooldown timer
+			// This enables players to collect multiple power-ups in sequence
+			s.state = engineskill.StateReady
+			s.timer = 0
+			s.activate(player, space)
 		}
+		// If state is Active, ignore the request (already active)
 	}
 }
 

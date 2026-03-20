@@ -57,7 +57,14 @@ func (s *StarSkill) HandleInput(player body.MovableCollidable, model *physicsmov
 		s.activationRequested = false
 		if s.state == engineskill.StateReady {
 			s.activate()
+		} else if s.state == engineskill.StateCooldown {
+			// Allow collecting power-up during cooldown to reset cooldown timer
+			// This enables players to collect multiple power-ups in sequence
+			s.state = engineskill.StateReady
+			s.timer = 0
+			s.activate()
 		}
+		// If state is Active, ignore the request (already active)
 	}
 }
 
