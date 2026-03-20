@@ -47,7 +47,7 @@ func climberStateTransitionLogic(c *actors.Character) bool {
 
 			// Capture current bottom-center position
 			x16, y16 := p.GetPosition16()
-			centerX16 := x16 + (32*16)/2  // Transition frame is 32x32
+			centerX16 := x16 + (32*16)/2 // Transition frame is 32x32
 			bottomY16 := y16 + (32 * 16)
 
 			// Restore natural size
@@ -212,6 +212,7 @@ func (p *ClimberPlayer) Hurt(damage int) {
 func (p *ClimberPlayer) OnTouch(other body.Collidable) {
 	// Handle Star Skill and Grow Skill collision with enemies
 	if p.IsStarActive() || p.IsGrowActive() {
+		ctx := p.AppContext()
 		owner := other.LastOwner()
 		if enemy, ok := owner.(gameentitytypes.EnemyActor); ok && enemy.IsEnemy() {
 			// Kill enemy
@@ -219,16 +220,17 @@ func (p *ClimberPlayer) OnTouch(other body.Collidable) {
 			centerX := float64(pos.Min.X + pos.Dx()/2)
 			centerY := float64(pos.Min.Y + pos.Dy()/2)
 
-			if p.AppContext().VFX != nil {
-				p.AppContext().VFX.SpawnDeathExplosion(centerX, centerY, 15)
+			if ctx.VFX != nil {
+				ctx.AudioManager.PlaySoundAtVolume("assets/audio/Fire_Hit_01.ogg", 0.5)
+				ctx.VFX.SpawnDeathExplosion(centerX, centerY, 15)
 			}
 
-			if p.AppContext().ActorManager != nil {
-				p.AppContext().ActorManager.Unregister(enemy)
+			if ctx.ActorManager != nil {
+				ctx.ActorManager.Unregister(enemy)
 			}
 
 			// Remove from physics space
-			if space := p.AppContext().Space; space != nil {
+			if space := ctx.Space; space != nil {
 				space.QueueForRemoval(enemy)
 			}
 		}

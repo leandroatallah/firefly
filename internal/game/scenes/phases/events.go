@@ -19,7 +19,7 @@ func subscribeEvents(ctx *app.AppContext, scene *PhasesScene) {
 		if evt, ok := e.(*actorevents.ActorJumpedEvent); ok {
 			yOffset := 1.0
 			ctx.VFX.SpawnJumpPuff(evt.X, evt.Y+yOffset, 1)
-			ctx.AudioManager.PlaySoundAtVolume("assets/audio/Jump.ogg", 0.2)
+			ctx.AudioManager.PlaySoundAtVolume("assets/audio/Menu_Select.ogg", 0.3)
 		}
 	})
 	em.Subscribe(actorevents.ActorLandedType, func(e event.Event) {
