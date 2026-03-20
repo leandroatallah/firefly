@@ -30,6 +30,7 @@ type MenuScene struct {
 	navigationTrigger  utils.DelayTrigger
 	shouldFadeOutSound bool
 	isFadingOutSound   bool
+	musicStarted       bool
 
 	mainMenu    *menu.Menu
 	optionsMenu *menu.Menu
@@ -125,20 +126,13 @@ func (s *MenuScene) refreshMenuLabels() {
 }
 
 func (s *MenuScene) OnStart() {
-	s.Schedule(2*time.Second, func() {
-		am := s.AppContext().SceneManager.AudioManager()
-		if am != nil {
-			am.SetVolume(1)
-			am.PlayMusic(TitleSound, true) // Loop menu music
-		}
-	})
-
 	// Reset state
 	s.count = 0
 	s.isNavigating = false
 	s.isFadingOutSound = false
 	s.shouldFadeOutSound = false
 	s.navigationTrigger = utils.DelayTrigger{} // Reset trigger state
+	s.musicStarted = false
 
 	// Reset menus
 	s.mainMenu.SetVisible(true)
@@ -165,6 +159,16 @@ func (s *MenuScene) Update() error {
 		s.AppContext().SceneManager.NavigateTo(
 			scenestypes.SceneStory, transition.NewFader(0, config.Get().FadeVisibleDuration), true,
 		)
+	}
+
+	// Start music only after transition is finished
+	if !s.musicStarted && !s.AppContext().SceneManager.IsTransitioning() {
+		s.musicStarted = true
+		am := s.AppContext().SceneManager.AudioManager()
+		if am != nil {
+			am.SetVolume(1)
+			am.PlayMusic(TitleSound, true) // Loop menu music
+		}
 	}
 
 	if s.isNavigating && s.shouldFadeOutSound && !s.isFadingOutSound {
