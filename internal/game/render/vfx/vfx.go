@@ -91,6 +91,11 @@ func SpawnGrowAuraParticles(m contractvfx.Manager, x, y float64, count int) {
 		{255, 100, 0, 255}, // Deep orange
 	}
 
+	// NOTE: For now, use only white
+	colors = []color.RGBA{
+		{255, 255, 255, 255},
+	}
+
 	SpawnAuraParticles(m, x, y, colors, count, 16.0, 1.5)
 }
 
