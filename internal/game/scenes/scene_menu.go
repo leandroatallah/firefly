@@ -1,8 +1,10 @@
 package gamescene
 
 import (
+	"fmt"
 	"image/color"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -101,7 +103,7 @@ func (s *MenuScene) refreshMenuLabels() {
 
 	// Options Menu
 	s.optionsMenu.UpdateItemLabel(0, i18n.T("options_back"))
-	s.optionsMenu.UpdateItemLabel(1, i18n.T("options_language"))
+	s.optionsMenu.UpdateItemLabel(1, fmt.Sprintf("%s: %s", i18n.T("options_language"), strings.ToUpper(cfg.Language)))
 
 	fullscreenKey := "options_fullscreen_off"
 	if cfg.Fullscreen {
