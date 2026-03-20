@@ -5,9 +5,11 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
+	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
 	physicsmovement "github.com/leandroatallah/firefly/internal/engine/physics/movement"
 	engineskill "github.com/leandroatallah/firefly/internal/engine/physics/skill"
 	"github.com/leandroatallah/firefly/internal/engine/utils/timing"
+	gamestates "github.com/leandroatallah/firefly/internal/game/entity/actors/states"
 )
 
 type GrowSkill struct {
@@ -94,12 +96,30 @@ func (s *GrowSkill) activate(player body.MovableCollidable) {
 	s.originalWidth = shape.Width()
 	s.originalHeight = shape.Height()
 
-	// Double size (Physical)
-	player.SetSize(s.originalWidth*2, s.originalHeight*2)
+	// Capture current bottom-center position to maintain it after size change
+	x16, y16 := player.GetPosition16()
+	centerX16 := x16 + (s.originalWidth*16)/2
+	bottomY16 := y16 + (s.originalHeight*16)
 
-	// Double scale (Visual)
+	// Double size (Physical)
+	newWidth := s.originalWidth * 2
+	newHeight := s.originalHeight * 2
+	player.SetSize(newWidth, newHeight)
+
+	// Re-position to maintain bottom-center
+	newX16 := centerX16 - (newWidth*16)/2
+	newY16 := bottomY16 - (newHeight*16)
+	player.SetPosition16(newX16, newY16)
+
+	// Double scale (Visual) - This is the target scale, 
+	// but the Growing state might override it to 1.0 for the animation.
 	if c, ok := player.(interface{ SetScale(float64) }); ok {
 		c.SetScale(2.0)
+	}
+
+	// Set State Growing
+	if stateSetter, ok := player.(interface{ SetNewState(actors.ActorStateEnum) error }); ok {
+		_ = stateSetter.SetNewState(gamestates.Growing)
 	}
 
 	// Refresh collision bodies if possible
@@ -113,12 +133,31 @@ func (s *GrowSkill) activate(player body.MovableCollidable) {
 }
 
 func (s *GrowSkill) deactivate(player body.MovableCollidable) {
+	// Capture current bottom-center position to maintain it after size change
+	shape := player.GetShape()
+	currentWidth := shape.Width()
+	currentHeight := shape.Height()
+
+	x16, y16 := player.GetPosition16()
+	centerX16 := x16 + (currentWidth*16)/2
+	bottomY16 := y16 + (currentHeight*16)
+
 	// Restore size
 	player.SetSize(s.originalWidth, s.originalHeight)
 
-	// Restore scale
+	// Re-position to maintain bottom-center
+	newX16 := centerX16 - (s.originalWidth*16)/2
+	newY16 := bottomY16 - (s.originalHeight*16)
+	player.SetPosition16(newX16, newY16)
+
+	// Restore scale (Visual)
 	if c, ok := player.(interface{ SetScale(float64) }); ok {
 		c.SetScale(1.0)
+	}
+
+	// Set State Shrinking
+	if stateSetter, ok := player.(interface{ SetNewState(actors.ActorStateEnum) error }); ok {
+		_ = stateSetter.SetNewState(gamestates.Shrinking)
 	}
 
 	// Refresh collision bodies if possible

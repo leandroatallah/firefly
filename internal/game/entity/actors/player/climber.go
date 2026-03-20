@@ -26,7 +26,23 @@ func climberStateTransitionLogic(c *actors.Character) bool {
 		return true
 	}
 
-	if state == gamestates.Exiting || state == gamestates.Lying || state == gamestates.Rising {
+	if state == gamestates.Growing && c.IsAnimationFinished() {
+		c.SetNewStateFatal(actors.Idle)
+		if p, ok := c.Owner().(interface{ SetScale(float64) }); ok {
+			p.SetScale(2.0)
+		}
+		return true
+	}
+
+	if state == gamestates.Shrinking && c.IsAnimationFinished() {
+		c.SetNewStateFatal(actors.Idle)
+		if p, ok := c.Owner().(interface{ SetScale(float64) }); ok {
+			p.SetScale(1.0)
+		}
+		return true
+	}
+
+	if state == gamestates.Exiting || state == gamestates.Lying || state == gamestates.Rising || state == gamestates.Growing || state == gamestates.Shrinking {
 		return true
 	}
 
@@ -162,7 +178,7 @@ func (p *ClimberPlayer) GetCharacter() *actors.Character {
 }
 
 func (p *ClimberPlayer) Hurt(damage int) {
-	if p.IsStarActive() {
+	if p.IsStarActive() || p.IsGrowActive() {
 		return
 	}
 	if p.State() == gamestates.Dying {
@@ -173,8 +189,8 @@ func (p *ClimberPlayer) Hurt(damage int) {
 }
 
 func (p *ClimberPlayer) OnTouch(other body.Collidable) {
-	// Handle Star Skill collision with enemies
-	if p.IsStarActive() {
+	// Handle Star Skill or Grow Skill collision with enemies
+	if p.IsStarActive() || p.IsGrowActive() {
 		owner := other.LastOwner()
 		if enemy, ok := owner.(gameentitytypes.EnemyActor); ok && enemy.IsEnemy() {
 			// Kill enemy
