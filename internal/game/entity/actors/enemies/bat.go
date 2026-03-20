@@ -62,6 +62,13 @@ func (e *BatEnemy) OnTouch(other body.Collidable) {
 			return
 		}
 
+		// Check if player has invincibility skill active
+		if invincible, ok := owner.(interface{ IsStarActive() bool; IsGrowActive() bool }); ok {
+			if invincible.IsStarActive() || invincible.IsGrowActive() {
+				return
+			}
+		}
+
 		if alive, ok := owner.(platformer.AlivePlayer); ok {
 			alive.Hurt(1)
 		}

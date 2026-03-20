@@ -173,8 +173,8 @@ func (p *ClimberPlayer) Hurt(damage int) {
 }
 
 func (p *ClimberPlayer) OnTouch(other body.Collidable) {
-	// Handle Star Skill collision with enemies
-	if p.IsStarActive() {
+	// Handle Star Skill and Grow Skill collision with enemies
+	if p.IsStarActive() || p.IsGrowActive() {
 		owner := other.LastOwner()
 		if enemy, ok := owner.(gameentitytypes.EnemyActor); ok && enemy.IsEnemy() {
 			// Kill enemy
