@@ -125,14 +125,16 @@ func (s *MenuScene) OnStart() {
 	s.navigationTrigger = utils.DelayTrigger{} // Reset trigger state
 
 	// Reset menus
-	s.mainMenu.SetVisible(true)
+	s.mainMenu.SetVisible(false)
 	s.optionsMenu.SetVisible(false)
 }
 
 func (s *MenuScene) Update() error {
-	canSkipDelay := s.count > timing.FromDuration(time.Second)
+	if s.count == timing.FromDuration(time.Second) {
+		s.mainMenu.SetVisible(true)
+	}
 
-	if canSkipDelay && !s.isNavigating {
+	if !s.isNavigating {
 		if s.optionsMenu.Visible() {
 			s.optionsMenu.Update()
 		} else if s.mainMenu.Visible() {
