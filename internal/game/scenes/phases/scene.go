@@ -29,6 +29,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/scene/transition"
 	"github.com/leandroatallah/firefly/internal/engine/sequences"
 	"github.com/leandroatallah/firefly/internal/engine/ui/menu"
+	gameplayer "github.com/leandroatallah/firefly/internal/game/entity/actors/player"
 	"github.com/leandroatallah/firefly/internal/engine/utils"
 	"github.com/leandroatallah/firefly/internal/engine/utils/timing"
 	gameenemies "github.com/leandroatallah/firefly/internal/game/entity/actors/enemies"
@@ -315,6 +316,11 @@ func (s *PhasesScene) startDeathSequence() {
 
 	// Call OnDie to set health to 0 and transition to Dying state
 	s.player.GetCharacter().SetNewStateFatal(gamestates.Dying)
+
+	// Reset all skills (e.g., Grow) to restore normal player size before teleport
+	if climber, ok := s.player.(*gameplayer.ClimberPlayer); ok {
+		climber.ResetSkills()
+	}
 
 	// Spawn explosion VFX at death location
 	if s.AppContext().VFX != nil {
