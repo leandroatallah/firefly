@@ -52,11 +52,26 @@ func (s *GrowSkill) RequestActivation() {
 
 func (s *GrowSkill) Reset(player body.MovableCollidable) {
 	if s.state == engineskill.StateActive {
-		s.deactivate(player)
+		s.RestoreNormalSize(player)
 	}
 	s.state = engineskill.StateReady
 	s.timer = 0
 	s.activationRequested = false
+}
+
+func (s *GrowSkill) RestoreNormalSize(player body.MovableCollidable) {
+	// Restore size
+	player.SetSize(s.originalWidth, s.originalHeight)
+
+	// Restore scale (Visual)
+	if c, ok := player.(interface{ SetScale(float64) }); ok {
+		c.SetScale(1.0)
+	}
+
+	// Refresh collision bodies if possible
+	if r, ok := player.(interface{ RefreshCollisions() }); ok {
+		r.RefreshCollisions()
+	}
 }
 
 func (s *GrowSkill) HandleInput(player body.MovableCollidable, model *physicsmovement.PlatformMovementModel, space body.BodiesSpace) {
@@ -133,27 +148,10 @@ func (s *GrowSkill) activate(player body.MovableCollidable) {
 }
 
 func (s *GrowSkill) deactivate(player body.MovableCollidable) {
-	// Capture current bottom-center position to maintain it after size change
-	shape := player.GetShape()
-	currentWidth := shape.Width()
-	currentHeight := shape.Height()
-
-	x16, y16 := player.GetPosition16()
-	centerX16 := x16 + (currentWidth*16)/2
-	bottomY16 := y16 + (currentHeight*16)
-
-	// Restore size
-	player.SetSize(s.originalWidth, s.originalHeight)
-
-	// Re-position to maintain bottom-center
-	newX16 := centerX16 - (s.originalWidth*16)/2
-	newY16 := bottomY16 - (s.originalHeight*16)
-	player.SetPosition16(newX16, newY16)
-
-	// Restore scale (Visual)
-	if c, ok := player.(interface{ SetScale(float64) }); ok {
-		c.SetScale(1.0)
-	}
+	// Transition to Shrinking state.
+	// We DO NOT change the physical body size yet; the actor's state transition logic
+	// will handle the final size restoration when the animation finishes.
+	// This keeps the 32x32 body aligned with the 32x32 animation frame during transition.
 
 	// Set State Shrinking
 	if stateSetter, ok := player.(interface{ SetNewState(actors.ActorStateEnum) error }); ok {

@@ -36,8 +36,29 @@ func climberStateTransitionLogic(c *actors.Character) bool {
 
 	if state == gamestates.Shrinking && c.IsAnimationFinished() {
 		c.SetNewStateFatal(actors.Idle)
-		if p, ok := c.Owner().(interface{ SetScale(float64) }); ok {
+		if p, ok := c.Owner().(interface {
+			SetScale(float64)
+			SetSize(int, int)
+			GetPosition16() (int, int)
+			SetPosition16(int, int)
+			RefreshCollisions()
+		}); ok {
 			p.SetScale(1.0)
+
+			// Capture current bottom-center position
+			x16, y16 := p.GetPosition16()
+			centerX16 := x16 + (32*16)/2  // Transition frame is 32x32
+			bottomY16 := y16 + (32 * 16)
+
+			// Restore natural size
+			p.SetSize(16, 16)
+
+			// Re-position to maintain bottom-center
+			newX16 := centerX16 - (16*16)/2
+			newY16 := bottomY16 - (16 * 16)
+			p.SetPosition16(newX16, newY16)
+
+			p.RefreshCollisions()
 		}
 		return true
 	}
