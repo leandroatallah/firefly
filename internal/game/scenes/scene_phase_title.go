@@ -69,7 +69,7 @@ func (s *PhaseTitleScene) Update() error {
 	if s.shouldInitMusic {
 		if am := ctx.AudioManager; am != nil {
 			s.shouldInitMusic = false
-			s.Schedule(4*time.Second, func() {
+			s.Schedule(2*time.Second, func() {
 				s.showTitle = true
 				am.SetVolume(1.0)
 				am.PlayMusic(TitleSound, true) // Loop title music

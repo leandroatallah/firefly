@@ -6,14 +6,10 @@
     },
     {
       "command": "dialogue",
-      "lines": [
-        "story_area1_line1",
-        "story_area1_line2"
-      ],
+      "lines": ["story_area1_line1", "story_area1_line2"],
       "position": "top",
       "speech_speed": 1,
       "speech_id": "story",
-      "speech_audio": [],
       "enable_speech_skip": true,
       "accumulative": true
     },

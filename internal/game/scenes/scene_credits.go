@@ -106,6 +106,12 @@ func buildCredits() []CreditEntry {
 func (s *CreditsScene) OnStart() {
 	s.BaseScene.OnStart()
 	s.scrollOffset = float64(config.Get().ScreenHeight)
+
+	am := s.AppContext().SceneManager.AudioManager()
+	if am != nil {
+		am.SetVolume(1)
+		am.PlayMusic(StorySound, true) // Loop menu music
+	}
 }
 
 func (s *CreditsScene) Update() error {
@@ -118,7 +124,7 @@ func (s *CreditsScene) Update() error {
 }
 
 func (s *CreditsScene) Draw(screen *ebiten.Image) {
-	screen.Fill(color.RGBA{0x1a, 0x1a, 0x2e, 0xff}) // Dark blue background
+	screen.Fill(color.RGBA{A: 255})
 
 	centerX := config.Get().ScreenWidth / 2
 	baseY := s.scrollOffset
