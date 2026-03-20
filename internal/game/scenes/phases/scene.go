@@ -205,6 +205,14 @@ func (s *PhasesScene) OnStart() {
 		)
 	})
 
+	// Set up pause menu navigation and selection callbacks
+	s.pauseMenu.SetOnNavigate(func() {
+		ctx.AudioManager.PlaySound("assets/audio/Menu_Click.ogg")
+	})
+	s.pauseMenu.SetOnSelect(func() {
+		ctx.AudioManager.PlaySound("assets/audio/Menu_Select2.ogg")
+	})
+
 	// Create pause options menu
 	s.pauseOptionsMenu = menu.NewMenu()
 	s.pauseOptionsMenu.SetFontSize(8)
@@ -229,6 +237,14 @@ func (s *PhasesScene) OnStart() {
 		cfg.Fullscreen = !cfg.Fullscreen
 		ebiten.SetFullscreen(cfg.Fullscreen)
 		s.refreshPauseMenuLabels()
+	})
+
+	// Set up pause options menu navigation and selection callbacks
+	s.pauseOptionsMenu.SetOnNavigate(func() {
+		ctx.AudioManager.PlaySound("assets/audio/Menu_Click.ogg")
+	})
+	s.pauseOptionsMenu.SetOnSelect(func() {
+		ctx.AudioManager.PlaySound("assets/audio/Menu_Select2.ogg")
 	})
 
 	s.pauseScreen.SetMenu(s.pauseMenu)

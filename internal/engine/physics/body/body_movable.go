@@ -172,8 +172,9 @@ func (b *MovableBody) IsWalking() bool {
 }
 
 func (b *MovableBody) IsGoingUp() bool {
-	threshold := config.Get().Physics.DownwardGravity
-	if b.vy16 <= -threshold {
+	// Check if velocity is negative (moving upward)
+	// Use a small threshold to avoid detecting tiny movements as going up
+	if b.vy16 < 0 {
 		return true
 	}
 

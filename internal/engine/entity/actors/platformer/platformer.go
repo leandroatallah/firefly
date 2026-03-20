@@ -103,14 +103,9 @@ func NewPlatformerCharacter(stateMap map[string]animation.SpriteState, spriteDat
 		Character: c,
 	}
 
-	pf.SetOnJump(func(pos image.Point) {
-		if pf.AppContext() != nil {
-			pf.AppContext().EventManager.Publish(&events.ActorJumpedEvent{
-				X: float64(pos.X),
-				Y: float64(pos.Y),
-			})
-		}
-	})
+	// Note: Jump event is now published directly from JumpSkill.OnJump callback
+	// to ensure it fires for all jump types including coyote jumps
+	// Land event is still handled here via state machine
 	pf.SetOnLand(func(pos image.Point) {
 		if pf.AppContext() != nil {
 			pf.AppContext().EventManager.Publish(&events.ActorLandedEvent{
