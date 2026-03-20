@@ -61,6 +61,8 @@ func (s *RisingState) OnStart(currentCount int) {
 	actor := s.GetActor()
 	actor.SetHealth(actor.MaxHealth())
 	actor.SetFreeze(false)
+	actor.SetVelocity(0, 0)
+	actor.SetAcceleration(0, 0)
 }
 
 func (s *RisingState) OnFinish() {
