@@ -1,10 +1,12 @@
 package gamescenephases
 
 import (
+	"fmt"
 	"image"
 	"image/color"
 	"log"
 	"math"
+	"strings"
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -61,9 +63,11 @@ type PhasesScene struct {
 	// UI effects
 	ShowDrawScreenFlash int
 
-	screenFlipper  *scene.ScreenFlipper
-	sequencePlayer sequencestypes.Player
-	pauseScreen    *pause.PauseScreen
+	screenFlipper    *scene.ScreenFlipper
+	sequencePlayer   sequencestypes.Player
+	pauseScreen      *pause.PauseScreen
+	pauseMenu        *menu.Menu
+	pauseOptionsMenu *menu.Menu
 
 	// Game-layer camera controller with vertical-only-upward constraint
 	gameCamera *gamecamera.Controller
@@ -169,23 +173,69 @@ func (s *PhasesScene) OnStart() {
 	s.pauseScreen = pause.NewPauseScreen(ebiten.KeyEnter, 250*time.Millisecond)
 
 	// Create pause menu
-	pauseMenu := menu.NewMenu()
-	pauseMenu.SetFontSize(8)
-	pauseMenu.AddItem("RESUME", func() {
+	s.pauseMenu = menu.NewMenu()
+	s.pauseMenu.SetFontSize(8)
+	// Resume
+	s.pauseMenu.AddItem("", func() {
 		s.pauseScreen.Toggle()
 	})
-	pauseMenu.AddItem("RESTART", func() {
+	// Restart
+	s.pauseMenu.AddItem("", func() {
 		s.pauseScreen.Toggle()
-		s.AppContext().SceneManager.NavigateTo(
+		ctx.SceneManager.NavigateTo(
 			scenestypes.ScenePhaseReboot,
 			transition.NewFader(0, config.Get().FadeVisibleDuration),
 			true,
 		)
 	})
-	s.pauseScreen.SetMenu(pauseMenu)
+	// Options
+	s.pauseMenu.AddItem("", func() {
+		s.pauseScreen.SetMenu(s.pauseOptionsMenu)
+	})
+	// Exit to Menu
+	s.pauseMenu.AddItem("", func() {
+		s.pauseScreen.Toggle()
+		ctx.AudioManager.PauseCurrentMusic()
+		// NewRedirectScene
+		ctx.SceneManager.NavigateTo(
+			scenestypes.SceneMenu,
+			transition.NewFader(0, time.Duration(2*time.Second)),
+			true,
+		)
+	})
+
+	// Create pause options menu
+	s.pauseOptionsMenu = menu.NewMenu()
+	s.pauseOptionsMenu.SetFontSize(8)
+	// Back
+	s.pauseOptionsMenu.AddItem("", func() {
+		s.pauseScreen.SetMenu(s.pauseMenu)
+	})
+	// Language
+	s.pauseOptionsMenu.AddItem("", func() {
+		cfg := config.Get()
+		if cfg.Language == "en" {
+			cfg.Language = "pt-br"
+		} else {
+			cfg.Language = "en"
+		}
+		ctx.I18n.Load(cfg.Language)
+		s.refreshPauseMenuLabels()
+	})
+	// Fullscreen
+	s.pauseOptionsMenu.AddItem("", func() {
+		cfg := config.Get()
+		cfg.Fullscreen = !cfg.Fullscreen
+		ebiten.SetFullscreen(cfg.Fullscreen)
+		s.refreshPauseMenuLabels()
+	})
+
+	s.pauseScreen.SetMenu(s.pauseMenu)
 	s.pauseScreen.SetFont(s.mainText)
+	s.refreshPauseMenuLabels()
 
 	s.pauseScreen.SetOnStart(func(p *pause.PauseScreen) {
+		p.SetMenu(s.pauseMenu) // Reset to main pause menu on open
 		if ctx.AudioManager != nil {
 			ctx.AudioManager.PauseCurrentMusic()
 		}
@@ -707,6 +757,29 @@ func (s *PhasesScene) initTilemap() {
 
 func (s *PhasesScene) canPause() bool {
 	return s.allowPause && !s.sequencePlayer.IsPlaying()
+}
+
+func (s *PhasesScene) refreshPauseMenuLabels() {
+	i18n := s.AppContext().I18n
+	cfg := config.Get()
+
+	if s.pauseMenu != nil {
+		s.pauseMenu.UpdateItemLabel(0, i18n.T("pause_resume"))
+		s.pauseMenu.UpdateItemLabel(1, i18n.T("pause_restart"))
+		s.pauseMenu.UpdateItemLabel(2, i18n.T("pause_options"))
+		s.pauseMenu.UpdateItemLabel(3, i18n.T("pause_exit"))
+	}
+
+	if s.pauseOptionsMenu != nil {
+		s.pauseOptionsMenu.UpdateItemLabel(0, i18n.T("options_back"))
+		s.pauseOptionsMenu.UpdateItemLabel(1, fmt.Sprintf("%s: %s", i18n.T("options_language"), strings.ToUpper(cfg.Language)))
+
+		fullscreenKey := "options_fullscreen_off"
+		if cfg.Fullscreen {
+			fullscreenKey = "options_fullscreen_on"
+		}
+		s.pauseOptionsMenu.UpdateItemLabel(2, i18n.T(fullscreenKey))
+	}
 }
 
 func (s *PhasesScene) drawPause(screen *ebiten.Image) {

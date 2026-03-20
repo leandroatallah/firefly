@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"image/color"
 	"log"
+	"os"
 	"strings"
 	"time"
 
@@ -55,6 +56,7 @@ func (s *MenuScene) initMenus() {
 	s.optionsMenu.SetItemSpacing(12)
 
 	// Main Menu
+	// Game start
 	s.mainMenu.AddItem("", func() {
 		if !s.isNavigating {
 			s.isNavigating = true
@@ -62,16 +64,24 @@ func (s *MenuScene) initMenus() {
 			s.mainMenu.SetVisible(false) // Hide menu to prevent double clicks
 		}
 	})
+	// Options
 	s.mainMenu.AddItem("", func() {
 		s.mainMenu.SetVisible(false)
 		s.optionsMenu.SetVisible(true)
 	})
+	// Exit
+	s.mainMenu.AddItem("", func() {
+		// os.Exit(0) is acceptable for a simple game.
+		os.Exit(0)
+	})
 
 	// Options Menu
+	// Back
 	s.optionsMenu.AddItem("", func() {
 		s.optionsMenu.SetVisible(false)
 		s.mainMenu.SetVisible(true)
 	})
+	// Language
 	s.optionsMenu.AddItem("", func() {
 		cfg := config.Get()
 		if cfg.Language == "en" {
@@ -83,6 +93,7 @@ func (s *MenuScene) initMenus() {
 		s.refreshMenuLabels()
 	})
 
+	// Fullscreen
 	s.optionsMenu.AddItem("", func() {
 		cfg := config.Get()
 		cfg.Fullscreen = !cfg.Fullscreen
@@ -100,6 +111,7 @@ func (s *MenuScene) refreshMenuLabels() {
 	// Main Menu
 	s.mainMenu.UpdateItemLabel(0, i18n.T("menu_game_start"))
 	s.mainMenu.UpdateItemLabel(1, i18n.T("menu_options"))
+	s.mainMenu.UpdateItemLabel(2, i18n.T("menu_exit"))
 
 	// Options Menu
 	s.optionsMenu.UpdateItemLabel(0, i18n.T("options_back"))
@@ -113,11 +125,13 @@ func (s *MenuScene) refreshMenuLabels() {
 }
 
 func (s *MenuScene) OnStart() {
-	am := s.AppContext().SceneManager.AudioManager()
-	if am != nil {
-		am.SetVolume(1)
-		am.PlayMusic(TitleSound, true) // Loop menu music
-	}
+	s.Schedule(2*time.Second, func() {
+		am := s.AppContext().SceneManager.AudioManager()
+		if am != nil {
+			am.SetVolume(1)
+			am.PlayMusic(TitleSound, true) // Loop menu music
+		}
+	})
 
 	// Reset state
 	s.count = 0
@@ -132,6 +146,10 @@ func (s *MenuScene) OnStart() {
 }
 
 func (s *MenuScene) Update() error {
+	if err := s.BaseScene.Update(); err != nil {
+		return err
+	}
+
 	canSkipDelay := s.count > timing.FromDuration(time.Second)
 
 	if canSkipDelay && !s.isNavigating {
