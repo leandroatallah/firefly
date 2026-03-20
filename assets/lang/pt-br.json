@@ -1,10 +1,15 @@
 {
   "menu_game_start": "Iniciar Jogo",
   "menu_options": "Opções",
+  "menu_exit": "Sair do Jogo",
   "options_back": "Voltar",
   "options_language": "Idioma",
   "options_fullscreen_on": "Tela Cheia: LIGADO",
   "options_fullscreen_off": "Tela Cheia: DESLIGADO",
-  "story_area1_line1": "Há muito tempo… uma maldição cruel foi lançada. \nO amor de um jovem foi tirado dele. \nEla foi trancada em uma torre de pedra solitária.",
+  "pause_resume": "Retomar",
+  "pause_restart": "Reiniciar",
+  "pause_options": "Opções",
+  "pause_exit": "Sair ao Menu",
+  "story_area1_line1": "Há muito tempo… uma maldição cruel foi lançada. \nO amor de um jovem foi tirado dele. \nEla foi trancada em uma solitária torre de pedra.",
   "story_area1_line2": "O céu escureceu, o vento silenciou… \ne o mundo esqueceu o seu nome."
 }

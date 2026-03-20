@@ -1,10 +1,15 @@
 {
   "menu_game_start": "Game Start",
   "menu_options": "Options",
+  "menu_exit": "Exit Game",
   "options_back": "Back",
   "options_language": "Language",
   "options_fullscreen_on": "Fullscreen: ON",
   "options_fullscreen_off": "Fullscreen: OFF",
+  "pause_resume": "Resume",
+  "pause_restart": "Restart",
+  "pause_options": "Options",
+  "pause_exit": "Exit to Menu",
   "story_area1_line1": "Long ago… a cruel curse was cast. \nA young man’s love was taken from him. \nShe was locked away in a lonely stone tower.",
   "story_area1_line2": "The sky turned dark, the wind fell silent… \nand the world forgot her name."
 }
