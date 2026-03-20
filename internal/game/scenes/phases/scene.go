@@ -183,6 +183,7 @@ func (s *PhasesScene) OnStart() {
 	// Restart
 	s.pauseMenu.AddItem("", func() {
 		s.pauseScreen.Toggle()
+		s.freezeAllActors()
 		ctx.SceneManager.NavigateTo(
 			scenestypes.ScenePhaseReboot,
 			transition.NewFader(0, config.Get().FadeVisibleDuration),
@@ -196,6 +197,7 @@ func (s *PhasesScene) OnStart() {
 	// Exit to Menu
 	s.pauseMenu.AddItem("", func() {
 		s.pauseScreen.Toggle()
+		s.freezeAllActors()
 		ctx.AudioManager.PauseCurrentMusic()
 		// NewRedirectScene
 		ctx.SceneManager.NavigateTo(
