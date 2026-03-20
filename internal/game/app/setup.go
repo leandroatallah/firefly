@@ -26,7 +26,7 @@ func Setup(assets fs.FS) error {
 	// Basic Ebiten setup
 	ebiten.SetWindowSize(cfg.ScreenWidth*3, cfg.ScreenHeight*3)
 	ebiten.SetFullscreen(cfg.Fullscreen)
-	ebiten.SetWindowTitle("The Higher I Climb, The Farther You Are")
+	ebiten.SetWindowTitle("Growbel")
 
 	// Initialize all systems and managers
 	audioManager := audio.NewAudioManager()
