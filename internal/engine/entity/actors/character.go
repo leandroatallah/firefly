@@ -35,11 +35,6 @@ type Character struct {
 
 	skills []skill.Skill
 
-	// Original sprite frame size for correct rendering when body size changes
-	// TODO: Turns it on a behavioral struct. It is too specific.
-	originalFrameWidth  int
-	originalFrameHeight int
-
 	StateTransitionHandler func(*Character) bool
 	OnStateChange          func(oldState, newState ActorStateEnum)
 	bodyphysics.Ownership
@@ -61,10 +56,8 @@ func NewCharacter(s sprites.SpriteMap, bodyRect *bodyphysics.Rect) *Character { 
 		CollidableBody: collidable,
 		AliveBody:      alive,
 
-		SpriteEntity:        spriteEntity,
-		imageOptions:        &ebiten.DrawImageOptions{},
-		originalFrameWidth:  bodyRect.Width(),
-		originalFrameHeight: bodyRect.Height(),
+		SpriteEntity: spriteEntity,
+		imageOptions: &ebiten.DrawImageOptions{},
 	}
 	// Set the owner for all body components to this Character
 	// Body.Owner -> MovableBody (chosen as the primary physical representation)
@@ -141,6 +134,15 @@ func (c *Character) GetCharacter() *Character {
 
 func (c *Character) NewState(state ActorStateEnum) (ActorState, error) {
 	return NewState(c, state)
+}
+
+func (c *Character) SetNewState(state ActorStateEnum) error {
+	s, err := NewState(c, state)
+	if err != nil {
+		return err
+	}
+	c.SetState(s)
+	return nil
 }
 
 func (c *Character) SetNewStateFatal(state ActorStateEnum) {
@@ -236,9 +238,24 @@ func (c *Character) UpdateImageOptions() {
 	}
 	c.imageOptions.GeoM.Reset()
 
-	if s := c.Scale(); s != 0 && s != 1.0 {
-		c.imageOptions.GeoM.Scale(s, s)
+	sprite := c.GetSpriteByState(c.state.State())
+	if sprite == nil || sprite.Image == nil {
+		sprite = c.GetSpriteByState(Idle)
 	}
+	if sprite == nil || sprite.Image == nil {
+		sprite = c.GetFirstSprite()
+	}
+
+	if sprite == nil || sprite.Image == nil {
+		return
+	}
+
+	frameWidth := float64(sprite.Image.Bounds().Dy())
+	frameHeight := frameWidth
+	pos := c.Position()
+	bodyWidth := float64(pos.Dx())
+	bodyHeight := float64(pos.Dy())
+	scale := c.Scale()
 
 	accX, _ := c.Acceleration()
 	fDirection := c.FaceDirection()
@@ -251,18 +268,26 @@ func (c *Character) UpdateImageOptions() {
 
 	c.SetFaceDirection(fDirection)
 
+	// 1. Handle horizontal flip (before scale).
 	if fDirection == animation.FaceDirectionLeft {
-		width := c.Position().Dx()
 		c.imageOptions.GeoM.Scale(-1, 1)
-		c.imageOptions.GeoM.Translate(float64(width), 0)
+		c.imageOptions.GeoM.Translate(frameWidth, 0)
 	}
 
-	// Apply character position
+	// 2. Align the sprite frame's bottom-center to the physical body's bottom-center.
+	// We calculate the raw offset needed to center the unscaled frame over the scaled body.
+	rawOffsetX := (frameWidth - bodyWidth/scale) / 2
+	rawOffsetY := (frameHeight - bodyHeight/scale)
+	c.imageOptions.GeoM.Translate(-rawOffsetX, -rawOffsetY)
+
+	// 3. Apply the character's visual scale.
+	if scale != 0 && scale != 1.0 {
+		c.imageOptions.GeoM.Scale(scale, scale)
+	}
+
+	// 4. Translate the whole assembly to the body's world position.
 	x, y := c.GetPositionMin()
-	c.imageOptions.GeoM.Translate(
-		float64(x),
-		float64(y),
-	)
+	c.imageOptions.GeoM.Translate(float64(x), float64(y))
 }
 
 func (c *Character) handleState() {
@@ -355,10 +380,15 @@ func (c *Character) Image() *ebiten.Image {
 		sprite = c.GetFirstSprite()
 	}
 
-	// Use original frame size for sprite extraction, not current body size
-	// This ensures correct sprite rendering when body size changes (e.g., grow skill)
-	pos := c.Position()
-	frameRect := image.Rect(pos.Min.X, pos.Min.Y, pos.Min.X+c.originalFrameWidth, pos.Min.Y+c.originalFrameHeight)
+	if sprite == nil || sprite.Image == nil {
+		return nil
+	}
+
+	frameHeight := sprite.Image.Bounds().Dy()
+	frameWidth := frameHeight // Assume square frames as per project standard
+
+	// AnimatedSpriteImage only cares about rect dimensions for sub-image extraction.
+	frameRect := image.Rect(0, 0, frameWidth, frameHeight)
 	stateDurationCount := c.state.GetAnimationCount(c.count)
 	return c.AnimatedSpriteImage(sprite, frameRect, stateDurationCount, c.SpriteEntity.FrameRate())
 }

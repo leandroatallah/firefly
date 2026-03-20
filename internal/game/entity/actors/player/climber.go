@@ -26,7 +26,23 @@ func climberStateTransitionLogic(c *actors.Character) bool {
 		return true
 	}
 
-	if state == gamestates.Exiting || state == gamestates.Lying || state == gamestates.Rising {
+	if state == gamestates.Growing && c.IsAnimationFinished() {
+		c.SetNewStateFatal(actors.Idle)
+		if p, ok := c.Owner().(interface{ SetScale(float64) }); ok {
+			p.SetScale(2.0)
+		}
+		return true
+	}
+
+	if state == gamestates.Shrinking && c.IsAnimationFinished() {
+		c.SetNewStateFatal(actors.Idle)
+		if p, ok := c.Owner().(interface{ SetScale(float64) }); ok {
+			p.SetScale(1.0)
+		}
+		return true
+	}
+
+	if state == gamestates.Exiting || state == gamestates.Lying || state == gamestates.Rising || state == gamestates.Growing || state == gamestates.Shrinking {
 		return true
 	}
 
@@ -162,7 +178,7 @@ func (p *ClimberPlayer) GetCharacter() *actors.Character {
 }
 
 func (p *ClimberPlayer) Hurt(damage int) {
-	if p.IsStarActive() {
+	if p.IsStarActive() || p.IsGrowActive() {
 		return
 	}
 	if p.State() == gamestates.Dying {
