@@ -34,7 +34,7 @@ func NewFreezePowerItem(ctx *app.AppContext, x, y int, id string) (*FreezePowerI
 	}
 
 	// Initialize base item
-	base, err := createPowerUpBase(ctx, x, y, id, "internal/game/entity/items/power.json", powerItem.activateSkill)
+	base, err := createPowerUpBase(ctx, x, y, id, "assets/entities/items/power.json", powerItem.activateSkill)
 	if err != nil {
 		return nil, err
 	}

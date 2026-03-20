@@ -86,11 +86,7 @@ func (s *StoryScene) OnStart() {
 		return
 	}
 
-	sequence, err := sequences.NewSequenceFromJSON(phase.SequencePath)
-	if err != nil {
-		log.Fatal(err)
-	}
-	s.sequencePlayer.Play(sequence)
+	s.sequencePlayer.PlaySequence(phase.SequencePath)
 	s.isPlayingSequence = true
 }
 

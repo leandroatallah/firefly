@@ -1,18 +1,28 @@
 package gamescene
 
 import (
+	"os"
 	"testing"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/engine/app"
+	"github.com/leandroatallah/firefly/internal/engine/assets/font"
+	"github.com/leandroatallah/firefly/internal/engine/data/config"
 	"github.com/leandroatallah/firefly/internal/engine/mocks"
 	"github.com/leandroatallah/firefly/internal/engine/physics/space"
 )
 
 func TestCreditsScene_Structure(t *testing.T) {
+	moduleRoot := getModuleRoot()
+	fontMain, err := font.NewFontText(os.DirFS(moduleRoot), config.Get().MainFontFace)
+	if err != nil {
+		t.Fatalf("failed to load font: %v", err)
+	}
+
 	mockNav := &mocks.MockSceneManager{}
 	ctx := &app.AppContext{
 		SceneManager: mockNav,
+		Font:         fontMain,
 	}
 
 	s := NewCreditsScene(ctx)
@@ -32,10 +42,17 @@ func TestCreditsScene_Structure(t *testing.T) {
 }
 
 func TestCreditsScene_Lifecycle(t *testing.T) {
+	moduleRoot := getModuleRoot()
+	fontMain, err := font.NewFontText(os.DirFS(moduleRoot), config.Get().MainFontFace)
+	if err != nil {
+		t.Fatalf("failed to load font: %v", err)
+	}
+
 	mockNav := &mocks.MockSceneManager{}
 	ctx := &app.AppContext{
 		SceneManager: mockNav,
 		Space:        space.NewSpace(),
+		Font:         fontMain,
 	}
 	s := NewCreditsScene(ctx)
 
@@ -43,7 +60,7 @@ func TestCreditsScene_Lifecycle(t *testing.T) {
 	s.OnStart()
 
 	// Test Update doesn't panic
-	err := s.Update()
+	err = s.Update()
 	if err != nil {
 		t.Errorf("Update returned error: %v", err)
 	}
@@ -57,9 +74,17 @@ func TestCreditsScene_Lifecycle(t *testing.T) {
 }
 
 func TestCreditsScene_Draw(t *testing.T) {
+	moduleRoot := getModuleRoot()
+	fontMain, err := font.NewFontText(os.DirFS(moduleRoot), config.Get().MainFontFace)
+	if err != nil {
+		t.Fatalf("failed to load font: %v", err)
+	}
+
 	mockNav := &mocks.MockSceneManager{}
 	ctx := &app.AppContext{
 		SceneManager: mockNav,
+		Font:         fontMain,
+		Space:        space.NewSpace(),
 	}
 	s := NewCreditsScene(ctx)
 	s.OnStart()

@@ -17,7 +17,7 @@ type SwarmEnemy struct {
 
 // NewSwarmEnemy creates a new swarm enemy.
 func NewSwarmEnemy(ctx *app.AppContext, x, y int, id string) (*SwarmEnemy, error) {
-	character, spriteData, statData, stateMap, err := builder.PreparePlatformer(ctx, "internal/game/entity/actors/enemies/swarm.json")
+	character, spriteData, statData, stateMap, err := builder.PreparePlatformer(ctx, "assets/entities/enemies/swarm.json")
 	if err != nil {
 		return nil, err
 	}

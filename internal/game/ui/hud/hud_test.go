@@ -140,8 +140,8 @@ func TestMain(m *testing.M) {
 func TestNewStatusBar(t *testing.T) {
 	// StatusBar expects platformer.PlatformerActorEntity
 	// Let's see what that interface is.
-	
-	sb, err := NewStatusBar(nil, 100)
+
+	sb, err := NewStatusBar(nil, 100, nil, os.DirFS("."))
 	if err != nil {
 		t.Fatalf("failed to create StatusBar: %v", err)
 	}
@@ -156,7 +156,7 @@ func TestNewStatusBar(t *testing.T) {
 }
 
 func TestStatusBar_Update(t *testing.T) {
-	sb, err := NewStatusBar(nil, 100)
+	sb, err := NewStatusBar(nil, 100, nil, os.DirFS("."))
 	if err != nil {
 		t.Fatalf("failed to create StatusBar: %v", err)
 	}
@@ -169,7 +169,7 @@ func TestStatusBar_Update(t *testing.T) {
 func TestStatusBar_Draw(t *testing.T) {
 	// Note: Testing Draw with a real player requires full PlatformerActorEntity implementation
 	// For now, test the nil player case which exercises the early return logic
-	sb, err := NewStatusBar(nil, 100)
+	sb, err := NewStatusBar(nil, 100, nil, os.DirFS("."))
 	if err != nil {
 		t.Fatalf("failed to create StatusBar: %v", err)
 	}

@@ -40,11 +40,11 @@ func Setup(assets fs.FS) error {
 	}
 
 	// Initialize Dialogue Manager
-	fontMain, err := font.NewFontText(cfg.MainFontFace)
+	fontMain, err := font.NewFontText(assets, cfg.MainFontFace)
 	if err != nil {
 		return err
 	}
-	fontSmall, err := font.NewFontText(cfg.SmallFontFace)
+	fontSmall, err := font.NewFontText(assets, cfg.SmallFontFace)
 	if err != nil {
 		return err
 	}
@@ -52,7 +52,7 @@ func Setup(assets fs.FS) error {
 	speechFontMain := speech.NewSpeechFont(fontMain, 8, 14)
 	speechFontSmall := speech.NewSpeechFont(fontSmall, 8, 12)
 
-	speechBubble := gamespeech.NewSpeechBubble(speechFontMain, i18nManager)
+	speechBubble := gamespeech.NewSpeechBubble(assets, speechFontMain, i18nManager)
 	speechStory := gamespeech.NewStorySpeech(speechFontSmall, i18nManager)
 	dialogueManager := speech.NewManager(speechBubble, speechStory)
 	dialogueManager.SetActiveSpeech(speech.BubbleSpeechID)
@@ -64,7 +64,7 @@ func Setup(assets fs.FS) error {
 	audio.LoadAudioAssetsFromFS(assets, audioManager)
 
 	// Load VFX Manager (particles + floating text)
-	vfxManager := vfx.NewManager("assets/particles/vfx.json")
+	vfxManager := vfx.NewManager(assets, "assets/particles/vfx.json")
 	vfxManager.SetDefaultFont(fontMain)
 
 	// Load phases

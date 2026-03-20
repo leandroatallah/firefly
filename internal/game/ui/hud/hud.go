@@ -1,15 +1,15 @@
 package gamehud
 
 import (
+	"bytes"
 	"fmt"
 	"image/color"
-	"log"
+	"io/fs"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
 	"github.com/leandroatallah/firefly/internal/engine/assets/font"
-	"github.com/leandroatallah/firefly/internal/engine/data/config"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors/platformer"
 )
 
@@ -25,15 +25,14 @@ type StatusBar struct {
 	mainText *font.FontText
 }
 
-func NewStatusBar(player platformer.PlatformerActorEntity, score int) (*StatusBar, error) {
-	heart, _, err := ebitenutil.NewImageFromFile("assets/images/heart.png")
+func NewStatusBar(player platformer.PlatformerActorEntity, score int, mainText *font.FontText, fsys fs.FS) (*StatusBar, error) {
+	heartData, err := fs.ReadFile(fsys, "assets/images/heart.png")
 	if err != nil {
 		return nil, err
 	}
-
-	mainText, err := font.NewFontText(config.Get().MainFontFace)
+	heart, _, err := ebitenutil.NewImageFromReader(bytes.NewReader(heartData))
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	return &StatusBar{

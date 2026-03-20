@@ -2,7 +2,6 @@ package gamescene
 
 import (
 	"image/color"
-	"log"
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -47,13 +46,9 @@ type IntroScene struct {
 }
 
 func NewIntroScene(context *app.AppContext) *IntroScene {
-	fontText, err := font.NewFontText(config.Get().MainFontFace)
-	if err != nil {
-		log.Fatal(err)
-	}
 	overlay := ebiten.NewImage(config.Get().ScreenWidth, config.Get().ScreenHeight)
 	overlay.Fill(color.Black)
-	scene := IntroScene{fontText: fontText, fadeOverlay: overlay}
+	scene := IntroScene{fontText: context.Font, fadeOverlay: overlay}
 	scene.SetAppContext(context)
 	return &scene
 }

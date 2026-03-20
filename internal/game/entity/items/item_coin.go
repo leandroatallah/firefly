@@ -16,7 +16,7 @@ type CollectibleCoinItem struct {
 }
 
 func NewCollectibleCoinItem(ctx *app.AppContext, x, y int, id string) (*CollectibleCoinItem, error) {
-	spriteData, statData, err := jsonutil.ParseSpriteAndStats[items.StatData]("internal/game/entity/items/coin.json")
+	spriteData, statData, err := jsonutil.ParseSpriteAndStats[items.StatData](ctx.Assets, "assets/entities/items/coin.json")
 	if err != nil {
 		return nil, err
 	}

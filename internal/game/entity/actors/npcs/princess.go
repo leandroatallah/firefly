@@ -16,7 +16,7 @@ type Princess struct {
 
 // NewPrincess creates a new princess NPC.
 func NewPrincess(ctx *app.AppContext, x, y int, id string) (*Princess, error) {
-	character, spriteData, statData, stateMap, err := builder.PreparePlatformer(ctx, "internal/game/entity/actors/npcs/princess.json")
+	character, spriteData, statData, stateMap, err := builder.PreparePlatformer(ctx, "assets/entities/npcs/princess.json")
 	if err != nil {
 		return nil, err
 	}

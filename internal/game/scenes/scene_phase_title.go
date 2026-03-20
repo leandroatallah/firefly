@@ -27,12 +27,8 @@ type PhaseTitleScene struct {
 }
 
 func NewPhaseTitleScene(ctx *app.AppContext) *PhaseTitleScene {
-	fontText, err := font.NewFontText(config.Get().SmallFontFace)
-	if err != nil {
-		log.Fatal(err)
-	}
 	s := &PhaseTitleScene{
-		fontText: fontText,
+		fontText: ctx.Font,
 	}
 	s.SetAppContext(ctx)
 	return s

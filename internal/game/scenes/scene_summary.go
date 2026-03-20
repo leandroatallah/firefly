@@ -2,7 +2,6 @@ package gamescene
 
 import (
 	"image/color"
-	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
@@ -23,13 +22,9 @@ type SummaryScene struct {
 }
 
 func NewSummaryScene(context *app.AppContext) *SummaryScene {
-	fontText, err := font.NewFontText(config.Get().MainFontFace)
-	if err != nil {
-		log.Fatal(err)
-	}
 	overlay := ebiten.NewImage(config.Get().ScreenWidth, config.Get().ScreenHeight)
 	overlay.Fill(color.Black)
-	scene := SummaryScene{fontText: fontText}
+	scene := SummaryScene{fontText: context.Font}
 	scene.SetAppContext(context)
 	return &scene
 }

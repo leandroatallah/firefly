@@ -1,7 +1,9 @@
 package gamespeech
 
 import (
+	"bytes"
 	"image/color"
+	"io/fs"
 	"log"
 
 	"github.com/ebitenui/ebitenui/image"
@@ -18,9 +20,13 @@ type SpeechBubble struct {
 	nineSlice *image.NineSlice
 }
 
-func NewSpeechBubble(fontSource *speech.SpeechFont, i18nManager *i18n.I18nManager) *SpeechBubble {
+func NewSpeechBubble(fsys fs.FS, fontSource *speech.SpeechFont, i18nManager *i18n.I18nManager) *SpeechBubble {
 	// Load 9-slice bubble image
-	img, _, err := ebitenutil.NewImageFromFile("assets/images/9-slice-speech.png")
+	imgData, err := fs.ReadFile(fsys, "assets/images/9-slice-speech.png")
+	if err != nil {
+		log.Fatal(err)
+	}
+	img, _, err := ebitenutil.NewImageFromReader(bytes.NewReader(imgData))
 	if err != nil {
 		log.Fatal(err)
 	}

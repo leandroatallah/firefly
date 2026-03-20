@@ -3,7 +3,6 @@ package gamescene
 import (
 	"fmt"
 	"image/color"
-	"log"
 	"math/rand"
 	"os"
 	"strings"
@@ -47,19 +46,9 @@ type MenuScene struct {
 }
 
 func NewMenuScene(context *app.AppContext) *MenuScene {
-	fontText, err := font.NewFontText(config.Get().MainFontFace)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fontSmall, err := font.NewFontText(config.Get().SmallFontFace)
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	scene := MenuScene{
-		fontText:        fontText,
-		fontSmall:       fontSmall,
+		fontText:        context.Font,
+		fontSmall:       context.Font, // Using same font, different size via Draw options
 		camera:          camera.NewController(0, 0),
 		particles:       particles.NewSystem(),
 		bgParticles:     particles.NewSystem(),

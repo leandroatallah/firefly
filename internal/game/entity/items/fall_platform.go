@@ -33,7 +33,7 @@ type FallingPlatformItem struct {
 }
 
 func NewFallingPlatformItem(ctx *app.AppContext, x, y int, id string) (*FallingPlatformItem, error) {
-	spriteData, statData, err := jsonutil.ParseSpriteAndStats[items.StatData]("internal/game/entity/items/fall_platform.json")
+	spriteData, statData, err := jsonutil.ParseSpriteAndStats[items.StatData](ctx.Assets, "assets/entities/items/fall_platform.json")
 	if err != nil {
 		return nil, err
 	}

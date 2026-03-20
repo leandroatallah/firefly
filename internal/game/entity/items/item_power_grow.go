@@ -34,7 +34,7 @@ func NewGrowPowerItem(ctx *app.AppContext, x, y int, id string) (*GrowPowerItem,
 	}
 	
 	// Initialize base item
-	base, err := createPowerUpBase(ctx, x, y, id, "internal/game/entity/items/item-power-grow.json", powerItem.activateSkill)
+	base, err := createPowerUpBase(ctx, x, y, id, "assets/entities/items/item-power-grow.json", powerItem.activateSkill)
 	if err != nil {
 		return nil, err
 	}

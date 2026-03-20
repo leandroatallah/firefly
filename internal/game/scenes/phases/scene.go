@@ -79,14 +79,10 @@ type PhasesScene struct {
 }
 
 func NewPhasesScene(ctx *app.AppContext) *PhasesScene {
-	mainText, err := font.NewFontText(config.Get().MainFontFace)
-	if err != nil {
-		log.Fatal(err)
-	}
 	tilemapScene := scene.NewTilemapScene(ctx)
 	scene := &PhasesScene{
 		TilemapScene: tilemapScene,
-		mainText:     mainText,
+		mainText:     ctx.Font,
 		bodyCounter:  &BodyCounter{},
 		vignette:     enginevfx.NewVignette(),
 	}
@@ -269,12 +265,7 @@ func (s *PhasesScene) OnStart() {
 	if err == nil && phase.SequencePath != "" {
 		s.sequencePlayer = sequences.NewSequencePlayer(ctx)
 		s.allowPause = phase.GoalType != SequenceGoalType
-		seq, err := sequences.NewSequenceFromJSON(phase.SequencePath)
-		if err != nil {
-			log.Printf("Failed to load sequence: %v", err)
-		} else {
-			s.sequencePlayer.Play(seq)
-		}
+		s.sequencePlayer.PlaySequence(phase.SequencePath)
 	}
 
 	s.initGoal()

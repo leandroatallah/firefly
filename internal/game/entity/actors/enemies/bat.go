@@ -17,7 +17,7 @@ type BatEnemy struct {
 
 // NewBatEnemy creates a new bat enemy.
 func NewBatEnemy(ctx *app.AppContext, x, y int, id string) (*BatEnemy, error) {
-	character, spriteData, statData, stateMap, err := builder.PreparePlatformer(ctx, "internal/game/entity/actors/enemies/bat.json")
+	character, spriteData, statData, stateMap, err := builder.PreparePlatformer(ctx, "assets/entities/enemies/bat.json")
 	if err != nil {
 		return nil, err
 	}

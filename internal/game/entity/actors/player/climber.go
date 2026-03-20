@@ -82,7 +82,7 @@ type ClimberPlayer struct {
 
 // NewClimberPlayer creates a new climber player.
 func NewClimberPlayer(ctx *app.AppContext) (platformer.PlatformerActorEntity, error) {
-	character, spriteData, statData, stateMap, err := builder.PreparePlatformer(ctx, "internal/game/entity/actors/player/climber.json")
+	character, spriteData, statData, stateMap, err := builder.PreparePlatformer(ctx, "assets/entities/player/climber.json")
 	if err != nil {
 		return nil, err
 	}

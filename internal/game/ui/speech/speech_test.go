@@ -44,14 +44,15 @@ func TestMain(m *testing.M) {
 }
 
 func TestSpeechBubble(t *testing.T) {
-	fontMain, err := font.NewFontText(config.Get().MainFontFace)
+	moduleRoot := getModuleRoot()
+	fontMain, err := font.NewFontText(os.DirFS(moduleRoot), config.Get().MainFontFace)
 	if err != nil {
 		t.Fatalf("failed to load font: %v", err)
 	}
 	speechFont := speech.NewSpeechFont(fontMain, 8, 14)
-	
-	i18nManager := i18n.NewI18nManager(os.DirFS("."))
-	sb := NewSpeechBubble(speechFont, i18nManager)
+
+	i18nManager := i18n.NewI18nManager(os.DirFS(moduleRoot))
+	sb := NewSpeechBubble(os.DirFS(moduleRoot), speechFont, i18nManager)
 	if sb == nil {
 		t.Fatal("NewSpeechBubble returned nil")
 	}
@@ -62,24 +63,25 @@ func TestSpeechBubble(t *testing.T) {
 	}
 
 	sb.Update()
-	
+
 	screen := ebiten.NewImage(320, 240)
 	sb.Draw(screen, "Hello World")
 
 	sb.Hide()
 	sb.Update()
-	
+
 	sb.ResetText()
 }
 
 func TestStorySpeech(t *testing.T) {
-	fontSmall, err := font.NewFontText(config.Get().SmallFontFace)
+	moduleRoot := getModuleRoot()
+	fontSmall, err := font.NewFontText(os.DirFS(moduleRoot), config.Get().SmallFontFace)
 	if err != nil {
 		t.Fatalf("failed to load font: %v", err)
 	}
 	speechFont := speech.NewSpeechFont(fontSmall, 8, 12)
-	
-	i18nManager := i18n.NewI18nManager(os.DirFS("."))
+
+	i18nManager := i18n.NewI18nManager(os.DirFS(moduleRoot))
 	ss := NewStorySpeech(speechFont, i18nManager)
 	if ss == nil {
 		t.Fatal("NewStorySpeech returned nil")
@@ -87,9 +89,9 @@ func TestStorySpeech(t *testing.T) {
 
 	ss.Show()
 	ss.Update()
-	
+
 	screen := ebiten.NewImage(320, 240)
 	ss.Draw(screen, "Once upon a time...")
-	
+
 	ss.Hide()
 }

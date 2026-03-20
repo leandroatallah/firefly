@@ -20,7 +20,7 @@ type PowerUpItem struct {
 
 // NewPowerUpItem creates a new power-up item with the given sprite config and skill activation callback.
 func NewPowerUpItem(ctx *app.AppContext, x, y int, id string, spriteConfigPath string, activateSkill func()) (*PowerUpItem, error) {
-	spriteData, statData, err := jsonutil.ParseSpriteAndStats[items.StatData](spriteConfigPath)
+	spriteData, statData, err := jsonutil.ParseSpriteAndStats[items.StatData](ctx.Assets, spriteConfigPath)
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +60,7 @@ func (p *PowerUpItem) SetOnCollect(fn func()) {
 // createPowerUpBase creates a base item for power-ups with the given sprite config and callback.
 // This is a helper function for power-up items that need to reference themselves in the callback.
 func createPowerUpBase(ctx *app.AppContext, x, y int, id string, spriteConfigPath string, activateSkill func()) (*items.BaseItem, error) {
-	spriteData, statData, err := jsonutil.ParseSpriteAndStats[items.StatData](spriteConfigPath)
+	spriteData, statData, err := jsonutil.ParseSpriteAndStats[items.StatData](ctx.Assets, spriteConfigPath)
 	if err != nil {
 		return nil, err
 	}

@@ -34,7 +34,7 @@ func NewStarPowerItem(ctx *app.AppContext, x, y int, id string) (*StarPowerItem,
 	}
 
 	// Initialize base item
-	base, err := createPowerUpBase(ctx, x, y, id, "internal/game/entity/items/star.json", powerItem.activateSkill)
+	base, err := createPowerUpBase(ctx, x, y, id, "assets/entities/items/star.json", powerItem.activateSkill)
 	if err != nil {
 		return nil, err
 	}

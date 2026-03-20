@@ -2,7 +2,6 @@ package gamescene
 
 import (
 	"image/color"
-	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
@@ -32,19 +31,9 @@ type CreditsScene struct {
 
 // NewCreditsScene creates a new credits scene
 func NewCreditsScene(context *app.AppContext) *CreditsScene {
-	fontTitle, err := font.NewFontText(config.Get().MainFontFace)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fontText, err := font.NewFontText(config.Get().SmallFontFace)
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	s := &CreditsScene{
-		fontTitle:   fontTitle,
-		fontText:    fontText,
+		fontTitle:   context.Font,
+		fontText:    context.Font,
 		scrollSpeed: 0.5,
 		credits:     buildCredits(),
 	}
