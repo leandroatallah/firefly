@@ -78,20 +78,29 @@ func (s *MenuScene) initMenus() {
 	s.optionsMenu.SetFontSize(8)
 	s.optionsMenu.SetItemSpacing(8)
 
-	// Set up navigation callback for screen shake
+	// Set up navigation callback for screen shake and sound
 	s.mainMenu.SetOnNavigate(func() {
-		s.camera.AddTrauma(0.5)
+		s.camera.AddTrauma(0.2)
+		s.AppContext().AudioManager.PlaySound("assets/audio/Menu_Click.ogg")
 	})
 	s.optionsMenu.SetOnNavigate(func() {
-		s.camera.AddTrauma(0.5)
+		s.camera.AddTrauma(0.2)
+		s.AppContext().AudioManager.PlaySound("assets/audio/Menu_Click.ogg")
 	})
 
-	// Set up selection callback for particle effect (only on Game Start)
+	// Set up selection callback for particle effect and sound (only on Game Start)
 	s.mainMenu.SetOnSelect(func() {
+		// Play selection sound
+		s.AppContext().AudioManager.PlaySound("assets/audio/Menu_Select2.ogg")
 		// Only spawn particles for Game Start (first item)
 		if s.mainMenu.SelectedIndex() == 0 {
 			s.spawnParticles()
 		}
+	})
+
+	// Options Menu selection callback (for Back option)
+	s.optionsMenu.SetOnSelect(func() {
+		s.AppContext().AudioManager.PlaySound("assets/audio/Menu_Select2.ogg")
 	})
 
 	// Main Menu
