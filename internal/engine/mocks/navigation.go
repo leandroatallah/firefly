@@ -62,6 +62,7 @@ func (t *MockTransition) StartTransition(cb func()) {
 	t.StartCallback = cb
 }
 func (t *MockTransition) EndTransition(cb func()) { cb() }
+func (t *MockTransition) IsRunning() bool         { return t.StartCalled }
 
 // Complete simulates the transition completion
 func (t *MockTransition) Complete() {
@@ -78,6 +79,7 @@ type MockSceneManager struct {
 	LastFresh      bool
 	NavigateCalls  int
 	CurrentSceneTo navigation.Scene
+	Transitioning  bool
 }
 
 func (m *MockSceneManager) AudioManager() *audio.AudioManager { return nil }
@@ -94,3 +96,4 @@ func (m *MockSceneManager) Update() error {
 	return nil
 }
 func (m *MockSceneManager) CurrentScene() navigation.Scene { return m.CurrentSceneTo }
+func (m *MockSceneManager) IsTransitioning() bool          { return m.Transitioning }

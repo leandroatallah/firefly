@@ -121,3 +121,8 @@ func (m *SceneManager) AudioManager() *audio.AudioManager {
 func (m *SceneManager) CurrentScene() navigation.Scene {
 	return m.current
 }
+
+// IsTransitioning returns true if a scene transition is currently in progress.
+func (m *SceneManager) IsTransitioning() bool {
+	return m.transitioner != nil && m.transitioner.IsRunning()
+}

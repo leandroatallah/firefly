@@ -7,8 +7,8 @@
     {
       "command": "dialogue",
       "lines": [
-        "Long ago… a cruel curse was cast. \nA young man’s love was taken from him. \nShe was locked away in a lonely stone tower.",
-        "The sky turned dark, the wind fell silent… \nand the world forgot her name."
+        "story_area1_line1",
+        "story_area1_line2"
       ],
       "position": "top",
       "speech_speed": 1,

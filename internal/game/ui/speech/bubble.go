@@ -8,6 +8,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/leandroatallah/firefly/internal/engine/data/config"
+	"github.com/leandroatallah/firefly/internal/engine/data/i18n"
 	"github.com/leandroatallah/firefly/internal/engine/ui/speech"
 )
 
@@ -17,7 +18,7 @@ type SpeechBubble struct {
 	nineSlice *image.NineSlice
 }
 
-func NewSpeechBubble(fontSource *speech.SpeechFont) *SpeechBubble {
+func NewSpeechBubble(fontSource *speech.SpeechFont, i18nManager *i18n.I18nManager) *SpeechBubble {
 	// Load 9-slice bubble image
 	img, _, err := ebitenutil.NewImageFromFile("assets/images/9-slice-speech.png")
 	if err != nil {
@@ -32,7 +33,7 @@ func NewSpeechBubble(fontSource *speech.SpeechFont) *SpeechBubble {
 	indicatorImg.Fill(color.Black)
 
 	s := &SpeechBubble{
-		baseSpeech: newBaseSpeech(fontSource),
+		baseSpeech: newBaseSpeech(fontSource, i18nManager),
 		nineSlice:  ns,
 	}
 	s.SetID(speech.BubbleSpeechID)

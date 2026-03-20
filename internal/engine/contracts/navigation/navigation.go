@@ -33,6 +33,7 @@ type SceneManager interface {
 	SwitchTo(scene Scene)
 	Update() error
 	CurrentScene() Scene
+	IsTransitioning() bool
 }
 
 type Transition interface {
@@ -40,4 +41,5 @@ type Transition interface {
 	Draw(screen *ebiten.Image)
 	StartTransition(func())
 	EndTransition(func())
+	IsRunning() bool
 }

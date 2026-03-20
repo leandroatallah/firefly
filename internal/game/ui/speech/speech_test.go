@@ -8,6 +8,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/engine/assets/font"
 	"github.com/leandroatallah/firefly/internal/engine/data/config"
+	"github.com/leandroatallah/firefly/internal/engine/data/i18n"
 	"github.com/leandroatallah/firefly/internal/engine/ui/speech"
 )
 
@@ -49,7 +50,8 @@ func TestSpeechBubble(t *testing.T) {
 	}
 	speechFont := speech.NewSpeechFont(fontMain, 8, 14)
 	
-	sb := NewSpeechBubble(speechFont)
+	i18nManager := i18n.NewI18nManager(os.DirFS("."))
+	sb := NewSpeechBubble(speechFont, i18nManager)
 	if sb == nil {
 		t.Fatal("NewSpeechBubble returned nil")
 	}
@@ -77,7 +79,8 @@ func TestStorySpeech(t *testing.T) {
 	}
 	speechFont := speech.NewSpeechFont(fontSmall, 8, 12)
 	
-	ss := NewStorySpeech(speechFont)
+	i18nManager := i18n.NewI18nManager(os.DirFS("."))
+	ss := NewStorySpeech(speechFont, i18nManager)
 	if ss == nil {
 		t.Fatal("NewStorySpeech returned nil")
 	}
