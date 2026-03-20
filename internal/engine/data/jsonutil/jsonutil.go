@@ -2,7 +2,7 @@ package jsonutil
 
 import (
 	"encoding/json"
-	"os"
+	"io/fs"
 
 	"github.com/leandroatallah/firefly/internal/engine/data/schemas"
 )
@@ -12,9 +12,9 @@ type SpriteAndStats[T any] struct {
 	StatData   T                  `json:"stats"`
 }
 
-func ParseSpriteAndStats[T any](path string) (schemas.SpriteData, T, error) {
+func ParseSpriteAndStats[T any](fsys fs.FS, path string) (schemas.SpriteData, T, error) {
 	var zero T
-	data, err := os.ReadFile(path)
+	data, err := fs.ReadFile(fsys, path)
 	if err != nil {
 		return schemas.SpriteData{}, zero, err
 	}

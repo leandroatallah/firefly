@@ -1,13 +1,13 @@
 package tilemap
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"image"
 	_ "image/png"
-	"io"
+	"io/fs"
 	"log"
-	"os"
 	"path/filepath"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -193,20 +193,14 @@ func (t *Tilemap) Reset(screen *ebiten.Image) {
 	t.imageOptions.GeoM.Reset()
 }
 
-func LoadTilemap(path string) (*Tilemap, error) {
-	jsonFile, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-	defer jsonFile.Close()
-
-	byteValue, err := io.ReadAll(jsonFile)
+func LoadTilemap(fsys fs.FS, path string) (*Tilemap, error) {
+	data, err := fs.ReadFile(fsys, path)
 	if err != nil {
 		return nil, err
 	}
 
 	var tilemap Tilemap
-	if err := json.Unmarshal(byteValue, &tilemap); err != nil {
+	if err := json.Unmarshal(data, &tilemap); err != nil {
 		return nil, err
 	}
 	tilemap.imageOptions = &ebiten.DrawImageOptions{}
@@ -214,7 +208,7 @@ func LoadTilemap(path string) (*Tilemap, error) {
 	// After loading the tilemap structure, load the associated tileset images.
 	for _, ts := range tilemap.Tilesets {
 		imagePath := filepath.Join(filepath.Dir(path), ts.Image)
-		img, err := loadImage(imagePath)
+		img, err := loadImage(fsys, imagePath)
 		if err != nil {
 			return nil, fmt.Errorf("failed to load tileset image %s: %w", imagePath, err)
 		}
@@ -225,14 +219,13 @@ func LoadTilemap(path string) (*Tilemap, error) {
 }
 
 // loadImage is a helper function to load an image from a file path.
-func loadImage(path string) (*ebiten.Image, error) {
-	f, err := os.Open(path)
+func loadImage(fsys fs.FS, path string) (*ebiten.Image, error) {
+	data, err := fs.ReadFile(fsys, path)
 	if err != nil {
 		return nil, err
 	}
-	defer f.Close()
 
-	img, _, err := image.Decode(f)
+	img, _, err := image.Decode(bytes.NewReader(data))
 	if err != nil {
 		return nil, err
 	}

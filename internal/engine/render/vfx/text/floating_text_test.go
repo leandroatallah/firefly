@@ -2,8 +2,9 @@ package text_test
 
 import (
 	"image/color"
-	"testing"
 	"os"
+	"path/filepath"
+	"testing"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/leandroatallah/firefly/internal/engine/assets/font"
@@ -11,6 +12,21 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/render/camera"
 	"github.com/leandroatallah/firefly/internal/engine/render/vfx/text"
 )
+
+// getModuleRoot returns the absolute path to the module root
+func getModuleRoot() string {
+	dir, _ := os.Getwd()
+	for {
+		if _, err := os.Stat(filepath.Join(dir, "go.mod")); err == nil {
+			return dir
+		}
+		parent := filepath.Dir(dir)
+		if parent == dir {
+			panic("could not find go.mod")
+		}
+		dir = parent
+	}
+}
 
 // mockFloatingText implements text.FloatingText for testing
 type mockFloatingText struct {
@@ -98,14 +114,12 @@ func TestFloatingTextBase_DrawText_WithCamera(t *testing.T) {
 	cam.SetCenter(100, 100)
 
 	ft := text.NewFloatingText("test", 100, 100, 10)
-	
-	// Try to load a real font from assets for the test
-	fontPath := "../../../../../assets/fonts/monogram.ttf"
-	if _, err := os.Stat(fontPath); err == nil {
-		f, err := font.NewFontText(fontPath)
-		if err == nil {
-			ft.SetFont(f)
-		}
+
+	// Load font from embedded FS
+	moduleRoot := getModuleRoot()
+	f, err := font.NewFontText(os.DirFS(moduleRoot), "assets/fonts/monogram.ttf")
+	if err == nil {
+		ft.SetFont(f)
 	} else {
 		// Fallback to testing without a font if assets are not reachable
 		ft.SetFont(nil)
@@ -113,7 +127,7 @@ func TestFloatingTextBase_DrawText_WithCamera(t *testing.T) {
 
 	screen := ebiten.NewImage(320, 240)
 	ft.DrawText(screen, 100, 100, cam)
-	
+
 	// Test without camera
 	ft.DrawText(screen, 100, 100, nil)
 }

@@ -27,7 +27,7 @@ func getModuleRoot() string {
 
 func TestNewFontText(t *testing.T) {
 	moduleRoot := getModuleRoot()
-	font, err := NewFontText(filepath.Join(moduleRoot, "assets/fonts/tiny5.ttf"))
+	font, err := NewFontText(os.DirFS(moduleRoot), "assets/fonts/tiny5.ttf")
 	if err != nil {
 		t.Fatalf("NewFontText failed: %v", err)
 	}
@@ -42,7 +42,8 @@ func TestNewFontText(t *testing.T) {
 }
 
 func TestNewFontTextNotFound(t *testing.T) {
-	font, err := NewFontText("nonexistent.ttf")
+	moduleRoot := getModuleRoot()
+	font, err := NewFontText(os.DirFS(moduleRoot), "nonexistent.ttf")
 	if err == nil {
 		t.Fatal("expected error for nonexistent font, got nil")
 	}
@@ -53,7 +54,7 @@ func TestNewFontTextNotFound(t *testing.T) {
 
 func TestFontTextNewFace(t *testing.T) {
 	moduleRoot := getModuleRoot()
-	font, err := NewFontText(filepath.Join(moduleRoot, "assets/fonts/tiny5.ttf"))
+	font, err := NewFontText(os.DirFS(moduleRoot), "assets/fonts/tiny5.ttf")
 	if err != nil {
 		t.Fatalf("NewFontText failed: %v", err)
 	}
@@ -74,7 +75,7 @@ func TestFontTextNewFace(t *testing.T) {
 
 func TestFontTextNewFaceDifferentSizes(t *testing.T) {
 	moduleRoot := getModuleRoot()
-	font, err := NewFontText(filepath.Join(moduleRoot, "assets/fonts/tiny5.ttf"))
+	font, err := NewFontText(os.DirFS(moduleRoot), "assets/fonts/tiny5.ttf")
 	if err != nil {
 		t.Fatalf("NewFontText failed: %v", err)
 	}
@@ -93,7 +94,7 @@ func TestFontTextNewFaceDifferentSizes(t *testing.T) {
 
 func TestFontTextDraw(t *testing.T) {
 	moduleRoot := getModuleRoot()
-	font, err := NewFontText(filepath.Join(moduleRoot, "assets/fonts/tiny5.ttf"))
+	font, err := NewFontText(os.DirFS(moduleRoot), "assets/fonts/tiny5.ttf")
 	if err != nil {
 		t.Fatalf("NewFontText failed: %v", err)
 	}
@@ -117,7 +118,7 @@ func TestFontTextDrawWithNilSource(t *testing.T) {
 
 func TestFontTextDrawEmptyString(t *testing.T) {
 	moduleRoot := getModuleRoot()
-	font, err := NewFontText(filepath.Join(moduleRoot, "assets/fonts/tiny5.ttf"))
+	font, err := NewFontText(os.DirFS(moduleRoot), "assets/fonts/tiny5.ttf")
 	if err != nil {
 		t.Fatalf("NewFontText failed: %v", err)
 	}

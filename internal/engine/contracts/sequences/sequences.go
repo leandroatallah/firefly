@@ -23,6 +23,7 @@ type Player interface {
 	IsPlaying() bool
 	IsOver() bool
 	Play(sequence Sequence)
+	PlaySequence(filePath string)
 	Stop()
 	Update()
 }

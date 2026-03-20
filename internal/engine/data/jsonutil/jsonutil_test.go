@@ -40,7 +40,7 @@ func TestParseSpriteAndStats(t *testing.T) {
 		t.Fatalf("failed to write test file: %v", err)
 	}
 
-	spriteData, stats, err := ParseSpriteAndStats[TestStats](testFile)
+	spriteData, stats, err := ParseSpriteAndStats[TestStats](os.DirFS(tmpDir), "test.json")
 	if err != nil {
 		t.Fatalf("expected no error, got %v", err)
 	}
@@ -58,7 +58,7 @@ func TestParseSpriteAndStats(t *testing.T) {
 }
 
 func TestParseSpriteAndStats_FileNotFound(t *testing.T) {
-	_, _, err := ParseSpriteAndStats[TestStats]("/nonexistent/file.json")
+	_, _, err := ParseSpriteAndStats[TestStats](os.DirFS("/"), "nonexistent/file.json")
 	if err == nil {
 		t.Fatal("expected error for nonexistent file, got nil")
 	}
@@ -73,7 +73,7 @@ func TestParseSpriteAndStats_InvalidJSON(t *testing.T) {
 		t.Fatalf("failed to write test file: %v", err)
 	}
 
-	_, _, err = ParseSpriteAndStats[TestStats](testFile)
+	_, _, err = ParseSpriteAndStats[TestStats](os.DirFS(tmpDir), "invalid.json")
 	if err == nil {
 		t.Fatal("expected error for invalid JSON, got nil")
 	}
@@ -94,7 +94,7 @@ func TestParseSpriteAndStats_MissingFields(t *testing.T) {
 		t.Fatalf("failed to write test file: %v", err)
 	}
 
-	_, stats, err := ParseSpriteAndStats[TestStats](testFile)
+	_, stats, err := ParseSpriteAndStats[TestStats](os.DirFS(tmpDir), "missing.json")
 	if err != nil {
 		t.Fatalf("expected no error (missing fields should use defaults), got %v", err)
 	}

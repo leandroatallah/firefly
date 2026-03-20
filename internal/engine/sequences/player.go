@@ -33,6 +33,15 @@ func NewSequencePlayer(appContext *app.AppContext) *SequencePlayer {
 	}
 }
 
+// PlaySequence loads and plays a sequence from a JSON file.
+func (p *SequencePlayer) PlaySequence(filePath string) {
+	sequence, err := NewSequenceFromJSON(p.AppContext().Assets, filePath)
+	if err != nil {
+		return
+	}
+	p.Play(sequence)
+}
+
 // Play starts executing a sequence.
 func (p *SequencePlayer) Play(sequence sequences.Sequence) {
 	sequencePath := sequence.GetPath()

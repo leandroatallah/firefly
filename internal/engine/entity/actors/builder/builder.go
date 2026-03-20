@@ -24,7 +24,7 @@ func PreparePlatformer(
 	ctx *app.AppContext,
 	jsonPath string,
 ) (*platformer.PlatformerCharacter, schemas.SpriteData, actors.StatData, map[string]animation.SpriteState, error) {
-	spriteData, statData, err := jsonutil.ParseSpriteAndStats[actors.StatData](jsonPath)
+	spriteData, statData, err := jsonutil.ParseSpriteAndStats[actors.StatData](ctx.Assets, jsonPath)
 	if err != nil {
 		return nil, schemas.SpriteData{}, actors.StatData{}, nil, err
 	}

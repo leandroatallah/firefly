@@ -2,7 +2,7 @@ package sequences
 
 import (
 	"encoding/json"
-	"os"
+	"io/fs"
 
 	"github.com/leandroatallah/firefly/internal/engine/contracts/sequences"
 )
@@ -218,8 +218,8 @@ func (cd *CommandData) ToCommand() sequences.Command {
 }
 
 // NewSequenceFromJSON loads a sequence from a JSON file path.
-func NewSequenceFromJSON(filePath string) (*Sequence, error) {
-	data, err := os.ReadFile(filePath)
+func NewSequenceFromJSON(fsys fs.FS, filePath string) (*Sequence, error) {
+	data, err := fs.ReadFile(fsys, filePath)
 	if err != nil {
 		return &Sequence{}, err
 	}

@@ -1,11 +1,12 @@
 package vfx
 
 import (
+	"bytes"
 	"encoding/json"
 	"image/color"
+	"io/fs"
 	"log"
 	"math/rand"
-	"os"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -33,11 +34,11 @@ type Manager struct {
 	pixelConfig *particles.Config
 }
 
-func NewManager(path string) *Manager {
+func NewManager(fsys fs.FS, path string) *Manager {
 	configs := make(map[string]*particles.Config)
 
 	// Load vfx.json
-	data, err := os.ReadFile(path)
+	data, err := fs.ReadFile(fsys, path)
 	if err != nil {
 		log.Printf("failed to load vfx config: %v", err)
 	} else {
@@ -47,27 +48,22 @@ func NewManager(path string) *Manager {
 		}
 
 		for _, vfx := range vfxList {
-			img, _, err := ebitenutil.NewImageFromFile(vfx.Image)
+			imgData, err := fs.ReadFile(fsys, vfx.Image)
 			if err != nil {
 				log.Printf("failed to load particle image %s: %v", vfx.Image, err)
 				// Fallback to white pixel
+				img := ebiten.NewImage(1, 1)
+				img.Fill(color.White)
+				configs[vfx.Type] = createConfigFromImage(img, vfx)
+				continue
+			}
+			img, _, err := ebitenutil.NewImageFromReader(bytes.NewReader(imgData))
+			if err != nil {
+				log.Printf("failed to parse particle image %s: %v", vfx.Image, err)
 				img = ebiten.NewImage(1, 1)
 				img.Fill(color.White)
 			}
-
-			frameCount := 1
-			if vfx.FrameWidth > 0 {
-				frameCount = img.Bounds().Dx() / vfx.FrameWidth
-			}
-
-			config := &particles.Config{
-				Image:       img,
-				FrameWidth:  vfx.FrameWidth,
-				FrameHeight: vfx.FrameHeight,
-				FrameCount:  frameCount,
-				FrameRate:   vfx.FrameRate,
-			}
-			configs[vfx.Type] = config
+			configs[vfx.Type] = createConfigFromImage(img, vfx)
 		}
 	}
 
@@ -84,6 +80,21 @@ func NewManager(path string) *Manager {
 			FrameHeight: 1,
 			FrameCount:  1,
 		},
+	}
+}
+
+func createConfigFromImage(img *ebiten.Image, vfx VFXConfig) *particles.Config {
+	frameCount := 1
+	if vfx.FrameWidth > 0 {
+		frameCount = img.Bounds().Dx() / vfx.FrameWidth
+	}
+
+	return &particles.Config{
+		Image:       img,
+		FrameWidth:  vfx.FrameWidth,
+		FrameHeight: vfx.FrameHeight,
+		FrameCount:  frameCount,
+		FrameRate:   vfx.FrameRate,
 	}
 }
 

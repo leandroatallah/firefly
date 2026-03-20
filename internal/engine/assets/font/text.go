@@ -2,7 +2,7 @@ package font
 
 import (
 	"bytes"
-	"os"
+	"io/fs"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
@@ -12,8 +12,8 @@ type FontText struct {
 	source *text.GoTextFaceSource
 }
 
-func NewFontText(path string) (*FontText, error) {
-	font, err := os.ReadFile(path)
+func NewFontText(fsys fs.FS, path string) (*FontText, error) {
+	font, err := fs.ReadFile(fsys, path)
 	if err != nil {
 		return nil, err
 	}

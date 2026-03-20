@@ -55,7 +55,7 @@ func (s *TilemapScene) OnStart() {
 	}
 
 	// Init tilemap
-	tm, err := tilemap.LoadTilemap(phase.TilemapPath)
+	tm, err := tilemap.LoadTilemap(s.AppContext().Assets, phase.TilemapPath)
 	if err != nil {
 		log.Fatal(err)
 	}
