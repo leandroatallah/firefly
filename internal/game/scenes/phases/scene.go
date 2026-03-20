@@ -366,6 +366,11 @@ func (s *PhasesScene) clampCameraTarget(x, y float64, bounds *image.Rectangle) (
 
 // startDeathSequence initiates the death sequence: player dies, camera moves to start position.
 func (s *PhasesScene) startDeathSequence() {
+	// Prevent multiple triggers
+	if s.death.active {
+		return
+	}
+
 	if s.player == nil || !s.Tilemap().HasPlayerStartPosition() {
 		return
 	}
@@ -649,6 +654,13 @@ func (s *PhasesScene) Update() error {
 		}
 	}
 
+	// Check for trigger collisions (spikes, endpoints, etc.)
+	// This ensures non-blocking trigger bodies call their OnTouch() callbacks
+	// Must happen after actor updates to detect collisions at current positions
+	if s.hasPlayer && s.player != nil {
+		space.ResolveCollisions(s.player)
+	}
+
 	// Remove bodies queued for removal
 	space.ProcessRemovals()
 
@@ -745,12 +757,17 @@ func (s *PhasesScene) TriggerScreenFlash() {
 	s.ShowDrawScreenFlash = 2
 }
 
-func (s *PhasesScene) endpointTrigger(eventID string) {
+func (s *PhasesScene) endpointTrigger(eventType string) {
 	if !s.hasPlayer {
 		return
 	}
 
-	switch eventID {
+	// Prevent multiple triggers (e.g., from continuous spike collision)
+	if s.death.active {
+		return
+	}
+
+	switch eventType {
 	case "SPIKE":
 		s.startDeathSequence()
 		return

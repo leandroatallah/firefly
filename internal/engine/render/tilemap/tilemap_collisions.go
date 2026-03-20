@@ -65,20 +65,34 @@ func (t *Tilemap) CreateCollisionBodies(space body.BodiesSpace, endpointTriggerF
 			} else {
 				for _, obj := range layer.Objects {
 					obstacle := t.NewObstacleRect(obj, "Endpoint", false)
-					var id string
+					
+					// Get event type (e.g., "SPIKE", "CUTSCENE") and event_id
+					var eventType string
+					var eventID string
 					for _, p := range obj.Properties {
-						if p.Name == "event_id" {
-							id = p.Value
-							break
+						switch p.Name {
+						case "event_type":
+							eventType = p.Value
+						case "event_id":
+							eventID = p.Value
 						}
 					}
-					if id == "" {
-						id = fmt.Sprintf("EVENT_%d", eventCount)
+					
+					// Use event_type if available, otherwise use event_id
+					triggerID := eventType
+					if triggerID == "" {
+						triggerID = eventID
+					}
+					if triggerID == "" {
+						triggerID = fmt.Sprintf("EVENT_%d", eventCount)
 						eventCount++
 					}
-					obstacle.SetID(id)
+					
+					// Set unique body ID using object's unique ID
+					obstacle.SetID(fmt.Sprintf("Endpoint_%d", obj.Id))
+					
 					if endpointTriggerFactory != nil {
-						obstacle.SetTouchable(endpointTriggerFactory(id))
+						obstacle.SetTouchable(endpointTriggerFactory(triggerID))
 					}
 					space.AddBody(obstacle)
 				}
