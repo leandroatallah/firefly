@@ -22,3 +22,8 @@ func (t *BaseTransition) Draw(screen *ebiten.Image) {}
 func (t *BaseTransition) StartTransition(cb func()) {}
 
 func (t *BaseTransition) EndTransition(cb func()) {}
+
+func (t *BaseTransition) IsRunning() bool {
+	return t.active
+}
+
