@@ -155,15 +155,53 @@ func (p *ClimberPlayer) ActivateFreezeSkill() {
 	}
 }
 
+func (p *ClimberPlayer) ActivateFreezeSkillWithItem(item interface{}) {
+	if p.freezeSkill != nil {
+		ctx := p.AppContext()
+		if ctx != nil && ctx.Space != nil {
+			p.freezeSkill.RequestActivationWithItem(item.(body.Collidable), ctx.Space)
+		} else {
+			p.freezeSkill.RequestActivation()
+		}
+	}
+}
+
 func (p *ClimberPlayer) ActivateGrowSkill() {
 	if p.growSkill != nil {
 		p.growSkill.RequestActivation()
 	}
 }
 
+func (p *ClimberPlayer) ActivateGrowSkillWithItem(item interface{}) {
+	if p.growSkill != nil {
+		// Get the physics space from the app context
+		ctx := p.AppContext()
+		if ctx != nil && ctx.Space != nil {
+			if collidable, ok := item.(interface{}); ok {
+				p.growSkill.RequestActivationWithItem(collidable.(body.Collidable), ctx.Space)
+			} else {
+				p.growSkill.RequestActivation()
+			}
+		} else {
+			p.growSkill.RequestActivation()
+		}
+	}
+}
+
 func (p *ClimberPlayer) ActivateStarSkill() {
 	if p.starSkill != nil {
 		p.starSkill.RequestActivation()
+	}
+}
+
+func (p *ClimberPlayer) ActivateStarSkillWithItem(item interface{}) {
+	if p.starSkill != nil {
+		ctx := p.AppContext()
+		if ctx != nil && ctx.Space != nil {
+			p.starSkill.RequestActivationWithItem(item.(body.Collidable), ctx.Space)
+		} else {
+			p.starSkill.RequestActivation()
+		}
 	}
 }
 
