@@ -3,7 +3,6 @@ package gameitems
 import (
 	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
-	gameentitytypes "github.com/leandroatallah/firefly/internal/game/entity/types"
 	gamevfx "github.com/leandroatallah/firefly/internal/game/render/vfx"
 )
 
@@ -14,23 +13,32 @@ type StarPowerItem struct {
 
 // NewStarPowerItem creates a new star power-up item.
 func NewStarPowerItem(ctx *app.AppContext, x, y int, id string) (*StarPowerItem, error) {
-	powerItem, err := NewPowerUpItem(
-		ctx, x, y, id,
-		"internal/game/entity/items/star.json",
-		func() {
-			// Activate star skill when collected
-			player, found := ctx.ActorManager.GetPlayer()
-			if !found {
-				return
-			}
-			if skillUser, ok := player.(gameentitytypes.StarSkillUser); ok {
-				skillUser.ActivateStarSkill()
-			}
+	var powerItem *StarPowerItem
+
+	powerItem = &StarPowerItem{
+		PowerUpItem: PowerUpItem{
+			activateSkill: func() {
+				// Activate star skill when collected
+				player, found := ctx.ActorManager.GetPlayer()
+				if !found {
+					return
+				}
+				// Pass self as item reference for respawn tracking
+				if skillUser, ok := player.(interface {
+					ActivateStarSkillWithItem(item interface{})
+				}); ok {
+					skillUser.ActivateStarSkillWithItem(powerItem)
+				}
+			},
 		},
-	)
+	}
+
+	// Initialize base item
+	base, err := createPowerUpBase(ctx, x, y, id, "internal/game/entity/items/star.json", powerItem.activateSkill)
 	if err != nil {
 		return nil, err
 	}
+	powerItem.BaseItem = *base
 
 	// Set collection feedback callback
 	powerItem.SetOnCollect(func() {
@@ -42,9 +50,7 @@ func NewStarPowerItem(ctx *app.AppContext, x, y int, id string) (*StarPowerItem,
 		ctx.VFX.TriggerScreenFlash()
 	})
 
-	return &StarPowerItem{
-		PowerUpItem: *powerItem,
-	}, nil
+	return powerItem, nil
 }
 
 // Update spawns rainbow aura particles around the item.

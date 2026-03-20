@@ -3,7 +3,6 @@ package gameitems
 import (
 	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
-	gameentitytypes "github.com/leandroatallah/firefly/internal/game/entity/types"
 	gamevfx "github.com/leandroatallah/firefly/internal/game/render/vfx"
 )
 
@@ -14,23 +13,32 @@ type GrowPowerItem struct {
 
 // NewGrowPowerItem creates a new grow power-up item.
 func NewGrowPowerItem(ctx *app.AppContext, x, y int, id string) (*GrowPowerItem, error) {
-	powerItem, err := NewPowerUpItem(
-		ctx, x, y, id,
-		"internal/game/entity/items/item-power-grow.json",
-		func() {
-			// Activate grow skill when collected
-			player, found := ctx.ActorManager.GetPlayer()
-			if !found {
-				return
-			}
-			if skillUser, ok := player.(gameentitytypes.GrowSkillUser); ok {
-				skillUser.ActivateGrowSkill()
-			}
+	var powerItem *GrowPowerItem
+	
+	powerItem = &GrowPowerItem{
+		PowerUpItem: PowerUpItem{
+			activateSkill: func() {
+				// Activate grow skill when collected
+				player, found := ctx.ActorManager.GetPlayer()
+				if !found {
+					return
+				}
+				// Pass self as item reference for respawn tracking
+				if skillUser, ok := player.(interface {
+					ActivateGrowSkillWithItem(item interface{})
+				}); ok {
+					skillUser.ActivateGrowSkillWithItem(powerItem)
+				}
+			},
 		},
-	)
+	}
+	
+	// Initialize base item
+	base, err := createPowerUpBase(ctx, x, y, id, "internal/game/entity/items/item-power-grow.json", powerItem.activateSkill)
 	if err != nil {
 		return nil, err
 	}
+	powerItem.BaseItem = *base
 
 	// Set collection feedback callback
 	powerItem.SetOnCollect(func() {
@@ -42,9 +50,7 @@ func NewGrowPowerItem(ctx *app.AppContext, x, y int, id string) (*GrowPowerItem,
 		ctx.VFX.TriggerScreenFlash()
 	})
 
-	return &GrowPowerItem{
-		PowerUpItem: *powerItem,
-	}, nil
+	return powerItem, nil
 }
 
 // Update spawns orange aura particles around the item.

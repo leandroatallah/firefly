@@ -200,3 +200,47 @@ func TestGrowSkill_CanActivateDuringCooldown(t *testing.T) {
 		t.Errorf("Width should be 40 (doubled from 20), got %d", player.GetShape().Width())
 	}
 }
+
+// TestGrowSkill_RespawnItem verifies that the power-up item is respawned when the skill deactivates.
+func TestGrowSkill_RespawnItem(t *testing.T) {
+	sp := space.NewSpace()
+
+	rect := bodyphysics.NewRect(0, 0, 10, 10)
+	obs := bodyphysics.NewObstacleRect(rect)
+	player := &mockScalablePlayer{
+		ObstacleRect: obs,
+		scale:        1.0,
+	}
+	player.SetID("player")
+	sp.AddBody(player)
+
+	// Create a mock item that tracks removal state
+	mockItem := &mockScalablePlayer{
+		ObstacleRect: obs,
+		scale:        1.0,
+	}
+	mockItem.SetID("item")
+	mockItem.SetPosition(100, 200)
+
+	skill := NewGrowSkill()
+	skill.duration = 2
+	skill.cooldown = 2
+
+	// Register item for respawn
+	skill.RequestActivationWithItem(mockItem, sp)
+	skill.HandleInput(player, nil, sp)
+
+	// Verify item was tracked
+	if skill.itemToRespawn == nil {
+		t.Fatal("Expected item to be tracked for respawn")
+	}
+
+	// Expire active duration to trigger deactivate and respawn
+	skill.Update(player, nil)
+	skill.Update(player, nil) // Deactivates and should respawn
+
+	// Verify item was cleared (respawned)
+	if skill.itemToRespawn != nil {
+		t.Error("Expected item to be cleared after respawn")
+	}
+}

@@ -3,7 +3,6 @@ package gameitems
 import (
 	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
-	gameentitytypes "github.com/leandroatallah/firefly/internal/game/entity/types"
 	gamevfx "github.com/leandroatallah/firefly/internal/game/render/vfx"
 )
 
@@ -14,23 +13,32 @@ type FreezePowerItem struct {
 
 // NewFreezePowerItem creates a new freeze power-up item.
 func NewFreezePowerItem(ctx *app.AppContext, x, y int, id string) (*FreezePowerItem, error) {
-	powerItem, err := NewPowerUpItem(
-		ctx, x, y, id,
-		"internal/game/entity/items/power.json",
-		func() {
-			// Activate freeze skill when collected
-			player, found := ctx.ActorManager.GetPlayer()
-			if !found {
-				return
-			}
-			if skillUser, ok := player.(gameentitytypes.FreezeSkillUser); ok {
-				skillUser.ActivateFreezeSkill()
-			}
+	var powerItem *FreezePowerItem
+
+	powerItem = &FreezePowerItem{
+		PowerUpItem: PowerUpItem{
+			activateSkill: func() {
+				// Activate freeze skill when collected
+				player, found := ctx.ActorManager.GetPlayer()
+				if !found {
+					return
+				}
+				// Pass self as item reference for respawn tracking
+				if skillUser, ok := player.(interface {
+					ActivateFreezeSkillWithItem(item interface{})
+				}); ok {
+					skillUser.ActivateFreezeSkillWithItem(powerItem)
+				}
+			},
 		},
-	)
+	}
+
+	// Initialize base item
+	base, err := createPowerUpBase(ctx, x, y, id, "internal/game/entity/items/power.json", powerItem.activateSkill)
 	if err != nil {
 		return nil, err
 	}
+	powerItem.BaseItem = *base
 
 	// Set collection feedback callback
 	powerItem.SetOnCollect(func() {
@@ -42,9 +50,7 @@ func NewFreezePowerItem(ctx *app.AppContext, x, y int, id string) (*FreezePowerI
 		ctx.VFX.TriggerScreenFlash()
 	})
 
-	return &FreezePowerItem{
-		PowerUpItem: *powerItem,
-	}, nil
+	return powerItem, nil
 }
 
 // Update spawns blue aura particles around the item.

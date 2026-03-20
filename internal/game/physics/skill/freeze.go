@@ -1,6 +1,7 @@
 package skill
 
 import (
+	"image"
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -23,6 +24,11 @@ type FreezeSkill struct {
 	OnActivate   func()
 	OnActive     func()
 	OnDeactivate func()
+
+	// Respawn tracking
+	itemToRespawn body.Collidable
+	itemPosition  image.Point
+	respawnSpace  body.BodiesSpace
 }
 
 func NewFreezeSkill() *FreezeSkill {
@@ -46,6 +52,17 @@ func (s *FreezeSkill) IsActive() bool {
 // RequestActivation flags the skill to be activated on the next update cycle
 func (s *FreezeSkill) RequestActivation() {
 	s.activationRequested = true
+}
+
+// RequestActivationWithItem flags the skill to be activated and registers the item for respawn
+func (s *FreezeSkill) RequestActivationWithItem(item body.Collidable, space body.BodiesSpace) {
+	s.activationRequested = true
+	if item != nil {
+		s.itemToRespawn = item
+		pos := item.Position()
+		s.itemPosition = image.Point{X: pos.Min.X, Y: pos.Min.Y}
+		s.respawnSpace = space
+	}
 }
 
 func (s *FreezeSkill) Reset() {
@@ -137,7 +154,39 @@ func (s *FreezeSkill) deactivate() {
 	}
 	s.frozenBodies = s.frozenBodies[:0]
 
+	// Respawn the power-up item if registered
+	s.respawnItem()
+
 	if s.OnDeactivate != nil {
 		s.OnDeactivate()
 	}
+}
+
+// respawnItem restores the power-up item to its original position
+func (s *FreezeSkill) respawnItem() {
+	if s.itemToRespawn == nil || s.respawnSpace == nil {
+		return
+	}
+
+	// Check if item implements the removed interface
+	type Removable interface {
+		IsRemoved() bool
+		SetRemoved(bool)
+	}
+
+	if item, ok := s.itemToRespawn.(Removable); ok {
+		// Mark item as not removed
+		item.SetRemoved(false)
+
+		// Restore position
+		s.itemToRespawn.SetPosition(s.itemPosition.X, s.itemPosition.Y)
+
+		// Re-add to physics space
+		s.respawnSpace.AddBody(s.itemToRespawn)
+	}
+
+	// Clear respawn tracking
+	s.itemToRespawn = nil
+	s.itemPosition = image.Point{}
+	s.respawnSpace = nil
 }

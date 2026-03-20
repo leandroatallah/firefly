@@ -57,6 +57,36 @@ func (p *PowerUpItem) SetOnCollect(fn func()) {
 	p.onCollect = fn
 }
 
+// createPowerUpBase creates a base item for power-ups with the given sprite config and callback.
+// This is a helper function for power-up items that need to reference themselves in the callback.
+func createPowerUpBase(ctx *app.AppContext, x, y int, id string, spriteConfigPath string, activateSkill func()) (*items.BaseItem, error) {
+	spriteData, statData, err := jsonutil.ParseSpriteAndStats[items.StatData](spriteConfigPath)
+	if err != nil {
+		return nil, err
+	}
+
+	base, err := CreateAnimatedItem(id, spriteData, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	// SetPosition must be before SetItemBodies
+	base.SetPosition(x, y)
+	base.SetAppContext(ctx)
+	base.SetOwner(base)
+
+	if err = SetItemBodies(base, spriteData, nil); err != nil {
+		return nil, fmt.Errorf("SetItemBodies: %w", err)
+	}
+	if err = SetItemStats(base, statData); err != nil {
+		return nil, fmt.Errorf("SetItemStats: %w", err)
+	}
+
+	base.StateCollisionManager.RefreshCollisions()
+
+	return base, nil
+}
+
 // OnTouch handles collision with the player and activates the skill.
 func (p *PowerUpItem) OnTouch(other body.Collidable) {
 	if p.IsRemoved() {

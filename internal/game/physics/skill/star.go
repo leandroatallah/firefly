@@ -1,6 +1,7 @@
 package skill
 
 import (
+	"image"
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -19,6 +20,11 @@ type StarSkill struct {
 
 	// Callbacks for external systems (audio, vfx)
 	OnActive func()
+
+	// Respawn tracking
+	itemToRespawn body.Collidable
+	itemPosition  image.Point
+	respawnSpace  body.BodiesSpace
 }
 
 func NewStarSkill() *StarSkill {
@@ -41,6 +47,17 @@ func (s *StarSkill) IsActive() bool {
 // RequestActivation flags the skill to be activated on the next update cycle
 func (s *StarSkill) RequestActivation() {
 	s.activationRequested = true
+}
+
+// RequestActivationWithItem flags the skill to be activated and registers the item for respawn
+func (s *StarSkill) RequestActivationWithItem(item body.Collidable, space body.BodiesSpace) {
+	s.activationRequested = true
+	if item != nil {
+		s.itemToRespawn = item
+		pos := item.Position()
+		s.itemPosition = image.Point{X: pos.Min.X, Y: pos.Min.Y}
+		s.respawnSpace = space
+	}
 }
 
 func (s *StarSkill) Reset() {
@@ -94,4 +111,35 @@ func (s *StarSkill) activate() {
 }
 
 func (s *StarSkill) deactivate() {
+	// Respawn the power-up item if registered
+	s.respawnItem()
+}
+
+// respawnItem restores the power-up item to its original position
+func (s *StarSkill) respawnItem() {
+	if s.itemToRespawn == nil || s.respawnSpace == nil {
+		return
+	}
+
+	// Check if item implements the removed interface
+	type Removable interface {
+		IsRemoved() bool
+		SetRemoved(bool)
+	}
+
+	if item, ok := s.itemToRespawn.(Removable); ok {
+		// Mark item as not removed
+		item.SetRemoved(false)
+
+		// Restore position
+		s.itemToRespawn.SetPosition(s.itemPosition.X, s.itemPosition.Y)
+
+		// Re-add to physics space
+		s.respawnSpace.AddBody(s.itemToRespawn)
+	}
+
+	// Clear respawn tracking
+	s.itemToRespawn = nil
+	s.itemPosition = image.Point{}
+	s.respawnSpace = nil
 }
