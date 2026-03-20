@@ -97,6 +97,11 @@ func (m *Menu) SetOnCancel(fn func()) {
 	m.onCancel = fn
 }
 
+// SelectedIndex returns the currently selected item index.
+func (m *Menu) SelectedIndex() int {
+	return m.selected
+}
+
 // Update handles input for menu navigation.
 func (m *Menu) Update() {
 	if !m.visible {

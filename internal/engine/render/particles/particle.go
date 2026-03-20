@@ -131,3 +131,16 @@ func (s *System) Draw(screen *ebiten.Image, cam *camera.Controller) {
 		p.Draw(screen, cam)
 	}
 }
+
+// DrawDirect draws all particles directly to the screen without camera transformation.
+// The drawFn function is called for each particle to draw it.
+func (s *System) DrawDirect(screen *ebiten.Image, drawFn func(*ebiten.Image, *Particle)) {
+	for _, p := range s.particles {
+		drawFn(screen, p)
+	}
+}
+
+// Particles returns all active particles for custom rendering.
+func (s *System) Particles() []*Particle {
+	return s.particles
+}
