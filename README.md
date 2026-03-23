@@ -1,3 +1,5 @@
+![](growbel.gif)
+
 # Growbel
 
 A 2D game built with Ebitengine, featuring a modular architecture.
@@ -10,6 +12,10 @@ The project is structured into two main packages: `engine` and `game`.
 - **`internal/game`**: The specific implementation of the game, including scenes, characters, and items.
 
 This separation allows the engine to be developed independently from the game's content.
+
+## Play Now
+
+You can play the game directly in your browser here: <https://leandroatallah.itch.io/growbel>
 
 ## Folder Structure
 
