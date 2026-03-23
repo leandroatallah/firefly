@@ -44,7 +44,7 @@ func NewFallingPlatformItem(ctx *app.AppContext, x, y int, id string) (*FallingP
 		"break":   Break,
 	}
 
-	base, err := CreateAnimatedItem(id, spriteData, stateMap)
+	base, err := CreateAnimatedItem(ctx.Assets, id, spriteData, stateMap)
 	if err != nil {
 		return nil, err
 	}

@@ -21,7 +21,7 @@ func NewCollectibleCoinItem(ctx *app.AppContext, x, y int, id string) (*Collecti
 		return nil, err
 	}
 
-	base, err := CreateAnimatedItem(id, spriteData, nil)
+	base, err := CreateAnimatedItem(ctx.Assets, id, spriteData, nil)
 	if err != nil {
 		return nil, err
 	}

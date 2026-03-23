@@ -2,6 +2,7 @@ package gameitems
 
 import (
 	"fmt"
+	"io/fs"
 
 	"github.com/leandroatallah/firefly/internal/engine/contracts/animation"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
@@ -11,7 +12,7 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/render/sprites"
 )
 
-func CreateAnimatedItem(id string, data schemas.SpriteData, customStates map[string]animation.SpriteState) (*items.BaseItem, error) {
+func CreateAnimatedItem(fsys fs.FS, id string, data schemas.SpriteData, customStates map[string]animation.SpriteState) (*items.BaseItem, error) {
 	stateMap := map[string]animation.SpriteState{
 		"idle": items.Idle,
 	}
@@ -19,7 +20,7 @@ func CreateAnimatedItem(id string, data schemas.SpriteData, customStates map[str
 		stateMap[k] = v
 	}
 
-	assets, err := sprites.GetSpritesFromAssets(data.Assets, stateMap)
+	assets, err := sprites.GetSpritesFromAssets(fsys, data.Assets, stateMap)
 	if err != nil {
 		return nil, err
 	}

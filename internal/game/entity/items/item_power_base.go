@@ -25,7 +25,7 @@ func NewPowerUpItem(ctx *app.AppContext, x, y int, id string, spriteConfigPath s
 		return nil, err
 	}
 
-	base, err := CreateAnimatedItem(id, spriteData, nil)
+	base, err := CreateAnimatedItem(ctx.Assets, id, spriteData, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +65,7 @@ func createPowerUpBase(ctx *app.AppContext, x, y int, id string, spriteConfigPat
 		return nil, err
 	}
 
-	base, err := CreateAnimatedItem(id, spriteData, nil)
+	base, err := CreateAnimatedItem(ctx.Assets, id, spriteData, nil)
 	if err != nil {
 		return nil, err
 	}
