@@ -2,6 +2,7 @@ package platformer
 
 import (
 	"image"
+	"io/fs"
 
 	"github.com/leandroatallah/firefly/internal/engine/app"
 	"github.com/leandroatallah/firefly/internal/engine/contracts/animation"
@@ -93,8 +94,8 @@ func (p *PlatformerCharacter) AddSkill(s skill.Skill) {
 	p.Character.AddSkill(s)
 }
 
-func NewPlatformerCharacter(stateMap map[string]animation.SpriteState, spriteData schemas.SpriteData, bodyRect *bodyphysics.Rect) *PlatformerCharacter {
-	s, err := sprites.GetSpritesFromAssets(spriteData.Assets, stateMap)
+func NewPlatformerCharacter(fsys fs.FS, stateMap map[string]animation.SpriteState, spriteData schemas.SpriteData, bodyRect *bodyphysics.Rect) *PlatformerCharacter {
+	s, err := sprites.GetSpritesFromAssets(fsys, spriteData.Assets, stateMap)
 	if err != nil {
 		return nil
 	}

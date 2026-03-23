@@ -1,13 +1,15 @@
 package sprites
 
 import (
+	"io/fs"
+
 	"github.com/leandroatallah/firefly/internal/engine/contracts/animation"
 	"github.com/leandroatallah/firefly/internal/engine/data/schemas"
 )
 
 // GetSpritesFromAssets converts asset data from a JSON schema into a SpriteMap,
 // using a provided mapping from string keys to sprite states.
-func GetSpritesFromAssets(assets map[string]schemas.AssetData, stateMap map[string]animation.SpriteState) (SpriteMap, error) {
+func GetSpritesFromAssets(fsys fs.FS, assets map[string]schemas.AssetData, stateMap map[string]animation.SpriteState) (SpriteMap, error) {
 	s := make(SpriteAssets)
 	for key, value := range assets {
 		if state, ok := stateMap[key]; ok {
@@ -18,5 +20,5 @@ func GetSpritesFromAssets(assets map[string]schemas.AssetData, stateMap map[stri
 			s = s.AddSprite(state, value.Path, loop)
 		}
 	}
-	return LoadSprites(s)
+	return LoadSprites(fsys, s)
 }

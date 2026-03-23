@@ -1,7 +1,9 @@
 package sprites
 
 import (
+	"bytes"
 	"image"
+	"io/fs"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -102,11 +104,15 @@ func (s SpriteAssets) AddSprite(state animation.SpriteState, path string, loop b
 	return s
 }
 
-func LoadSprites(list SpriteAssets) (SpriteMap, error) {
+func LoadSprites(fsys fs.FS, list SpriteAssets) (SpriteMap, error) {
 	res := make(map[animation.SpriteState]*Sprite)
 
 	for state, assetInfo := range list {
-		img, _, err := ebitenutil.NewImageFromFile(assetInfo.Path)
+		data, err := fs.ReadFile(fsys, assetInfo.Path)
+		if err != nil {
+			return nil, err
+		}
+		img, _, err := ebitenutil.NewImageFromReader(bytes.NewReader(data))
 		if err != nil {
 			return nil, err
 		}
