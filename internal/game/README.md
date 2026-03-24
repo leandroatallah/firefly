@@ -8,8 +8,15 @@ This module contains the specific implementation and logic for the _Growbel_ gam
   - `config.go`: Game configuration settings.
   - `phases_list.go`: Defines the list and order of game phases.
   - `setup.go`: Handles game initialization and setup routines.
+  - `setup_audio.go`: Handles game-specific audio initialization.
 - `entity/`: Defines the concrete game entities.
-  - `actors/`: Implements the `Player`, `NPCs`, and specific `Enemies`. It includes state machines and behavior logic for these characters.
+  - `actors/`: Implements the `Player`, `NPCs`, and specific `Enemies`.
+    - `enemies/`: Concrete enemy implementations (bat, wolf, swarm).
+    - `events/`: Actor-specific event handling.
+    - `methods/`: Reusable actor behaviors (death, state transitions).
+    - `npcs/`: Non-player character implementations.
+    - `player/`: Player character implementation (Climber).
+    - `states/`: Actor state machine implementations.
   - `items/`: Implements collectible items like `Coin` and interactive environmental items like `FallingPlatform`.
   - `obstacles/`: Defines game-specific obstacles like walls and movement-restricting boundaries.
   - `types/`: Custom types and interfaces related to game entities.
@@ -19,6 +26,7 @@ This module contains the specific implementation and logic for the _Growbel_ gam
   - `init_scenes.go`: Initializes the registry of all game scenes.
   - `scene_intro.go`: The introductory cinematic/tutorial scene.
   - `scene_menu.go`: The main menu and options scene.
+  - `scene_credits.go`: Displays game credits and contributors.
   - `scene_phase_title.go`: Interstitial scene for displaying phase names.
   - `scene_phase_reboot.go`: Scene for handling phase restarts.
   - `scene_story.go`: Scenes dedicated to cinematic storytelling.
@@ -30,7 +38,8 @@ This module contains the specific implementation and logic for the _Growbel_ gam
 ## Customization and Implementation
 
 - `render/`: Contains game-specific rendering logic.
+  - `camera/`: Game-specific camera behaviors and constraints.
   - `vfx/`: Game-specific visual effects, such as overhead and screen text.
 - `ui/`: Implements the game's specific user interface.
   - `hud/`: Game's main Heads-Up Display elements.
-  - `speech/`: Game-specific speech bubbles and dialogue styles.
+  - `speech/`: Game-specific speech bubbles (`bubble.go`) and cinematic dialogue (`story.go`).

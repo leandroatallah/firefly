@@ -1,6 +1,11 @@
 {
   "context": {
-    "fileName": ["AGENTS.md"]
+    "fileName": [
+      "AGENTS.md"
+    ]
   },
-  "experimental": { "enableAgents": true }
+  "experimental": {
+    "enableAgents": true
+  },
+  "$version": 3
 }

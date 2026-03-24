@@ -34,7 +34,7 @@ You can play the game directly in your browser here: <https://leandroatallah.itc
 │   │   ├── app/         # Main engine loop, context, and initialization
 │   │   ├── assets/      # Asset loading and management (images, fonts)
 │   │   ├── audio/       # Audio playback functionality
-│   │   ├── contracts/   # Interfaces for engine components (animation, body, config, context, navigation, sequences, tilemaplayer)
+│   │   ├── contracts/   # Interfaces for engine components (animation, body, config, context, navigation, sequences, tilemaplayer, vfx)
 │   │   ├── data/        # Data loading, management, and configuration schemas
 │   │   │   └── config/  # Engine configuration
 │   │   │   └── i18n/    # Internationalization (i18n) manager and translation loading
@@ -48,18 +48,18 @@ You can play the game directly in your browser here: <https://leandroatallah.itc
 │   │   ├── render/      # Rendering tasks (camera, particles, screenutil, sprites, tilemap, vfx)
 │   │   │   └── camera/  # Camera control and rendering
 │   │   ├── scene/       # Game scene management and transitions
-│   │   ├── sequences/   # Game sequences and command processing
-│   │   ├── ui/          # Building blocks for user interface elements (hud, speech)
+│   │   ├── sequences/   # Game sequences and command processing (commands_*.go)
+│   │   ├── ui/          # Building blocks for user interface elements (hud, menu, speech)
 │   │   └── utils/       # Utility functions (fixed-point arithmetic, timing, triggers)
 │   └── game/            # Game-specific implementation
-│       ├── app/         # Game-specific setup and initialization (config, phases list, setup)
-│       ├── entity/      # Concrete game entities (actors, items, obstacles, types)
-│       │   ├── actors/  # Game-specific characters (player, npcs, enemies) and state logic
+│       ├── app/         # Game-specific setup and initialization (config, setup_audio, setup)
+│       ├── entity/      # Concrete game entities
+│       │   ├── actors/  # Player, NPCs, Enemies and state logic (enemies, events, methods, states)
 │       │   ├── items/   # Game-specific items (coins, falling platforms)
 │       │   └── obstacles/ # Game-specific obstacles (walls, hazards)
 │       ├── physics/     # Game-specific physics behaviors and skills
-│       ├── render/      # Game-specific rendering logic (vfx)
-│       ├── scenes/      # Game scenes and phases (intro, menu, story, summary)
+│       ├── render/      # Game-specific rendering logic (camera, vfx)
+│       ├── scenes/      # Game scenes (intro, menu, credits, story, summary)
 │       └── ui/          # Game's specific user interface (hud, speech)
 ├── go.mod               # Go module definition
 └── README.md

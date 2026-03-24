@@ -5,7 +5,7 @@ This module contains the core, reusable game engine components for the Firefly p
 ## Core Components
 
 - `app/`: Manages the main engine loop, context, and initialization (`engine.go`, `context.go`).
-- `contracts/`: Defines the Go interfaces (contracts) for key engine components like animations, bodies, configuration, context, navigation, sequences, and tilemap layers. This promotes a decoupled architecture.
+- `contracts/`: Defines the Go interfaces (contracts) for key engine components like animations, bodies, configuration, context, navigation, sequences, tilemap layers, and visual effects (vfx). This promotes a decoupled architecture.
 - `data/`: Handles data loading, management, and configuration schemas (e.g., from JSON files).
   - `config/`: Engine-specific configuration structures.
   - `datamanager/`: Centralized manager for loading and accessing game data.
@@ -18,7 +18,7 @@ This module contains the core, reusable game engine components for the Firefly p
 - `mocks/`: Contains mock implementations of engine components for testing purposes, facilitating unit and integration tests for the game module.
 - `sequences/`: Manages scripted event sequences, commands, and cutscenes.
   - `player.go`: Executes sequences of commands.
-  - `commands/`: Scriptable actions for actors, camera, music, and visual effects.
+  - `commands_*.go`: Scriptable actions for actors, camera, music, and visual effects.
 - `utils/`: Contains various utility functions (e.g., fixed-point arithmetic `fp16/`, timing `timing/`, and `delay_trigger.go`).
 
 ## Game Object Management
@@ -61,4 +61,5 @@ This module contains the core, reusable game engine components for the Firefly p
   - `screenutil/`: Utility functions for screen coordinates, rendering, and screen-wide effects like flashes.
 - `ui/`: Provides building blocks for user interface elements.
   - `hud/`: Base components for Heads-Up Displays.
+  - `menu/`: Components for creating interactive menus.
   - `speech/`: Components for speech bubbles and dialogue systems.
