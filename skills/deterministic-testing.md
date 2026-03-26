@@ -1,0 +1,17 @@
+# Deterministic & Fast Tests
+
+## Rules
+
+- No `time.Sleep` — use virtual time or frame counters instead
+- No dependency on frame timing or human interaction
+- Tests must produce the same result on every run (no flakiness)
+
+## Timing
+
+Use the `timing` package mocks to control time progression in tests rather than relying on wall-clock time.
+
+## i18n Edge Cases
+
+- Missing key → should return the key itself as fallback
+- Formatting args: `T("key_with_%d", count)`
+- Missing language file → `Load()` should return an error
