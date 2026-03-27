@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
 make sync-skills
 make sync-agents
-git add .claude/skills/ .qwen/skills/ .kiro/skills/
 git add .claude/agents/ .qwen/agents/ .kiro/agents/

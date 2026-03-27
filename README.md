@@ -75,8 +75,8 @@ You can play the game directly in your browser here: <https://leandroatallah.itc
 The project includes a `Makefile` to automate common tasks:
 
 - `make build-wasm`: Compiles the game to WebAssembly and creates a distributable zip.
-- `make sync-skills`: Synchronizes AI agent skills from `.agents/skills` to supported AI tool directories (`.claude`, `.qwen`, `.kiro`).
-- `make setup`: Initializes the development environment by installing git hooks.
+- `make sync-agents`: Synchronizes AI agent definitions from `.agents/agents` to supported AI tool directories (`.claude`, `.qwen`, `.kiro`).
+- `make setup`: Initializes the development environment by installing git hooks and creating skill symlinks.
 - `make clean`: Removes generated build artifacts and temporary files.
 
 ### Scripts
@@ -84,17 +84,24 @@ The project includes a `Makefile` to automate common tasks:
 Custom scripts are located in the `scripts/` directory:
 
 - `build_wasm.sh`: Handles the multi-step process of building for the web.
-- `sync-skills.sh`: Ensures AI agent instructions are consistent across different tools.
+- `sync-agents.sh`: Transforms agent definitions from `.agents/agents/` to tool-specific formats for Claude, Kiro, and Qwen.
+- `setup-skill-symlinks.sh`: Creates symlinks from `.agents/skills/` to tool directories for instant skill propagation.
 - `test_coverage.sh`: Runs the full test suite and generates an HTML coverage report in the `coverage/` directory.
-- `hooks/pre-commit`: A git hook that automatically syncs skills before each commit.
+- `hooks/pre-commit`: A git hook that automatically syncs agents before each commit.
 
 ### AI Agent Skills
 
 This project uses specialized instructions for AI agents (like Claude, Gemini, or Qwen) stored in `.agents/skills/`. These skills provide agents with domain-specific knowledge about the engine's architecture, testing strategies, and coding standards.
 
-To update or add a new skill:
-1. Edit the `SKILL.md` file in the relevant subfolder of `.agents/skills/`.
-2. Run `make sync-skills` to propagate the changes to all supported AI tools.
+Skills are automatically available to all AI tools via symlinks. To update a skill, edit the `SKILL.md` file in `.agents/skills/[skill-name]/` and changes propagate instantly.
+
+### AI Agents
+
+Specialized subagents for test coverage automation are defined in `.agents/agents/`. These agents coordinate to analyze coverage gaps, generate mocks, write tests, and verify improvements.
+
+To update agents:
+1. Edit files in `.agents/agents/`
+2. Run `make sync-agents` to propagate changes to all AI tools
 
 ## Dependencies
 
