@@ -25,10 +25,13 @@ type Controller struct {
 	DeadZoneRadius   float64
 	SmoothingFactor  float64
 	isFollowing      bool
-	centerX, centerY float64
-	screenWidth      float64
-	screenHeight     float64
-	bounds           *image.Rectangle
+	centerX, centerY   float64
+	screenWidth        float64
+	screenHeight       float64
+	bounds             *image.Rectangle
+	VerticalOnlyUpward bool
+	lastTargetY        float64
+	initialized        bool
 }
 
 func NewController(x, y float64) *Controller {
@@ -90,6 +93,8 @@ func (c *Controller) Bounds() *image.Rectangle {
 func (c *Controller) SetCenter(x, y float64) {
 	c.centerX = x
 	c.centerY = y
+	c.lastTargetY = y
+	c.initialized = true
 	c.Kamera().SetCenter(x, y)
 }
 
@@ -109,6 +114,8 @@ func (c *Controller) SetPositionTopLeft(x, y float64) {
 	centerY := y + c.screenHeight/2
 	c.centerX = centerX
 	c.centerY = centerY
+	c.lastTargetY = centerY
+	c.initialized = true
 	c.Kamera().SetCenter(centerX, centerY)
 }
 
@@ -118,6 +125,8 @@ func (c *Controller) SetFollowTarget(b body.Body) {
 	w, h := b.GetShape().Width(), b.GetShape().Height()
 	targetX := float64(x) + float64(w)/2
 	targetY := float64(y) + float64(h)/2
+	c.lastTargetY = targetY
+	c.initialized = true
 	c.Kamera().SetCenter(targetX, targetY)
 }
 
@@ -129,6 +138,16 @@ func (c *Controller) Update() {
 		w, h := c.followTarget.GetShape().Width(), c.followTarget.GetShape().Height()
 		targetX = float64(x) + float64(w)/2
 		targetY = float64(y) + float64(h)/2
+
+		// Apply vertical-only-upward constraint
+		if c.VerticalOnlyUpward {
+			if c.initialized && targetY > c.lastTargetY {
+				targetY = c.lastTargetY // Block downward movement
+			} else {
+				c.lastTargetY = targetY
+			}
+			c.initialized = true
+		}
 	} else {
 		targetX = c.centerX
 		targetY = c.centerY
