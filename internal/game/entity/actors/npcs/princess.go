@@ -7,7 +7,6 @@ import (
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors/builder"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors/movement"
 	"github.com/leandroatallah/firefly/internal/engine/entity/actors/platformer"
-	gameplayermethods "github.com/leandroatallah/firefly/internal/game/entity/actors/methods"
 )
 
 type Princess struct {

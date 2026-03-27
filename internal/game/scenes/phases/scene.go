@@ -464,13 +464,9 @@ func (s *PhasesScene) updateDeathCameraPhase() {
 		if s.player != nil {
 			s.player.GetCharacter().SetNewStateFatal(gamestates.Rising)
 		}
-		// Snap camera to final position
+		// Snap camera to final position (SetCenter also syncs lastTargetY for VerticalOnlyUpward)
 		baseCam := s.BaseCamera()
 		baseCam.SetCenter(s.death.cameraTargetX, s.death.cameraTargetY)
-
-		// Sync game camera's lastCameraY to prevent oscillation
-		_, camY := baseCam.GetActualCenter()
-		s.gameCamera.SetLastCameraY(camY)
 
 		s.death.active = false
 	} else {
