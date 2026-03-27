@@ -44,6 +44,7 @@ func TestMain(m *testing.M) {
 
 func TestClimberPlayer_Skills(t *testing.T) {
 	ctx := &app.AppContext{
+		Assets:       os.DirFS("."),
 		ActorManager: actors.NewManager(),
 		Space:        space.NewSpace(),
 		EventManager: event.NewManager(),
