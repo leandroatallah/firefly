@@ -70,14 +70,18 @@ tests := []struct {
 
 ## 📋 Standard Workflow for Agents
 
-1. **Analyze Coverage**: Run `go test ./internal/engine/[package] -coverprofile=coverage.out && go tool cover -func=coverage.out`.
-2. **Identify Gaps**: Read the source file and identify functions or branches with 0% coverage.
-3. **Create Test File**: If it doesn't exist, create `[filename]_test.go`.
-4. **Write Tests**: Follow the patterns above. Ensure you test both "happy paths" and error/edge cases.
-5. **Verify**: Run the test and check the new coverage percentage.
+1. **Analyze Coverage**: Use the coverage tools to identify gaps:
+   - For a specific package: `go test ./internal/engine/[package] -coverprofile=coverage.out && go tool cover -func=coverage.out`
+   - For a full project report: `bash scripts/test_coverage.sh`
+2. **Consult Skills**: Review the relevant AI Agent Skills in `.agents/skills/` (e.g., `go-testing`, `mocking-strategies`, `fixed-point-physics`) for specialized patterns and requirements.
+3. **Identify Gaps**: Read the source file and identify functions or branches with 0% coverage.
+4. **Create Test File**: If it doesn't exist, create `[filename]_test.go`.
+5. **Write Tests**: Follow the patterns in this document and the referenced skills. Ensure you test both "happy paths" and error/edge cases.
+6. **Verify**: Run the test and check the new coverage percentage.
 
 ## ⚠️ Precautions
 
+- **AI Agent Skills**: If you need to update agent instructions, modify the files in `.agents/skills/` and run `make sync-skills`.
 - **Never commit changes**. Do not use `git commit` or attempt to stage/commit files. The user is responsible for all version control operations.
 - **Do not modify production code** unless you find a bug that makes it untestable (e.g., global state that needs to be injected).
 - **Keep tests fast**. Avoid long `time.Sleep` calls; use virtual time or frame counters.

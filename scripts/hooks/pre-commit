@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+make sync-skills
+git add .claude/skills/ .qwen/skills/ .kiro/skills/
