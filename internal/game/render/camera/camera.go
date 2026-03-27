@@ -11,9 +11,7 @@ import (
 // Controller wraps the engine's camera.Controller to add game-specific behavior.
 // Currently implements vertical-only-upward constraint: camera moves up but never down.
 type Controller struct {
-	base        *enginecamera.Controller
-	lastCameraY float64
-	initialized bool
+	base *enginecamera.Controller
 }
 
 // Base returns the underlying engine camera controller.
@@ -23,56 +21,15 @@ func (c *Controller) Base() *enginecamera.Controller {
 
 // NewController creates a new game-layer camera controller wrapping the engine controller.
 func NewController(base *enginecamera.Controller) *Controller {
+	base.VerticalOnlyUpward = true
 	return &Controller{
-		base:        base,
-		lastCameraY: 0,
+		base: base,
 	}
 }
 
 // Update updates the camera position with game-specific constraints applied.
-// Calculates target position and applies vertical-only-upward constraint BEFORE setting camera position.
 func (c *Controller) Update() {
-	if c.base.IsFollowing() && c.base.FollowTarget() != nil {
-		target := c.base.FollowTarget()
-		x, y := target.GetPositionMin()
-		w, h := target.GetShape().Width(), target.GetShape().Height()
-		targetX := float64(x) + float64(w)/2
-		targetY := float64(y) + float64(h)/2
-
-		// Apply vertical-only-upward constraint BEFORE setting position
-		if c.initialized && targetY > c.lastCameraY {
-			targetY = c.lastCameraY // Block downward movement
-		} else {
-			c.lastCameraY = targetY
-		}
-		c.initialized = true
-
-		// Apply bounds clamping manually
-		if bounds := c.base.Bounds(); bounds != nil {
-			halfW := c.base.Width() / 2
-			halfH := c.base.Height() / 2
-			minX := float64(bounds.Min.X) + halfW
-			maxX := float64(bounds.Max.X) - halfW
-			minY := float64(bounds.Min.Y) + halfH
-			maxY := float64(bounds.Max.Y) - halfH
-
-			if targetX < minX {
-				targetX = minX
-			}
-			if targetX > maxX {
-				targetX = maxX
-			}
-			if targetY < minY {
-				targetY = minY
-			}
-			if targetY > maxY {
-				targetY = maxY
-			}
-		}
-
-		c.base.SetCenter(targetX, targetY)
-	}
-	// Don't call base.Update() - we handled everything to prevent downward target calculation
+	c.base.Update()
 }
 
 // Draw delegates to the base camera controller.
@@ -87,19 +44,9 @@ func (c *Controller) DrawCollisionBox(screen *ebiten.Image, b body.Collidable) {
 	c.base.DrawCollisionBox(screen, b)
 }
 
-// SetFollowTarget sets the follow target and initializes lastCameraY.
+// SetFollowTarget sets the follow target.
 func (c *Controller) SetFollowTarget(b body.Body) {
 	c.base.SetFollowTarget(b)
-	_, y := b.GetPositionMin()
-	h := b.GetShape().Height()
-	c.lastCameraY = float64(y) + float64(h)/2
-	c.initialized = true
-}
-
-// SetLastCameraY sets the last camera Y position for vertical constraint tracking.
-func (c *Controller) SetLastCameraY(y float64) {
-	c.lastCameraY = y
-	c.initialized = true
 }
 
 // SetBounds delegates to the base camera controller.
@@ -112,17 +59,13 @@ func (c *Controller) Bounds() *image.Rectangle {
 	return c.base.Bounds()
 }
 
-// SetCenter delegates to the base camera controller and updates lastCameraY.
+// SetCenter delegates to the base camera controller.
 func (c *Controller) SetCenter(x, y float64) {
-	c.lastCameraY = y
-	c.initialized = true
 	c.base.SetCenter(x, y)
 }
 
-// SetPositionTopLeft delegates to the base camera controller and updates lastCameraY.
+// SetPositionTopLeft delegates to the base camera controller.
 func (c *Controller) SetPositionTopLeft(x, y float64) {
-	c.lastCameraY = y + c.base.Height()/2
-	c.initialized = true
 	c.base.SetPositionTopLeft(x, y)
 }
 
@@ -139,11 +82,6 @@ func (c *Controller) FollowTarget() body.Body {
 // SetFollowing delegates to the base camera controller.
 func (c *Controller) SetFollowing(following bool) {
 	c.base.SetFollowing(following)
-}
-
-// Kamera returns the underlying kamera.Camera for debug purposes.
-func (c *Controller) Kamera() *ebiten.Image {
-	return nil // Placeholder - should not be used directly
 }
 
 // Position delegates to the base camera controller.
