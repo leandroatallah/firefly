@@ -15,10 +15,6 @@ import (
 
 // climberStateTransitionLogic provides custom state handling for the ClimberPlayer.
 func climberStateTransitionLogic(c *actors.Character) bool {
-	if gameplayermethods.StandardStateTransitionLogic(c) {
-		return true
-	}
-
 	state := c.State()
 
 	if state == gamestates.Rising && c.IsAnimationFinished() {

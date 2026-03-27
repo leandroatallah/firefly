@@ -35,7 +35,6 @@ func NewPrincess(ctx *app.AppContext, x, y int, id string) (*Princess, error) {
 	}
 
 	princess.Character.SetMovementState(movement.Idle, nil)
-	princess.Character.SetStateTransitionHandler(gameplayermethods.StandardStateTransitionLogic)
 
 	return princess, nil
 }
