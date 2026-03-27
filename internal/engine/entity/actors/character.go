@@ -303,6 +303,24 @@ func (c *Character) handleState() {
 		}
 	}
 
+	state := c.state.State()
+
+	// Standard transitions
+	if state == Dying && c.IsAnimationFinished() {
+		c.SetNewStateFatal(Dead)
+		return
+	}
+
+	// When the character is exiting, the state no longer changes.
+	if state == Exiting || state == Dying || state == Dead {
+		return
+	}
+
+	if c.Health() <= 0 && state != Dying {
+		c.SetNewStateFatal(Dying)
+		return
+	}
+
 	// Allow game-specific logic to override the default behavior
 	if c.StateTransitionHandler != nil && c.StateTransitionHandler(c) {
 		return
@@ -315,8 +333,6 @@ func (c *Character) handleState() {
 		}
 		c.SetState(state)
 	}
-
-	state := c.state.State()
 
 	switch {
 	case state == Hurted:

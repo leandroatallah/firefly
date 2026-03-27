@@ -19,6 +19,9 @@ var (
 	Falling ActorStateEnum
 	Landing ActorStateEnum
 	Hurted  ActorStateEnum
+	Dying   ActorStateEnum
+	Dead    ActorStateEnum
+	Exiting ActorStateEnum
 )
 
 func init() {
@@ -28,6 +31,9 @@ func init() {
 	Falling = RegisterState("fall", func(b BaseState) ActorState { return &FallState{BaseState: b} })
 	Landing = RegisterState("land", func(b BaseState) ActorState { return &LandingState{BaseState: b} })
 	Hurted = RegisterState("hurt", func(b BaseState) ActorState { return &HurtState{BaseState: b} })
+	Dying = RegisterState("die", func(b BaseState) ActorState { return &DyingState{BaseState: b} })
+	Dead = RegisterState("dead", func(b BaseState) ActorState { return &DeadState{BaseState: b} })
+	Exiting = RegisterState("exit", func(b BaseState) ActorState { return &ExitingState{BaseState: b} })
 }
 
 type BaseState struct {
