@@ -74,6 +74,8 @@ func TestCharacter_StateTransitionOverride(t *testing.T) {
 	sMap := sprites.SpriteMap{actors.Idle: &sprites.Sprite{Image: img}}
 	rect := bodyphysics.NewRect(0, 0, 16, 16)
 	c := actors.NewCharacter(sMap, rect)
+	c.SetMaxHealth(100)
+	c.SetHealth(100)
 
 	overrideCalled := false
 	c.SetStateTransitionHandler(func(char *actors.Character) bool {
