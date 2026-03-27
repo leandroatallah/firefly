@@ -1,3 +1,8 @@
+---
+name: agent-workflow
+description: A multi-agent pipeline for automating test coverage improvement.
+---
+
 # Chained Agent Workflow
 
 A multi-agent pipeline for automating test coverage improvement.

@@ -1,3 +1,8 @@
+---
+name: go-testing
+description: Guidelines for table-driven tests, coverage analysis, and package-specific testing patterns.
+---
+
 # Go Testing & Coverage
 
 Write structured table-driven tests with multiple input/output cases.

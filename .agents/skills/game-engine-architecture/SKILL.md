@@ -1,3 +1,8 @@
+---
+name: game-engine-architecture
+description: Core engine patterns for scene lifecycles, state machines, and headless execution.
+---
+
 # Game Engine Architecture
 
 ## Scene Lifecycle

@@ -1,3 +1,8 @@
+---
+name: unstaged-code-review
+description: Review unstaged changes, explain what changed, suggest improvements, and propose focused commits.
+---
+
 # Code Review & Commit Suggestions
 
 Review unstaged changes, explain what changed, suggest improvements, and propose focused commits.
@@ -13,11 +18,13 @@ git status
 
 **2. Explain changes**
 For each modified file, summarize:
+
 - What was added, removed, or refactored
 - Why the change likely exists (inferred from context)
 
 **3. Suggest improvements**
 Look for:
+
 - Missing error handling
 - Untested code paths
 - Style violations (e.g., `_ = variable` pattern)
