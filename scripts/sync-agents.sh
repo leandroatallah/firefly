@@ -37,7 +37,7 @@ for agent_file in "$AGENTS_DIR"/*.md; do
     claude_tools=""
     while IFS= read -r cap; do
         case "$cap" in
-            "execute_commands") claude_tools="${claude_tools:+$claude_tools, }Bash" ;;
+            "execute_commands"|"run_shell_command") claude_tools="${claude_tools:+$claude_tools, }Bash" ;;
             "write_files") claude_tools="${claude_tools:+$claude_tools, }Write" ;;
             "read_files") claude_tools="${claude_tools:+$claude_tools, }Read" ;;
             "code_intelligence") claude_tools="${claude_tools:+$claude_tools, }Grep, Glob" ;;
@@ -66,7 +66,7 @@ EOF
         fi
         first=false
         case "$cap" in
-            "execute_commands") kiro_tools="${kiro_tools}execute_bash" ;;
+            "execute_commands"|"run_shell_command") kiro_tools="${kiro_tools}execute_bash" ;;
             "write_files") kiro_tools="${kiro_tools}fs_write" ;;
             "read_files") kiro_tools="${kiro_tools}fs_read" ;;
             "code_intelligence") kiro_tools="${kiro_tools}code" ;;
@@ -91,7 +91,7 @@ EOF
     opencode_perms=""
     while IFS= read -r cap; do
         case "$cap" in
-            "execute_commands") opencode_perms="${opencode_perms}  shell: true\n" ;;
+            "execute_commands"|"run_shell_command") opencode_perms="${opencode_perms}  shell: true\n" ;;
             "write_files") opencode_perms="${opencode_perms}  write: true\n" ;;
             "read_files") opencode_perms="${opencode_perms}  read: true\n" ;;
             "code_intelligence") opencode_perms="${opencode_perms}  grep: true\n  glob: true\n" ;;

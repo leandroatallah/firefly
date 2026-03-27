@@ -27,16 +27,19 @@ Coordinates the pipeline: triggers agents in sequence, passes outputs between th
 
 ## Workflow Sequence
 
-1. **Coverage Analyzer** → Identify low-coverage packages
-2. **Gap Detector** → Analyze source and identify gaps
-3. **Mock Generator** → Create required mocks (if needed)
-4. **Test Writer** → Write tests for identified gaps
-5. **Coverage Verifier** → Validate tests and measure improvement
-6. Repeat for next priority package until goal reached
+1. **Coverage Analyzer** → Identify low-coverage packages.
+2. **Gap Detector** → Identify missing behaviors/paths.
+3. **Story Architect** → Create User Stories in `.agents/work/backlog/`.
+4. **Spec Engineer** → Create Specs and move Stories to `.agents/work/active/`.
+5. **Mock Generator** → Create required mocks (if needed).
+6. **TDD Specialist** → Write failing (Red) tests based on Specs.
+7. **Feature Implementer** → Write code to pass (Green) tests.
+8. **Workflow Gatekeeper** → Validate the cycle and move Stories to `.agents/work/done/`.
+9. Repeat until goal reached.
 
 ## Inputs
 
-- Target coverage goal (default: 80%)
+- Target coverage goal (default: 80%).
 - Priority list from AGENTS.md:
   1. `internal/engine/entity/actors` (48.0%)
   2. `internal/game/scenes/phases` (0.0%)
@@ -45,22 +48,16 @@ Coordinates the pipeline: triggers agents in sequence, passes outputs between th
 
 ## Outputs
 
-- Final coverage summary report:
-  - Starting coverage per package
-  - Ending coverage per package
-  - Total coverage improvement
-  - Tests written count
-  - Mocks generated count
-  - Time taken
-  - Remaining gaps (if any)
+- Final coverage summary report.
+- Completed User Stories in `.agents/work/done/`.
+- Updated codebase with verified TDD implementations.
 
 ## Error Handling
 
-- Retry failed steps up to 3 times
-- Skip problematic packages and continue with others
-- Log all errors for manual review
-- Provide recommendations for manual intervention if needed
+- Retry failed steps up to 3 times.
+- If a story fails the **Gatekeeper**, backtrack to **TDD Specialist** or **Feature Implementer**.
+- Skip problematic stories and log errors for review.
 
 ## Integration
 
-Coordinates all other agents: **Coverage Analyzer**, **Gap Detector**, **Mock Generator**, **Test Writer**, **Coverage Verifier**.
+Coordinates: **Coverage Analyzer**, **Gap Detector**, **Story Architect**, **Spec Engineer**, **Mock Generator**, **TDD Specialist**, **Feature Implementer**, **Workflow Gatekeeper**.
