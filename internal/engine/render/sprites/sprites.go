@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"image"
 	"io/fs"
+	"os"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -120,4 +121,9 @@ func LoadSprites(fsys fs.FS, list SpriteAssets) (SpriteMap, error) {
 	}
 
 	return res, nil
+}
+
+// LoadSpritesFromOS loads sprites using OS filesystem paths.
+func LoadSpritesFromOS(list SpriteAssets) (SpriteMap, error) {
+	return LoadSprites(os.DirFS("."), list)
 }

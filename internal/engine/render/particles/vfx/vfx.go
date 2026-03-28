@@ -7,6 +7,8 @@ import (
 	"io/fs"
 	"log"
 	"math/rand"
+	"os"
+	"path/filepath"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -81,6 +83,15 @@ func NewManager(fsys fs.FS, path string) *Manager {
 			FrameCount:  1,
 		},
 	}
+}
+
+// NewManagerFromPath loads a VFX manager from an OS filesystem path.
+func NewManagerFromPath(path string) *Manager {
+	dir, file := filepath.Split(path)
+	if dir == "" {
+		dir = "."
+	}
+	return NewManager(os.DirFS(dir), file)
 }
 
 func createConfigFromImage(img *ebiten.Image, vfx VFXConfig) *particles.Config {

@@ -18,14 +18,14 @@ func TestGetSpritesFromAssetsSmoke(t *testing.T) {
 		"idle": "idle_state",
 	}
 
-	_, err := GetSpritesFromAssets(assets, stateMap)
+	_, err := GetSpritesFromAssetsOS(assets, stateMap)
 	if err == nil {
 		t.Error("expected error for non-existent image path")
 	}
 	
 	// Test with no matching states (should be empty map but no error)
 	emptyStateMap := map[string]animation.SpriteState{}
-	res, err := GetSpritesFromAssets(assets, emptyStateMap)
+	res, err := GetSpritesFromAssetsOS(assets, emptyStateMap)
 	if err != nil {
 		t.Errorf("unexpected error for empty state map: %v", err)
 	}

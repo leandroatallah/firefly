@@ -2,6 +2,7 @@ package sprites
 
 import (
 	"io/fs"
+	"os"
 
 	"github.com/leandroatallah/firefly/internal/engine/contracts/animation"
 	"github.com/leandroatallah/firefly/internal/engine/data/schemas"
@@ -21,4 +22,9 @@ func GetSpritesFromAssets(fsys fs.FS, assets map[string]schemas.AssetData, state
 		}
 	}
 	return LoadSprites(fsys, s)
+}
+
+// GetSpritesFromAssetsOS is a convenience wrapper using the OS filesystem.
+func GetSpritesFromAssetsOS(assets map[string]schemas.AssetData, stateMap map[string]animation.SpriteState) (SpriteMap, error) {
+	return GetSpritesFromAssets(os.DirFS("."), assets, stateMap)
 }
