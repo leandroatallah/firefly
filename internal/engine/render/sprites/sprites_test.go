@@ -287,7 +287,7 @@ func TestSpriteAssets_AddSpriteOverwrite(t *testing.T) {
 
 func TestLoadSpritesError(t *testing.T) {
 	sa := SpriteAssets{}.AddSprite("idle", "non_existent.png", true)
-	_, err := LoadSprites(sa)
+	_, err := LoadSpritesFromOS(sa)
 	if err == nil {
 		t.Error("expected error loading non-existent sprite")
 	}
@@ -298,7 +298,7 @@ func TestLoadSprites_Success(t *testing.T) {
 	// to verify the function structure. A full integration test would
 	// require test assets.
 	sa := SpriteAssets{}.AddSprite("test", "non_existent.png", true)
-	sprites, err := LoadSprites(sa)
+	sprites, err := LoadSpritesFromOS(sa)
 	if err == nil {
 		t.Error("expected error for non-existent file")
 	}
@@ -318,14 +318,14 @@ func TestGetSpritesFromAssets(t *testing.T) {
 		"idle": "idle_state",
 	}
 
-	_, err := GetSpritesFromAssets(assets, stateMap)
+	_, err := GetSpritesFromAssetsOS(assets, stateMap)
 	if err == nil {
 		t.Error("expected error for non-existent image path")
 	}
 
 	// Test with no matching states (should be empty map but no error)
 	emptyStateMap := map[string]animation.SpriteState{}
-	res, err := GetSpritesFromAssets(assets, emptyStateMap)
+	res, err := GetSpritesFromAssetsOS(assets, emptyStateMap)
 	if err != nil {
 		t.Errorf("unexpected error for empty state map: %v", err)
 	}
@@ -343,7 +343,7 @@ func TestGetSpritesFromAssets_LoopNil(t *testing.T) {
 		"idle": "idle_state",
 	}
 
-	_, err := GetSpritesFromAssets(assets, stateMap)
+	_, err := GetSpritesFromAssetsOS(assets, stateMap)
 	// Will error on file load, but we're testing the nil Loop handling
 	if err == nil {
 		t.Error("expected error for non-existent file")

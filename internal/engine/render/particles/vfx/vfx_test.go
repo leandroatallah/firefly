@@ -26,7 +26,7 @@ func TestManager(t *testing.T) {
 	_ = os.WriteFile("vfx_test.json", jsonData, 0644)
 	defer os.Remove("vfx_test.json")
 
-	m := NewManager("vfx_test.json")
+	m := NewManagerFromPath("vfx_test.json")
 	if m == nil {
 		t.Fatal("NewManager returned nil")
 	}
