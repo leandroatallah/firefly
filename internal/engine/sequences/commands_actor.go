@@ -149,7 +149,36 @@ func (c *SetSpeedCommand) Init(appContext any) {
 
 func (c *SetSpeedCommand) Update() bool { return true }
 
-// FollowPlayerCommand sets movement state to Follow targeting the player
+// FollowActorCommand sets movement state to Follow targeting a specific actor by ID.
+type FollowActorCommand struct {
+	TargetID       string
+	SubjectID      string
+	StayOnPlatform bool
+}
+
+func (c *FollowActorCommand) Init(appContext any) {
+	ctx := appContext.(*app.AppContext)
+	subject, ok := ctx.ActorManager.Find(c.SubjectID)
+	if !ok {
+		return
+	}
+	for _, a := range resolveActorTargets(ctx, c.TargetID) {
+		ch := a.GetCharacter()
+		if ch != nil {
+			ch.ClearSkills()
+			if c.StayOnPlatform {
+				a.SetMovementState(movement.Follow, subject, movement.WithPlatformFollow())
+			} else {
+				a.SetMovementState(movement.Follow, subject)
+			}
+		}
+	}
+}
+
+func (c *FollowActorCommand) Update() bool { return true }
+
+// FollowPlayerCommand sets movement state to Follow targeting the primary player.
+// It is a convenience wrapper around FollowActorCommand for single-player games.
 type FollowPlayerCommand struct {
 	TargetID       string
 	StayOnPlatform bool
@@ -161,17 +190,12 @@ func (c *FollowPlayerCommand) Init(appContext any) {
 	if !ok {
 		return
 	}
-	for _, a := range resolveActorTargets(ctx, c.TargetID) {
-		ch := a.GetCharacter()
-		if ch != nil {
-			ch.ClearSkills()
-			if c.StayOnPlatform {
-				a.SetMovementState(movement.Follow, player, movement.WithPlatformFollow())
-			} else {
-				a.SetMovementState(movement.Follow, player)
-			}
-		}
+	cmd := &FollowActorCommand{
+		TargetID:       c.TargetID,
+		SubjectID:      player.ID(),
+		StayOnPlatform: c.StayOnPlatform,
 	}
+	cmd.Init(appContext)
 }
 
 func (c *FollowPlayerCommand) Update() bool { return true }

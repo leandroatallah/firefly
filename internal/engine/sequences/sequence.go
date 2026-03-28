@@ -2,7 +2,10 @@ package sequences
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/fs"
+	"os"
+	"path/filepath"
 
 	"github.com/leandroatallah/firefly/internal/engine/contracts/sequences"
 )
@@ -57,8 +60,9 @@ type CommandData struct {
 	EndX     float64 `json:"end_x,omitempty"`
 	Speed    float64 `json:"speed,omitempty"`
 
-	// Fields for "follow_player"
-	StayOnPlatform bool `json:"stay_on_platform,omitempty"`
+	// Fields for "follow_player" / "follow_actor"
+	StayOnPlatform bool   `json:"stay_on_platform,omitempty"`
+	SubjectID      string `json:"subject_id,omitempty"`
 
 	// Per-command control over whether this command blocks the sequence timeline.
 	// If omitted, commands are treated as blocking (current default behavior).
@@ -132,6 +136,12 @@ func (cd *CommandData) ToCommand() sequences.Command {
 	case "follow_player":
 		return &FollowPlayerCommand{
 			TargetID:       cd.TargetID,
+			StayOnPlatform: cd.StayOnPlatform,
+		}
+	case "follow_actor":
+		return &FollowActorCommand{
+			TargetID:       cd.TargetID,
+			SubjectID:      cd.SubjectID,
 			StayOnPlatform: cd.StayOnPlatform,
 		}
 	case "stop_following":
@@ -217,8 +227,17 @@ func (cd *CommandData) ToCommand() sequences.Command {
 	return nil
 }
 
-// NewSequenceFromJSON loads a sequence from a JSON file path.
-func NewSequenceFromJSON(fsys fs.FS, filePath string) (*Sequence, error) {
+// NewSequenceFromJSON loads a sequence from an absolute file path on the OS filesystem.
+func NewSequenceFromJSON(filePath string) (*Sequence, error) {
+	dir, file := filepath.Split(filePath)
+	return NewSequenceFromFS(os.DirFS(dir), file, filePath)
+}
+
+// NewSequenceFromFS loads a sequence from a file within an fs.FS.
+func NewSequenceFromFS(fsys fs.FS, filePath string, fullPath ...string) (*Sequence, error) {
+	if fsys == nil {
+		return &Sequence{}, fmt.Errorf("NewSequenceFromFS: nil fs.FS for path %q", filePath)
+	}
 	data, err := fs.ReadFile(fsys, filePath)
 	if err != nil {
 		return &Sequence{}, err
@@ -253,12 +272,18 @@ func NewSequenceFromJSON(fsys fs.FS, filePath string) (*Sequence, error) {
 		oneTime = *sequenceData.OneTime
 	}
 
+	// Use the full path if provided (for os-based callers), otherwise use filePath
+	storedPath := filePath
+	if len(fullPath) > 0 {
+		storedPath = fullPath[0]
+	}
+
 	return &Sequence{
 		commands:            commands,
 		BlockPlayerMovement: sequenceData.BlockPlayerMovement,
 		interruptible:       interruptible,
 		oneTime:             oneTime,
-		Path:                filePath,
+		Path:                storedPath,
 		blockSequenceFlags:  flags,
 	}, nil
 }

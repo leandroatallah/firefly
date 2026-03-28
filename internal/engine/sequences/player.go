@@ -35,7 +35,7 @@ func NewSequencePlayer(appContext *app.AppContext) *SequencePlayer {
 
 // PlaySequence loads and plays a sequence from a JSON file.
 func (p *SequencePlayer) PlaySequence(filePath string) {
-	sequence, err := NewSequenceFromJSON(p.AppContext().Assets, filePath)
+	sequence, err := NewSequenceFromFS(p.AppContext().Assets, filePath)
 	if err != nil {
 		return
 	}

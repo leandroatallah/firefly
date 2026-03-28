@@ -28,7 +28,11 @@ func (c *CallSequenceCommand) Init(appContext any) {
 	}
 
 	var err error
-	c.nestedSequence, err = NewSequenceFromJSON(ctx.Assets, sequencePath)
+	if filepath.IsAbs(sequencePath) {
+		c.nestedSequence, err = NewSequenceFromJSON(sequencePath)
+	} else {
+		c.nestedSequence, err = NewSequenceFromFS(ctx.Assets, sequencePath)
+	}
 	if err != nil {
 		// If loading fails, mark as complete so the sequence continues
 		c.isComplete = true
