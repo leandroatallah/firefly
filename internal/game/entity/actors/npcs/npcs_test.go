@@ -42,6 +42,7 @@ func TestMain(m *testing.M) {
 func TestNewPrincess(t *testing.T) {
 	ctx := &app.AppContext{
 		ActorManager: actors.NewManager(),
+		Assets:       os.DirFS("."),
 	}
 
 	s, err := NewPrincess(ctx, 100, 100, "princess-1")

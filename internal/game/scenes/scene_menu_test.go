@@ -38,6 +38,12 @@ func TestMenuScene_Structure(t *testing.T) {
 
 	s.OnStart()
 
+	// mainMenu becomes visible after 1 second of updates
+	ticks := timing.FromDuration(time.Second) + 1
+	for i := 0; i < ticks; i++ {
+		s.Update()
+	}
+
 	if !s.mainMenu.Visible() {
 		t.Error("mainMenu should be visible after OnStart")
 	}

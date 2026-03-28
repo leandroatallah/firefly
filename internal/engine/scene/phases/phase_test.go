@@ -53,6 +53,11 @@ func (p *testPlayer) Stop() {
 	p.playing = false
 }
 
+func (p *testPlayer) PlaySequence(filePath string) {
+	p.playing = true
+	p.isOver = false
+}
+
 func (p *testPlayer) Update() {
 	p.updates++
 }

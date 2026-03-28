@@ -54,10 +54,15 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-func TestNewCollectibleCoinItem(t *testing.T) {
-	ctx := &app.AppContext{
+func newTestCtx() *app.AppContext {
+	return &app.AppContext{
 		ActorManager: actors.NewManager(),
+		Assets:       os.DirFS("."),
 	}
+}
+
+func TestNewCollectibleCoinItem(t *testing.T) {
+	ctx := newTestCtx()
 	
 	coin, err := NewCollectibleCoinItem(ctx, 100, 100, "coin-1")
 	if err != nil {
@@ -74,10 +79,8 @@ func TestNewCollectibleCoinItem(t *testing.T) {
 }
 
 func TestCollectibleCoinItem_OnTouch(t *testing.T) {
-	actorMgr := actors.NewManager()
-	ctx := &app.AppContext{
-		ActorManager: actorMgr,
-	}
+	ctx := newTestCtx()
+	actorMgr := ctx.ActorManager
 	
 	coin, err := NewCollectibleCoinItem(ctx, 100, 100, "coin-1")
 	if err != nil {
@@ -107,9 +110,7 @@ func TestCollectibleCoinItem_OnTouch(t *testing.T) {
 }
 
 func TestNewFallingPlatformItem(t *testing.T) {
-	ctx := &app.AppContext{
-		ActorManager: actors.NewManager(),
-	}
+	ctx := newTestCtx()
 	
 	fp, err := NewFallingPlatformItem(ctx, 100, 100, "fp-1")
 	if err != nil {
@@ -133,9 +134,7 @@ func TestNewFallingPlatformItem(t *testing.T) {
 }
 
 func TestNewPowerUpItems(t *testing.T) {
-	ctx := &app.AppContext{
-		ActorManager: actors.NewManager(),
-	}
+	ctx := newTestCtx()
 
 	tests := []struct {
 		name    string
