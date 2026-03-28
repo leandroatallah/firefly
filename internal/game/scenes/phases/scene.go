@@ -110,6 +110,7 @@ func (s *PhasesScene) OnStart() {
 		}
 		s.player = p
 		ctx.ActorManager.Register(s.player)
+		ctx.ActorManager.RegisterPrimary(s.player)
 		s.PhysicsSpace().AddBody(s.player)
 
 		// Optionally block input for the current player of this phase

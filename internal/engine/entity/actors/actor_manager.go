@@ -4,7 +4,8 @@ import "fmt"
 
 // Manager holds a registry of all active actors in a scene.
 type Manager struct {
-	actors map[string]ActorEntity
+	actors        map[string]ActorEntity
+	primaryActor  ActorEntity
 }
 
 // NewManager creates a new actor manager.
@@ -12,6 +13,11 @@ func NewManager() *Manager {
 	return &Manager{
 		actors: make(map[string]ActorEntity),
 	}
+}
+
+// RegisterPrimary designates an actor as the primary (player-controlled) entity.
+func (m *Manager) RegisterPrimary(actor ActorEntity) {
+	m.primaryActor = actor
 }
 
 // Register adds an actor to the manager.
@@ -41,14 +47,13 @@ func (m *Manager) Clear() {
 	}
 }
 
-// GetPlayer retrieves the player actor.
-// It assumes the player is registered with the ID "player".
+// GetPlayer retrieves the primary actor registered via RegisterPrimary.
+// Falls back to finding an actor with ID "player" for backward compatibility.
 func (m *Manager) GetPlayer() (ActorEntity, bool) {
-	p, found := m.Find("player")
-	if !found {
-		return nil, false
+	if m.primaryActor != nil {
+		return m.primaryActor, true
 	}
-	return p, true
+	return m.Find("player")
 }
 
 func (m *Manager) ForEach(f func(ActorEntity)) {
