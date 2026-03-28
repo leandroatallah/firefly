@@ -113,3 +113,13 @@ func (c *Controller) AddTrauma(amount float64) {
 func (c *Controller) CamDebug() {
 	c.base.CamDebug()
 }
+
+// Kamera returns nil; the game camera layer does not expose the underlying kamera instance.
+func (c *Controller) Kamera() interface{} {
+	return nil
+}
+
+// DisableSmoothing delegates to the base camera controller.
+func (c *Controller) DisableSmoothing() {
+	c.base.DisableSmoothing()
+}

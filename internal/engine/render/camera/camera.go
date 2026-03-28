@@ -229,6 +229,12 @@ func (c *Controller) Kamera() *kamera.Camera {
 	return c.cam
 }
 
+// DisableSmoothing sets the camera to use no smoothing (instant movement).
+// Useful for tests.
+func (c *Controller) DisableSmoothing() {
+	c.cam.SmoothType = kamera.None
+}
+
 func (c *Controller) Position() image.Rectangle {
 	// return c.target.Position()
 	return c.followTarget.Position()
