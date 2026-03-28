@@ -30,6 +30,7 @@ func TestControllerVerticalOnlyUpward(t *testing.T) {
 	setupConfig()
 	base := enginecamera.NewController(160, 120)
 	ctrl := NewController(base)
+	base.DisableSmoothing()
 
 	rect := bodyphysics.NewRect(100, 100, 32, 16)
 	target := bodyphysics.NewCollidableBodyFromRect(rect)
@@ -74,6 +75,7 @@ func TestControllerBoundsClamping(t *testing.T) {
 	setupConfig()
 	base := enginecamera.NewController(160, 120)
 	ctrl := NewController(base)
+	base.DisableSmoothing()
 
 	// Set bounds [0, 0] to [1000, 1000]
 	// Viewport is [320, 240], half [160, 120]
@@ -112,6 +114,7 @@ func TestControllerSettersUpdateLastCameraY(t *testing.T) {
 	setupConfig()
 	base := enginecamera.NewController(0, 0)
 	ctrl := NewController(base)
+	base.DisableSmoothing()
 
 	// SetCenter should update lastCameraY
 	ctrl.SetCenter(100, 200)
@@ -121,6 +124,7 @@ func TestControllerSettersUpdateLastCameraY(t *testing.T) {
 	target := bodyphysics.NewCollidableBodyFromRect(rect)
 	target.SetPosition(100, 300) // center Y is 308
 	ctrl.SetFollowTarget(target) // SetFollowTarget also updates lastCameraY to target center
+	ctrl.SetFollowing(true)
 	
 	ctrl.Update()
 	_, cy := base.Kamera().Center()
@@ -158,6 +162,7 @@ func TestControllerDelegations(t *testing.T) {
 	setupConfig()
 	base := enginecamera.NewController(0, 0)
 	ctrl := NewController(base)
+	base.DisableSmoothing()
 
 	if ctrl.IsFollowing() {
 		t.Error("expected IsFollowing to be false initially")
