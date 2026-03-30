@@ -118,5 +118,4 @@ func (t *Transition) Draw(_ *ebiten.Image) {}  // Use blank in param list
 | `sequences` | 60.8% | Command execution and completion conditions |
 | `entity/items` | 52.3% | Item collection and state transitions |
 | `scene` | 73.0% | Scene transitions and tilemap initialization |
-| `game/physics/skill` | 78.0% | Game-specific power-ups (freeze, grow, star) |
 | `data/i18n` | (new) | `I18nManager.Load()` and `T()` methods, error handling |

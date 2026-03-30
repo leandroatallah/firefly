@@ -1,6 +1,6 @@
 # Engine Module
 
-This module contains the core, reusable game engine components for the Firefly project. It is designed to be game-agnostic and provides the fundamental building blocks for creating a 2D game.
+This module contains the core, reusable game engine components. It is designed to be game-agnostic and provides the fundamental building blocks for creating a 2D game.
 
 ## Core Components
 
