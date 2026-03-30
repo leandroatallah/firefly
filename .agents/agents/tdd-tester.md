@@ -17,8 +17,9 @@ Acts as the "Tester". Strictly follows the **Red Phase** of TDD. Writes failing 
 
 - Read Specifications from `.agents/work/active/SPEC_[ID].md`.
 - Write table-driven tests in `*_test.go`.
-- Ensure the test **fails** to compile or fails its assertions (showing why the feature is needed).
-- Use `internal/engine/mocks/` and interfaces for isolation.
+- Tests must verify **observable behavior through public interfaces** — not implementation details, internal call counts, or private state. Test names describe *what* the system does, not *how*.
+- Ensure tests fail for the right reason: **missing behavior**, not just a missing symbol or signature.
+- Mock only at **system boundaries** (e.g., physics space, audio, file I/O) using `internal/engine/mocks/`. Do not mock internal engine packages you control.
 - Strictly adhere to `AGENTS.md` (no `_ = variable`, Go style).
 
 ## Inputs
@@ -30,7 +31,7 @@ Acts as the "Tester". Strictly follows the **Red Phase** of TDD. Writes failing 
 ## Outputs
 
 - Failing `*_test.go` file.
-- Error report showing the test failed (The **Red** proof).
+- Error report showing the test failed (The **Red** proof), including *why* it fails (behavior missing, not just missing symbol).
 
 ## Integration
 

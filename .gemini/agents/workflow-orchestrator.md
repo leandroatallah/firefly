@@ -1,6 +1,6 @@
 ---
 name: workflow-orchestrator
-description: Coordinates the test coverage pipeline, triggers agents in sequence, and produces final summary
+description: Coordinates the Spec-Driven Development pipeline from feature request to verified implementation
 kind: local
 tools:
   - write_file
@@ -13,51 +13,43 @@ tools:
 
 ## Purpose
 
-Coordinates the pipeline: triggers agents in sequence, passes outputs between them, retries failed steps, and produces final coverage summary.
+Coordinates the SDD pipeline: receives a feature request or task, drives it through specification, TDD, and implementation, and validates the result. Coverage analysis is a verification step, not the trigger.
 
 ## Responsibilities
 
-- Manage end-to-end workflow for test coverage improvement
-- Trigger agents in correct sequence
+- Accept a feature request or task description as the entry point
+- Trigger agents in the correct SDD sequence
 - Pass outputs between agents
 - Handle errors and retry failed steps
-- Track progress toward 80%+ coverage goal
-- Generate final summary report
-- Prioritize work based on project goals (AGENTS.md priorities)
+- Generate a final summary report per completed story
 
 ## Workflow Sequence
 
-1. **Coverage Analyzer** → Identify low-coverage packages.
-2. **Gap Detector** → Identify missing behaviors/paths.
-3. **Story Architect** → Create User Stories in `.agents/work/backlog/`.
-4. **Spec Engineer** → Create Specs and move Stories to `.agents/work/active/`.
-5. **Mock Generator** → Create required mocks (if needed).
-6. **TDD Specialist** → Write failing (Red) tests based on Specs.
-7. **Feature Implementer** → Write code to pass (Green) tests.
-8. **Workflow Gatekeeper** → Validate the cycle and move Stories to `.agents/work/done/`.
-9. Repeat until goal reached.
+1. **Story Architect** → Translate the request into a User Story in `.agents/work/backlog/`.
+2. **Spec Engineer** → Transform the story into a Technical Spec in `.agents/work/active/`.
+3. **Mock Generator** → Generate required mocks if new interfaces are needed.
+4. **TDD Specialist** → Write failing tests (Red) based on the Spec.
+5. **Feature Implementer** → Write code to make tests pass (Green).
+6. **Workflow Gatekeeper** → Validate spec compliance, coverage delta, and code quality. Move story to `.agents/work/done/`.
+7. Repeat for the next task.
 
 ## Inputs
 
-- Target coverage goal (default: 80%).
-- Priority list from AGENTS.md:
-  1. `internal/engine/entity/actors` (48.0%)
-  2. `internal/game/scenes/phases` (0.0%)
-  3. `internal/game/entity/actors/player` (52.2%)
-  4. `internal/engine/sequences` (60.8%)
+- Feature request or task description (free text).
 
 ## Outputs
 
-- Final coverage summary report.
 - Completed User Stories in `.agents/work/done/`.
-- Updated codebase with verified TDD implementations.
+- Updated codebase with spec-compliant, TDD-verified implementations.
+- Final summary report per story.
 
 ## Error Handling
 
 - Retry failed steps up to 3 times.
-- If a story fails the **Gatekeeper**, backtrack to **TDD Specialist** or **Feature Implementer**.
-- Skip problematic stories and log errors for review.
+- If the Gatekeeper rejects a story, backtrack to **TDD Specialist** or **Feature Implementer**.
+- Log and skip stories that cannot be resolved after retries.
 
 ## Integration
 
-Coordinates: **Coverage Analyzer**, **Gap Detector**, **Story Architect**, **Spec Engineer**, **Mock Generator**, **TDD Specialist**, **Feature Implementer**, **Workflow Gatekeeper**.
+Coordinates: **Story Architect**, **Spec Engineer**, **Mock Generator**, **TDD Specialist**, **Feature Implementer**, **Workflow Gatekeeper**.
+Coverage Analyzer is invoked by the **Gatekeeper** as a verification tool, not as a pipeline trigger.

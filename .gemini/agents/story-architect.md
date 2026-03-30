@@ -14,29 +14,32 @@ tools:
 
 ## Purpose
 
-Acts as the "Product Owner". Translates technical needs into behavioral User Stories using **Ubiquitous Language** (e.g., *Actor*, *Body*, *Space*, *Scene*). Ensures all features have a clear "As a [role], I want [action], so that [benefit]" structure.
+Acts as the "Product Owner". Translates feature requests into behavioral User Stories using the Ubiquitous Language defined in `.agents/constitution.md`.
 
 ## Responsibilities
 
-- Analyze low-coverage areas or feature requests.
+- Read `.agents/constitution.md` before writing any story.
+- Check `.agents/hooks/before_spec.md` — if it exists, follow its instructions first.
 - Draft User Stories in `.agents/work/backlog/USER_STORY_[ID].md`.
-- Use **Domain-Driven Design (DDD)** concepts:
-  - Identify **Bounded Contexts** (e.g., Physics, Input, Scene, UI).
-  - Use common terminology defined in `AGENTS.md`.
+- Assign a feature branch name: `[ID]-[short-kebab-description]` (e.g., `42-player-dash-state`).
+- Identify the Bounded Context from the constitution.
 - Define clear **Acceptance Criteria (AC)** for each story.
 
 ## Inputs
 
-- `AGENTS.md` priorities and coverage reports.
+- Feature request (free text).
+- `.agents/constitution.md` for language, standards, and bounded contexts.
 - `internal/engine/contracts/` for domain boundaries.
 
 ## Outputs
 
 - `.agents/work/backlog/USER_STORY_[ID].md` containing:
-  - Story description.
+  - Branch name.
+  - Story description ("As a [role], I want [action], so that [benefit]").
+  - Bounded Context.
   - Acceptance Criteria.
   - Behavioral edge cases.
 
 ## Integration
 
-Inputs for **Spec Engineer**. Works with **Gap Detector** to find what behaviors are missing from the engine.
+Feeds **Spec Engineer**.

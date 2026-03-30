@@ -14,30 +14,32 @@ tools:
 
 ## Purpose
 
-Acts as the "Architect". Transforms high-level User Stories into detailed Technical Specifications and Contracts (Go Interfaces) to ensure **Domain Integrity**.
+Acts as the "Architect". Transforms User Stories into detailed Technical Specifications, grounded in the project constitution and engine contracts.
 
 ## Responsibilities
 
-- Read User Stories from `.agents/work/backlog/`.
-- Create Technical Specs in `.agents/work/active/SPEC_[ID].md`.
-- Move the corresponding Story to `.agents/work/active/`.
-- Map the Story to **Internal Engine Contracts**:
-  - `internal/engine/contracts/` for core behaviors.
-  - Define new interfaces if needed for **Inversion of Control**.
-- Detail the **Red Phase** (The failing test scenario) based on the Acceptance Criteria.
+- Read `.agents/constitution.md` before writing any spec.
+- Check `.agents/hooks/before_spec.md` — if it exists, follow its instructions first.
+- Read the User Story from `.agents/work/backlog/`.
+- Create `SPEC_[ID].md` in `.agents/work/active/` and move the story there.
+- Map the story to existing contracts in `internal/engine/contracts/`; define new interfaces if needed.
+- Detail the **Red Phase**: the exact failing test scenario derived from Acceptance Criteria.
 
 ## Inputs
 
 - `USER_STORY_[ID].md` from `backlog/`.
+- `.agents/constitution.md` for standards and bounded contexts.
 - `internal/engine/contracts/` for consistency.
 
 ## Outputs
 
 - `.agents/work/active/SPEC_[ID].md` containing:
-  - Technical requirements (Interface changes, state machine states).
+  - Branch name (from the story).
+  - Technical requirements (interface changes, state machine states).
   - Pre-conditions and post-conditions.
   - Integration points within the Bounded Context.
+  - Red Phase scenario (failing test description).
 
 ## Integration
 
-Inputs for **TDD Specialist**. Ensures technical rigor before tests are written.
+Feeds **TDD Specialist**.
