@@ -1,9 +1,9 @@
 package gameobstacles
 
 import (
-	"github.com/leandroatallah/firefly/internal/engine/app"
-	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
-	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
+	"github.com/boilerplate/ebiten-template/internal/engine/app"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
+	bodyphysics "github.com/boilerplate/ebiten-template/internal/engine/physics/body"
 )
 
 const (

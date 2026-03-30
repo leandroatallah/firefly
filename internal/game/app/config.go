@@ -4,9 +4,9 @@ import (
 	"flag"
 	"time"
 
-	"github.com/leandroatallah/firefly/internal/engine/data/config"
-	"github.com/leandroatallah/firefly/internal/engine/utils/fp16"
-	"github.com/leandroatallah/firefly/internal/engine/utils/timing"
+	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
+	"github.com/boilerplate/ebiten-template/internal/engine/utils/fp16"
+	"github.com/boilerplate/ebiten-template/internal/engine/utils/timing"
 )
 
 const (

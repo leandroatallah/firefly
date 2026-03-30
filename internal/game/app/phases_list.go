@@ -1,9 +1,9 @@
 package gamesetup
 
 import (
-	"github.com/leandroatallah/firefly/internal/engine/scene/phases"
-	gamescenephases "github.com/leandroatallah/firefly/internal/game/scenes/phases"
-	scenestypes "github.com/leandroatallah/firefly/internal/game/scenes/types"
+	"github.com/boilerplate/ebiten-template/internal/engine/scene/phases"
+	gamescenephases "github.com/boilerplate/ebiten-template/internal/game/scenes/phases"
+	scenestypes "github.com/boilerplate/ebiten-template/internal/game/scenes/types"
 )
 
 func GetPhases() []phases.Phase {

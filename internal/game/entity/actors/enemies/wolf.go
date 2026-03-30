@@ -1,14 +1,14 @@
 package gameenemies
 
 import (
-	"github.com/leandroatallah/firefly/internal/engine/app"
-	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
-	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
-	"github.com/leandroatallah/firefly/internal/engine/entity/actors/builder"
-	"github.com/leandroatallah/firefly/internal/engine/entity/actors/movement"
-	"github.com/leandroatallah/firefly/internal/engine/entity/actors/platformer"
-	gameplayer "github.com/leandroatallah/firefly/internal/game/entity/actors/player"
-	gamestates "github.com/leandroatallah/firefly/internal/game/entity/actors/states"
+	"github.com/boilerplate/ebiten-template/internal/engine/app"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
+	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
+	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/builder"
+	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/movement"
+	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/platformer"
+	gameplayer "github.com/boilerplate/ebiten-template/internal/game/entity/actors/player"
+	gamestates "github.com/boilerplate/ebiten-template/internal/game/entity/actors/states"
 )
 
 type WolfEnemy struct {

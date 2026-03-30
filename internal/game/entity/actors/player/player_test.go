@@ -5,12 +5,12 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/leandroatallah/firefly/internal/engine/app"
-	"github.com/leandroatallah/firefly/internal/engine/data/config"
-	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
-	"github.com/leandroatallah/firefly/internal/engine/event"
-	"github.com/leandroatallah/firefly/internal/engine/physics/space"
-	_ "github.com/leandroatallah/firefly/internal/game/entity/actors/states"
+	"github.com/boilerplate/ebiten-template/internal/engine/app"
+	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
+	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
+	"github.com/boilerplate/ebiten-template/internal/engine/event"
+	"github.com/boilerplate/ebiten-template/internal/engine/physics/space"
+	_ "github.com/boilerplate/ebiten-template/internal/game/entity/actors/states"
 )
 
 func getModuleRoot() string {

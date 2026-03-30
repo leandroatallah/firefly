@@ -1,16 +1,13 @@
 package gameplayer
 
 import (
-	"github.com/leandroatallah/firefly/internal/engine/app"
-	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
-	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
-	"github.com/leandroatallah/firefly/internal/engine/entity/actors/builder"
-	"github.com/leandroatallah/firefly/internal/engine/entity/actors/platformer"
-	gameplayermethods "github.com/leandroatallah/firefly/internal/game/entity/actors/methods"
-	gamestates "github.com/leandroatallah/firefly/internal/game/entity/actors/states"
-	gameentitytypes "github.com/leandroatallah/firefly/internal/game/entity/types"
-	gameskill "github.com/leandroatallah/firefly/internal/game/physics/skill"
-	gamevfx "github.com/leandroatallah/firefly/internal/game/render/vfx"
+	"github.com/boilerplate/ebiten-template/internal/engine/app"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
+	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
+	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/builder"
+	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/platformer"
+	gameplayermethods "github.com/boilerplate/ebiten-template/internal/game/entity/actors/methods"
+	gamestates "github.com/boilerplate/ebiten-template/internal/game/entity/actors/states"
 )
 
 // climberStateTransitionLogic provides custom state handling for the ClimberPlayer.

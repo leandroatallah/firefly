@@ -1,7 +1,7 @@
 package gameplayermethods
 
 import (
-	"github.com/leandroatallah/firefly/internal/engine/entity/actors/platformer"
+	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/platformer"
 )
 
 type PlayerDeathBehavior struct {

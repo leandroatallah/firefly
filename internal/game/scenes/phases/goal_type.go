@@ -1,6 +1,6 @@
 package gamescenephases
 
-import "github.com/leandroatallah/firefly/internal/engine/scene/phases"
+import "github.com/boilerplate/ebiten-template/internal/engine/scene/phases"
 
 var (
 	ReactEndpointType phases.GoalType = "reach_endpoint"

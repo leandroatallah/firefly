@@ -3,10 +3,10 @@ package gamenpcs
 import (
 	"log"
 
-	"github.com/leandroatallah/firefly/internal/engine/app"
-	"github.com/leandroatallah/firefly/internal/engine/entity/actors/npcs"
-	"github.com/leandroatallah/firefly/internal/engine/entity/actors/platformer"
-	gameplayer "github.com/leandroatallah/firefly/internal/game/entity/actors/player"
+	"github.com/boilerplate/ebiten-template/internal/engine/app"
+	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/npcs"
+	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/platformer"
+	gameplayer "github.com/boilerplate/ebiten-template/internal/game/entity/actors/player"
 )
 
 const (

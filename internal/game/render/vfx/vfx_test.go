@@ -7,10 +7,10 @@ import (
 	"testing/fstest"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/leandroatallah/firefly/internal/engine/data/config"
-	"github.com/leandroatallah/firefly/internal/engine/mocks"
-	"github.com/leandroatallah/firefly/internal/engine/render/camera"
-	enginevfx "github.com/leandroatallah/firefly/internal/engine/render/particles/vfx"
+	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
+	"github.com/boilerplate/ebiten-template/internal/engine/mocks"
+	"github.com/boilerplate/ebiten-template/internal/engine/render/camera"
+	enginevfx "github.com/boilerplate/ebiten-template/internal/engine/render/particles/vfx"
 )
 
 func TestMain(m *testing.M) {

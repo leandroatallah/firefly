@@ -1,46 +1,41 @@
 package gamescenephases
 
 import (
-	"fmt"
-	"image"
 	"image/color"
 	"log"
-	"math"
-	"strings"
 	"time"
 
+	"github.com/boilerplate/ebiten-template/internal/engine/app"
+	"github.com/boilerplate/ebiten-template/internal/engine/assets/font"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
+	sequencestypes "github.com/boilerplate/ebiten-template/internal/engine/contracts/sequences"
+	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
+	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
+	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/enemies"
+	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/npcs"
+	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/platformer"
+	"github.com/boilerplate/ebiten-template/internal/engine/entity/items"
+	bodyphysics "github.com/boilerplate/ebiten-template/internal/engine/physics/body"
+	enginecamera "github.com/boilerplate/ebiten-template/internal/engine/render/camera"
+	"github.com/boilerplate/ebiten-template/internal/engine/render/screenutil"
+	enginevfx "github.com/boilerplate/ebiten-template/internal/engine/render/vfx"
+	"github.com/boilerplate/ebiten-template/internal/engine/scene"
+	"github.com/boilerplate/ebiten-template/internal/engine/scene/pause"
+	"github.com/boilerplate/ebiten-template/internal/engine/scene/phases"
+	"github.com/boilerplate/ebiten-template/internal/engine/scene/transition"
+	"github.com/boilerplate/ebiten-template/internal/engine/sequences"
+	"github.com/boilerplate/ebiten-template/internal/engine/ui/menu"
+	"github.com/boilerplate/ebiten-template/internal/engine/utils"
+	"github.com/boilerplate/ebiten-template/internal/engine/utils/timing"
+	gameenemies "github.com/boilerplate/ebiten-template/internal/game/entity/actors/enemies"
+	gamenpcs "github.com/boilerplate/ebiten-template/internal/game/entity/actors/npcs"
+	gamestates "github.com/boilerplate/ebiten-template/internal/game/entity/actors/states"
+	gameitems "github.com/boilerplate/ebiten-template/internal/game/entity/items"
+	gameentitytypes "github.com/boilerplate/ebiten-template/internal/game/entity/types"
+	gamecamera "github.com/boilerplate/ebiten-template/internal/game/render/camera"
+	scenestypes "github.com/boilerplate/ebiten-template/internal/game/scenes/types"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/vector"
-	"github.com/leandroatallah/firefly/internal/engine/app"
-	"github.com/leandroatallah/firefly/internal/engine/assets/font"
-	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
-	sequencestypes "github.com/leandroatallah/firefly/internal/engine/contracts/sequences"
-	"github.com/leandroatallah/firefly/internal/engine/data/config"
-	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
-	"github.com/leandroatallah/firefly/internal/engine/entity/actors/enemies"
-	"github.com/leandroatallah/firefly/internal/engine/entity/actors/npcs"
-	"github.com/leandroatallah/firefly/internal/engine/entity/actors/platformer"
-	"github.com/leandroatallah/firefly/internal/engine/entity/items"
-	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
-	enginecamera "github.com/leandroatallah/firefly/internal/engine/render/camera"
-	"github.com/leandroatallah/firefly/internal/engine/render/screenutil"
-	enginevfx "github.com/leandroatallah/firefly/internal/engine/render/vfx"
-	"github.com/leandroatallah/firefly/internal/engine/scene"
-	"github.com/leandroatallah/firefly/internal/engine/scene/pause"
-	"github.com/leandroatallah/firefly/internal/engine/scene/phases"
-	"github.com/leandroatallah/firefly/internal/engine/scene/transition"
-	"github.com/leandroatallah/firefly/internal/engine/sequences"
-	"github.com/leandroatallah/firefly/internal/engine/ui/menu"
-	"github.com/leandroatallah/firefly/internal/engine/utils"
-	"github.com/leandroatallah/firefly/internal/engine/utils/timing"
-	gameenemies "github.com/leandroatallah/firefly/internal/game/entity/actors/enemies"
-	gamenpcs "github.com/leandroatallah/firefly/internal/game/entity/actors/npcs"
-	gameplayer "github.com/leandroatallah/firefly/internal/game/entity/actors/player"
-	gamestates "github.com/leandroatallah/firefly/internal/game/entity/actors/states"
-	gameitems "github.com/leandroatallah/firefly/internal/game/entity/items"
-	gameentitytypes "github.com/leandroatallah/firefly/internal/game/entity/types"
-	gamecamera "github.com/leandroatallah/firefly/internal/game/render/camera"
-	scenestypes "github.com/leandroatallah/firefly/internal/game/scenes/types"
 )
 
 type PhasesScene struct {
@@ -60,15 +55,15 @@ type PhasesScene struct {
 
 	// Navigation triggers
 	completionTrigger utils.DelayTrigger
+	deathTrigger      utils.DelayTrigger
 
 	// UI effects
 	ShowDrawScreenFlash int
 
-	screenFlipper    *scene.ScreenFlipper
-	sequencePlayer   sequencestypes.Player
-	pauseScreen      *pause.PauseScreen
-	pauseMenu        *menu.Menu
-	pauseOptionsMenu *menu.Menu
+	screenFlipper  *scene.ScreenFlipper
+	sequencePlayer sequencestypes.Player
+	pauseScreen    *pause.PauseScreen
+	pauseMenu      *menu.Menu
 
 	// Game-layer camera controller with vertical-only-upward constraint
 	gameCamera *gamecamera.Controller
@@ -96,6 +91,7 @@ func NewPhasesScene(ctx *app.AppContext) *PhasesScene {
 func (s *PhasesScene) OnStart() {
 	s.TilemapScene.OnStart()
 	s.count = 0
+	s.death.active = false
 
 	ctx := s.AppContext()
 
@@ -177,26 +173,11 @@ func (s *PhasesScene) OnStart() {
 	s.pauseMenu.AddItem("", func() {
 		s.pauseScreen.Toggle()
 	})
-	// Restart
-	s.pauseMenu.AddItem("", func() {
-		s.pauseScreen.Toggle()
-		s.freezeAllActors()
-		ctx.SceneManager.NavigateTo(
-			scenestypes.ScenePhaseReboot,
-			transition.NewFader(0, config.Get().FadeVisibleDuration),
-			true,
-		)
-	})
-	// Options
-	s.pauseMenu.AddItem("", func() {
-		s.pauseScreen.SetMenu(s.pauseOptionsMenu)
-	})
 	// Exit to Menu
 	s.pauseMenu.AddItem("", func() {
 		s.pauseScreen.Toggle()
 		s.freezeAllActors()
 		ctx.AudioManager.PauseCurrentMusic()
-		// NewRedirectScene
 		ctx.SceneManager.NavigateTo(
 			scenestypes.SceneMenu,
 			transition.NewFader(0, time.Duration(2*time.Second)),
@@ -209,40 +190,6 @@ func (s *PhasesScene) OnStart() {
 		ctx.AudioManager.PlaySound("assets/audio/Menu_Click.ogg")
 	})
 	s.pauseMenu.SetOnSelect(func() {
-		ctx.AudioManager.PlaySound("assets/audio/Menu_Select2.ogg")
-	})
-
-	// Create pause options menu
-	s.pauseOptionsMenu = menu.NewMenu()
-	s.pauseOptionsMenu.SetFontSize(8)
-	// Back
-	s.pauseOptionsMenu.AddItem("", func() {
-		s.pauseScreen.SetMenu(s.pauseMenu)
-	})
-	// Language
-	s.pauseOptionsMenu.AddItem("", func() {
-		cfg := config.Get()
-		if cfg.Language == "en" {
-			cfg.Language = "pt-br"
-		} else {
-			cfg.Language = "en"
-		}
-		ctx.I18n.Load(cfg.Language)
-		s.refreshPauseMenuLabels()
-	})
-	// Fullscreen
-	s.pauseOptionsMenu.AddItem("", func() {
-		cfg := config.Get()
-		cfg.Fullscreen = !cfg.Fullscreen
-		ebiten.SetFullscreen(cfg.Fullscreen)
-		s.refreshPauseMenuLabels()
-	})
-
-	// Set up pause options menu navigation and selection callbacks
-	s.pauseOptionsMenu.SetOnNavigate(func() {
-		ctx.AudioManager.PlaySound("assets/audio/Menu_Click.ogg")
-	})
-	s.pauseOptionsMenu.SetOnSelect(func() {
 		ctx.AudioManager.PlaySound("assets/audio/Menu_Select2.ogg")
 	})
 
@@ -328,206 +275,34 @@ func (s *PhasesScene) checkPlayerFallDeath() {
 	}
 }
 
-// clampCameraTarget clamps camera target position to camera bounds.
-func (s *PhasesScene) clampCameraTarget(x, y float64, bounds *image.Rectangle) (float64, float64) {
-	if bounds == nil {
-		return x, y
-	}
-
-	halfW := s.gameCamera.Width() / 2
-	halfH := s.gameCamera.Height() / 2
-	minX := float64(bounds.Min.X) + halfW
-	maxX := float64(bounds.Max.X) - halfW
-	minY := float64(bounds.Min.Y) + halfH
-	maxY := float64(bounds.Max.Y) - halfH
-
-	if x < minX {
-		x = minX
-	}
-	if x > maxX {
-		x = maxX
-	}
-	if y < minY {
-		y = minY
-	}
-	if y > maxY {
-		y = maxY
-	}
-	return x, y
-}
-
-// startDeathSequence initiates the death sequence: player dies, camera moves to start position.
+// startDeathSequence triggers the death VFX and navigates to PhaseRebootScene,
+// which fades to black and NavigateBack to restart the phase via OnStart.
 func (s *PhasesScene) startDeathSequence() {
-	// Prevent multiple triggers
 	if s.death.active {
 		return
 	}
 
-	if s.player == nil || !s.Tilemap().HasPlayerStartPosition() {
+	if s.player == nil {
 		return
 	}
 
-	// Get player death position (for explosion VFX)
-	deathX, deathY := s.player.GetPositionMin()
-	deathW, deathH := s.player.GetShape().Width(), s.player.GetShape().Height()
-	deathCenterX := float64(deathX) + float64(deathW)/2
-	deathCenterY := float64(deathY) + float64(deathH)/2
+	s.death.active = true
 
-	// Get player start position from tilemap
-	startX, startY, found := s.Tilemap().GetPlayerStartPosition()
-	if !found {
-		return
-	}
-
-	// Call OnDie to set health to 0 and transition to Dying state
-	s.player.GetCharacter().SetNewStateFatal(gamestates.Dying)
-
-	// Reset all skills (e.g., Grow) to restore normal player size before teleport
-	if climber, ok := s.player.(*gameplayer.ClimberPlayer); ok {
-		climber.ResetSkills()
-	}
-
-	// Spawn explosion VFX at death location
+	// Spawn explosion VFX at player position
 	if s.AppContext().VFX != nil {
-		s.AppContext().VFX.SpawnDeathExplosion(deathCenterX, deathCenterY, 50)
+		deathX, deathY := s.player.GetPositionMin()
+		deathW, deathH := s.player.GetShape().Width(), s.player.GetShape().Height()
+		s.AppContext().VFX.SpawnDeathExplosion(
+			float64(deathX)+float64(deathW)/2,
+			float64(deathY)+float64(deathH)/2,
+			50,
+		)
 	}
 
-	// Disable player movement during death sequence
+	s.player.GetCharacter().SetNewStateFatal(gamestates.Dying)
 	s.player.SetImmobile(true)
 
-	// Store player start position for teleport
-	s.death.playerStartX = float64(startX)
-	s.death.playerStartY = float64(startY)
-
-	// Get current camera position
-	baseCam := s.BaseCamera()
-	s.death.cameraStartX, s.death.cameraStartY = baseCam.GetActualCenter()
-
-	// Calculate camera target (clamped to bounds)
-	s.death.cameraTargetX, s.death.cameraTargetY = s.clampCameraTarget(float64(startX), float64(startY), baseCam.Bounds())
-
-	// Calculate dynamic duration based on distance
-	dx := s.death.cameraTargetX - s.death.cameraStartX
-	dy := s.death.cameraTargetY - s.death.cameraStartY
-	distance := math.Sqrt(dx*dx + dy*dy)
-
-	// Base duration + distance factor, capped between 30-60 frames
-	s.death.duration = int(30 + distance*0.15)
-	if s.death.duration > 60 {
-		s.death.duration = 60
-	}
-	if s.death.duration < 30 {
-		s.death.duration = 30
-	}
-
-	// Wait 1.5 seconds after explosion before moving camera
-	s.death.waitDuration = 90 // 1.5 seconds at 60fps
-	s.death.waitTimer = s.death.waitDuration
-	s.death.phase = deathSequencePhaseWaiting
-	s.death.timer = 0
-	s.death.active = true
-}
-
-// updateDeathSequence updates the death sequence state machine.
-func (s *PhasesScene) updateDeathSequence() {
-	switch s.death.phase {
-	case deathSequencePhaseWaiting:
-		s.updateDeathWaitPhase()
-	case deathSequencePhaseMoving:
-		s.updateDeathCameraPhase()
-	}
-}
-
-// updateDeathWaitPhase handles the waiting phase (explosion animation).
-func (s *PhasesScene) updateDeathWaitPhase() {
-	s.death.waitTimer--
-	if s.death.waitTimer <= 0 {
-		// Wait complete - teleport player to start position
-		if s.player != nil {
-			actorHeight := s.player.Position().Dy()
-			s.player.SetPosition(int(s.death.playerStartX), int(s.death.playerStartY)-actorHeight)
-		}
-		// Start camera movement
-		s.death.phase = deathSequencePhaseMoving
-		s.death.timer = 0
-	}
-}
-
-// updateDeathCameraPhase handles the camera movement phase.
-func (s *PhasesScene) updateDeathCameraPhase() {
-	s.death.timer++
-	progress := float64(s.death.timer) / float64(s.death.duration)
-	if progress >= 1.0 {
-		// Reset level entities (items, enemies, etc.)
-		s.resetLevelEntities()
-
-		// Camera reached start position - transition player to Rising and unfreeze
-		if s.player != nil {
-			s.player.GetCharacter().SetNewStateFatal(gamestates.Rising)
-		}
-		// Snap camera to final position (SetCenter also syncs lastTargetY for VerticalOnlyUpward)
-		baseCam := s.BaseCamera()
-		baseCam.SetCenter(s.death.cameraTargetX, s.death.cameraTargetY)
-
-		s.death.active = false
-	} else {
-		// Ease-out quadratic interpolation: starts fast, slows down
-		easedProgress := progress * (2 - progress)
-		currentX := s.death.cameraStartX + (s.death.cameraTargetX-s.death.cameraStartX)*easedProgress
-		currentY := s.death.cameraStartY + (s.death.cameraTargetY-s.death.cameraStartY)*easedProgress
-		baseCam := s.BaseCamera()
-		baseCam.SetCenter(currentX, currentY)
-	}
-}
-
-func (s *PhasesScene) resetLevelEntities() {
-	space := s.PhysicsSpace()
-	bodies := space.Bodies()
-	var toRemove []body.Collidable
-
-	for _, b := range bodies {
-		// Identify items
-		if _, ok := b.(items.Item); ok {
-			toRemove = append(toRemove, b)
-			continue
-		}
-
-		// Identify non-player actors (enemies, NPCs)
-		if actor, ok := b.(actors.ActorEntity); ok {
-			if s.player != nil && actor.ID() == s.player.ID() {
-				continue
-			}
-			toRemove = append(toRemove, b)
-			// Also unregister from ActorManager
-			if s.AppContext().ActorManager != nil {
-				s.AppContext().ActorManager.Unregister(actor)
-			}
-		}
-	}
-
-	// Remove from space
-	for _, b := range toRemove {
-		space.RemoveBody(b)
-	}
-	space.ProcessRemovals()
-
-	// Re-initialize from tilemap
-	s.initTilemap()
-
-	// Reset phase progress
-	s.reachedEndpoint = false
-
-	// Reset player skills
-	if s.player != nil {
-		if resetter, ok := s.player.(interface{ ResetSkills() }); ok {
-			resetter.ResetSkills()
-		}
-	}
-
-	// Reset body counter
-	if s.bodyCounter != nil {
-		s.bodyCounter.setBodyCounter(space)
-	}
+	s.deathTrigger.Enable(timing.FromDuration(time.Second))
 }
 
 // Camera returns the game-layer camera controller with vertical-only-upward constraint.
@@ -581,13 +356,17 @@ func (s *PhasesScene) Update() error {
 		s.startDeathSequence()
 	}
 
-	// Update death sequence if active
-	if s.death.active {
-		s.updateDeathSequence()
-	}
-
 	// Update navigation triggers
 	s.completionTrigger.Update()
+	s.deathTrigger.Update()
+
+	if s.deathTrigger.Trigger() {
+		s.AppContext().SceneManager.NavigateTo(
+			scenestypes.ScenePhaseReboot,
+			transition.NewFader(0, config.Get().FadeVisibleDuration),
+			false,
+		)
+	}
 
 	// Check goal completion
 	if s.goal != nil && s.goal.IsCompleted() && !s.completionTrigger.IsEnabled() {
@@ -603,14 +382,10 @@ func (s *PhasesScene) Update() error {
 	}
 
 	// Update camera (use game-layer camera with vertical-only-upward constraint)
-	// Skip during death sequence - camera is controlled by death sequence
-	if !s.death.active {
-		if s.gameCamera != nil {
-			s.gameCamera.Update()
-		} else {
-			// Fallback to base camera update
-			s.TilemapScene.Camera().Update()
-		}
+	if s.gameCamera != nil {
+		s.gameCamera.Update()
+	} else {
+		s.TilemapScene.Camera().Update()
 	}
 	// Call BaseScene.Update directly for Schedule handling (skip TilemapScene.Update to avoid double camera update)
 	if err := s.BaseScene.Update(); err != nil {
@@ -790,24 +565,10 @@ func (s *PhasesScene) canPause() bool {
 
 func (s *PhasesScene) refreshPauseMenuLabels() {
 	i18n := s.AppContext().I18n
-	cfg := config.Get()
 
 	if s.pauseMenu != nil {
-		s.pauseMenu.UpdateItemLabel(0, i18n.T("pause_resume"))
-		s.pauseMenu.UpdateItemLabel(1, i18n.T("pause_restart"))
-		s.pauseMenu.UpdateItemLabel(2, i18n.T("pause_options"))
-		s.pauseMenu.UpdateItemLabel(3, i18n.T("pause_exit"))
-	}
-
-	if s.pauseOptionsMenu != nil {
-		s.pauseOptionsMenu.UpdateItemLabel(0, i18n.T("options_back"))
-		s.pauseOptionsMenu.UpdateItemLabel(1, fmt.Sprintf("%s: %s", i18n.T("options_language"), strings.ToUpper(cfg.Language)))
-
-		fullscreenKey := "options_fullscreen_off"
-		if cfg.Fullscreen {
-			fullscreenKey = "options_fullscreen_on"
-		}
-		s.pauseOptionsMenu.UpdateItemLabel(2, i18n.T(fullscreenKey))
+		s.pauseMenu.UpdateItemLabel(0, i18n.T("menu.start"))
+		s.pauseMenu.UpdateItemLabel(1, i18n.T("menu.exit"))
 	}
 }
 

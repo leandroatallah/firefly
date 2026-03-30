@@ -1,10 +1,9 @@
 package gamescenephases
 
 import (
-	"github.com/leandroatallah/firefly/internal/engine/app"
-	actorevents "github.com/leandroatallah/firefly/internal/engine/entity/actors/events"
-	"github.com/leandroatallah/firefly/internal/engine/event"
-	gameplayer "github.com/leandroatallah/firefly/internal/game/entity/actors/player"
+	"github.com/boilerplate/ebiten-template/internal/engine/app"
+	actorevents "github.com/boilerplate/ebiten-template/internal/engine/entity/actors/events"
+	"github.com/boilerplate/ebiten-template/internal/engine/event"
 )
 
 func subscribeEvents(ctx *app.AppContext, scene *PhasesScene) {
@@ -29,13 +28,6 @@ func subscribeEvents(ctx *app.AppContext, scene *PhasesScene) {
 		if evt, ok := e.(*actorevents.ActorLandedEvent); ok {
 			yOffset := 1.0
 			ctx.VFX.SpawnLandingPuff(evt.X, evt.Y+yOffset, 1)
-
-			// Trigger screen shake if player is grown
-			if player, found := ctx.ActorManager.GetPlayer(); found {
-				if climber, ok := player.(*gameplayer.ClimberPlayer); ok && climber.IsGrowActive() {
-					scene.Camera().Base().AddTrauma(0.3)
-				}
-			}
 		}
 	})
 }

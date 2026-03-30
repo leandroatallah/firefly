@@ -4,14 +4,14 @@ import (
 	"image/color"
 	"time"
 
+	"github.com/boilerplate/ebiten-template/internal/engine/app"
+	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
+	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
+	"github.com/boilerplate/ebiten-template/internal/engine/scene"
+	"github.com/boilerplate/ebiten-template/internal/engine/scene/transition"
+	"github.com/boilerplate/ebiten-template/internal/engine/utils"
+	"github.com/boilerplate/ebiten-template/internal/engine/utils/timing"
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/leandroatallah/firefly/internal/engine/app"
-	"github.com/leandroatallah/firefly/internal/engine/data/config"
-	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
-	"github.com/leandroatallah/firefly/internal/engine/scene"
-	"github.com/leandroatallah/firefly/internal/engine/scene/transition"
-	"github.com/leandroatallah/firefly/internal/engine/utils"
-	"github.com/leandroatallah/firefly/internal/engine/utils/timing"
 )
 
 type PhaseRebootScene struct {

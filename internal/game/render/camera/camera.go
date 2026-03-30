@@ -3,13 +3,12 @@ package camera
 import (
 	"image"
 
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
+	enginecamera "github.com/boilerplate/ebiten-template/internal/engine/render/camera"
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
-	enginecamera "github.com/leandroatallah/firefly/internal/engine/render/camera"
 )
 
-// Controller wraps the engine's camera.Controller to add game-specific behavior.
-// Currently implements vertical-only-upward constraint: camera moves up but never down.
+// Controller wraps the engine's camera.Controller to provide a game-layer abstraction.
 type Controller struct {
 	base *enginecamera.Controller
 }
@@ -21,13 +20,12 @@ func (c *Controller) Base() *enginecamera.Controller {
 
 // NewController creates a new game-layer camera controller wrapping the engine controller.
 func NewController(base *enginecamera.Controller) *Controller {
-	base.VerticalOnlyUpward = true
 	return &Controller{
 		base: base,
 	}
 }
 
-// Update updates the camera position with game-specific constraints applied.
+// Update delegates to the base camera controller.
 func (c *Controller) Update() {
 	c.base.Update()
 }

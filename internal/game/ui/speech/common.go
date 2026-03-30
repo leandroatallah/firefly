@@ -6,8 +6,8 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
-	"github.com/leandroatallah/firefly/internal/engine/data/i18n"
-	"github.com/leandroatallah/firefly/internal/engine/ui/speech"
+	"github.com/boilerplate/ebiten-template/internal/engine/data/i18n"
+	"github.com/boilerplate/ebiten-template/internal/engine/ui/speech"
 )
 
 const (

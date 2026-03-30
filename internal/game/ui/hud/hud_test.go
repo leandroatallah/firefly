@@ -7,8 +7,8 @@ import (
 	"testing"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/leandroatallah/firefly/internal/engine/data/config"
-	gamesetup "github.com/leandroatallah/firefly/internal/game/app"
+	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
+	gamesetup "github.com/boilerplate/ebiten-template/internal/game/app"
 )
 
 // localMockActor implements platformer.PlatformerActorEntity for testing

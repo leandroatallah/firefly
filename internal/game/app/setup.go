@@ -4,21 +4,21 @@ import (
 	"io/fs"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/leandroatallah/firefly/internal/engine/app"
-	"github.com/leandroatallah/firefly/internal/engine/assets/font"
-	"github.com/leandroatallah/firefly/internal/engine/audio"
-	"github.com/leandroatallah/firefly/internal/engine/data/config"
-	"github.com/leandroatallah/firefly/internal/engine/data/i18n"
-	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
-	"github.com/leandroatallah/firefly/internal/engine/event"
-	"github.com/leandroatallah/firefly/internal/engine/physics/space"
-	"github.com/leandroatallah/firefly/internal/engine/render/particles/vfx"
-	"github.com/leandroatallah/firefly/internal/engine/scene"
-	"github.com/leandroatallah/firefly/internal/engine/scene/phases"
-	"github.com/leandroatallah/firefly/internal/engine/ui/speech"
-	gamescene "github.com/leandroatallah/firefly/internal/game/scenes"
-	scenestypes "github.com/leandroatallah/firefly/internal/game/scenes/types"
-	gamespeech "github.com/leandroatallah/firefly/internal/game/ui/speech"
+	"github.com/boilerplate/ebiten-template/internal/engine/app"
+	"github.com/boilerplate/ebiten-template/internal/engine/assets/font"
+	"github.com/boilerplate/ebiten-template/internal/engine/audio"
+	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
+	"github.com/boilerplate/ebiten-template/internal/engine/data/i18n"
+	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
+	"github.com/boilerplate/ebiten-template/internal/engine/event"
+	"github.com/boilerplate/ebiten-template/internal/engine/physics/space"
+	"github.com/boilerplate/ebiten-template/internal/engine/render/particles/vfx"
+	"github.com/boilerplate/ebiten-template/internal/engine/scene"
+	"github.com/boilerplate/ebiten-template/internal/engine/scene/phases"
+	"github.com/boilerplate/ebiten-template/internal/engine/ui/speech"
+	gamescene "github.com/boilerplate/ebiten-template/internal/game/scenes"
+	scenestypes "github.com/boilerplate/ebiten-template/internal/game/scenes/types"
+	gamespeech "github.com/boilerplate/ebiten-template/internal/game/ui/speech"
 )
 
 func Setup(assets fs.FS) error {
@@ -26,7 +26,7 @@ func Setup(assets fs.FS) error {
 	// Basic Ebiten setup
 	ebiten.SetWindowSize(cfg.ScreenWidth*3, cfg.ScreenHeight*3)
 	ebiten.SetFullscreen(cfg.Fullscreen)
-	ebiten.SetWindowTitle("Growbel")
+	ebiten.SetWindowTitle("Ebitengine Boilerplate")
 
 	// Initialize all systems and managers
 	audioManager := audio.NewAudioManager()

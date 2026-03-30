@@ -3,8 +3,8 @@ package gameitems
 import (
 	"log"
 
-	"github.com/leandroatallah/firefly/internal/engine/app"
-	"github.com/leandroatallah/firefly/internal/engine/entity/items"
+	"github.com/boilerplate/ebiten-template/internal/engine/app"
+	"github.com/boilerplate/ebiten-template/internal/engine/entity/items"
 )
 
 const (

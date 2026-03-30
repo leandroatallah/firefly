@@ -5,9 +5,9 @@ import (
 	"testing"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/leandroatallah/firefly/internal/engine/data/config"
-	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
-	enginecamera "github.com/leandroatallah/firefly/internal/engine/render/camera"
+	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
+	bodyphysics "github.com/boilerplate/ebiten-template/internal/engine/physics/body"
+	enginecamera "github.com/boilerplate/ebiten-template/internal/engine/render/camera"
 )
 
 func setupConfig() {
@@ -29,6 +29,7 @@ func TestNewController(t *testing.T) {
 func TestControllerVerticalOnlyUpward(t *testing.T) {
 	setupConfig()
 	base := enginecamera.NewController(160, 120)
+	base.VerticalOnlyUpward = true
 	ctrl := NewController(base)
 	base.DisableSmoothing()
 
@@ -74,6 +75,7 @@ func TestControllerVerticalOnlyUpward(t *testing.T) {
 func TestControllerBoundsClamping(t *testing.T) {
 	setupConfig()
 	base := enginecamera.NewController(160, 120)
+	base.VerticalOnlyUpward = true
 	ctrl := NewController(base)
 	base.DisableSmoothing()
 
@@ -113,6 +115,7 @@ func TestControllerBoundsClamping(t *testing.T) {
 func TestControllerSettersUpdateLastCameraY(t *testing.T) {
 	setupConfig()
 	base := enginecamera.NewController(0, 0)
+	base.VerticalOnlyUpward = true
 	ctrl := NewController(base)
 	base.DisableSmoothing()
 

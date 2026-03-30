@@ -3,10 +3,10 @@ package gameitems
 import (
 	"fmt"
 
-	"github.com/leandroatallah/firefly/internal/engine/app"
-	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
-	"github.com/leandroatallah/firefly/internal/engine/data/jsonutil"
-	"github.com/leandroatallah/firefly/internal/engine/entity/items"
+	"github.com/boilerplate/ebiten-template/internal/engine/app"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
+	"github.com/boilerplate/ebiten-template/internal/engine/data/jsonutil"
+	"github.com/boilerplate/ebiten-template/internal/engine/entity/items"
 )
 
 // PowerUpItem is a base struct for collectible power-up items.

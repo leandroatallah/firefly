@@ -1,10 +1,10 @@
 package gamescene
 
 import (
-	"github.com/leandroatallah/firefly/internal/engine/app"
-	"github.com/leandroatallah/firefly/internal/engine/contracts/navigation"
-	gamescenephases "github.com/leandroatallah/firefly/internal/game/scenes/phases"
-	scenestypes "github.com/leandroatallah/firefly/internal/game/scenes/types"
+	"github.com/boilerplate/ebiten-template/internal/engine/app"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/navigation"
+	gamescenephases "github.com/boilerplate/ebiten-template/internal/game/scenes/phases"
+	scenestypes "github.com/boilerplate/ebiten-template/internal/game/scenes/types"
 )
 
 func InitSceneMap(ctx *app.AppContext) navigation.SceneMap {

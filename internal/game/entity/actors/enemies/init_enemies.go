@@ -3,9 +3,9 @@ package gameenemies
 import (
 	"log"
 
-	"github.com/leandroatallah/firefly/internal/engine/app"
-	"github.com/leandroatallah/firefly/internal/engine/entity/actors/enemies"
-	"github.com/leandroatallah/firefly/internal/engine/entity/actors/platformer"
+	"github.com/boilerplate/ebiten-template/internal/engine/app"
+	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/enemies"
+	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/platformer"
 )
 
 const (

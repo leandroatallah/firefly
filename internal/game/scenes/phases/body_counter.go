@@ -1,8 +1,8 @@
 package gamescenephases
 
 import (
-	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
-	gameenemies "github.com/leandroatallah/firefly/internal/game/entity/actors/enemies"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
+	gameenemies "github.com/boilerplate/ebiten-template/internal/game/entity/actors/enemies"
 )
 
 type BodyCounter struct {

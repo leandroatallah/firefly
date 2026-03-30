@@ -1,7 +1,7 @@
 package gameentitytypes
 
 import (
-	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
+	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
 )
 
 // EnemyActor is an interface that identifies an actor as an enemy.

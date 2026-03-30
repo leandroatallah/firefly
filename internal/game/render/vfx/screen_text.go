@@ -2,8 +2,8 @@ package vfx
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/leandroatallah/firefly/internal/engine/render/camera"
-	"github.com/leandroatallah/firefly/internal/engine/render/vfx/text"
+	"github.com/boilerplate/ebiten-template/internal/engine/render/camera"
+	"github.com/boilerplate/ebiten-template/internal/engine/render/vfx/text"
 )
 
 // ScreenText displays text at fixed screen coordinates.

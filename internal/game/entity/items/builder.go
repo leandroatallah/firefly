@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"io/fs"
 
-	"github.com/leandroatallah/firefly/internal/engine/contracts/animation"
-	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
-	"github.com/leandroatallah/firefly/internal/engine/data/schemas"
-	"github.com/leandroatallah/firefly/internal/engine/entity/items"
-	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
-	"github.com/leandroatallah/firefly/internal/engine/render/sprites"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/animation"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
+	"github.com/boilerplate/ebiten-template/internal/engine/data/schemas"
+	"github.com/boilerplate/ebiten-template/internal/engine/entity/items"
+	bodyphysics "github.com/boilerplate/ebiten-template/internal/engine/physics/body"
+	"github.com/boilerplate/ebiten-template/internal/engine/render/sprites"
 )
 
 func CreateAnimatedItem(fsys fs.FS, id string, data schemas.SpriteData, customStates map[string]animation.SpriteState) (*items.BaseItem, error) {

@@ -9,9 +9,9 @@ import (
 	"github.com/ebitenui/ebitenui/image"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
-	"github.com/leandroatallah/firefly/internal/engine/data/config"
-	"github.com/leandroatallah/firefly/internal/engine/data/i18n"
-	"github.com/leandroatallah/firefly/internal/engine/ui/speech"
+	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
+	"github.com/boilerplate/ebiten-template/internal/engine/data/i18n"
+	"github.com/boilerplate/ebiten-template/internal/engine/ui/speech"
 )
 
 type SpeechBubble struct {

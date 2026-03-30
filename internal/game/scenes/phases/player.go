@@ -3,13 +3,13 @@ package gamescenephases
 import (
 	"image"
 
-	"github.com/leandroatallah/firefly/internal/engine/app"
-	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
-	"github.com/leandroatallah/firefly/internal/engine/entity/actors/events"
-	"github.com/leandroatallah/firefly/internal/engine/entity/actors/platformer"
-	"github.com/leandroatallah/firefly/internal/engine/physics/skill"
-	gameplayer "github.com/leandroatallah/firefly/internal/game/entity/actors/player"
-	gameentitytypes "github.com/leandroatallah/firefly/internal/game/entity/types"
+	"github.com/boilerplate/ebiten-template/internal/engine/app"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
+	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/events"
+	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/platformer"
+	"github.com/boilerplate/ebiten-template/internal/engine/physics/skill"
+	gameplayer "github.com/boilerplate/ebiten-template/internal/game/entity/actors/player"
+	gameentitytypes "github.com/boilerplate/ebiten-template/internal/game/entity/types"
 )
 
 func createPlayer(ctx *app.AppContext, playerType gameentitytypes.PlayerType) (platformer.PlatformerActorEntity, error) {
