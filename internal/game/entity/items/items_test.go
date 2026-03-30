@@ -11,19 +11,6 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/mocks"
 )
 
-type MockCoinCollectorActor struct {
-	mocks.MockActor
-	coins int
-}
-
-func (m *MockCoinCollectorActor) AddCoinCount(amount int) {
-	m.coins += amount
-}
-
-func (m *MockCoinCollectorActor) CoinCount() int {
-	return m.coins
-}
-
 func getModuleRoot() string {
 	dir, _ := os.Getwd()
 	for {
@@ -60,57 +47,9 @@ func newTestCtx() *app.AppContext {
 	}
 }
 
-func TestNewCollectibleCoinItem(t *testing.T) {
-	ctx := newTestCtx()
-	
-	coin, err := NewCollectibleCoinItem(ctx, 100, 100, "coin-1")
-	if err != nil {
-		t.Fatalf("failed to create coin: %v", err)
-	}
-
-	if coin == nil {
-		t.Fatal("NewCollectibleCoinItem returned nil")
-	}
-
-	if coin.ID() != "coin-1" {
-		t.Errorf("expected ID coin-1, got %s", coin.ID())
-	}
-}
-
-func TestCollectibleCoinItem_OnTouch(t *testing.T) {
-	ctx := newTestCtx()
-	actorMgr := ctx.ActorManager
-	
-	coin, err := NewCollectibleCoinItem(ctx, 100, 100, "coin-1")
-	if err != nil {
-		t.Fatalf("failed to create coin: %v", err)
-	}
-
-	mockPlayer := &MockCoinCollectorActor{
-		MockActor: mocks.MockActor{Id: "player"},
-	}
-	actorMgr.Register(mockPlayer)
-	
-	// Touch with non-player should do nothing
-	mockOther := &mocks.MockActor{Id: "other"}
-	coin.OnTouch(mockOther)
-	if coin.IsRemoved() {
-		t.Error("coin should not be removed by non-player")
-	}
-
-	// Touch with player should remove coin
-	coin.OnTouch(mockPlayer)
-	if !coin.IsRemoved() {
-		t.Error("coin should be removed by player")
-	}
-	if mockPlayer.coins != 1 {
-		t.Errorf("expected 1 coin, got %d", mockPlayer.coins)
-	}
-}
-
 func TestNewFallingPlatformItem(t *testing.T) {
 	ctx := newTestCtx()
-	
+
 	fp, err := NewFallingPlatformItem(ctx, 100, 100, "fp-1")
 	if err != nil {
 		t.Fatalf("failed to create falling platform: %v", err)
@@ -126,57 +65,10 @@ func TestNewFallingPlatformItem(t *testing.T) {
 
 	// Test OnTouch
 	mockPlayer := &mocks.MockActor{Id: "player"}
-	mockPlayer.SetPosition(100, 80) // Above platform
+	mockPlayer.SetPosition(100, 80)
 	ctx.ActorManager.Register(mockPlayer)
-	
+
 	fp.OnTouch(mockPlayer)
-}
-
-func TestNewPowerUpItems(t *testing.T) {
-	ctx := newTestCtx()
-
-	tests := []struct {
-		name    string
-		factory func(ctx *app.AppContext, x, y int, id string) (items.Item, error)
-	}{
-		{"Freeze", func(ctx *app.AppContext, x, y int, id string) (items.Item, error) {
-			item, err := NewFreezePowerItem(ctx, x, y, id)
-			if err != nil {
-				return nil, err
-			}
-			return item, nil
-		}},
-		{"Grow", func(ctx *app.AppContext, x, y int, id string) (items.Item, error) {
-			item, err := NewGrowPowerItem(ctx, x, y, id)
-			if err != nil {
-				return nil, err
-			}
-			return item, nil
-		}},
-		{"Star", func(ctx *app.AppContext, x, y int, id string) (items.Item, error) {
-			item, err := NewStarPowerItem(ctx, x, y, id)
-			if err != nil {
-				return nil, err
-			}
-			return item, nil
-		}},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			id := tt.name + "-1"
-			item, err := tt.factory(ctx, 100, 100, id)
-			if err != nil {
-				t.Fatalf("failed to create %s power-up: %v", tt.name, err)
-			}
-			if item == nil {
-				t.Fatalf("New%sPowerItem returned nil", tt.name)
-			}
-			if item.ID() != id {
-				t.Errorf("expected ID %s, got %s", id, item.ID())
-			}
-		})
-	}
 }
 
 func TestInitItemMap(t *testing.T) {
@@ -185,13 +77,7 @@ func TestInitItemMap(t *testing.T) {
 	if m == nil {
 		t.Fatal("InitItemMap returned nil")
 	}
-	if _, ok := m[FreezePowerUpType]; !ok {
-		t.Error("FreezePowerUpType missing from ItemMap")
-	}
-	if _, ok := m[GrowPowerUpType]; !ok {
-		t.Error("GrowPowerUpType missing from ItemMap")
-	}
-	if _, ok := m[StarPowerUpType]; !ok {
-		t.Error("StarPowerUpType missing from ItemMap")
+	if _, ok := m[FallingPlatformType]; !ok {
+		t.Error("FallingPlatformType missing from ItemMap")
 	}
 }
