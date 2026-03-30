@@ -76,35 +76,6 @@
         "path": "assets/images/empty.png",
         "loop": true,
         "collision_rect": []
-      },
-      "rise": {
-        "path": "assets/images/climber-rise.png",
-        "loop": false,
-        "collision_rect": []
-      },
-      "grow": {
-        "path": "assets/images/climber-grow.png",
-        "loop": false,
-        "collision_rect": [
-          {
-            "x": 8,
-            "y": 12,
-            "width": 16,
-            "height": 20
-          }
-        ]
-      },
-      "shrink": {
-        "path": "assets/images/climber-shrink.png",
-        "loop": false,
-        "collision_rect": [
-          {
-            "x": 8,
-            "y": 12,
-            "width": 16,
-            "height": 20
-          }
-        ]
       }
     },
     "facing_direction": 0,
