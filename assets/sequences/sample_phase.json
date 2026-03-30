@@ -1,0 +1,19 @@
+{
+  "commands": [
+    {
+      "command": "pause_all_music"
+    },
+    {
+      "command": "delay",
+      "frames": 60
+    },
+    {
+      "command": "play_music",
+      "path": "assets/audio/music/Goblins_Dance_Battle.ogg",
+      "rewind": false,
+      "volume": 0.7,
+      "loop": true
+    }
+  ],
+  "block_player_movement": false
+}
