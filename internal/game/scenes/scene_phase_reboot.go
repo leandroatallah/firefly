@@ -22,8 +22,6 @@ type PhaseRebootScene struct {
 }
 
 func NewPhaseRebootScene(context *app.AppContext) *PhaseRebootScene {
-	overlay := ebiten.NewImage(config.Get().ScreenWidth, config.Get().ScreenHeight)
-	overlay.Fill(color.Black)
 	scene := PhaseRebootScene{}
 	scene.SetAppContext(context)
 	return &scene
@@ -34,7 +32,6 @@ func (s *PhaseRebootScene) Draw(screen *ebiten.Image) {
 }
 
 func (s *PhaseRebootScene) OnStart() {
-	// Freeze all actors and items to preserve state during reboot
 	s.freezeAllActors()
 	s.navigationTrigger.Enable(timing.FromDuration(167 * time.Millisecond))
 }

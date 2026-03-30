@@ -3,12 +3,7 @@ package scenestypes
 import "github.com/boilerplate/ebiten-template/internal/engine/contracts/navigation"
 
 const (
-	SceneIntro navigation.SceneType = iota
-	SceneMenu
+	SceneMenu navigation.SceneType = iota
 	ScenePhases
-	SceneSummary
 	ScenePhaseReboot
-	SceneStory
-	ScenePhaseTitle
-	SceneCredits
 )
