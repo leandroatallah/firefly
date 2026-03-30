@@ -4,9 +4,9 @@ import (
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/leandroatallah/firefly/internal/engine/app"
-	"github.com/leandroatallah/firefly/internal/engine/audio"
-	"github.com/leandroatallah/firefly/internal/engine/contracts/navigation"
+	"github.com/boilerplate/ebiten-template/internal/engine/app"
+	"github.com/boilerplate/ebiten-template/internal/engine/audio"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/navigation"
 )
 
 type SceneManager struct {

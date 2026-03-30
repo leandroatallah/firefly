@@ -5,9 +5,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/leandroatallah/firefly/internal/engine/app"
-	contractseq "github.com/leandroatallah/firefly/internal/engine/contracts/sequences"
-	"github.com/leandroatallah/firefly/internal/engine/mocks"
+	"github.com/boilerplate/ebiten-template/internal/engine/app"
+	contractseq "github.com/boilerplate/ebiten-template/internal/engine/contracts/sequences"
+	"github.com/boilerplate/ebiten-template/internal/engine/mocks"
 )
 
 func TestSequencePlayerPlaysBlockingCommandsToCompletion(t *testing.T) {

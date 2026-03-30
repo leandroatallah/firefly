@@ -3,11 +3,11 @@ package scene
 import (
 	"testing"
 
-	"github.com/leandroatallah/firefly/internal/engine/app"
-	"github.com/leandroatallah/firefly/internal/engine/data/config"
-	"github.com/leandroatallah/firefly/internal/engine/mocks"
-	"github.com/leandroatallah/firefly/internal/engine/render/camera"
-	"github.com/leandroatallah/firefly/internal/engine/render/tilemap"
+	"github.com/boilerplate/ebiten-template/internal/engine/app"
+	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
+	"github.com/boilerplate/ebiten-template/internal/engine/mocks"
+	"github.com/boilerplate/ebiten-template/internal/engine/render/camera"
+	"github.com/boilerplate/ebiten-template/internal/engine/render/tilemap"
 )
 
 func TestScreenFlipper_GridGeneration(t *testing.T) {

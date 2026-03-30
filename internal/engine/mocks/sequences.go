@@ -1,6 +1,6 @@
 package mocks
 
-import contractseq "github.com/leandroatallah/firefly/internal/engine/contracts/sequences"
+import contractseq "github.com/boilerplate/ebiten-template/internal/engine/contracts/sequences"
 
 // MockCommand implements sequences.Command
 type MockCommand struct {

@@ -7,7 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/leandroatallah/firefly/internal/engine/contracts/sequences"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/sequences"
 )
 
 type Sequence struct {

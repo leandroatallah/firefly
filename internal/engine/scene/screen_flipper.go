@@ -5,11 +5,11 @@ import (
 	"log"
 	"math"
 
-	"github.com/leandroatallah/firefly/internal/engine/app"
-	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
-	"github.com/leandroatallah/firefly/internal/engine/data/config"
-	"github.com/leandroatallah/firefly/internal/engine/render/camera"
-	"github.com/leandroatallah/firefly/internal/engine/render/tilemap"
+	"github.com/boilerplate/ebiten-template/internal/engine/app"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
+	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
+	"github.com/boilerplate/ebiten-template/internal/engine/render/camera"
+	"github.com/boilerplate/ebiten-template/internal/engine/render/tilemap"
 )
 
 type FlipType int

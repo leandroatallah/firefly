@@ -3,9 +3,9 @@ package scene
 import (
 	"testing"
 
-	"github.com/leandroatallah/firefly/internal/engine/app"
-	"github.com/leandroatallah/firefly/internal/engine/contracts/navigation"
-	"github.com/leandroatallah/firefly/internal/engine/mocks"
+	"github.com/boilerplate/ebiten-template/internal/engine/app"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/navigation"
+	"github.com/boilerplate/ebiten-template/internal/engine/mocks"
 )
 
 func TestDefaultSceneFactory_Create(t *testing.T) {

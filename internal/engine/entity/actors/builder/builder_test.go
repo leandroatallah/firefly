@@ -5,14 +5,14 @@ import (
 	"testing"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/leandroatallah/firefly/internal/engine/contracts/animation"
-	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
-	"github.com/leandroatallah/firefly/internal/engine/data/schemas"
-	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
-	"github.com/leandroatallah/firefly/internal/engine/entity/actors/movement"
-	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
-	physicsmovement "github.com/leandroatallah/firefly/internal/engine/physics/movement"
-	"github.com/leandroatallah/firefly/internal/engine/render/sprites"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/animation"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
+	"github.com/boilerplate/ebiten-template/internal/engine/data/schemas"
+	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
+	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/movement"
+	bodyphysics "github.com/boilerplate/ebiten-template/internal/engine/physics/body"
+	physicsmovement "github.com/boilerplate/ebiten-template/internal/engine/physics/movement"
+	"github.com/boilerplate/ebiten-template/internal/engine/render/sprites"
 )
 
 // mockActorWithCollision implements actors.ActorEntity with collisionRectSetter

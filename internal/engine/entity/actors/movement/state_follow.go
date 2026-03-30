@@ -3,7 +3,7 @@ package movement
 import (
 	"image"
 
-	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 )
 
 // FollowMovementState defines a movement behavior where an actor follows a target

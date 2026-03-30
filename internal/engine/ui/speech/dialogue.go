@@ -5,8 +5,8 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
-	"github.com/leandroatallah/firefly/internal/engine/audio"
-	"github.com/leandroatallah/firefly/internal/engine/data/config"
+	"github.com/boilerplate/ebiten-template/internal/engine/audio"
+	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
 )
 
 // Manager handles the display of dialogue and speech bubbles.

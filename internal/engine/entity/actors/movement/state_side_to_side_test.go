@@ -4,8 +4,8 @@ import (
 	"image"
 	"testing"
 
-	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
-	"github.com/leandroatallah/firefly/internal/engine/contracts/tilemaplayer"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/tilemaplayer"
 )
 
 type mockSpace struct {

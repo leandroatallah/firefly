@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/leandroatallah/firefly/internal/engine/contracts/animation"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/animation"
 )
 
 type TestStats struct {

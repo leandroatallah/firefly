@@ -4,8 +4,8 @@ import (
 	"testing"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
-	"github.com/leandroatallah/firefly/internal/engine/render/sprites"
+	bodyphysics "github.com/boilerplate/ebiten-template/internal/engine/physics/body"
+	"github.com/boilerplate/ebiten-template/internal/engine/render/sprites"
 )
 
 func TestBaseItem_Lifecycle(t *testing.T) {

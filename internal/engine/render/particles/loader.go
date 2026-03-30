@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
-	"github.com/leandroatallah/firefly/internal/engine/data/schemas"
+	"github.com/boilerplate/ebiten-template/internal/engine/data/schemas"
 )
 
 // LoadConfig loads a particle configuration from a JSON file.

@@ -4,7 +4,7 @@ import (
 	"image"
 	"testing"
 
-	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 )
 
 func TestNewChaseMovementState(t *testing.T) {

@@ -1,7 +1,7 @@
 package items
 
 import (
-	"github.com/leandroatallah/firefly/internal/engine/entity"
+	"github.com/boilerplate/ebiten-template/internal/engine/entity"
 )
 
 type ItemState interface {

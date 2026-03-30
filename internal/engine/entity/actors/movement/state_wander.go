@@ -4,7 +4,7 @@ import (
 	"image"
 	"math/rand"
 
-	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 )
 
 var Wander MovementStateEnum

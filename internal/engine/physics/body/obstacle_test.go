@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 )
 
 func TestNewObstacleRect(t *testing.T) {

@@ -3,7 +3,7 @@ package schemas
 import (
 	"testing"
 
-	"github.com/leandroatallah/firefly/internal/engine/contracts/animation"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/animation"
 )
 
 func TestShapeRect_Rect(t *testing.T) {

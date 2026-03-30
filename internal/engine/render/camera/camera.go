@@ -5,9 +5,9 @@ import (
 	"image/color"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
-	"github.com/leandroatallah/firefly/internal/engine/data/config"
-	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
+	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
+	bodyphysics "github.com/boilerplate/ebiten-template/internal/engine/physics/body"
 	"github.com/setanarut/kamera/v2"
 )
 

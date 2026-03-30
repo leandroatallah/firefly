@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/leandroatallah/firefly/internal/engine/data/config"
-	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
+	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
+	bodyphysics "github.com/boilerplate/ebiten-template/internal/engine/physics/body"
 )
 
 // saveConfig saves the current config for restoration

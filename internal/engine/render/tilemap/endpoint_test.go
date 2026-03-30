@@ -3,8 +3,8 @@ package tilemap
 import (
 	"testing"
 
-	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
-	"github.com/leandroatallah/firefly/internal/engine/physics/space"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
+	"github.com/boilerplate/ebiten-template/internal/engine/physics/space"
 )
 
 func TestCreateCollisionBodiesWithTwoEndpointLayers(t *testing.T) {

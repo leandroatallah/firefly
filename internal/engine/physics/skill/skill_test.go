@@ -3,12 +3,12 @@ package skill
 import (
 	"testing"
 
-	"github.com/leandroatallah/firefly/internal/engine/contracts/animation"
-	"github.com/leandroatallah/firefly/internal/engine/data/config"
-	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
-	"github.com/leandroatallah/firefly/internal/engine/physics/movement"
-	"github.com/leandroatallah/firefly/internal/engine/physics/space"
-	"github.com/leandroatallah/firefly/internal/engine/utils/fp16"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/animation"
+	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
+	bodyphysics "github.com/boilerplate/ebiten-template/internal/engine/physics/body"
+	"github.com/boilerplate/ebiten-template/internal/engine/physics/movement"
+	"github.com/boilerplate/ebiten-template/internal/engine/physics/space"
+	"github.com/boilerplate/ebiten-template/internal/engine/utils/fp16"
 )
 
 func TestHorizontalMovementSkillImmobileBehavior(t *testing.T) {

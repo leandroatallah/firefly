@@ -4,9 +4,9 @@ import (
 	"image"
 	"testing"
 
-	"github.com/leandroatallah/firefly/internal/engine/data/config"
-	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
-	"github.com/leandroatallah/firefly/internal/engine/physics/space"
+	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
+	bodyphysics "github.com/boilerplate/ebiten-template/internal/engine/physics/body"
+	"github.com/boilerplate/ebiten-template/internal/engine/physics/space"
 )
 
 type dimsProvider struct{ w, h int }

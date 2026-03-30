@@ -1,6 +1,6 @@
 package context
 
-import "github.com/leandroatallah/firefly/internal/engine/app"
+import "github.com/boilerplate/ebiten-template/internal/engine/app"
 
 type ContextProvider interface {
 	// Use any to prevent life cycle imports

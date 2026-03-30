@@ -5,8 +5,8 @@ import (
 	"log"
 	"strings"
 
-	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
-	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
+	bodyphysics "github.com/boilerplate/ebiten-template/internal/engine/physics/body"
 )
 
 type LayerNameID int

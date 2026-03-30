@@ -3,10 +3,10 @@ package sequences
 import (
 	"testing"
 
-	"github.com/leandroatallah/firefly/internal/engine/app"
-	"github.com/leandroatallah/firefly/internal/engine/event"
-	"github.com/leandroatallah/firefly/internal/engine/physics/space"
-	"github.com/leandroatallah/firefly/internal/engine/scene"
+	"github.com/boilerplate/ebiten-template/internal/engine/app"
+	"github.com/boilerplate/ebiten-template/internal/engine/event"
+	"github.com/boilerplate/ebiten-template/internal/engine/physics/space"
+	"github.com/boilerplate/ebiten-template/internal/engine/scene"
 )
 
 func setupTestAppContext() *app.AppContext {

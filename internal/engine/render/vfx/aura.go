@@ -4,8 +4,8 @@ import (
 	"image/color"
 	"math/rand"
 
-	contractvfx "github.com/leandroatallah/firefly/internal/engine/contracts/vfx"
-	"github.com/leandroatallah/firefly/internal/engine/render/particles"
+	contractvfx "github.com/boilerplate/ebiten-template/internal/engine/contracts/vfx"
+	"github.com/boilerplate/ebiten-template/internal/engine/render/particles"
 )
 
 // SpawnAuraParticles spawns flame-shaped aura particles with a wave-like motion.

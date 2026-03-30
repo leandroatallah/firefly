@@ -3,7 +3,7 @@ package sequences
 import (
 	"path/filepath"
 
-	"github.com/leandroatallah/firefly/internal/engine/app"
+	"github.com/boilerplate/ebiten-template/internal/engine/app"
 )
 
 // CallSequenceCommand calls a nested sequence from a JSON file path.

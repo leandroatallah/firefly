@@ -1,8 +1,8 @@
 package sequences
 
 import (
-	"github.com/leandroatallah/firefly/internal/engine/app"
-	"github.com/leandroatallah/firefly/internal/engine/contracts/sequences"
+	"github.com/boilerplate/ebiten-template/internal/engine/app"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/sequences"
 )
 
 // SequencePlayer manages the execution of a sequence.

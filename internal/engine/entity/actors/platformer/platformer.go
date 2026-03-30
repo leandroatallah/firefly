@@ -4,16 +4,16 @@ import (
 	"image"
 	"io/fs"
 
-	"github.com/leandroatallah/firefly/internal/engine/app"
-	"github.com/leandroatallah/firefly/internal/engine/contracts/animation"
-	"github.com/leandroatallah/firefly/internal/engine/contracts/context"
-	"github.com/leandroatallah/firefly/internal/engine/data/schemas"
-	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
-	"github.com/leandroatallah/firefly/internal/engine/entity/actors/events"
-	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
-	physicsmovement "github.com/leandroatallah/firefly/internal/engine/physics/movement"
-	"github.com/leandroatallah/firefly/internal/engine/physics/skill"
-	"github.com/leandroatallah/firefly/internal/engine/render/sprites"
+	"github.com/boilerplate/ebiten-template/internal/engine/app"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/animation"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/context"
+	"github.com/boilerplate/ebiten-template/internal/engine/data/schemas"
+	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
+	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/events"
+	bodyphysics "github.com/boilerplate/ebiten-template/internal/engine/physics/body"
+	physicsmovement "github.com/boilerplate/ebiten-template/internal/engine/physics/movement"
+	"github.com/boilerplate/ebiten-template/internal/engine/physics/skill"
+	"github.com/boilerplate/ebiten-template/internal/engine/render/sprites"
 )
 
 type AlivePlayer interface {
@@ -94,10 +94,10 @@ func (p *PlatformerCharacter) AddSkill(s skill.Skill) {
 	p.Character.AddSkill(s)
 }
 
-func NewPlatformerCharacter(fsys fs.FS, stateMap map[string]animation.SpriteState, spriteData schemas.SpriteData, bodyRect *bodyphysics.Rect) *PlatformerCharacter {
+func NewPlatformerCharacter(fsys fs.FS, stateMap map[string]animation.SpriteState, spriteData schemas.SpriteData, bodyRect *bodyphysics.Rect) (*PlatformerCharacter, error) {
 	s, err := sprites.GetSpritesFromAssets(fsys, spriteData.Assets, stateMap)
 	if err != nil {
-		return nil
+		return nil, err
 	}
 	c := actors.NewCharacter(s, bodyRect)
 	pf := &PlatformerCharacter{
@@ -120,5 +120,5 @@ func NewPlatformerCharacter(fsys fs.FS, stateMap map[string]animation.SpriteStat
 	c.SetFrameRate(spriteData.FrameRate)
 	c.SetOwner(pf)
 
-	return pf
+	return pf, nil
 }

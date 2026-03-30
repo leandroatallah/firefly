@@ -3,7 +3,7 @@ package body
 import (
 	"fmt"
 
-	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 )
 
 type ObstacleType int

@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	contractsbody "github.com/leandroatallah/firefly/internal/engine/contracts/body"
+	contractsbody "github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 )
 
 type testCollidable struct {

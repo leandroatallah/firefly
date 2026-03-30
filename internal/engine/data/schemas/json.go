@@ -1,7 +1,7 @@
 package schemas
 
 import (
-	"github.com/leandroatallah/firefly/internal/engine/contracts/animation"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/animation"
 )
 
 // ShapeRect defines a rectangular shape with position and dimensions.

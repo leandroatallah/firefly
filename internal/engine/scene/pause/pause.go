@@ -5,9 +5,9 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
-	"github.com/leandroatallah/firefly/internal/engine/assets/font"
-	"github.com/leandroatallah/firefly/internal/engine/ui/menu"
-	"github.com/leandroatallah/firefly/internal/engine/utils/timing"
+	"github.com/boilerplate/ebiten-template/internal/engine/assets/font"
+	"github.com/boilerplate/ebiten-template/internal/engine/ui/menu"
+	"github.com/boilerplate/ebiten-template/internal/engine/utils/timing"
 )
 
 type PauseScreen struct {

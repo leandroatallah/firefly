@@ -1,7 +1,7 @@
 package body
 
 import (
-	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 )
 
 // TouchTrigger implements the physics.Touchable interface to handle body contact.

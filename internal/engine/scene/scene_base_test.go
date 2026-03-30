@@ -5,10 +5,10 @@ import (
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/leandroatallah/firefly/internal/engine/app"
-	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
-	"github.com/leandroatallah/firefly/internal/engine/mocks"
-	"github.com/leandroatallah/firefly/internal/engine/physics/space"
+	"github.com/boilerplate/ebiten-template/internal/engine/app"
+	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
+	"github.com/boilerplate/ebiten-template/internal/engine/mocks"
+	"github.com/boilerplate/ebiten-template/internal/engine/physics/space"
 )
 
 func TestBaseScene_Lifecycle(t *testing.T) {

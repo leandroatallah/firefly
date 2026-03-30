@@ -4,9 +4,9 @@ import (
 	"image"
 	"testing"
 
-	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
-	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
-	"github.com/leandroatallah/firefly/internal/engine/render/sprites"
+	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
+	bodyphysics "github.com/boilerplate/ebiten-template/internal/engine/physics/body"
+	"github.com/boilerplate/ebiten-template/internal/engine/render/sprites"
 )
 
 func TestPlatformerCharacter_SetOnJump(t *testing.T) {

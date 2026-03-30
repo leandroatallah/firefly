@@ -1,6 +1,6 @@
 package phases
 
-import "github.com/leandroatallah/firefly/internal/engine/contracts/sequences"
+import "github.com/boilerplate/ebiten-template/internal/engine/contracts/sequences"
 
 // Goal defines the interface for phase completion criteria
 type Goal interface {

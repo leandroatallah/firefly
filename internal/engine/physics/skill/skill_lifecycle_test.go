@@ -5,14 +5,14 @@ import (
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/leandroatallah/firefly/internal/engine/contracts/animation"
-	contractsbody "github.com/leandroatallah/firefly/internal/engine/contracts/body"
-	"github.com/leandroatallah/firefly/internal/engine/data/config"
-	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
-	"github.com/leandroatallah/firefly/internal/engine/physics/movement"
-	"github.com/leandroatallah/firefly/internal/engine/physics/space"
-	"github.com/leandroatallah/firefly/internal/engine/utils/fp16"
-	"github.com/leandroatallah/firefly/internal/engine/utils/timing"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/animation"
+	contractsbody "github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
+	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
+	bodyphysics "github.com/boilerplate/ebiten-template/internal/engine/physics/body"
+	"github.com/boilerplate/ebiten-template/internal/engine/physics/movement"
+	"github.com/boilerplate/ebiten-template/internal/engine/physics/space"
+	"github.com/boilerplate/ebiten-template/internal/engine/utils/fp16"
+	"github.com/boilerplate/ebiten-template/internal/engine/utils/timing"
 )
 
 // mockMovableCollidable for skill tests

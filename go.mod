@@ -1,4 +1,4 @@
-module github.com/leandroatallah/firefly
+module github.com/boilerplate/ebiten-template
 
 go 1.25
 

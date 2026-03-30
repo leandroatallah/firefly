@@ -2,8 +2,8 @@ package skill
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
-	physicsmovement "github.com/leandroatallah/firefly/internal/engine/physics/movement"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
+	physicsmovement "github.com/boilerplate/ebiten-template/internal/engine/physics/movement"
 )
 
 // SkillState represents the possible states of a skill.

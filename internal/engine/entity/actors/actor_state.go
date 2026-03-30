@@ -1,6 +1,6 @@
 package actors
 
-import "github.com/leandroatallah/firefly/internal/engine/entity"
+import "github.com/boilerplate/ebiten-template/internal/engine/entity"
 
 type ActorState interface {
 	State() ActorStateEnum

@@ -5,9 +5,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/leandroatallah/firefly/internal/engine/data/config"
-	"github.com/leandroatallah/firefly/internal/engine/mocks"
-	enginecamera "github.com/leandroatallah/firefly/internal/engine/render/camera"
+	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
+	"github.com/boilerplate/ebiten-template/internal/engine/mocks"
+	enginecamera "github.com/boilerplate/ebiten-template/internal/engine/render/camera"
 )
 
 func TestMain(m *testing.M) {

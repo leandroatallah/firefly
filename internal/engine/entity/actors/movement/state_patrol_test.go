@@ -3,7 +3,7 @@ package movement
 import (
 	"testing"
 
-	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
+	bodyphysics "github.com/boilerplate/ebiten-template/internal/engine/physics/body"
 )
 
 func TestPatrolMovementState(t *testing.T) {

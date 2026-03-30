@@ -4,8 +4,8 @@ import (
 	"container/heap"
 	"image"
 
-	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
-	"github.com/leandroatallah/firefly/internal/engine/physics/space"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
+	"github.com/boilerplate/ebiten-template/internal/engine/physics/space"
 )
 
 // ChaseMovementState implements the A* pathfinding algorithm to chase a target.

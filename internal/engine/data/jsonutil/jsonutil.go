@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"io/fs"
 
-	"github.com/leandroatallah/firefly/internal/engine/data/schemas"
+	"github.com/boilerplate/ebiten-template/internal/engine/data/schemas"
 )
 
 type SpriteAndStats[T any] struct {

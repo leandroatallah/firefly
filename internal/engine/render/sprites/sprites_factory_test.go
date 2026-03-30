@@ -3,8 +3,8 @@ package sprites
 import (
 	"testing"
 
-	"github.com/leandroatallah/firefly/internal/engine/contracts/animation"
-	"github.com/leandroatallah/firefly/internal/engine/data/schemas"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/animation"
+	"github.com/boilerplate/ebiten-template/internal/engine/data/schemas"
 )
 
 func TestGetSpritesFromAssetsSmoke(t *testing.T) {

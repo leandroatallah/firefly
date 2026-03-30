@@ -2,7 +2,7 @@ package navigation
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/leandroatallah/firefly/internal/engine/audio"
+	"github.com/boilerplate/ebiten-template/internal/engine/audio"
 )
 
 type SceneType int

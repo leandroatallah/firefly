@@ -3,7 +3,7 @@ package mocks
 import (
 	"time"
 
-	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
+	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
 )
 
 // MockAudioManager implements audio.Manager for testing

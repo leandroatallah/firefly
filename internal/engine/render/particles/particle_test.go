@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/leandroatallah/firefly/internal/engine/render/camera"
+	"github.com/boilerplate/ebiten-template/internal/engine/render/camera"
 )
 
 func TestParticleUpdate(t *testing.T) {

@@ -4,10 +4,10 @@ import (
 	"log"
 	"math"
 
-	"github.com/leandroatallah/firefly/internal/engine/app"
-	contractvfx "github.com/leandroatallah/firefly/internal/engine/contracts/vfx"
-	"github.com/leandroatallah/firefly/internal/engine/data/config"
-	"github.com/leandroatallah/firefly/internal/engine/render/camera"
+	"github.com/boilerplate/ebiten-template/internal/engine/app"
+	contractvfx "github.com/boilerplate/ebiten-template/internal/engine/contracts/vfx"
+	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
+	"github.com/boilerplate/ebiten-template/internal/engine/render/camera"
 )
 
 type SpawnTextCommand struct {

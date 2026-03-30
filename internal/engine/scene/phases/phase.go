@@ -1,6 +1,6 @@
 package phases
 
-import "github.com/leandroatallah/firefly/internal/engine/contracts/navigation"
+import "github.com/boilerplate/ebiten-template/internal/engine/contracts/navigation"
 
 type GoalType string
 

@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/leandroatallah/firefly/internal/engine/data/config"
+	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
 )
 
 var (

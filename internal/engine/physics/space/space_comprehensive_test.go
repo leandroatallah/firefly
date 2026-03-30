@@ -4,8 +4,8 @@ import (
 	"image"
 	"testing"
 
-	contractsbody "github.com/leandroatallah/firefly/internal/engine/contracts/body"
-	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
+	contractsbody "github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
+	bodyphysics "github.com/boilerplate/ebiten-template/internal/engine/physics/body"
 )
 
 // Test HasCollision function

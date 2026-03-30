@@ -3,8 +3,8 @@ package phases
 import (
 	"testing"
 
-	"github.com/leandroatallah/firefly/internal/engine/contracts/navigation"
-	contractseq "github.com/leandroatallah/firefly/internal/engine/contracts/sequences"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/navigation"
+	contractseq "github.com/boilerplate/ebiten-template/internal/engine/contracts/sequences"
 )
 
 func TestManagerAdvanceToNextPhaseIntegration(t *testing.T) {

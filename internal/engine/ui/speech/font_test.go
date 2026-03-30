@@ -5,7 +5,7 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
-	"github.com/leandroatallah/firefly/internal/engine/assets/font"
+	"github.com/boilerplate/ebiten-template/internal/engine/assets/font"
 )
 
 func TestSpeechFont(t *testing.T) {

@@ -3,7 +3,7 @@ package movement
 import (
 	"fmt"
 
-	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 )
 
 // MovementStateOption defines a function that configures a movement state

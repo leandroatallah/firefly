@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
-	bodyphysics "github.com/leandroatallah/firefly/internal/engine/physics/body"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
+	bodyphysics "github.com/boilerplate/ebiten-template/internal/engine/physics/body"
 )
 
 // StateEnum is a constraint for generic types that represent states, typically as integers.

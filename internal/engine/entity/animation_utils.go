@@ -3,8 +3,8 @@ package entity
 import (
 	"image"
 
-	"github.com/leandroatallah/firefly/internal/engine/contracts/animation"
-	"github.com/leandroatallah/firefly/internal/engine/render/sprites"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/animation"
+	"github.com/boilerplate/ebiten-template/internal/engine/render/sprites"
 )
 
 type Animatable interface {

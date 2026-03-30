@@ -5,9 +5,9 @@ import (
 	"math"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/leandroatallah/firefly/internal/engine/contracts/body"
-	"github.com/leandroatallah/firefly/internal/engine/data/config"
-	enginecamera "github.com/leandroatallah/firefly/internal/engine/render/camera"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
+	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
+	enginecamera "github.com/boilerplate/ebiten-template/internal/engine/render/camera"
 )
 
 // Vignette draws a retro darkness overlay with a jagged circular opening.

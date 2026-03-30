@@ -3,7 +3,7 @@ package body
 import (
 	"testing"
 
-	"github.com/leandroatallah/firefly/internal/engine/utils/fp16"
+	"github.com/boilerplate/ebiten-template/internal/engine/utils/fp16"
 )
 
 func TestNewBody(t *testing.T) {

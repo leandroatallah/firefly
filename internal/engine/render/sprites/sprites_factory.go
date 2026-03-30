@@ -4,8 +4,8 @@ import (
 	"io/fs"
 	"os"
 
-	"github.com/leandroatallah/firefly/internal/engine/contracts/animation"
-	"github.com/leandroatallah/firefly/internal/engine/data/schemas"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/animation"
+	"github.com/boilerplate/ebiten-template/internal/engine/data/schemas"
 )
 
 // GetSpritesFromAssets converts asset data from a JSON schema into a SpriteMap,

@@ -3,7 +3,7 @@ package enemies
 import (
 	"fmt"
 
-	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
+	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
 )
 
 type EnemyFactory[T actors.ActorEntity] struct {

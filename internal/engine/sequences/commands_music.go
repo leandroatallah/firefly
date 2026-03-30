@@ -1,8 +1,8 @@
 package sequences
 
 import (
-	"github.com/leandroatallah/firefly/internal/engine/app"
-	"github.com/leandroatallah/firefly/internal/engine/utils/timing"
+	"github.com/boilerplate/ebiten-template/internal/engine/app"
+	"github.com/boilerplate/ebiten-template/internal/engine/utils/timing"
 )
 
 // PlayMusicCommand plays background music.

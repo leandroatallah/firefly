@@ -1,6 +1,6 @@
 package movement
 
-import "github.com/leandroatallah/firefly/internal/engine/contracts/body"
+import "github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 
 type IdleMovementState struct {
 	BaseMovementState

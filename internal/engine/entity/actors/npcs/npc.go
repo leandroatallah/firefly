@@ -1,7 +1,7 @@
 package npcs
 
 import (
-	"github.com/leandroatallah/firefly/internal/engine/entity/actors"
+	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
 )
 
 type NpcType string
