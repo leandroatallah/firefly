@@ -11,25 +11,73 @@ A multi-agent pipeline following Spec-Driven Development (SDD). The spec is the 
 
 Any feature request, task, or improvement idea. The pipeline starts from a human-readable description, not from a coverage report.
 
+## Story Folder Convention
+
+Each story lives in a self-contained folder that moves through the pipeline:
+
+```
+.agents/work/
+├── backlog/[ID]-[slug]/
+│   ├── USER_STORY.md   ← written by Story Architect
+│   └── PROGRESS.md     ← pipeline status tracker
+├── active/[ID]-[slug]/
+│   ├── USER_STORY.md
+│   ├── SPEC.md         ← written by Spec Engineer
+│   └── PROGRESS.md
+└── done/[ID]-[slug]/
+    ├── USER_STORY.md
+    ├── SPEC.md
+    └── PROGRESS.md
+```
+
+`PROGRESS.md` is the single source of truth for pipeline state. Every agent updates it before finishing.
+
+## PROGRESS.md Format
+
+```markdown
+# PROGRESS — [ID]-[slug]
+
+**Status:** 🔄 Active   (or ✅ Done)
+
+## Pipeline Stages
+
+| Stage | Status | Notes |
+|---|---|---|
+| Story Architect    | ✅ Complete | `USER_STORY.md` written |
+| Spec Engineer      | ✅ Complete | `SPEC.md` written |
+| Mock Generator     | ✅ Complete | No mocks required |
+| TDD Specialist     | ✅ Complete | `path/to/foo_test.go` |
+| Feature Implementer| ✅ Complete | `path/to/foo.go` |
+| Gatekeeper         | ⬜ Pending  | |
+```
+
 ## Agents
 
 **1. Story Architect**
-Translates the feature request into a User Story with Acceptance Criteria using DDD ubiquitous language. Writes to `.agents/work/backlog/USER_STORY_[ID].md`.
+Translates the feature request into a User Story with Acceptance Criteria using DDD ubiquitous language.
+- Creates `backlog/[ID]-[slug]/USER_STORY.md` and `PROGRESS.md`.
 
 **2. Spec Engineer**
-Transforms the story into a Technical Specification: interface contracts, state machine transitions, pre/post-conditions. Writes to `.agents/work/active/SPEC_[ID].md`.
+Transforms the story into a Technical Specification: interface contracts, state machine transitions, pre/post-conditions.
+- Moves folder from `backlog/` to `active/`.
+- Writes `SPEC.md`, updates `PROGRESS.md`.
 
 **3. Mock Generator**
-Inspects `internal/engine/contracts/` and `internal/engine/mocks/`, generates or updates mocks required by the spec. Decides shared vs. package-local placement.
+Inspects `internal/engine/contracts/` and `internal/engine/mocks/`, generates or updates mocks required by the spec.
+- Updates `PROGRESS.md` (or marks "skipped — no mocks required").
 
 **4. TDD Specialist**
-Writes failing `_test.go` files (Red phase) that exactly match the Spec's acceptance criteria. Tests verify observable behavior through public interfaces.
+Writes failing `_test.go` files (Red phase) that exactly match the Spec's acceptance criteria.
+- Updates `PROGRESS.md` with test file path(s).
 
 **5. Feature Implementer**
 Writes the minimum production code to make the failing tests pass (Green phase). Does not modify tests.
+- Updates `PROGRESS.md` with production file path(s).
 
 **6. Workflow Gatekeeper**
-Validates spec compliance, TDD cycle, and code quality. Runs Coverage Analyzer to confirm a positive delta. Moves the story to `.agents/work/done/` on success, or triggers a backtrack on failure.
+Validates spec compliance, TDD cycle, and code quality. Runs Coverage Analyzer to confirm a positive delta.
+- Updates `PROGRESS.md` to `✅ Done`.
+- Moves folder from `active/` to `done/`.
 
 ## Chain
 
