@@ -10,9 +10,9 @@
 
 ```go
 type groundedSubState interface {
-    Enter()
-    Update() groundedSubStateEnum
-    Exit()
+    OnStart(currentCount int)
+    OnFinish()
+    transitionTo() groundedSubStateEnum
 }
 
 type groundedSubStateEnum int
@@ -36,7 +36,7 @@ Each is a separate type in its own file:
 | `DuckingSubState` | wraps `DuckingState` from SPEC-003 |
 | `AimLockSubState` | `aim_lock_sub_state.go` |
 
-Each implements `Enter()`, `Update() groundedSubStateEnum`, `Exit()`.
+Each implements `OnStart(currentCount int)`, `OnFinish()`, and `transitionTo() groundedSubStateEnum`.
 
 ### `GroundedState` — composite state
 
@@ -44,16 +44,17 @@ Each implements `Enter()`, `Update() groundedSubStateEnum`, `Exit()`.
 type GroundedState struct { /* injected deps, active sub-state */ }
 
 func NewGroundedState(deps GroundedDeps) *GroundedState
-func (g *GroundedState) Enter()                // sets active sub-state to IdleSubState, calls sub.Enter()
-func (g *GroundedState) Update() ActorStateEnum // delegates to active sub-state; handles sub-state transitions
-func (g *GroundedState) Exit()                 // calls active sub-state.Exit(), then parent cleanup
+func (g *GroundedState) OnStart(currentCount int)  // sets active sub-state to IdleSubState, calls sub.OnStart()
+func (g *GroundedState) State() ActorStateEnum     // returns StateGrounded
+func (g *GroundedState) OnFinish()                 // calls active sub-state.OnFinish(), then parent cleanup
 ```
 
-- `Update()` calls `activeSub.Update()` → if returned sub-state differs from current, calls `current.Exit()`, sets new sub, calls `new.Enter()`.
-- If a transition out of `Grounded` is needed (e.g. jump → `Falling`, dash → `Dashing`), `Update()` returns the appropriate `ActorStateEnum` to the parent state machine.
+- `OnStart()` initializes active sub-state to `IdleSubState` and calls `sub.OnStart(currentCount)`.
+- State transitions are evaluated each frame by the parent `Character` state machine calling `Character.Update()`, which checks input and calls `GroundedState.transitionTo()` (internal method).
+- If a transition out of `Grounded` is needed (e.g. jump → `Falling`, dash → `Dashing`), the parent state machine returns the appropriate `ActorStateEnum`.
 - Plugs into the existing `Character` `handleState` switch as a single `ActorStateEnum` value (e.g. `StateGrounded`).
-- Parent `Grounded.Exit()` calls `activeSub.Exit()` before its own cleanup.
-- Re-entering `Grounded` from `Falling`: `Enter()` always resets sub-state to `Idle`.
+- Parent `Grounded.OnFinish()` calls `activeSub.OnFinish()` before its own cleanup.
+- Re-entering `Grounded` from `Falling`: `OnStart()` always resets sub-state to `Idle`.
 
 ### Transition rules (inside `GroundedState.Update`)
 
@@ -91,18 +92,18 @@ File: `internal/game/entity/actors/states/grounded_state_test.go`
 
 `TestGroundedSubStateTransitions` (table-driven):
 
-| case | input | initial sub-state | expected sub-state after Update() |
+| case | input | initial sub-state | expected sub-state after transitionTo() |
 |---|---|---|---|
 | no input | none | Idle | Idle |
 | horizontal input | right | Idle | Walking |
 | duck input | down | Walking | Ducking |
 | duck released + clearance | none | Ducking | Idle |
-| jump input | jump | Idle | (returns StateFalling to parent) |
+| jump input | jump | Idle | (parent state machine returns StateFalling) |
 
-`TestGroundedStateExitCallsSubExit`:
-- Enter `GroundedState`, transition to `Ducking` sub-state, call `GroundedState.Exit()` → assert `DuckingSubState.Exit()` was called.
+`TestGroundedStateOnFinishCallsSubOnFinish`:
+- Call `GroundedState.OnStart()`, transition to `Ducking` sub-state, call `GroundedState.OnFinish()` → assert `DuckingSubState.OnFinish()` was called.
 
 `TestGroundedStateReEntryResetsToIdle`:
-- Enter → transition to `Walking` → Exit → Enter again → assert active sub-state is `Idle`.
+- Call `OnStart()` → transition to `Walking` → call `OnFinish()` → call `OnStart()` again → assert active sub-state is `Idle`.
 
 Test must fail (types do not exist yet) → implement → test passes.

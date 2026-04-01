@@ -36,6 +36,7 @@ func createPlayer(ctx *app.AppContext, playerType gameentitytypes.PlayerType) (p
 			Y: float64(jumpPos.Y),
 		})
 	}
+	jumpSkill.SetJumpCutMultiplier(0.4)
 	p.GetCharacter().AddSkill(jumpSkill)
 	p.GetCharacter().AddSkill(skill.NewHorizontalMovementSkill())
 
