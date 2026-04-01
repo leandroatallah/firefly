@@ -66,7 +66,7 @@ Translates the feature request into a User Story with Acceptance Criteria using 
 
 **2. Spec Engineer**
 Transforms the story into a Technical Specification: interface contracts, state machine transitions, pre/post-conditions.
-- Moves folder from `backlog/` to `active/`.
+- Moves folder from `backlog/` to `active/` using `bash scripts/story.sh start <id-slug>`.
 - Writes `SPEC.md`, updates `PROGRESS.md`.
 
 **3. Mock Generator**
@@ -84,7 +84,7 @@ Writes the minimum production code to make the failing tests pass (Green phase).
 **6. Workflow Gatekeeper**
 Validates spec compliance, TDD cycle, and code quality. Runs Coverage Analyzer to confirm a positive delta.
 - Updates `PROGRESS.md` to `✅ Done`.
-- Moves folder from `active/` to `done/`.
+- Moves folder from `active/` to `done/` using `bash scripts/story.sh done <id-slug>`.
 
 ## Chain
 

@@ -123,3 +123,16 @@ func (t *Transition) Draw(_ *ebiten.Image) {}  // Use blank in param list
 | `entity/items` | 52.3% | Item collection and state transitions |
 | `scene` | 73.0% | Scene transitions and tilemap initialization |
 | `data/i18n` | (new) | `I18nManager.Load()` and `T()` methods, error handling |
+
+## 🛠 Story Management Scripts
+
+Use these scripts to manage story lifecycle. Do **not** move folders manually.
+
+| Script | Purpose |
+| :--- | :--- |
+| `bash scripts/story.sh new <id-slug>` | Create a new story in `backlog/` |
+| `bash scripts/story.sh start <id-slug>` | Move story `backlog/` → `active/` (Spec Engineer) |
+| `bash scripts/story.sh done <id-slug>` | Move story `active/` → `done/` (Gatekeeper) |
+| `bash scripts/story.sh status` | List all stories by lane |
+| `go run scripts/next-id.go` | Print the next available story ID |
+| `go run scripts/kanban.go` | Generate `kanban.html` board |
