@@ -37,6 +37,7 @@ The engine is built on a "Space-Body-Model" pattern:
 
 - **Non-Obvious Pattern**: It uses an **Ownership Hierarchy**. A body can "own" other bodies. The [Ownership.LastOwner()](internal/engine/physics/body/ownership.go) method performs an iterative traversal with cycle detection to find the root entity (e.g., finding the `Character` that owns a sword's collision box).
 - **Movable vs Collidable**: Logic is split into [MovableBody](internal/engine/physics/body/body_movable.go) (velocity/acceleration) and [CollidableBody](internal/engine/physics/body/body_collidable.go) (collision shapes/resolution).
+- **Hitbox Resize Utilities**: `ResizeFixedBottom(rect, newHeight)` and `ResizeFixedTop(rect, newHeight)` return a new rect with the same bottom or top edge respectively, used by duck and dash states to shrink the hitbox without repositioning the actor.
 
 ### Space: Collision Resolution
 
@@ -52,6 +53,14 @@ The engine is built on a "Space-Body-Model" pattern:
 
 - **Platformer Logic**: [PlatformMovementModel](internal/engine/physics/movement/movement_model_platform.go) implements asymmetric gravity (higher downward gravity for a "snappier" feel) and air control multipliers.
 - **Top-Down Logic**: [TopDownMovementModel](internal/engine/physics/movement/movement_model_topdown.go) includes diagonal normalization to prevent the "diagonal speed boost" pitfall.
+- **One-Way Platform Drop-Through**: `tryDropThrough` disables a `OneWayPlatform`'s solidity for the actor for a minimum of 2 frames when down + jump are pressed simultaneously. Input disambiguation: down alone → duck; down + jump → drop-through; jump alone → normal jump.
+
+### Skill: Ability Integration
+
+[skill](internal/engine/physics/skill) encapsulates discrete player abilities.
+
+- **`JumpSkill`**: Handles jump activation and variable jump height. Calls `body.TryJump(force)` on key-press. On early key release while `body.IsGoingUp()`, multiplies upward velocity by `JumpCutMultiplier` (range `(0.0, 1.0]`, default `1.0`). The cut fires at most once per jump. Accepts an injectable `InputSource` interface for deterministic testing.
+- **`DashSkill` / `DashState`**: Tween-based dash deceleration using `InOutSineTween`. Velocity follows an `InOutSine` curve from `DashSpeed` to `0` over a configurable frame duration. Gravity is suspended and the hitbox is reduced to duck height for the full dash. One air dash per jump; cooldown prevents immediate re-trigger.
 
 ---
 

@@ -12,6 +12,10 @@ Achieve **80%+ test coverage** across the codebase, prioritizing the engine's en
 2. **Level Management (`internal/game/scenes/phases`)**: 0.0% coverage. This is the foundation for all game levels.
 3. **Player & Character Logic (`internal/game/entity/actors/player`)**: 52.2% coverage. Good progress here, but still needs more integration tests.
 4. **Sequences (`internal/engine/sequences`)**: 60.8% coverage. Essential for cutscenes and scripted events.
+5. **Composite Grounded State (`internal/game/entity/actors/states`)**: New sub-state machine (`GroundedState`, `DuckingState`, `DashState`). Each sub-state transition must be independently tested.
+6. **Physics Skills (`internal/engine/physics/skill`)**: `JumpSkill` jump-cut logic and `DashState` tween deceleration are new and untested.
+7. **Scene Freeze (`internal/engine/scene`)**: `FreezeController` tick/reset logic needs full branch coverage.
+8. **Physics Tween (`internal/engine/physics/tween`)**: `InOutSineTween` interpolation values and `Done()` boundary.
 
 ## 🛠 Testing Strategy & Patterns
 
@@ -73,7 +77,7 @@ tests := []struct {
 1. **Analyze Coverage**: Use the coverage tools to identify gaps:
    - For a specific package: `go test ./internal/engine/[package] -coverprofile=coverage.out && go tool cover -func=coverage.out`
    - For a full project report: `bash scripts/test_coverage.sh`
-2. **Consult Skills**: Review the relevant AI Agent Skills in `.agents/skills/` (e.g., `go-testing`, `mocking-strategies`, `fixed-point-physics`) for specialized patterns and requirements.
+2. **Consult Skills**: Review the relevant AI Agent Skills in `.kiro/skills/` (e.g., `go-testing`, `mocking-strategies`, `fixed-point-physics`) for specialized patterns and requirements.
 3. **Identify Gaps**: Read the source file and identify functions or branches with 0% coverage.
 4. **Create Test File**: If it doesn't exist, create `[filename]_test.go`.
 5. **Write Tests**: Follow the patterns in this document and the referenced skills. Ensure you test both "happy paths" and error/edge cases.
@@ -81,7 +85,7 @@ tests := []struct {
 
 ## ⚠️ Precautions
 
-- **AI Agent Skills**: If you need to update agent instructions, modify the files in `.agents/skills/` and run `make sync-skills`.
+- **AI Agent Skills**: Skills are located in `.kiro/skills/` and synced from `.agents/skills/`. Modify source files in `.agents/skills/` and run `make sync-skills` to update.
 - **Never commit changes**. Do not use `git commit` or attempt to stage/commit files. The user is responsible for all version control operations.
 - **Do not modify production code** unless you find a bug that makes it untestable (e.g., global state that needs to be injected).
 - **Keep tests fast**. Avoid long `time.Sleep` calls; use virtual time or frame counters.

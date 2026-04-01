@@ -7,9 +7,11 @@ A minimal, clean boilerplate for starting new game projects with Ebitengine, bas
 - **Core Engine:** Robust entity management, scene management, and physics.
 - **Platformer Foundation:** Ready-to-use platformer logic in `internal/game/scenes/phases/`.
 - **I18n:** Built-in internationalization support.
-- **Input:** Unified input handling.
+- **Input:** Unified input handling with last-pressed-wins directional priority.
 - **VFX:** Particle and floating text systems.
 - **Boilerplate Scene:** A minimal main menu to get you started.
+- **Advanced Player Mechanics:** Duck state, variable jump height, tween-based dash, one-way platform drop-through, and composite grounded sub-state machine.
+- **Scene Freeze Frame:** Hit-stop effect for impactful gameplay moments.
 
 ## Getting Started
 

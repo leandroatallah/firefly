@@ -15,6 +15,7 @@ This module contains the core, reusable game engine components. It is designed t
   - `schemas/`: Definitions for data structures used in asset files.
 - `event/`: Provides a basic event handling system for inter-component communication.
 - `input/`: Manages user input from keyboard, mouse, or gamepads.
+  - `HorizontalAxis`: Last-pressed-wins directional input — when both left and right are held, the most recently pressed direction wins.
 - `mocks/`: Contains mock implementations of engine components for testing purposes, facilitating unit and integration tests for the game module.
 - `sequences/`: Manages scripted event sequences, commands, and cutscenes.
   - `player.go`: Executes sequences of commands.
@@ -29,9 +30,14 @@ This module contains the core, reusable game engine components. It is designed t
   - `animation_utils.go`: Helper functions for animation logic.
 - `physics/`: Implements the physics simulation.
   - `body/`: Defines physical body interfaces and implementations.
-  - `movement/`: Provides movement models (e.g., platformer physics).
+    - `ResizeFixedBottom(rect, newHeight)`: Resizes a rect while anchoring its bottom edge (used by duck and dash states).
+    - `ResizeFixedTop(rect, newHeight)`: Resizes a rect while anchoring its top edge.
+  - `movement/`: Provides movement models (e.g., platformer physics). Includes one-way platform drop-through logic.
   - `skill/`: Manages physics-related skills or abilities.
+    - `JumpSkill`: Supports variable jump height via a configurable `JumpCutMultiplier` — releasing the jump button early reduces the apex.
   - `space/`: Handles collision detection and spatial partitioning.
+  - `tween/`: Interpolation utilities.
+    - `InOutSineTween`: Smooth `InOutSine` tween used by the dash deceleration.
 - `scene/`: Manages game scenes, scene transitions, and the overall scene lifecycle.
   - `scene_manager.go`: Orchestrates scene loading, updating, and drawing.
   - `scene_base.go`: Provides a common base for all scenes.
@@ -42,6 +48,7 @@ This module contains the core, reusable game engine components. It is designed t
   - `camera_config.go`: Defines camera behavior for scenes.
   - `screen_flipper.go`: Manages screen flipping effects.
   - `scene_tilemap.go`: Handles tilemap-based scene elements.
+  - `freeze.go`: `FreezeController` — pauses all Actor and Body updates for a given number of frames (hit-stop effect). Exposed via the `Freezable` contract in `contracts/scene/`.
 
 ## Presentation
 
