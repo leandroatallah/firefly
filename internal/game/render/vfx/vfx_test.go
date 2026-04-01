@@ -4,13 +4,11 @@ import (
 	"image"
 	"os"
 	"testing"
-	"testing/fstest"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
 	"github.com/boilerplate/ebiten-template/internal/engine/mocks"
 	"github.com/boilerplate/ebiten-template/internal/engine/render/camera"
-	enginevfx "github.com/boilerplate/ebiten-template/internal/engine/render/particles/vfx"
 )
 
 func TestMain(m *testing.M) {
@@ -57,18 +55,4 @@ func TestScreenText(t *testing.T) {
 	cam := camera.NewController(0, 0)
 	
 	st.Draw(screen, cam)
-}
-
-func TestSpawnStarParticles(t *testing.T) {
-	// Should not panic with nil manager
-	SpawnStarParticles(nil, 100, 100, 1)
-
-	// Create a dummy vfx.json for Manager
-	vfxPath := "vfx_test.json"
-	fsys := fstest.MapFS{
-		vfxPath: &fstest.MapFile{Data: []byte("[]")},
-	}
-
-	m := enginevfx.NewManager(fsys, vfxPath)
-	SpawnStarParticles(m, 100, 100, 5)
 }

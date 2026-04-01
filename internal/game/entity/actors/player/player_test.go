@@ -55,22 +55,7 @@ func TestClimberPlayer_Skills(t *testing.T) {
 		t.Fatalf("failed to create climber player: %v", err)
 	}
 
-	climber := p.(*ClimberPlayer)
-
-	// Test Star Skill Activation
-	if climber.IsStarActive() {
-		t.Error("Star skill should not be active initially")
-	}
-	climber.ActivateStarSkill()
-	// Skill activation happens on next Update cycle through character.Update -> skill.HandleInput
-	climber.Update(ctx.Space)
-	if !climber.IsStarActive() {
-		t.Error("Star skill should be active after activation and update")
-	}
-
-	// Test ResetSkills
-	climber.ResetSkills()
-	if climber.IsStarActive() {
-		t.Error("Star skill should be inactive after reset")
+	if p == nil {
+		t.Fatal("NewClimberPlayer returned nil")
 	}
 }

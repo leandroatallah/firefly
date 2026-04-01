@@ -37,7 +37,7 @@ func PreparePlatformer(
 	rect := BodyRectFromSpriteData(spriteData)
 	character, err := platformer.NewPlatformerCharacter(ctx.Assets, stateMap, spriteData, rect)
 	if err != nil {
-		return nil, schemas.SpriteData{}, actors.StatData{}, nil, fmt.Errorf("failed to create platformer character:", err)
+		return nil, schemas.SpriteData{}, actors.StatData{}, nil, fmt.Errorf("failed to create platformer character: %w", err)
 	}
 	character.SetAppContext(ctx)
 
