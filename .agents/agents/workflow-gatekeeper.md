@@ -19,7 +19,7 @@ Acts as the "Lead Engineer" and "QA". Validates that the implementation matches 
 - Check that the implementation exactly matches `SPEC.md` in `active/[ID]-[slug]/`.
 - Run `Coverage Analyzer` to confirm a positive coverage delta for the changed packages.
 - Move the entire story folder from `active/` to `done/`: `.agents/work/done/[ID]-[slug]/`.
-- Update `PROGRESS.md` before moving: mark "Gatekeeper" ✅, set top-level **Status** to `✅ Done`.
+- Update `PROGRESS.md` before moving: mark "Gatekeeper" ✅, set top-level **Status** to `✅ Done`, and append a `## Log` entry with the coverage delta and confirmation. If rejecting, append the rejection reason and which agent to backtrack to — do NOT move the folder.
 - Enforce project-wide standards:
   - Table-driven tests.
   - No `_ = variable` in production code.

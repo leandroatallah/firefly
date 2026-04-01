@@ -12,3 +12,8 @@
 | TDD Specialist | ⬜ Pending | |
 | Feature Implementer | ⬜ Pending | |
 | Gatekeeper | ⬜ Pending | |
+
+## Log
+
+- **Story Architect**: USER_STORY.md created.
+- **Spec Engineer**: SPEC.md created.

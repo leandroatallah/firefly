@@ -21,7 +21,7 @@ Acts as the "Tester". Strictly follows the **Red Phase** of TDD. Writes failing 
 - Ensure tests fail for the right reason: **missing behavior**, not just a missing symbol or signature.
 - Mock only at **system boundaries** (e.g., physics space, audio, file I/O) using `internal/engine/mocks/`. Do not mock internal engine packages you control.
 - Strictly adhere to `AGENTS.md` (no `_ = variable`, Go style).
-- Update `PROGRESS.md` in `.agents/work/active/[ID]-[slug]/`: mark "TDD Specialist" ✅ and add the test file path(s) as a note.
+- Update `PROGRESS.md` in `.agents/work/active/[ID]-[slug]/`: mark "TDD Specialist" ✅ and append a `## Log` entry with the test file path(s) and a one-line summary of what the Red failure proves.
 
 ## Inputs
 

@@ -19,7 +19,7 @@ Acts as the "Architect". Transforms User Stories into detailed Technical Specifi
 - Read `USER_STORY.md` from `.agents/work/backlog/[ID]-[slug]/`.
 - Move the entire story folder from `backlog/` to `active/`: `.agents/work/active/[ID]-[slug]/`.
 - Write `SPEC.md` inside the active folder.
-- Update `PROGRESS.md`: mark "Spec Engineer" ✅.
+- Update `PROGRESS.md`: mark "Spec Engineer" ✅ and append a `## Log` entry: `Spec Engineer [date]: SPEC.md created. Key decisions: [brief note on any non-obvious design choices].`
 - Map the story to existing contracts in `internal/engine/contracts/`; define new interfaces if needed.
 - Detail the **Red Phase**: the exact failing test scenario derived from Acceptance Criteria.
 
