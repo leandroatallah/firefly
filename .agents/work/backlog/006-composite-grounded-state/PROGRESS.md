@@ -1,6 +1,6 @@
 # PROGRESS — 006-composite-grounded-state
 
-**Status:** 🔄 Active
+**Status:** 📋 Backlog
 
 ## Pipeline Stages
 

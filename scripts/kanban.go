@@ -11,16 +11,19 @@ import (
 )
 
 func cards(dir string) string {
-	entries, _ := filepath.Glob(filepath.Join(dir, "*.md"))
+	entries, _ := os.ReadDir(dir)
 	var b strings.Builder
-	for _, f := range entries {
-		file, err := os.Open(f)
+	for _, e := range entries {
+		if !e.IsDir() {
+			continue
+		}
+		f, err := os.Open(filepath.Join(dir, e.Name(), "USER_STORY.md"))
 		if err != nil {
 			continue
 		}
-		scanner := bufio.NewScanner(file)
+		scanner := bufio.NewScanner(f)
 		scanner.Scan()
-		file.Close()
+		f.Close()
 		title := strings.TrimPrefix(scanner.Text(), "# ")
 		fmt.Fprintf(&b, `<div class="card">%s</div>`+"\n", title)
 	}

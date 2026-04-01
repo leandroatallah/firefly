@@ -1,6 +1,6 @@
 # PROGRESS — 005-one-way-platform-drop-through
 
-**Status:** 🔄 Active
+**Status:** 📋 Backlog
 
 ## Pipeline Stages
 

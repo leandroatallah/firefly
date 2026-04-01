@@ -1,6 +1,6 @@
-# PROGRESS — 007-scene-freeze-frame
+# PROGRESS — 008-bullet-spawn-offset-toggler
 
-**Status:** 🔄 Active
+**Status:** 📋 Backlog
 
 ## Pipeline Stages
 
