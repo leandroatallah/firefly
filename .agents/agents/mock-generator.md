@@ -22,7 +22,7 @@ Inspects `internal/engine/contracts/` interfaces and existing `internal/engine/m
   - **Package-local mocks**: Used in single package → place in `*_test.go` or `mocks_test.go`
 - Generate mock implementations with configurable behavior.
 - Ensure mocks follow project conventions (no `_ = variable` pattern).
-- Update `PROGRESS.md` in `.agents/work/active/[ID]-[slug]/`: mark "Mock Generator" ✅ (or "skipped — no mocks required").
+- Update `PROGRESS.md` in `.agents/work/active/[ID]-[slug]/`: mark "Mock Generator" ✅ (or "skipped — no mocks required") and append a `## Log` entry listing any mocks created or confirming none were needed.
 
 ## Inputs
 

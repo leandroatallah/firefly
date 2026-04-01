@@ -21,7 +21,7 @@ Acts as the "Developer". Follows the **Green Phase** of TDD. Writes the minimal 
 - Ensure code is idiomatic and matches existing patterns.
 - Follow "No `_ = variable`" rule.
 - Refactor if necessary after passing the test (Clean Stage).
-- Update `PROGRESS.md` in `.agents/work/active/[ID]-[slug]/`: mark "Feature Implementer" ✅ and add the production file path(s) as a note.
+- Update `PROGRESS.md` in `.agents/work/active/[ID]-[slug]/`: mark "Feature Implementer" ✅ and append a `## Log` entry with the production file path(s) and confirmation that all tests pass.
 
 ## Inputs
 

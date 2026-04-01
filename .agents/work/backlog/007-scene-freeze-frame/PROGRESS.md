@@ -1,6 +1,6 @@
 # PROGRESS — 007-scene-freeze-frame
 
-**Status:** 🔄 Active
+**Status:** 📋 Backlog
 
 ## Pipeline Stages
 
@@ -12,3 +12,8 @@
 | TDD Specialist | ⬜ Pending | |
 | Feature Implementer | ⬜ Pending | |
 | Gatekeeper | ⬜ Pending | |
+
+## Log
+
+- **Story Architect**: USER_STORY.md created.
+- **Spec Engineer**: SPEC.md created.

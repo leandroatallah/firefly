@@ -49,7 +49,14 @@ Each story lives in a self-contained folder that moves through the pipeline:
 | TDD Specialist     | ✅ Complete | `path/to/foo_test.go` |
 | Feature Implementer| ✅ Complete | `path/to/foo.go` |
 | Gatekeeper         | ⬜ Pending  | |
+
+## Log
+
+- **[Agent] [date]**: What was done, decided, or why a backtrack occurred.
+  Example: `Gatekeeper rejected: coverage dropped 2% — missing edge case in TestFooExit. Backtracking to TDD Specialist.`
 ```
+
+The Log section is the agent's working memory across stateless sessions. Every agent **must** append an entry when it completes or when it rejects/backtracks. Keep entries concise — one or two lines max. This is the primary context source for the next agent starting a fresh session.
 
 ## Agents
 
