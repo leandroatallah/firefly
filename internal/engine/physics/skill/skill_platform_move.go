@@ -13,6 +13,8 @@ type HorizontalMovementSkill struct {
 	SkillBase
 	activationKey ebiten.Key
 	axis          *input.HorizontalAxis
+	prevLeft      bool
+	prevRight     bool
 }
 
 func NewHorizontalMovementSkill() *HorizontalMovementSkill {
@@ -50,16 +52,19 @@ func (s *HorizontalMovementSkill) HandleInput(body body.MovableCollidable, model
 	moveLeft := input.IsSomeKeyPressed(ebiten.KeyA, ebiten.KeyLeft)
 	moveRight := input.IsSomeKeyPressed(ebiten.KeyD, ebiten.KeyRight)
 
-	if moveLeft {
+	if moveLeft && !s.prevLeft {
 		s.axis.Press(-1)
-	} else {
+	} else if !moveLeft && s.prevLeft {
 		s.axis.Release(-1)
 	}
-	if moveRight {
+	if moveRight && !s.prevRight {
 		s.axis.Press(1)
-	} else {
+	} else if !moveRight && s.prevRight {
 		s.axis.Release(1)
 	}
+
+	s.prevLeft = moveLeft
+	s.prevRight = moveRight
 
 	horizontalInertia := cfg.Physics.HorizontalInertia
 	if val := body.HorizontalInertia(); val >= 0 {
