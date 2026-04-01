@@ -12,6 +12,7 @@ import (
 type HorizontalMovementSkill struct {
 	SkillBase
 	activationKey ebiten.Key
+	axis          *input.HorizontalAxis
 }
 
 func NewHorizontalMovementSkill() *HorizontalMovementSkill {
@@ -19,6 +20,7 @@ func NewHorizontalMovementSkill() *HorizontalMovementSkill {
 		SkillBase: SkillBase{
 			state: StateReady,
 		},
+		axis: input.NewHorizontalAxis(),
 	}
 }
 
@@ -48,27 +50,31 @@ func (s *HorizontalMovementSkill) HandleInput(body body.MovableCollidable, model
 	moveLeft := input.IsSomeKeyPressed(ebiten.KeyA, ebiten.KeyLeft)
 	moveRight := input.IsSomeKeyPressed(ebiten.KeyD, ebiten.KeyRight)
 
+	if moveLeft {
+		s.axis.Press(-1)
+	} else {
+		s.axis.Release(-1)
+	}
+	if moveRight {
+		s.axis.Press(1)
+	} else {
+		s.axis.Release(1)
+	}
+
 	horizontalInertia := cfg.Physics.HorizontalInertia
 	if val := body.HorizontalInertia(); val >= 0 {
 		horizontalInertia = val
 	}
 
+	dir := s.axis.Value()
 	if horizontalInertia > 0 {
-		if moveLeft {
+		if dir < 0 {
 			body.OnMoveLeft(body.Speed())
-		}
-		if moveRight {
+		} else if dir > 0 {
 			body.OnMoveRight(body.Speed())
 		}
 	} else {
-		switch {
-		case moveLeft:
-			vx16 = -fp16.To16(body.Speed())
-		case moveRight:
-			vx16 = fp16.To16(body.Speed())
-		default:
-			vx16 = 0
-		}
+		vx16 = fp16.To16(dir * body.Speed())
 	}
 
 	body.SetVelocity(vx16, vy16)
