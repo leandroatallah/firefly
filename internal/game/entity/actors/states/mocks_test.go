@@ -46,6 +46,10 @@ func (m *MockBody) Position() image.Rectangle {
 type MockInputSource struct {
 	DuckHeldFunc            func() bool
 	HasCeilingClearanceFunc func() bool
+	HorizontalInputFunc     func() int
+	JumpPressedFunc         func() bool
+	DashPressedFunc         func() bool
+	AimLockHeldFunc         func() bool
 }
 
 func (m *MockInputSource) DuckHeld() bool {
@@ -58,6 +62,34 @@ func (m *MockInputSource) DuckHeld() bool {
 func (m *MockInputSource) HasCeilingClearance() bool {
 	if m.HasCeilingClearanceFunc != nil {
 		return m.HasCeilingClearanceFunc()
+	}
+	return false
+}
+
+func (m *MockInputSource) HorizontalInput() int {
+	if m.HorizontalInputFunc != nil {
+		return m.HorizontalInputFunc()
+	}
+	return 0
+}
+
+func (m *MockInputSource) JumpPressed() bool {
+	if m.JumpPressedFunc != nil {
+		return m.JumpPressedFunc()
+	}
+	return false
+}
+
+func (m *MockInputSource) DashPressed() bool {
+	if m.DashPressedFunc != nil {
+		return m.DashPressedFunc()
+	}
+	return false
+}
+
+func (m *MockInputSource) AimLockHeld() bool {
+	if m.AimLockHeldFunc != nil {
+		return m.AimLockHeldFunc()
 	}
 	return false
 }
