@@ -2,9 +2,11 @@ package gamehud
 
 import (
 	"image"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"testing"
+	"testing/fstest"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
@@ -137,11 +139,19 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-func TestNewStatusBar(t *testing.T) {
-	// StatusBar expects platformer.PlatformerActorEntity
-	// Let's see what that interface is.
+func heartFS(t *testing.T) fs.FS {
+	t.Helper()
+	data, err := os.ReadFile("assets/images/item-power-grow.png")
+	if err != nil {
+		t.Fatalf("could not read test image: %v", err)
+	}
+	return fstest.MapFS{
+		"assets/images/heart.png": &fstest.MapFile{Data: data},
+	}
+}
 
-	sb, err := NewStatusBar(nil, 100, nil, os.DirFS("."))
+func TestNewStatusBar(t *testing.T) {
+	sb, err := NewStatusBar(nil, 100, nil, heartFS(t))
 	if err != nil {
 		t.Fatalf("failed to create StatusBar: %v", err)
 	}
@@ -156,7 +166,7 @@ func TestNewStatusBar(t *testing.T) {
 }
 
 func TestStatusBar_Update(t *testing.T) {
-	sb, err := NewStatusBar(nil, 100, nil, os.DirFS("."))
+	sb, err := NewStatusBar(nil, 100, nil, heartFS(t))
 	if err != nil {
 		t.Fatalf("failed to create StatusBar: %v", err)
 	}
@@ -167,16 +177,12 @@ func TestStatusBar_Update(t *testing.T) {
 }
 
 func TestStatusBar_Draw(t *testing.T) {
-	// Note: Testing Draw with a real player requires full PlatformerActorEntity implementation
-	// For now, test the nil player case which exercises the early return logic
-	sb, err := NewStatusBar(nil, 100, nil, os.DirFS("."))
+	sb, err := NewStatusBar(nil, 100, nil, heartFS(t))
 	if err != nil {
 		t.Fatalf("failed to create StatusBar: %v", err)
 	}
 
 	screen := ebiten.NewImage(320, 240)
-
-	// Test with no player (should return early)
 	sb.player = nil
 	sb.Draw(screen)
 }

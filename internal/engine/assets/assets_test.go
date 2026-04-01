@@ -45,7 +45,7 @@ func TestLoadImageFromFs(t *testing.T) {
 		ScreenHeight: 240,
 	}
 
-	testFs := createTestFsFromPath("assets/images/default-idle.png")
+	testFs := createTestFsFromPath("assets/images/climber-idle.png")
 
 	ctx := &app.AppContext{
 		Config: cfg,
@@ -78,7 +78,7 @@ func TestLoadImageFromFsValidatesImage(t *testing.T) {
 		ScreenHeight: 240,
 	}
 
-	testFs := createTestFsFromPath("assets/images/default-idle.png")
+	testFs := createTestFsFromPath("assets/images/climber-idle.png")
 
 	ctx := &app.AppContext{
 		Config: cfg,
