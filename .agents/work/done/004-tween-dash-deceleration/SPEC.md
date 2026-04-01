@@ -27,9 +27,9 @@ func (t *InOutSineTween) Reset()
 type DashState struct { /* injected deps */ }
 
 func NewDashState(body body.MovableCollidable, space body.BodiesSpace, cfg DashConfig) *DashState
-func (s *DashState) Enter()
+func (s *DashState) OnStart(currentCount int)
 func (s *DashState) Update() ActorStateEnum
-func (s *DashState) Exit()
+func (s *DashState) OnFinish()
 
 type DashConfig struct {
     Speed            int     // DashSpeed (x16 units)
@@ -40,7 +40,7 @@ type DashConfig struct {
 }
 ```
 
-- `Enter()`:
+- `OnStart(currentCount int)`:
   - Checks `space.Query(...)` in facing direction within `BlockDistance` → if blocked, abort (return immediately, transition to `Idle`/`Falling`).
   - Zeroes vertical velocity, sets `body.SetFreeze(true)` (gravity suspended).
   - Resizes hitbox via `ResizeFixedBottom` to `DuckHeight`.
@@ -50,7 +50,7 @@ type DashConfig struct {
   - If tween not done: apply `tween.Tick()` as horizontal velocity in facing direction → return `StateDashing`.
   - If tween done: `body.SetFreeze(false)`, restore hitbox → return `StateFalling` or `StateIdle` based on grounded check.
   - If wall collision detected mid-dash: abandon tween, `body.SetFreeze(false)`, restore hitbox → return `StateFalling`/`StateIdle`.
-- `Exit()`: ensures freeze is off, hitbox restored, cooldown timer started.
+- `OnFinish()`: ensures freeze is off, hitbox restored, cooldown timer started.
 - Air-dash allowance: tracked as `airDashUsed bool`; reset in `Enter()` when grounded, set when dash starts airborne.
 - Cooldown: `Update()` returns `StateDashing` (blocks re-trigger) until cooldown expires; managed by the state itself or the parent state machine.
 
@@ -105,6 +105,6 @@ File: `internal/game/entity/actors/states/dash_state_test.go`
 | tween complete, grounded | frame == duration, grounded | StateIdle |
 | tween complete, airborne | frame == duration, not grounded | StateFalling |
 | wall collision | blocked mid-dash | StateFalling or StateIdle |
-| dash while already dashing | Enter() called twice | second Enter() is no-op |
+| dash while already dashing | OnStart() called twice | second OnStart() is no-op |
 
 Test must fail (types do not exist yet) → implement → test passes.
