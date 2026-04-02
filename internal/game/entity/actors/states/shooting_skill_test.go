@@ -23,7 +23,7 @@ func TestShootingSkill_CooldownGating(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			spawnCount := 0
 			shooter := &mocks.MockShooter{
-				SpawnBulletFunc: func(x16, y16, speedX16 int, owner interface{}) {
+				SpawnBulletFunc: func(x16, y16, vx16, vy16 int, owner interface{}) {
 					spawnCount++
 				},
 			}
@@ -56,7 +56,7 @@ func TestShootingSkill_CooldownGating(t *testing.T) {
 func TestShootingSkill_AlternatingYOffset(t *testing.T) {
 	var yOffsets []int
 	shooter := &mocks.MockShooter{
-		SpawnBulletFunc: func(x16, y16, speedX16 int, owner interface{}) {
+		SpawnBulletFunc: func(x16, y16, vx16, vy16 int, owner interface{}) {
 			yOffsets = append(yOffsets, y16)
 		},
 	}
@@ -93,7 +93,7 @@ func TestShootingSkill_AlternatingYOffset(t *testing.T) {
 func TestShootingSkill_ReleaseRepressWithinCooldown(t *testing.T) {
 	spawnCount := 0
 	shooter := &mocks.MockShooter{
-		SpawnBulletFunc: func(x16, y16, speedX16 int, owner interface{}) {
+		SpawnBulletFunc: func(x16, y16, vx16, vy16 int, owner interface{}) {
 			spawnCount++
 		},
 	}
