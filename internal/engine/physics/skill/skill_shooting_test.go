@@ -14,7 +14,7 @@ import (
 func TestShootingSkill_CooldownGating(t *testing.T) {
 	spawnCount := 0
 	shooter := &mocks.MockShooter{
-		SpawnBulletFunc: func(x16, y16, speedX16 int, owner interface{}) {
+		SpawnBulletFunc: func(x16, y16, vx16, vy16 int, owner interface{}) {
 			spawnCount++
 		},
 	}
@@ -42,7 +42,7 @@ func TestShootingSkill_CooldownGating(t *testing.T) {
 func TestShootingSkill_AlternatingYOffset(t *testing.T) {
 	var yOffsets []int
 	shooter := &mocks.MockShooter{
-		SpawnBulletFunc: func(x16, y16, speedX16 int, owner interface{}) {
+		SpawnBulletFunc: func(x16, y16, vx16, vy16 int, owner interface{}) {
 			yOffsets = append(yOffsets, y16)
 		},
 	}
@@ -71,7 +71,7 @@ func TestShootingSkill_AlternatingYOffset(t *testing.T) {
 
 func TestShootingSkill_StateTransitions(t *testing.T) {
 	shooter := &mocks.MockShooter{
-		SpawnBulletFunc: func(x16, y16, speedX16 int, owner interface{}) {},
+		SpawnBulletFunc: func(x16, y16, vx16, vy16 int, owner interface{}) {},
 	}
 
 	s := skill.NewShootingSkill(shooter, 2, 0, 32<<4, 4)
@@ -101,7 +101,7 @@ func TestShootingSkill_StateTransitions(t *testing.T) {
 func TestShootingSkill_NoSpawnWhenNotReady(t *testing.T) {
 	spawnCount := 0
 	shooter := &mocks.MockShooter{
-		SpawnBulletFunc: func(x16, y16, speedX16 int, owner interface{}) {
+		SpawnBulletFunc: func(x16, y16, vx16, vy16 int, owner interface{}) {
 			spawnCount++
 		},
 	}
@@ -126,6 +126,7 @@ func TestShootingSkill_NoSpawnWhenNotReady(t *testing.T) {
 type mockMovableCollidable struct {
 	getPosition16Func func() (int, int)
 	faceDirectionFunc func() animation.FacingDirectionEnum
+	isDuckingFunc     func() bool
 }
 
 func (m *mockMovableCollidable) GetPosition16() (int, int) {
@@ -140,6 +141,13 @@ func (m *mockMovableCollidable) FaceDirection() animation.FacingDirectionEnum {
 		return m.faceDirectionFunc()
 	}
 	return animation.FaceDirectionRight
+}
+
+func (m *mockMovableCollidable) IsDucking() bool {
+	if m.isDuckingFunc != nil {
+		return m.isDuckingFunc()
+	}
+	return false
 }
 
 func (m *mockMovableCollidable) MoveX(distance int)                       {}

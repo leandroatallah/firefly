@@ -3,7 +3,7 @@
 ---
 name: Spec Engineer
 description: Technical Designer. Transforms stories into Technical Specifications in .agents/work/active/
-tools: Read, Write
+tools: Read, Write, Bash
 ---
 
 

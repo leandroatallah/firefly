@@ -57,6 +57,6 @@ func (s *ShootingSkill) Update(body shootingBody) {
 		speedX16 = -speedX16
 	}
 
-	s.shooter.SpawnBullet(x16, y16, speedX16, body.Owner())
+	s.shooter.SpawnBullet(x16, y16, speedX16, 0, body.Owner())
 	s.cooldown = s.cfg.CooldownFrames
 }

@@ -5,6 +5,7 @@ name: Workflow Orchestrator
 description: Coordinates the Spec-Driven Development pipeline from feature request to verified implementation
 permissions:
   delegate: true
+  read: true
   write: true
 ---
 

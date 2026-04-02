@@ -3,6 +3,7 @@ name: workflow-orchestrator
 description: Coordinates the Spec-Driven Development pipeline from feature request to verified implementation
 kind: local
 tools:
+  - read_file
   - write_file
 ---
 
