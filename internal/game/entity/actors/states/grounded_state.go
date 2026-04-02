@@ -47,6 +47,10 @@ func (g *GroundedState) Update() actors.ActorStateEnum {
 		return StateDashing
 	}
 
+	if g.deps.Shooting != nil && input.ShootHeld() {
+		g.deps.Shooting.Update(g.deps.Body)
+	}
+
 	next := g.activeSub.transitionTo(input)
 	if next != g.activeKey {
 		g.activeSub.OnFinish()

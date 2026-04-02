@@ -1,13 +1,21 @@
 package gamestates_test
 
-import "image"
+import (
+	"image"
+
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/animation"
+)
 
 type MockBody struct {
-	SetSizeFunc     func(w, h int)
-	SetVelocityFunc func(vx, vy int)
-	VelocityFunc    func() (int, int)
-	HeightFunc      func() int
-	PositionFunc    func() image.Rectangle
+	SetSizeFunc       func(w, h int)
+	SetVelocityFunc   func(vx, vy int)
+	VelocityFunc      func() (int, int)
+	HeightFunc        func() int
+	PositionFunc      func() image.Rectangle
+	GetPosition16Func func() (int, int)
+	FaceDirectionFunc func() animation.FacingDirectionEnum
+	OwnerFunc         func() interface{}
+	AccelerationFunc  func() (int, int)
 }
 
 func (m *MockBody) SetSize(w, h int) {
@@ -43,6 +51,34 @@ func (m *MockBody) Position() image.Rectangle {
 	return image.Rectangle{}
 }
 
+func (m *MockBody) GetPosition16() (int, int) {
+	if m.GetPosition16Func != nil {
+		return m.GetPosition16Func()
+	}
+	return 0, 0
+}
+
+func (m *MockBody) FaceDirection() animation.FacingDirectionEnum {
+	if m.FaceDirectionFunc != nil {
+		return m.FaceDirectionFunc()
+	}
+	return animation.FaceDirectionRight
+}
+
+func (m *MockBody) Owner() interface{} {
+	if m.OwnerFunc != nil {
+		return m.OwnerFunc()
+	}
+	return nil
+}
+
+func (m *MockBody) Acceleration() (int, int) {
+	if m.AccelerationFunc != nil {
+		return m.AccelerationFunc()
+	}
+	return 0, 0
+}
+
 type MockInputSource struct {
 	DuckHeldFunc            func() bool
 	HasCeilingClearanceFunc func() bool
@@ -50,6 +86,7 @@ type MockInputSource struct {
 	JumpPressedFunc         func() bool
 	DashPressedFunc         func() bool
 	AimLockHeldFunc         func() bool
+	ShootHeldFunc           func() bool
 }
 
 func (m *MockInputSource) DuckHeld() bool {
@@ -90,6 +127,13 @@ func (m *MockInputSource) DashPressed() bool {
 func (m *MockInputSource) AimLockHeld() bool {
 	if m.AimLockHeldFunc != nil {
 		return m.AimLockHeldFunc()
+	}
+	return false
+}
+
+func (m *MockInputSource) ShootHeld() bool {
+	if m.ShootHeldFunc != nil {
+		return m.ShootHeldFunc()
 	}
 	return false
 }
