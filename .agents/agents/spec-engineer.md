@@ -4,6 +4,7 @@ description: Technical Designer. Transforms stories into Technical Specification
 capabilities:
   - read_files
   - write_files
+  - execute_commands
 ---
 
 # Spec Engineer

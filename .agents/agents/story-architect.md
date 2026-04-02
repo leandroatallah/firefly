@@ -4,9 +4,7 @@ description: Agile Analyst. Writes User Stories (DDD-inspired) in .agents/work/b
 capabilities:
   - read_files
   - write_files
----
-
-# Story Architect
+  - execute_commands
 
 ## Purpose
 

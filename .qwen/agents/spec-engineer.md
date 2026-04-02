@@ -6,6 +6,7 @@ description: Technical Designer. Transforms stories into Technical Specification
 permissions:
   read: true
   write: true
+  shell: true
 ---
 
 

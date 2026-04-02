@@ -3,7 +3,7 @@
 ---
 name: Workflow Orchestrator
 description: Coordinates the Spec-Driven Development pipeline from feature request to verified implementation
-tools: Delegate, Write
+tools: Delegate, Read, Write
 ---
 
 
