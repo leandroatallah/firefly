@@ -33,17 +33,18 @@ Direction is determined by directional input (arrow keys / D-pad) while holding 
   - `WalkingShootingUp`, `WalkingShootingDiagonalUp`, `WalkingShootingDiagonalDown`
   - `JumpingShootingUp`, `JumpingShootingDown`, `JumpingShootingDiagonalUp`, `JumpingShootingDiagonalDown`
   - `FallingShootingUp`, `FallingShootingDown`, `FallingShootingDiagonalUp`, `FallingShootingDiagonalDown`
-- **AC3** — `ShootingSkill.HandleInput()` reads directional input and transitions to the appropriate directional shooting state.
-- **AC4** — Bullet velocity is calculated based on direction:
+- **AC3** — `ShootingSkill` uses `StateTransitionHandler` for state transitions (refactored from US-011's `SetStateEnums()` approach).
+- **AC4** — `ShootingSkill.HandleInput()` reads directional input and requests appropriate directional shooting state transitions via handler.
+- **AC5** — Bullet velocity is calculated based on direction:
   - Straight: `(±speedX, 0)`
   - Up: `(0, -speedY)`
   - Down: `(0, +speedY)` (only while airborne)
   - Diagonal: `(±speedX * 0.707, ±speedY * 0.707)` (normalized 45° vector)
-- **AC5** — Bullet spawn offset is adjusted per direction (e.g., up shots spawn above the character's head).
-- **AC6** — Shooting down is only allowed while jumping or falling (grounded down input triggers ducking, not shooting down).
-- **AC7** — Directional state transitions: changing aim direction while shooting transitions between directional shooting states without releasing the shoot button.
-- **AC8** — Sprite system maps directional shooting states to distinct sprite sheets (e.g., `"idle_shoot_up.png"`).
-- **AC9** — Unit tests cover: all 8 directions, bullet velocity calculation, state transitions between directions, down-shooting restriction while grounded.
+- **AC6** — Bullet spawn offset is adjusted per direction (e.g., up shots spawn above the character's head).
+- **AC7** — Shooting down is only allowed while jumping or falling (grounded down input triggers ducking, not shooting down).
+- **AC8** — Directional state transitions: changing aim direction while shooting transitions between directional shooting states without releasing the shoot button.
+- **AC9** — Sprite system maps directional shooting states to distinct sprite sheets (e.g., `"idle_shoot_up.png"`).
+- **AC10** — Unit tests cover: all 8 directions, bullet velocity calculation, state transitions between directions, down-shooting restriction while grounded.
 
 ## Behavioral Edge Cases
 
@@ -62,6 +63,19 @@ Direction is determined by directional input (arrow keys / D-pad) while holding 
 - Sprite sheets required for each directional variant (significant art asset requirement).
 - `ShootingSkill` remains in `internal/engine/physics/skill/` but may need game-specific directional logic injected.
 - Consider whether diagonal-back shooting is allowed while walking forward (Cuphead allows this).
+
+## Architectural Improvement from US-011
+
+**Issue:** US-011's `ShootingSkill` uses `SetStateEnums()` to inject 8 state enum fields, which is fragile and violates separation of concerns.
+
+**Solution:** Refactor to use `StateTransitionHandler` pattern:
+- Replace `SetStateEnums()` with a single `StateTransitionHandler` injection
+- Handler provides methods: `TransitionToShooting(direction)`, `TransitionFromShooting()`
+- Engine layer requests transitions, game layer implements them
+- Follows existing architecture pattern from state machine
+- Type-safe, single injection point, cleaner API
+
+This refactor should be completed as part of US-012 implementation.
 
 ## Success Criteria
 
