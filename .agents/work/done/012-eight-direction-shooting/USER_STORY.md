@@ -29,10 +29,12 @@ Direction is determined by directional input (arrow keys / D-pad) while holding 
 
 - **AC1** — Input system detects 8 directional inputs: none (straight), up, down, up-forward, down-forward, up-back, down-back.
 - **AC2** — New shooting state variants registered for each direction:
-  - `IdleShootingUp`, `IdleShootingDiagonalUp`, `IdleShootingDiagonalDown`
-  - `WalkingShootingUp`, `WalkingShootingDiagonalUp`, `WalkingShootingDiagonalDown`
-  - `JumpingShootingUp`, `JumpingShootingDown`, `JumpingShootingDiagonalUp`, `JumpingShootingDiagonalDown`
-  - `FallingShootingUp`, `FallingShootingDown`, `FallingShootingDiagonalUp`, `FallingShootingDiagonalDown`
+  - **Idle:** `IdleShooting` (straight), `IdleShootingUp`
+  - **Walking:** `WalkingShooting` (straight), `WalkingShootingDiagonalUp`
+  - **Ducking:** `DuckingShooting` (straight only)
+  - **Jumping:** `JumpingShooting` (straight), `JumpingShootingUp`, `JumpingShootingDown`, `JumpingShootingDiagonalUp`, `JumpingShootingDiagonalDown`
+  - **Falling:** `FallingShooting` (straight), `FallingShootingUp`, `FallingShootingDown`, `FallingShootingDiagonalUp`, `FallingShootingDiagonalDown`
+  - **Note:** Idle diagonal impossible (horizontal input = walking). Walking + up = diagonal-up. Ducking only allows straight (down already pressed). Walking down impossible (down = ducking).
 - **AC3** — `ShootingSkill` uses `StateTransitionHandler` for state transitions (refactored from US-011's `SetStateEnums()` approach).
 - **AC4** — `ShootingSkill.HandleInput()` reads directional input and requests appropriate directional shooting state transitions via handler.
 - **AC5** — Bullet velocity is calculated based on direction:
