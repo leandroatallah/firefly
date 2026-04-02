@@ -7,33 +7,16 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-type ActorStateEnum interface{}
-
-type Stateful interface {
-	State() ActorStateEnum
-	SetState(interface{})
-	NewState(ActorStateEnum) (interface{}, error)
-}
-
 type ShootingSkill struct {
 	SkillBase
-	shooter         body.Shooter
-	spawnOffsetX    int
-	bulletSpeed     int
-	toggler         *OffsetToggler
-	shootHeld       bool
-	handler         body.StateTransitionHandler
-	lastDirection   body.ShootDirection
-	directionSet    bool
-
-	idleState           ActorStateEnum
-	walkingState        ActorStateEnum
-	jumpingState        ActorStateEnum
-	fallingState        ActorStateEnum
-	idleShootingState   ActorStateEnum
-	walkingShootingState ActorStateEnum
-	jumpingShootingState ActorStateEnum
-	fallingShootingState ActorStateEnum
+	shooter       body.Shooter
+	spawnOffsetX  int
+	bulletSpeed   int
+	toggler       *OffsetToggler
+	shootHeld     bool
+	handler       body.StateTransitionHandler
+	lastDirection body.ShootDirection
+	directionSet  bool
 }
 
 func NewShootingSkill(shooter body.Shooter, cooldownFrames, spawnOffsetX16, bulletSpeedX16, yOffset int) *ShootingSkill {
@@ -47,17 +30,6 @@ func NewShootingSkill(shooter body.Shooter, cooldownFrames, spawnOffsetX16, bull
 		bulletSpeed:  bulletSpeedX16,
 		toggler:      NewOffsetToggler(yOffset),
 	}
-}
-
-func (s *ShootingSkill) SetStateEnums(idle, walking, jumping, falling, idleShooting, walkingShooting, jumpingShooting, fallingShooting ActorStateEnum) {
-	s.idleState = idle
-	s.walkingState = walking
-	s.jumpingState = jumping
-	s.fallingState = falling
-	s.idleShootingState = idleShooting
-	s.walkingShootingState = walkingShooting
-	s.jumpingShootingState = jumpingShooting
-	s.fallingShootingState = fallingShooting
 }
 
 func (s *ShootingSkill) SetStateTransitionHandler(handler body.StateTransitionHandler) {
@@ -100,12 +72,8 @@ func (s *ShootingSkill) HandleInput(b body.MovableCollidable, model *physicsmove
 
 	direction := body.ShootDirectionStraight
 	
-	if s.shootHeld && !wasHeld {
-		if s.handler != nil {
-			s.handler.TransitionToShooting(direction)
-		} else {
-			s.transitionToShootingState(b)
-		}
+	if s.shootHeld && !wasHeld && s.handler != nil {
+		s.handler.TransitionToShooting(direction)
 	}
 	s.lastDirection = direction
 	s.directionSet = true
@@ -140,8 +108,8 @@ func (s *ShootingSkill) Update(b body.MovableCollidable, model *physicsmovement.
 	wasHeld := s.shootHeld
 	s.shootHeld = ebiten.IsKeyPressed(ebiten.KeyX)
 
-	if !s.shootHeld && wasHeld {
-		s.transitionToBaseState(b)
+	if !s.shootHeld && wasHeld && s.handler != nil {
+		s.handler.TransitionFromShooting()
 	}
 }
 
@@ -220,68 +188,4 @@ func (s *ShootingSkill) calculateSpawnOffset(direction body.ShootDirection, face
 		return sign * offset * 707 / 1000, offset * 707 / 1000
 	}
 	return sign * offset, s.toggler.Next()
-}
-
-func (s *ShootingSkill) transitionToShootingState(b body.MovableCollidable) {
-	if s.idleState == nil {
-		return
-	}
-
-	actor, ok := b.(Stateful)
-	if !ok {
-		return
-	}
-
-	currentState := actor.State()
-	var newState ActorStateEnum
-
-	switch currentState {
-	case s.idleState:
-		newState = s.idleShootingState
-	case s.walkingState:
-		newState = s.walkingShootingState
-	case s.jumpingState:
-		newState = s.jumpingShootingState
-	case s.fallingState:
-		newState = s.fallingShootingState
-	default:
-		return
-	}
-
-	state, err := actor.NewState(newState)
-	if err == nil {
-		actor.SetState(state)
-	}
-}
-
-func (s *ShootingSkill) transitionToBaseState(b body.MovableCollidable) {
-	if s.idleState == nil {
-		return
-	}
-
-	actor, ok := b.(Stateful)
-	if !ok {
-		return
-	}
-
-	currentState := actor.State()
-	var newState ActorStateEnum
-
-	switch currentState {
-	case s.idleShootingState:
-		newState = s.idleState
-	case s.walkingShootingState:
-		newState = s.walkingState
-	case s.jumpingShootingState:
-		newState = s.jumpingState
-	case s.fallingShootingState:
-		newState = s.fallingState
-	default:
-		return
-	}
-
-	state, err := actor.NewState(newState)
-	if err == nil {
-		actor.SetState(state)
-	}
 }
