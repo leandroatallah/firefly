@@ -13,23 +13,34 @@ tools: Delegate, Write
 
 Coordinates the SDD pipeline: receives a feature request or task, drives it through specification, TDD, and implementation, and validates the result. Coverage analysis is a verification step, not the trigger.
 
-## Responsibilities
-
-- Accept a feature request or task description as the entry point
-- Trigger agents in the correct SDD sequence
-- Pass outputs between agents
-- Handle errors and retry failed steps
-- Generate a final summary report per completed story
-
 ## Workflow Sequence
 
-1. **Story Architect** → Translate the request into a User Story in `.agents/work/backlog/`.
-2. **Spec Engineer** → Transform the story into a Technical Spec in `.agents/work/active/`.
-3. **Mock Generator** → Generate required mocks if new interfaces are needed.
-4. **TDD Specialist** → Write failing tests (Red) based on the Spec.
-5. **Feature Implementer** → Write code to make tests pass (Green).
-6. **Workflow Gatekeeper** → Validate spec compliance, coverage delta, and code quality. Move story to `.agents/work/done/`.
+1. **Story Architect** → Create `backlog/[ID]-[slug]/USER_STORY.md` + `PROGRESS.md`.
+2. **Spec Engineer** → Move folder to `active/[ID]-[slug]/`, write `SPEC.md`, update `PROGRESS.md`.
+3. **Mock Generator** → Generate required mocks, update `PROGRESS.md`.
+4. **TDD Specialist** → Write failing tests (Red), update `PROGRESS.md` with test file paths.
+5. **Feature Implementer** → Write code to make tests pass (Green), update `PROGRESS.md` with production file paths.
+6. **Workflow Gatekeeper** → Validate spec compliance, coverage delta, and code quality. Update `PROGRESS.md` to Done, move folder to `done/[ID]-[slug]/`.
 7. Repeat for the next task.
+
+## Story Folder Convention
+
+```
+.agents/work/
+├── backlog/[ID]-[slug]/
+│   ├── USER_STORY.md
+│   └── PROGRESS.md
+├── active/[ID]-[slug]/
+│   ├── USER_STORY.md
+│   ├── SPEC.md
+│   └── PROGRESS.md
+└── done/[ID]-[slug]/
+    ├── USER_STORY.md
+    ├── SPEC.md
+    └── PROGRESS.md
+```
+
+The folder moves through `backlog/ → active/ → done/` as the pipeline progresses. `PROGRESS.md` is the single source of truth for pipeline state.
 
 ## Inputs
 
@@ -37,14 +48,14 @@ Coordinates the SDD pipeline: receives a feature request or task, drives it thro
 
 ## Outputs
 
-- Completed User Stories in `.agents/work/done/`.
+- Completed story folders in `.agents/work/done/`.
 - Updated codebase with spec-compliant, TDD-verified implementations.
 - Final summary report per story.
 
 ## Error Handling
 
 - Retry failed steps up to 3 times.
-- If the Gatekeeper rejects a story, backtrack to **TDD Specialist** or **Feature Implementer**.
+- If the Gatekeeper rejects a story, backtrack to **TDD Specialist** or **Feature Implementer** and update `PROGRESS.md` accordingly.
 - Log and skip stories that cannot be resolved after retries.
 
 ## Integration

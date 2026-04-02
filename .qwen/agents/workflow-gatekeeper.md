@@ -19,9 +19,10 @@ Acts as the "Lead Engineer" and "QA". Validates that the implementation matches 
 ## Responsibilities
 
 - Verify the **Red-Green-Refactor** cycle has been followed.
-- Check that the implementation exactly matches the Spec (`SPEC_[ID].md`).
+- Check that the implementation exactly matches `SPEC.md` in `active/[ID]-[slug]/`.
 - Run `Coverage Analyzer` to confirm a positive coverage delta for the changed packages.
-- Move completed stories from `active/` to `done/`.
+- Move the entire story folder from `active/` to `done/`: `.agents/work/done/[ID]-[slug]/`.
+- Update `PROGRESS.md` before moving: mark "Gatekeeper" ✅, set top-level **Status** to `✅ Done`, and append a `## Log` entry with the coverage delta and confirmation. If rejecting, append the rejection reason and which agent to backtrack to — do NOT move the folder.
 - Enforce project-wide standards:
   - Table-driven tests.
   - No `_ = variable` in production code.
@@ -30,13 +31,13 @@ Acts as the "Lead Engineer" and "QA". Validates that the implementation matches 
 
 ## Inputs
 
-- `USER_STORY_[ID].md` and `SPEC_[ID].md` from `active/`.
+- `USER_STORY.md`, `SPEC.md`, and `PROGRESS.md` from `active/[ID]-[slug]/`.
 - New or modified tests and production code.
 
 ## Outputs
 
-- A "Certificate of Completion" for the story.
-- Files moved to `.agents/work/done/`.
+- Updated `PROGRESS.md` with all stages ✅ and status `Done`.
+- Story folder moved to `.agents/work/done/[ID]-[slug]/`.
 - Feedback report if quality gates fail (triggers backtrack to TDD Specialist or Feature Implementer).
 
 ## Integration

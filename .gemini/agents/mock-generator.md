@@ -20,25 +20,26 @@ Inspects `internal/engine/contracts/` interfaces and existing `internal/engine/m
 
 ## Responsibilities
 
-- Scan `internal/engine/contracts/` for interface definitions
-- Check existing mocks in `internal/engine/mocks/`
+- Scan `internal/engine/contracts/` for interface definitions.
+- Check existing mocks in `internal/engine/mocks/`.
 - Determine mock placement strategy:
   - **Shared mocks**: Used across multiple packages → place in `internal/engine/mocks/`
   - **Package-local mocks**: Used in single package → place in `*_test.go` or `mocks_test.go`
-- Generate mock implementations with configurable behavior
-- Ensure mocks follow project conventions (no `_ = variable` pattern)
+- Generate mock implementations with configurable behavior.
+- Ensure mocks follow project conventions (no `_ = variable` pattern).
+- Update `PROGRESS.md` in `.agents/work/active/[ID]-[slug]/`: mark "Mock Generator" ✅ (or "skipped — no mocks required") and append a `## Log` entry listing any mocks created or confirming none were needed.
 
 ## Inputs
 
-- Gap report from Gap Detector (required interfaces)
-- Existing mock inventory
+- `SPEC.md` from `.agents/work/active/[ID]-[slug]/`.
+- Existing mock inventory in `internal/engine/mocks/`.
 
 ## Outputs
 
 - Generated mock files:
-  - `internal/engine/mocks/mock_*.go` for shared mocks
-  - Package-local mock code snippets for Test Writer
-- Mock usage documentation
+  - `internal/engine/mocks/mock_*.go` for shared mocks.
+  - Package-local mock code snippets for TDD Specialist.
+- Updated `PROGRESS.md`.
 
 ## Mock Patterns
 
@@ -58,4 +59,4 @@ func (m *MockBodiesSpace) Add(body contracts.Body) {
 
 ## Integration
 
-Receives requirements from **Gap Detector**, provides mocks to **Test Writer**.
+Receives requirements from **Spec Engineer**, provides mocks to **TDD Specialist**.
