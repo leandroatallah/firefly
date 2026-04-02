@@ -22,6 +22,11 @@ var (
 	Dying   ActorStateEnum
 	Dead    ActorStateEnum
 	Exiting ActorStateEnum
+
+	IdleShooting    ActorStateEnum
+	WalkingShooting ActorStateEnum
+	JumpingShooting ActorStateEnum
+	FallingShooting ActorStateEnum
 )
 
 func init() {
@@ -34,6 +39,11 @@ func init() {
 	Dying = RegisterState("die", func(b BaseState) ActorState { return &DyingState{BaseState: b} })
 	Dead = RegisterState("dead", func(b BaseState) ActorState { return &DeadState{BaseState: b} })
 	Exiting = RegisterState("exit", func(b BaseState) ActorState { return &ExitingState{BaseState: b} })
+
+	IdleShooting = RegisterState("idle_shoot", func(b BaseState) ActorState { return &IdleShootingState{BaseState: b} })
+	WalkingShooting = RegisterState("walk_shoot", func(b BaseState) ActorState { return &WalkingShootingState{BaseState: b} })
+	JumpingShooting = RegisterState("jump_shoot", func(b BaseState) ActorState { return &JumpingShootingState{BaseState: b} })
+	FallingShooting = RegisterState("fall_shoot", func(b BaseState) ActorState { return &FallingShootingState{BaseState: b} })
 }
 
 type BaseState struct {
