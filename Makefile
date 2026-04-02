@@ -22,8 +22,7 @@ sync-agents:
 
 setup:
 	@bash scripts/setup-skill-symlinks.sh
-	@cp scripts/hooks/pre-commit .git/hooks/pre-commit
-	@chmod +x .git/hooks/pre-commit
+	@lefthook install 2>/dev/null || $(HOME)/go/bin/lefthook install
 	@echo "Git hooks installed."
 
 clean:

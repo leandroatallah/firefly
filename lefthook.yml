@@ -1,0 +1,24 @@
+pre-commit:
+  commands:
+    sync-skills:
+      glob: ".agents/skills/**"
+      run: make sync-skills && git add .claude/skills/ .qwen/skills/ .kiro/skills/
+    sync-agents:
+      glob: ".agents/agents/**"
+      run: make sync-agents && git add .claude/agents/ .qwen/agents/ .kiro/agents/
+
+pre-push:
+  commands:
+    test:
+      run: go test ./...
+    lint:
+      run: golangci-lint run ./...
+
+commit-msg:
+  commands:
+    warn-main:
+      run: |
+        branch=$(git rev-parse --abbrev-ref HEAD)
+        if [ "$branch" = "main" ]; then
+          echo "⚠️  Warning: you are committing directly to main."
+        fi
