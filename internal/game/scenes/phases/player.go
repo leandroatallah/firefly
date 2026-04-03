@@ -8,8 +8,8 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/events"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/platformer"
 	"github.com/boilerplate/ebiten-template/internal/engine/physics/skill"
+	"github.com/boilerplate/ebiten-template/internal/engine/utils/fp16"
 	gameplayer "github.com/boilerplate/ebiten-template/internal/game/entity/actors/player"
-	gamestates "github.com/boilerplate/ebiten-template/internal/game/entity/actors/states"
 	gameentitytypes "github.com/boilerplate/ebiten-template/internal/game/entity/types"
 )
 
@@ -27,8 +27,9 @@ func createPlayer(ctx *app.AppContext, playerType gameentitytypes.PlayerType) (p
 	}
 
 	addJumpSkill(ctx, p)
+	p.GetCharacter().AddSkill(skill.NewDashSkill())
 	p.GetCharacter().AddSkill(skill.NewHorizontalMovementSkill())
-	
+
 	// Add shooting skill - get shooter from current scene
 	if currentScene := ctx.SceneManager.CurrentScene(); currentScene != nil {
 		if shooter, ok := currentScene.(body.Shooter); ok {
@@ -55,12 +56,6 @@ func addJumpSkill(ctx *app.AppContext, p platformer.PlatformerActorEntity) {
 }
 
 func addShootingSkill(p platformer.PlatformerActorEntity, shooter body.Shooter) {
-	shootingCfg := gamestates.ShootingConfig{
-		CooldownFrames: 15,
-		SpawnOffsetX16: 8 << 4,
-		BulletSpeedX16: 4 << 4,
-		YOffset:        2,
-	}
-	shootingSkill := gamestates.NewShootingSkill(shootingCfg, shooter)
+	shootingSkill := skill.NewShootingSkill(shooter, 15, 4, fp16.To16(6), 4)
 	p.GetCharacter().AddSkill(shootingSkill)
 }
