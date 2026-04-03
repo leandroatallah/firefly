@@ -358,6 +358,10 @@ func (c *Character) handleState() {
 		setNewState(Jumping)
 	case state != Falling && c.IsFalling():
 		setNewState(Falling)
+	case state == Ducking && !c.IsDucking():
+		setNewState(Idle)
+	case state != Ducking && c.IsDucking():
+		setNewState(Ducking)
 	case state != Walking && c.IsWalking():
 		setNewState(Walking)
 	case state != Idle && c.IsIdle():

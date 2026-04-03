@@ -24,6 +24,7 @@ type MovableBody struct {
 	immobile            bool
 	freeze              bool
 	faceDirection       animation.FacingDirectionEnum
+	ducking             bool
 }
 
 func NewMovableBody(body *Body) *MovableBody {
@@ -154,7 +155,15 @@ func (b *MovableBody) SetFaceDirection(value animation.FacingDirectionEnum) {
 }
 
 func (b *MovableBody) IsIdle() bool {
-	return !b.IsWalking() && !b.IsFalling() && !b.IsGoingUp()
+	return !b.IsWalking() && !b.IsFalling() && !b.IsGoingUp() && !b.ducking
+}
+
+func (b *MovableBody) IsDucking() bool {
+	return b.ducking && !b.IsFalling() && !b.IsGoingUp()
+}
+
+func (b *MovableBody) SetDucking(ducking bool) {
+	b.ducking = ducking
 }
 
 func (b *MovableBody) IsWalking() bool {
