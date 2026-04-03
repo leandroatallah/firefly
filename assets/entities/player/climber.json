@@ -125,6 +125,18 @@
           }
         ]
       },
+      "dash": {
+        "path": "assets/images/climber-dash.png",
+        "loop": false,
+        "collision_rect": [
+          {
+            "x": 4,
+            "y": 6,
+            "width": 8,
+            "height": 10
+          }
+        ]
+      },
       "duck": {
         "path": "assets/images/climber-duck.png",
         "loop": true,
