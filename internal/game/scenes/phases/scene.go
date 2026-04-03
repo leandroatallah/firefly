@@ -1,6 +1,7 @@
 package gamescenephases
 
 import (
+	"fmt"
 	"image/color"
 	"log"
 	"time"
@@ -70,16 +71,43 @@ type PhasesScene struct {
 
 	vignette *enginevfx.Vignette
 
-	death deathSequence
+	death   deathSequence
+	bullets []*gamestates.Bullet
+	bulletImg *ebiten.Image
+	bulletCounter int
+}
+
+// SpawnBullet implements body.Shooter interface for shooting skill.
+func (s *PhasesScene) SpawnBullet(x16, y16, vx16, vy16 int, owner interface{}) {
+	baseBody := bodyphysics.NewBody(bodyphysics.NewRect(0, 0, 2, 1))
+	baseBody.SetPosition16(x16, y16)
+	
+	s.bulletCounter++
+	bulletID := fmt.Sprintf("bullet_%d", s.bulletCounter)
+	baseBody.SetID(bulletID)
+	
+	movableBody := bodyphysics.NewMovableBody(baseBody)
+	collidableBody := bodyphysics.NewCollidableBody(baseBody)
+	collidableBody.SetOwner(owner)
+	
+	bullet := gamestates.NewBullet(movableBody, collidableBody, s.PhysicsSpace(), vx16, vy16)
+	collidableBody.SetTouchable(bullet)
+	s.PhysicsSpace().AddBody(collidableBody)
+	s.bullets = append(s.bullets, bullet)
 }
 
 func NewPhasesScene(ctx *app.AppContext) *PhasesScene {
 	tilemapScene := scene.NewTilemapScene(ctx)
+	
+	bulletImg := ebiten.NewImage(2, 1)
+	bulletImg.Fill(color.RGBA{255, 255, 255, 255})
+	
 	scene := &PhasesScene{
 		TilemapScene: tilemapScene,
 		mainText:     ctx.Font,
 		bodyCounter:  &BodyCounter{},
 		vignette:     enginevfx.NewVignette(),
+		bulletImg:    bulletImg,
 	}
 	scene.SetAppContext(ctx)
 
@@ -108,6 +136,8 @@ func (s *PhasesScene) OnStart() {
 		ctx.ActorManager.Register(s.player)
 		ctx.ActorManager.RegisterPrimary(s.player)
 		s.PhysicsSpace().AddBody(s.player)
+
+		addShootingSkill(s.player, s)
 
 		// Optionally block input for the current player of this phase
 		if phase, err := ctx.PhaseManager.GetCurrentPhase(); err == nil && phase.BlockPlayerMovement {
@@ -417,6 +447,11 @@ func (s *PhasesScene) Update() error {
 		}
 	}
 
+	// Update bullets
+	for _, bullet := range s.bullets {
+		bullet.Update()
+	}
+
 	// Check for trigger collisions (spikes, endpoints, etc.)
 	// This ensures non-blocking trigger bodies call their OnTouch() callbacks
 	// Must happen after actor updates to detect collisions at current positions
@@ -426,6 +461,23 @@ func (s *PhasesScene) Update() error {
 
 	// Remove bodies queued for removal
 	space.ProcessRemovals()
+
+	// Clean up removed bullets by checking if body still exists in space
+	activeBullets := make([]*gamestates.Bullet, 0, len(s.bullets))
+	bodies := space.Bodies()
+	for _, bullet := range s.bullets {
+		found := false
+		for _, b := range bodies {
+			if b == bullet.Body() {
+				found = true
+				break
+			}
+		}
+		if found {
+			activeBullets = append(activeBullets, bullet)
+		}
+	}
+	s.bullets = activeBullets
 
 	return nil
 }
@@ -466,6 +518,14 @@ func (s *PhasesScene) Draw(screen *ebiten.Image) {
 				s.Camera().DrawCollisionBox(screen, sb)
 			}
 		}
+	}
+
+	// Draw bullets
+	for _, bullet := range s.bullets {
+		opts := &ebiten.DrawImageOptions{}
+		x, y := bullet.Body().GetPositionMin()
+		opts.GeoM.Translate(float64(x), float64(y))
+		s.Camera().Draw(s.bulletImg, opts, screen)
 	}
 
 	if s.ShowDrawScreenFlash > 0 {

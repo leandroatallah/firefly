@@ -43,7 +43,7 @@ func TestShootingSkill_CooldownGating(t *testing.T) {
 			}
 
 			for i := 0; i < tt.updateCalls; i++ {
-				skill.Update(body)
+				skill.Update(body, nil)
 			}
 
 			if spawnCount != tt.wantSpawns {
@@ -76,7 +76,7 @@ func TestShootingSkill_AlternatingYOffset(t *testing.T) {
 	}
 
 	for i := 0; i < 4; i++ {
-		skill.Update(body)
+		skill.Update(body, nil)
 	}
 
 	want := []int{(50 << 4) + 4, (50 << 4) - 4, (50 << 4) + 4, (50 << 4) - 4}
@@ -112,8 +112,8 @@ func TestShootingSkill_ReleaseRepressWithinCooldown(t *testing.T) {
 		OwnerFunc:         func() interface{} { return nil },
 	}
 
-	skill.Update(body)
-	skill.Update(body)
+	skill.Update(body, nil)
+	skill.Update(body, nil)
 
 	if spawnCount != 1 {
 		t.Errorf("got %d spawns, want 1", spawnCount)

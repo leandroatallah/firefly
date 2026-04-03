@@ -77,6 +77,54 @@
         "loop": true,
         "collision_rect": []
       },
+      "idle_shoot": {
+        "path": "assets/images/climber-idle.png",
+        "loop": true,
+        "collision_rect": [
+          {
+            "x": 4,
+            "y": 6,
+            "width": 8,
+            "height": 10
+          }
+        ]
+      },
+      "walk_shoot": {
+        "path": "assets/images/climber-walk.png",
+        "loop": true,
+        "collision_rect": [
+          {
+            "x": 4,
+            "y": 6,
+            "width": 8,
+            "height": 10
+          }
+        ]
+      },
+      "jump_shoot": {
+        "path": "assets/images/climber-jump.png",
+        "loop": false,
+        "collision_rect": [
+          {
+            "x": 4,
+            "y": 6,
+            "width": 8,
+            "height": 10
+          }
+        ]
+      },
+      "fall_shoot": {
+        "path": "assets/images/climber-fall.png",
+        "loop": false,
+        "collision_rect": [
+          {
+            "x": 4,
+            "y": 6,
+            "width": 8,
+            "height": 10
+          }
+        ]
+      },
       "duck": {
         "path": "assets/images/climber-duck.png",
         "loop": true,

@@ -48,7 +48,7 @@ func (g *GroundedState) Update() actors.ActorStateEnum {
 	}
 
 	if g.deps.Shooting != nil && input.ShootHeld() {
-		g.deps.Shooting.Update(g.deps.Body)
+		g.deps.Shooting.Update(g.deps.Body, g.deps.Model)
 	}
 
 	next := g.activeSub.transitionTo(input)

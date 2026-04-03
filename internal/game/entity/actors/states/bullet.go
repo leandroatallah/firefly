@@ -3,20 +3,29 @@ package gamestates
 import contractsbody "github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 
 type Bullet struct {
-	body     contractsbody.MovableCollidable
+	movable  contractsbody.Movable
+	body     contractsbody.Collidable
 	space    contractsbody.BodiesSpace
 	speedX16 int
+	speedY16 int
 }
 
-func NewBullet(body contractsbody.MovableCollidable, space contractsbody.BodiesSpace, speedX16 int) *Bullet {
-	return &Bullet{body: body, space: space, speedX16: speedX16}
+func NewBullet(movable contractsbody.Movable, body contractsbody.Collidable, space contractsbody.BodiesSpace, speedX16, speedY16 int) *Bullet {
+	return &Bullet{movable: movable, body: body, space: space, speedX16: speedX16, speedY16: speedY16}
+}
+
+func (b *Bullet) Body() contractsbody.Collidable {
+	return b.body
 }
 
 func (b *Bullet) Update() {
-	b.body.SetVelocity(b.speedX16, 0)
+	x, y := b.body.GetPosition16()
+	x += b.speedX16
+	y += b.speedY16
+	b.body.SetPosition16(x, y)
+	
 	b.space.ResolveCollisions(b.body)
 
-	x, y := b.body.GetPosition16()
 	provider := b.space.GetTilemapDimensionsProvider()
 	w := provider.GetTilemapWidth()
 	h := provider.GetTilemapHeight()

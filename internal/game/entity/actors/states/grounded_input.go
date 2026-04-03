@@ -1,6 +1,9 @@
 package gamestates
 
-import contractsbody "github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
+import (
+	contractsbody "github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
+	physicsmovement "github.com/boilerplate/ebiten-template/internal/engine/physics/movement"
+)
 
 // GroundedInput is the input contract consumed by GroundedState and its sub-states.
 type GroundedInput interface {
@@ -17,5 +20,6 @@ type GroundedInput interface {
 type GroundedDeps struct {
 	Input    GroundedInput
 	Shooting *ShootingSkill
-	Body     contractsbody.Movable
+	Body     contractsbody.MovableCollidable
+	Model    *physicsmovement.PlatformMovementModel
 }

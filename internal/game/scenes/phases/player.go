@@ -9,6 +9,7 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/platformer"
 	"github.com/boilerplate/ebiten-template/internal/engine/physics/skill"
 	gameplayer "github.com/boilerplate/ebiten-template/internal/game/entity/actors/player"
+	gamestates "github.com/boilerplate/ebiten-template/internal/game/entity/actors/states"
 	gameentitytypes "github.com/boilerplate/ebiten-template/internal/game/entity/types"
 )
 
@@ -41,4 +42,15 @@ func createPlayer(ctx *app.AppContext, playerType gameentitytypes.PlayerType) (p
 	p.GetCharacter().AddSkill(skill.NewHorizontalMovementSkill())
 
 	return p, nil
+}
+
+func addShootingSkill(p platformer.PlatformerActorEntity, shooter body.Shooter) {
+	shootingCfg := gamestates.ShootingConfig{
+		CooldownFrames: 15,
+		SpawnOffsetX16: 8 << 4,
+		BulletSpeedX16: 4 << 4,
+		YOffset:        2,
+	}
+	shootingSkill := gamestates.NewShootingSkill(shootingCfg, shooter)
+	p.GetCharacter().AddSkill(shootingSkill)
 }
