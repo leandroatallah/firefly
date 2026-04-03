@@ -103,6 +103,9 @@ func Setup(assets fs.FS) error {
 
 	// Set initial game scene
 	initialScene := scenestypes.SceneMenu
+	if cfg.SkipIntro {
+		initialScene = scenestypes.ScenePhases
+	}
 	game.AppContext.SceneManager.NavigateTo(initialScene, nil, false)
 
 	if err := ebiten.RunGame(game); err != nil {
