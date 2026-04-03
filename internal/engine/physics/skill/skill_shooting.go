@@ -56,6 +56,12 @@ func (s *ShootingSkill) HandleInputWithDirection(b body.MovableCollidable, model
 		}
 		
 		x16, y16 := b.GetPosition16()
+		
+		// Adjust spawn position to account for player width when facing right
+		if b.FaceDirection() == animation.FaceDirectionRight {
+			x16 += b.GetShape().Width() << 4
+		}
+		
 		vx16, vy16 := s.calculateBulletVelocity(direction, b.FaceDirection())
 		offsetX, offsetY := s.calculateSpawnOffset(direction, b.FaceDirection())
 		
@@ -67,34 +73,17 @@ func (s *ShootingSkill) HandleInputWithDirection(b body.MovableCollidable, model
 }
 
 func (s *ShootingSkill) HandleInput(b body.MovableCollidable, model *physicsmovement.PlatformMovementModel, space body.BodiesSpace) {
-	wasHeld := s.shootHeld
-	s.shootHeld = true
-
-	direction := body.ShootDirectionStraight
+	shootPressed := ebiten.IsKeyPressed(ebiten.KeyX)
+	if !shootPressed {
+		return
+	}
 	
-	if s.shootHeld && !wasHeld && s.handler != nil {
-		s.handler.TransitionToShooting(direction)
-	}
-	s.lastDirection = direction
-	s.directionSet = true
-
-	if s.shootHeld && s.state == StateReady {
-		x16, y16 := b.GetPosition16()
-		dir := b.FaceDirection()
-
-		offsetX := s.spawnOffsetX
-		speedX := s.bulletSpeed
-		if dir == animation.FaceDirectionLeft {
-			offsetX = -offsetX
-			speedX = -speedX
-		}
-
-		yOffset := s.toggler.Next()
-		s.shooter.SpawnBullet(x16+offsetX, y16+yOffset, speedX, 0, b)
-
-		s.state = StateActive
-		s.timer = s.cooldown
-	}
+	up := ebiten.IsKeyPressed(ebiten.KeyUp) || ebiten.IsKeyPressed(ebiten.KeyW)
+	down := ebiten.IsKeyPressed(ebiten.KeyDown) || ebiten.IsKeyPressed(ebiten.KeyS)
+	left := ebiten.IsKeyPressed(ebiten.KeyLeft) || ebiten.IsKeyPressed(ebiten.KeyA)
+	right := ebiten.IsKeyPressed(ebiten.KeyRight) || ebiten.IsKeyPressed(ebiten.KeyD)
+	
+	s.HandleInputWithDirection(b, model, space, up, down, left, right)
 }
 
 func (s *ShootingSkill) Update(b body.MovableCollidable, model *physicsmovement.PlatformMovementModel) {

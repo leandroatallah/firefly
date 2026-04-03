@@ -25,13 +25,13 @@ func TestShootingSkill_CooldownGating(t *testing.T) {
 		faceDirectionFunc: func() animation.FacingDirectionEnum { return animation.FaceDirectionRight },
 	}
 
-	s.HandleInput(body, nil, nil)
+	s.HandleInputWithDirection(body, nil, nil, false, false, false, false)
 	s.Update(body, nil)
-	s.HandleInput(body, nil, nil)
+	s.HandleInputWithDirection(body, nil, nil, false, false, false, false)
 	s.Update(body, nil)
-	s.HandleInput(body, nil, nil)
+	s.HandleInputWithDirection(body, nil, nil, false, false, false, false)
 	s.Update(body, nil)
-	s.HandleInput(body, nil, nil)
+	s.HandleInputWithDirection(body, nil, nil, false, false, false, false)
 	s.Update(body, nil)
 
 	if spawnCount != 2 {
@@ -54,7 +54,7 @@ func TestShootingSkill_AlternatingYOffset(t *testing.T) {
 	}
 
 	for i := 0; i < 4; i++ {
-		s.HandleInput(body, nil, nil)
+		s.HandleInputWithDirection(body, nil, nil, false, false, false, false)
 		s.Update(body, nil)
 	}
 
@@ -84,10 +84,10 @@ func TestShootingSkill_StateTransitions(t *testing.T) {
 		t.Error("initial state should be Ready (IsActive=false)")
 	}
 
-	s.HandleInput(body, nil, nil)
+	s.HandleInputWithDirection(body, nil, nil, false, false, false, false)
 
 	if !s.IsActive() {
-		t.Error("after HandleInput with spawn, state should be Cooldown (IsActive=true)")
+		t.Error("after HandleInputWithDirection with spawn, state should be Cooldown (IsActive=true)")
 	}
 
 	s.Update(body, nil)
@@ -112,12 +112,12 @@ func TestShootingSkill_NoSpawnWhenNotReady(t *testing.T) {
 		faceDirectionFunc: func() animation.FacingDirectionEnum { return animation.FaceDirectionRight },
 	}
 
-	s.HandleInput(body, nil, nil)
+	s.HandleInputWithDirection(body, nil, nil, false, false, false, false)
 	if spawnCount != 1 {
 		t.Fatalf("first call should spawn, got %d spawns", spawnCount)
 	}
 
-	s.HandleInput(body, nil, nil)
+	s.HandleInputWithDirection(body, nil, nil, false, false, false, false)
 	if spawnCount != 1 {
 		t.Errorf("second call during cooldown should not spawn, got %d spawns", spawnCount)
 	}
@@ -127,7 +127,15 @@ type mockMovableCollidable struct {
 	getPosition16Func func() (int, int)
 	faceDirectionFunc func() animation.FacingDirectionEnum
 	isDuckingFunc     func() bool
+	width             int
 }
+
+type mockShape struct {
+	width int
+}
+
+func (s *mockShape) Width() int  { return s.width }
+func (s *mockShape) Height() int { return 0 }
 
 func (m *mockMovableCollidable) GetPosition16() (int, int) {
 	if m.getPosition16Func != nil {
@@ -191,7 +199,12 @@ func (m *mockMovableCollidable) SetSize(w, h int)                         {}
 func (m *mockMovableCollidable) Scale() float64                           { return 1.0 }
 func (m *mockMovableCollidable) SetScale(float64)                         {}
 func (m *mockMovableCollidable) GetPositionMin() (int, int)               { return 0, 0 }
-func (m *mockMovableCollidable) GetShape() body.Shape                     { return nil }
+func (m *mockMovableCollidable) GetShape() body.Shape {
+	if m.width > 0 {
+		return &mockShape{width: m.width}
+	}
+	return &mockShape{width: 16} // default width
+}
 func (m *mockMovableCollidable) ApplyValidPosition(int, bool, body.BodiesSpace) (int, int, bool) {
 	return 0, 0, false
 }

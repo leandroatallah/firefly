@@ -34,7 +34,7 @@ func TestShootingSkill_ShootStraight(t *testing.T) {
 		faceDirectionFunc: func() animation.FacingDirectionEnum { return animation.FaceDirectionRight },
 	}
 
-	s.HandleInput(mockBody, nil, nil)
+	s.HandleInputWithDirection(mockBody, nil, nil, false, false, false, false)
 
 	if capturedDir != body.ShootDirectionStraight {
 		t.Errorf("expected ShootDirectionStraight, got %v", capturedDir)
@@ -208,7 +208,7 @@ func TestShootingSkill_DirectionChangeMidShooting(t *testing.T) {
 		faceDirectionFunc: func() animation.FacingDirectionEnum { return animation.FaceDirectionRight },
 	}
 
-	s.HandleInput(mockBody, nil, nil)
+	s.HandleInputWithDirection(mockBody, nil, nil, false, false, false, false)
 
 	if transitionCount != 1 || directions[0] != body.ShootDirectionStraight {
 		t.Fatalf("first shot should be straight, got %d transitions, direction=%v", transitionCount, directions)
@@ -251,7 +251,7 @@ func TestShootingSkill_ReleaseDirectionalInput(t *testing.T) {
 		t.Fatalf("first shot should be up, got %v", directions)
 	}
 
-	s.HandleInput(mockBody, nil, nil)
+	s.HandleInputWithDirection(mockBody, nil, nil, false, false, false, false)
 
 	if len(directions) != 2 || directions[1] != body.ShootDirectionStraight {
 		t.Errorf("releasing up should transition to straight, got %v", directions)
