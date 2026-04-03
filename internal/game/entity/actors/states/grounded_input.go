@@ -18,8 +18,7 @@ type GroundedInput interface {
 
 // GroundedDeps holds the dependencies injected into GroundedState.
 type GroundedDeps struct {
-	Input    GroundedInput
-	Shooting *ShootingSkill
-	Body     contractsbody.MovableCollidable
-	Model    *physicsmovement.PlatformMovementModel
+	Input GroundedInput
+	Body  contractsbody.MovableCollidable
+	Model *physicsmovement.PlatformMovementModel
 }
