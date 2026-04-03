@@ -26,7 +26,20 @@ func createPlayer(ctx *app.AppContext, playerType gameentitytypes.PlayerType) (p
 		return nil, err
 	}
 
-	// Create jump skill and set up OnJump callback to publish event
+	addJumpSkill(ctx, p)
+	p.GetCharacter().AddSkill(skill.NewHorizontalMovementSkill())
+	
+	// Add shooting skill - get shooter from current scene
+	if currentScene := ctx.SceneManager.CurrentScene(); currentScene != nil {
+		if shooter, ok := currentScene.(body.Shooter); ok {
+			addShootingSkill(p, shooter)
+		}
+	}
+
+	return p, nil
+}
+
+func addJumpSkill(ctx *app.AppContext, p platformer.PlatformerActorEntity) {
 	jumpSkill := skill.NewJumpSkill()
 	jumpSkill.OnJump = func(body body.MovableCollidable) {
 		pos := body.Position()
@@ -39,9 +52,6 @@ func createPlayer(ctx *app.AppContext, playerType gameentitytypes.PlayerType) (p
 	}
 	jumpSkill.SetJumpCutMultiplier(0.4)
 	p.GetCharacter().AddSkill(jumpSkill)
-	p.GetCharacter().AddSkill(skill.NewHorizontalMovementSkill())
-
-	return p, nil
 }
 
 func addShootingSkill(p platformer.PlatformerActorEntity, shooter body.Shooter) {

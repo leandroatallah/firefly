@@ -137,8 +137,6 @@ func (s *PhasesScene) OnStart() {
 		ctx.ActorManager.RegisterPrimary(s.player)
 		s.PhysicsSpace().AddBody(s.player)
 
-		addShootingSkill(s.player, s)
-
 		// Optionally block input for the current player of this phase
 		if phase, err := ctx.PhaseManager.GetCurrentPhase(); err == nil && phase.BlockPlayerMovement {
 			if p, ok := ctx.ActorManager.GetPlayer(); ok {
