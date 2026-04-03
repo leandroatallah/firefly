@@ -18,8 +18,8 @@ This module contains the game-specific implementation built on top of `internal/
     - `player/`: Player character (`ClimberPlayer`).
     - `states/`: Custom actor state machine states (`Dying`, `Dead`, `Exiting`), plus the composite grounded sub-state machine:
       - `GroundedState`: Composite state owning `Idle`, `Walking`, `Ducking`, and `AimLock` sub-states. Plugs into the parent state machine as a single `StateGrounded` value.
-      - `DuckingState`: Entered when duck input is held while grounded. Shrinks the hitbox via `ResizeFixedBottom`, zeroes horizontal velocity, and blocks jumping. Exits when duck is released and there is ceiling clearance.
-      - `DashState`: Tween-based dash. Velocity follows an `InOutSine` curve from `DashSpeed` to `0`. Gravity is suspended and hitbox is duck-height for the full duration. One air dash per jump; cooldown prevents immediate re-trigger.
+      - `DuckingState`: Entered when duck input is held while grounded. The collision rect is automatically swapped via `StateCollisionManager` (defined in the JSON config). Zeroes horizontal velocity and blocks jumping. Exits when duck is released and there is ceiling clearance.
+      - `DashState`: Tween-based dash. Velocity follows an `InOutSine` curve from `DashSpeed` to `0`. Gravity is suspended and the collision rect is automatically swapped via `StateCollisionManager` for the full duration. One air dash per jump; cooldown prevents immediate re-trigger.
   - `items/`: Collectible and interactive items.
     - `fall_platform.go`: A platform that falls when touched.
     - `item_power_base.go`: Base struct for power-up items. See `POWERUPS.md` for how to add new ones.
