@@ -37,7 +37,6 @@ The engine is built on a "Space-Body-Model" pattern:
 
 - **Non-Obvious Pattern**: It uses an **Ownership Hierarchy**. A body can "own" other bodies. The [Ownership.LastOwner()](internal/engine/physics/body/ownership.go) method performs an iterative traversal with cycle detection to find the root entity (e.g., finding the `Character` that owns a sword's collision box).
 - **Movable vs Collidable**: Logic is split into [MovableBody](internal/engine/physics/body/body_movable.go) (velocity/acceleration) and [CollidableBody](internal/engine/physics/body/body_collidable.go) (collision shapes/resolution).
-- **Hitbox Resize Utilities**: `ResizeFixedBottom(rect, newHeight)` and `ResizeFixedTop(rect, newHeight)` return a new rect with the same bottom or top edge respectively, used by duck and dash states to shrink the hitbox without repositioning the actor.
 
 ### Space: Collision Resolution
 

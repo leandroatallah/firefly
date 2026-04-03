@@ -1,9 +1,5 @@
 package actors
 
-const (
-	duckHeightRatio = 0.5
-)
-
 var Ducking ActorStateEnum
 
 func init() {

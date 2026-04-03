@@ -30,8 +30,6 @@ This module contains the core, reusable game engine components. It is designed t
   - `animation_utils.go`: Helper functions for animation logic.
 - `physics/`: Implements the physics simulation.
   - `body/`: Defines physical body interfaces and implementations.
-    - `ResizeFixedBottom(rect, newHeight)`: Resizes a rect while anchoring its bottom edge (used by duck and dash states).
-    - `ResizeFixedTop(rect, newHeight)`: Resizes a rect while anchoring its top edge.
   - `movement/`: Provides movement models (e.g., platformer physics). Includes one-way platform drop-through logic.
   - `skill/`: Manages physics-related skills or abilities.
     - `JumpSkill`: Supports variable jump height via a configurable `JumpCutMultiplier` — releasing the jump button early reduces the apex.

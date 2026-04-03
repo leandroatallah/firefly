@@ -108,7 +108,6 @@ func defaultCfg() gamestates.DashConfig {
 		DurationFrames: 18,
 		BlockDistance:  32,
 		Cooldown:       30,
-		DuckHeight:     12,
 	}
 }
 

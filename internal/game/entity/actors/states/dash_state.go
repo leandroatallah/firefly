@@ -6,7 +6,6 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/animation"
 	contractsbody "github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
-	physicsbody "github.com/boilerplate/ebiten-template/internal/engine/physics/body"
 	"github.com/boilerplate/ebiten-template/internal/engine/physics/tween"
 )
 
@@ -24,7 +23,6 @@ type DashConfig struct {
 	DurationFrames int
 	BlockDistance  int
 	Cooldown       int
-	DuckHeight     int
 }
 
 // DashState drives a tween-based dash deceleration.
@@ -34,7 +32,6 @@ type DashState struct {
 	cfg         DashConfig
 	tween       *tween.InOutSineTween
 	dashing     bool
-	origHeight  int
 	airDashUsed bool
 }
 
@@ -60,16 +57,8 @@ func (s *DashState) OnStart(_ int) {
 		return
 	}
 
-	s.origHeight = pos.Dy()
 	s.body.SetFreeze(true)
-	_, vy := s.body.Velocity()
-	s.body.SetVelocity(0, vy*0) // zero vertical velocity
 	s.body.SetVelocity(0, 0)
-
-	// Resize hitbox to duck height.
-	newRect := physicsbody.ResizeFixedBottom(pos, s.cfg.DuckHeight)
-	s.body.SetPosition(newRect.Min.X, newRect.Min.Y)
-	s.body.SetSize(newRect.Dx(), newRect.Dy())
 
 	if s.body.IsFalling() {
 		s.airDashUsed = true
@@ -118,11 +107,6 @@ func (s *DashState) finish() {
 	}
 	s.dashing = false
 	s.body.SetFreeze(false)
-	// Restore hitbox height.
-	pos := s.body.Position()
-	newRect := physicsbody.ResizeFixedBottom(pos, s.origHeight)
-	s.body.SetPosition(newRect.Min.X, newRect.Min.Y)
-	s.body.SetSize(newRect.Dx(), newRect.Dy())
 }
 
 func (s *DashState) nextIdleOrFalling() actors.ActorStateEnum {
