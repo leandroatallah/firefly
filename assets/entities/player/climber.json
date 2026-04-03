@@ -155,7 +155,7 @@
   },
   "stats": {
     "health": 1,
-    "speed": 6,
-    "max_speed": 6
+    "speed": 4,
+    "max_speed": 4
   }
 }
