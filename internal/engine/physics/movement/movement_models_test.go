@@ -37,8 +37,8 @@ func TestClampToPlayArea_Edges(t *testing.T) {
 	config.Set(&config.AppConfig{ScreenWidth: 320, ScreenHeight: 240})
 
 	tests := []struct {
-		name       string
-		x, y       int
+		name         string
+		x, y         int
 		wantX, wantY int
 	}{
 		{"top-left corner", -10, -10, 0, 0},
@@ -123,7 +123,7 @@ func TestClampToPlayArea_NonRectShape(t *testing.T) {
 	config.Set(&config.AppConfig{ScreenWidth: 320, ScreenHeight: 240})
 
 	sp := space.NewSpace()
-	
+
 	// Create a body with non-rect shape (using mock)
 	actor := newMockMovableCollidable()
 	actor.SetPosition(-10, -10)
@@ -233,23 +233,23 @@ func TestPlatformMovementModel_SetGravityEnabled(t *testing.T) {
 func TestPlatformMovementModel_UpdateHorizontalVelocity(t *testing.T) {
 	cfg := &config.AppConfig{
 		Physics: config.PhysicsConfig{
-			HorizontalInertia:       1.0,
-			SpeedMultiplier:         1.0,
-			AirControlMultiplier:    0.5,
-			AirFrictionMultiplier:   2.0,
+			HorizontalInertia:     1.0,
+			SpeedMultiplier:       1.0,
+			AirControlMultiplier:  0.5,
+			AirFrictionMultiplier: 2.0,
 		},
 	}
 	config.Set(cfg)
 
 	tests := []struct {
-		name        string
-		accelX      int
-		onGround    bool
-		maxSpeed    int
-		wantVelX    int
+		name     string
+		accelX   int
+		onGround bool
+		maxSpeed int
+		wantVelX int
 	}{
 		{"no acceleration", 0, true, 10, 0},
-		{"positive acceleration", fp16.To16(2), true, 10, 0}, // Will be increased
+		{"positive acceleration", fp16.To16(2), true, 10, 0},  // Will be increased
 		{"negative acceleration", -fp16.To16(2), true, 10, 0}, // Will be decreased
 	}
 
@@ -286,7 +286,7 @@ func TestPlatformMovementModel_UpdateVerticalVelocity(t *testing.T) {
 	// Gravity disabled with acceleration
 	model.gravityEnabled = false
 	actor.SetAcceleration(0, fp16.To16(5))
-	vx, vy = model.UpdateVerticalVelocity(actor)
+	_, vy = model.UpdateVerticalVelocity(actor)
 	if vy != fp16.To16(5) {
 		t.Errorf("expected vy=%d; got %d", fp16.To16(5), vy)
 	}
@@ -324,14 +324,14 @@ func TestPlatformMovementModel_handleGravity(t *testing.T) {
 	// Airborne, falling
 	model.onGround = false
 	actor.SetVelocity(0, 50)
-	vx, vy = model.handleGravity(actor)
+	_, vy = model.handleGravity(actor)
 	if vy <= 50 {
 		t.Errorf("expected vy > 50 after gravity; got %d", vy)
 	}
 
 	// Airborne, jumping (negative vy)
 	actor.SetVelocity(0, -50)
-	vx, vy = model.handleGravity(actor)
+	_, vy = model.handleGravity(actor)
 	// Upward gravity adds to negative velocity (making it less negative towards zero)
 	// vy = -50 + 2 = -48
 	if vy != -48 {
@@ -340,7 +340,7 @@ func TestPlatformMovementModel_handleGravity(t *testing.T) {
 
 	// Clamp to max fall speed
 	actor.SetVelocity(0, 200)
-	vx, vy = model.handleGravity(actor)
+	_, vy = model.handleGravity(actor)
 	if vy > 128 {
 		t.Errorf("expected vy <= 128 (max fall speed); got %d", vy)
 	}
