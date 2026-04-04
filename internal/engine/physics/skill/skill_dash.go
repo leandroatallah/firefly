@@ -26,9 +26,9 @@ func NewDashSkill() *DashSkill {
 	return &DashSkill{
 		SkillBase: SkillBase{
 			state:    StateReady,
-			duration: timing.FromDuration(133 * time.Millisecond), // 8 frames (short burst)
+			duration: timing.FromDuration(200 * time.Millisecond), // 8 frames (short burst)
 			cooldown: timing.FromDuration(750 * time.Millisecond), // 45 frames
-			speed:    fp16.To16(10),
+			speed:    fp16.To16(6),
 		},
 		canAirDash:    true,
 		airDashUsed:   false,

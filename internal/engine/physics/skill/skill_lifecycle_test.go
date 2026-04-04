@@ -674,7 +674,7 @@ func TestDashSkill_TimingConstants(t *testing.T) {
 	d := NewDashSkill()
 
 	// Verify timing constants are reasonable
-	expectedDuration := timing.FromDuration(133 * time.Millisecond)
+	expectedDuration := timing.FromDuration(200 * time.Millisecond)
 	expectedCooldown := timing.FromDuration(750 * time.Millisecond)
 
 	if d.duration != expectedDuration {
