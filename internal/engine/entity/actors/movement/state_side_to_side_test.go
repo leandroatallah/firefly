@@ -23,9 +23,9 @@ func (m *mockSpace) Query(rect image.Rectangle) []body.Collidable {
 	return result
 }
 
-func (m *mockSpace) AddBody(b body.Collidable) {}
-func (m *mockSpace) RemoveBody(b body.Collidable) {}
-func (m *mockSpace) Bodies() []body.Collidable { return m.bodies }
+func (m *mockSpace) AddBody(b body.Collidable)                        {}
+func (m *mockSpace) RemoveBody(b body.Collidable)                     {}
+func (m *mockSpace) Bodies() []body.Collidable                        { return m.bodies }
 func (m *mockSpace) ResolveCollisions(b body.Collidable) (bool, bool) { return false, false }
 func (m *mockSpace) SetTilemapDimensionsProvider(p tilemaplayer.TilemapDimensionsProvider) {
 	m.tilemapProvider = p
@@ -179,7 +179,7 @@ func TestSideToSideMovementState_LimitToRoom(t *testing.T) {
 
 	space := &mockSpace{bodies: []body.Collidable{}}
 	space.tilemapProvider = &mockTilemapProvider{
-		bounds: image.Rect(0, 0, 320, 240),
+		bounds:    image.Rect(0, 0, 320, 240),
 		hasBounds: true,
 	}
 
@@ -202,7 +202,7 @@ func TestSideToSideMovementState_LimitToRoomVertical(t *testing.T) {
 
 	space := &mockSpace{bodies: []body.Collidable{}}
 	space.tilemapProvider = &mockTilemapProvider{
-		bounds: image.Rect(0, 0, 320, 240),
+		bounds:    image.Rect(0, 0, 320, 240),
 		hasBounds: true,
 	}
 
@@ -264,4 +264,3 @@ func TestSideToSideMovementState_TurnAfterWall(t *testing.T) {
 		t.Errorf("expected moveLeftForce 5 after turning, got %d", actor.moveLeftForce)
 	}
 }
-

@@ -3,8 +3,8 @@ package screenutil
 import (
 	"testing"
 
-	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 func TestGetCenterOfScreenPosition(t *testing.T) {
@@ -16,18 +16,18 @@ func TestGetCenterOfScreenPosition(t *testing.T) {
 	config.Set(&config.AppConfig{ScreenWidth: 320, ScreenHeight: 240})
 
 	tests := []struct {
-		name      string
-		width     int
-		height    int
-		wantX     int
-		wantY     int
+		name   string
+		width  int
+		height int
+		wantX  int
+		wantY  int
 	}{
-		{"small object", 100, 50, 110, 95},      // 160-50, 120-25
-		{"half screen", 160, 120, 80, 60},       // 160-80, 120-60
-		{"full screen", 320, 240, 0, 0},         // 160-160, 120-120
+		{"small object", 100, 50, 110, 95},         // 160-50, 120-25
+		{"half screen", 160, 120, 80, 60},          // 160-80, 120-60
+		{"full screen", 320, 240, 0, 0},            // 160-160, 120-120
 		{"larger than screen", 400, 300, -40, -30}, // 160-200, 120-150
-		{"zero size", 0, 0, 160, 120},           // 160-0, 120-0
-		{"odd dimensions", 33, 17, 144, 112},    // 160-16, 120-8 (integer division)
+		{"zero size", 0, 0, 160, 120},              // 160-0, 120-0
+		{"odd dimensions", 33, 17, 144, 112},       // 160-16, 120-8 (integer division)
 	}
 
 	for _, tt := range tests {
@@ -43,11 +43,11 @@ func TestGetCenterOfScreenPosition(t *testing.T) {
 
 func TestGetCenterOfScreenPosition_DifferentScreenSizes(t *testing.T) {
 	tests := []struct {
-		name         string
+		name             string
 		screenW, screenH int
-		objW, objH   int
-		wantX        int
-		wantY        int
+		objW, objH       int
+		wantX            int
+		wantY            int
 	}{
 		{"320x240 screen", 320, 240, 100, 50, 110, 95},
 		{"640x480 screen", 640, 480, 100, 50, 270, 215},

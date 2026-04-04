@@ -5,10 +5,10 @@ import (
 	"os"
 	"testing"
 
-	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
 	"github.com/boilerplate/ebiten-template/internal/engine/mocks"
 	"github.com/boilerplate/ebiten-template/internal/engine/render/camera"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 func TestMain(m *testing.M) {
@@ -22,10 +22,10 @@ func TestMain(m *testing.M) {
 
 func TestOverheadText(t *testing.T) {
 	mockActor := &mocks.MockActor{
-		Id: "test-actor",
+		Id:  "test-actor",
 		Pos: image.Rect(100, 100, 110, 110),
 	}
-	
+
 	ot := NewOverheadText(mockActor, "Hello", 60)
 	if ot == nil {
 		t.Fatal("NewOverheadText returned nil")
@@ -33,10 +33,10 @@ func TestOverheadText(t *testing.T) {
 
 	screen := ebiten.NewImage(320, 240)
 	cam := camera.NewController(0, 0)
-	
+
 	// Draw should update position based on actor
 	ot.Draw(screen, cam)
-	
+
 	if ot.X != 105 { // 100 + 10/2
 		t.Errorf("expected X 105, got %f", ot.X)
 	}
@@ -53,6 +53,6 @@ func TestScreenText(t *testing.T) {
 
 	screen := ebiten.NewImage(320, 240)
 	cam := camera.NewController(0, 0)
-	
+
 	st.Draw(screen, cam)
 }

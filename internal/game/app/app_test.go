@@ -15,7 +15,7 @@ func TestNewConfig(t *testing.T) {
 	// We need to reset flag.CommandLine before calling NewConfig if other tests call it
 	// or if we call it multiple times in this test.
 	// Since this is the only test calling it so far, it's fine.
-	
+
 	cfg := NewConfig()
 	if cfg == nil {
 		t.Fatal("NewConfig returned nil")

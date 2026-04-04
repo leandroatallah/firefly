@@ -1,9 +1,9 @@
 package speech
 
 import (
+	"github.com/boilerplate/ebiten-template/internal/engine/assets/font"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
-	"github.com/boilerplate/ebiten-template/internal/engine/assets/font"
 )
 
 type SpeechFont struct {

@@ -3,11 +3,11 @@ package pause
 import (
 	"time"
 
-	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/boilerplate/ebiten-template/internal/engine/assets/font"
 	"github.com/boilerplate/ebiten-template/internal/engine/ui/menu"
 	"github.com/boilerplate/ebiten-template/internal/engine/utils/timing"
+	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
 type PauseScreen struct {
@@ -118,4 +118,3 @@ func (p *PauseScreen) SetFont(font *font.FontText) {
 func (p *PauseScreen) Font() *font.FontText {
 	return p.font
 }
-

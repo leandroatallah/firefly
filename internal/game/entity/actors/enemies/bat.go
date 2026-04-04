@@ -36,7 +36,7 @@ func NewBatEnemy(ctx *app.AppContext, x, y int, id string) (*BatEnemy, error) {
 	}
 
 	enemy.SetGravityEnabled(false)
-	enemy.Character.SetMovementState(movement.SideToSide, nil, movement.WithIgnoreLedges(true), movement.WithWaitBeforeTurn(60))
+	enemy.SetMovementState(movement.SideToSide, nil, movement.WithIgnoreLedges(true), movement.WithWaitBeforeTurn(60))
 
 	return enemy, nil
 }

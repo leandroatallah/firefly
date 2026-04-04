@@ -85,7 +85,7 @@ func (p *PlatformerCharacter) OnLand() {
 }
 
 func (p *PlatformerCharacter) SetGravityEnabled(enabled bool) {
-	if model, ok := p.Character.MovementModel().(*physicsmovement.PlatformMovementModel); ok {
+	if model, ok := p.MovementModel().(*physicsmovement.PlatformMovementModel); ok {
 		model.SetGravityEnabled(enabled)
 	}
 }

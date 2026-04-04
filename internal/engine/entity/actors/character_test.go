@@ -3,12 +3,12 @@ package actors_test
 import (
 	"testing"
 
-	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
 	bodyphysics "github.com/boilerplate/ebiten-template/internal/engine/physics/body"
 	physicsmovement "github.com/boilerplate/ebiten-template/internal/engine/physics/movement"
 	"github.com/boilerplate/ebiten-template/internal/engine/render/sprites"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 func TestCharacter_Lifecycle(t *testing.T) {
@@ -84,14 +84,16 @@ func TestCharacter_StateTransitionOverride(t *testing.T) {
 	})
 
 	// handleState is unexported, but we can trigger it via Update if Freeze is false
-	c.Update(nil) 
+	c.Update(nil)
 	if !overrideCalled {
 		t.Error("StateTransitionHandler was not called")
 	}
 }
 
 type mockSkill struct{}
-func (m *mockSkill) Update(actor body.MovableCollidable, model *physicsmovement.PlatformMovementModel) {}
+
+func (m *mockSkill) Update(actor body.MovableCollidable, model *physicsmovement.PlatformMovementModel) {
+}
 func (m *mockSkill) IsActive() bool { return false }
 
 func TestCharacter_Skills(t *testing.T) {

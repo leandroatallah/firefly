@@ -4,10 +4,10 @@ import (
 	"image"
 	"testing"
 
-	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/tilemaplayer"
 	"github.com/boilerplate/ebiten-template/internal/engine/utils/fp16"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 // mockBodiesSpace implements body.BodiesSpace for testing
@@ -304,7 +304,7 @@ func TestCollidableBody_OnBlock(t *testing.T) {
 
 	other := NewCollidableBodyFromRect(NewRect(0, 0, 5, 5))
 	other.SetID("test")
-	
+
 	// OnBlock is intentionally a no-op for TouchTrigger
 	// This test verifies that behavior
 	cb.OnBlock(other)
@@ -412,7 +412,7 @@ func TestCollidableBody_ApplyValidPosition_Negative(t *testing.T) {
 	cb.SetID("moving")
 	// Set initial position to (20, 0)
 	cb.SetPosition(20, 0)
-	
+
 	space := newMockBodiesSpace()
 	space.AddBody(cb)
 

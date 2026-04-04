@@ -12,7 +12,7 @@ func TestTiming(t *testing.T) {
 	intendedTPS := 60
 	ebiten.SetTPS(intendedTPS)
 
-	// Note: ebiten.TPS() should return the maximum TPS (intended), 
+	// Note: ebiten.TPS() should return the maximum TPS (intended),
 	// even if the game loop isn't running.
 	currentTPS := TPS()
 	if currentTPS != intendedTPS {

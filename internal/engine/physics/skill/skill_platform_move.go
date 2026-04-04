@@ -1,12 +1,12 @@
 package skill
 
 import (
-	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
 	"github.com/boilerplate/ebiten-template/internal/engine/input"
 	physicsmovement "github.com/boilerplate/ebiten-template/internal/engine/physics/movement"
 	"github.com/boilerplate/ebiten-template/internal/engine/utils/fp16"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 type HorizontalMovementSkill struct {

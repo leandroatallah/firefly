@@ -8,10 +8,10 @@ import (
 
 func TestIsSomeKeyPressed(t *testing.T) {
 	tests := []struct {
-		name      string
-		keys      []ebiten.Key
-		pressed   map[ebiten.Key]bool
-		want      bool
+		name    string
+		keys    []ebiten.Key
+		pressed map[ebiten.Key]bool
+		want    bool
 	}{
 		{
 			name: "no keys given",
@@ -19,22 +19,22 @@ func TestIsSomeKeyPressed(t *testing.T) {
 			want: false,
 		},
 		{
-			name: "one key pressed",
-			keys: []ebiten.Key{ebiten.KeyA, ebiten.KeyB},
+			name:    "one key pressed",
+			keys:    []ebiten.Key{ebiten.KeyA, ebiten.KeyB},
 			pressed: map[ebiten.Key]bool{ebiten.KeyA: true},
-			want: true,
+			want:    true,
 		},
 		{
-			name: "no keys pressed",
-			keys: []ebiten.Key{ebiten.KeyA, ebiten.KeyB},
+			name:    "no keys pressed",
+			keys:    []ebiten.Key{ebiten.KeyA, ebiten.KeyB},
 			pressed: map[ebiten.Key]bool{},
-			want: false,
+			want:    false,
 		},
 		{
-			name: "all keys pressed",
-			keys: []ebiten.Key{ebiten.KeyA, ebiten.KeyB},
+			name:    "all keys pressed",
+			keys:    []ebiten.Key{ebiten.KeyA, ebiten.KeyB},
 			pressed: map[ebiten.Key]bool{ebiten.KeyA: true, ebiten.KeyB: true},
-			want: true,
+			want:    true,
 		},
 	}
 

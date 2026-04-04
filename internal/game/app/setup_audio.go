@@ -24,7 +24,7 @@ func collectAudioInDir(assets fs.FS, dir string) []string {
 			continue
 		}
 		name := entry.Name()
-		if !(strings.HasSuffix(name, ".ogg") || strings.HasSuffix(name, ".wav") || strings.HasSuffix(name, ".mp3")) {
+		if !strings.HasSuffix(name, ".ogg") && !strings.HasSuffix(name, ".wav") && !strings.HasSuffix(name, ".mp3") {
 			continue
 		}
 		paths = append(paths, dir+"/"+name)
@@ -46,7 +46,7 @@ func collectAudioWithPrefix(assets fs.FS, dir, prefix string) []string {
 		if !strings.HasPrefix(name, prefix) {
 			continue
 		}
-		if !(strings.HasSuffix(name, ".ogg") || strings.HasSuffix(name, ".wav") || strings.HasSuffix(name, ".mp3")) {
+		if !strings.HasSuffix(name, ".ogg") && !strings.HasSuffix(name, ".wav") && !strings.HasSuffix(name, ".mp3") {
 			continue
 		}
 		paths = append(paths, dir+"/"+name)

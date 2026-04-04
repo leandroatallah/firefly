@@ -7,7 +7,7 @@ import (
 func TestDumbChaseMovementState(t *testing.T) {
 	actor := &mockActor{speed: 5}
 	actor.SetPosition(0, 0)
-	
+
 	target := &mockActor{}
 	target.SetPosition(100, 100)
 
@@ -24,7 +24,7 @@ func TestDumbChaseMovementState(t *testing.T) {
 func TestAvoidMovementState(t *testing.T) {
 	actor := &mockActor{speed: 5}
 	actor.SetPosition(50, 50)
-	
+
 	target := &mockActor{}
 	target.SetPosition(100, 100)
 

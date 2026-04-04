@@ -2,6 +2,9 @@ package gamestates
 
 import "github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
 
+// State enum: part of engine public API
+//
+//nolint:gochecknoglobals
 var StateGrounded actors.ActorStateEnum
 
 func init() {

@@ -54,8 +54,6 @@ func TestDashSkillIntegratesWithMovementModel(t *testing.T) {
 	d.state = StateActive
 	d.timer = 2
 
-	vx, _ := actor.Velocity()
-
 	// First update should set dash active and move horizontally
 	prevX, _ := actor.GetPositionMin()
 	d.Update(actor, model)
@@ -74,11 +72,8 @@ func TestDashSkillIntegratesWithMovementModel(t *testing.T) {
 	d.Update(actor, model)
 	_ = model.Update(actor, sp)
 
-	vx2, _ := actor.Velocity()
 	// Velocity may persist due to physics, but dash should not force set; accept smoke check
-	if vx2 == 0 && vx != 0 {
-		// acceptable; no strict assertion — ensure no panic and progression through states
-	}
+	// No strict assertion — ensure no panic and progression through states
 }
 
 func TestJumpSkillTryActivateAndCoyoteBuffer(t *testing.T) {

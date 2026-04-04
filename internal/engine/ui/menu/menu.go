@@ -3,10 +3,10 @@ package menu
 import (
 	"image/color"
 
+	"github.com/boilerplate/ebiten-template/internal/engine/assets/font"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
-	"github.com/boilerplate/ebiten-template/internal/engine/assets/font"
 )
 
 // MenuItem represents a single option in the menu.

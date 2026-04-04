@@ -4,9 +4,9 @@ import (
 	"image/color"
 	"testing"
 
-	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/boilerplate/ebiten-template/internal/engine/audio"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 func TestManager(t *testing.T) {
@@ -141,9 +141,9 @@ type typingSpeech struct {
 	spelled          int
 }
 
-func (t *typingSpeech) ID() string { return t.id }
-func (t *typingSpeech) Show() { t.visible = true }
-func (t *typingSpeech) Hide() { t.visible = false }
+func (t *typingSpeech) ID() string    { return t.id }
+func (t *typingSpeech) Show()         { t.visible = true }
+func (t *typingSpeech) Hide()         { t.visible = false }
 func (t *typingSpeech) Visible() bool { return t.visible }
 func (t *typingSpeech) Text(msg string) string {
 	if t.spelled <= 0 {
@@ -154,24 +154,24 @@ func (t *typingSpeech) Text(msg string) string {
 	}
 	return msg[:t.spelled]
 }
-func (t *typingSpeech) ResetText() { t.spelled = 0; t.spellingComplete = false }
-func (t *typingSpeech) SetID(id string) { t.id = id }
-func (t *typingSpeech) SetSpellingDelay(d int) {}
+func (t *typingSpeech) ResetText()               { t.spelled = 0; t.spellingComplete = false }
+func (t *typingSpeech) SetID(id string)          { t.id = id }
+func (t *typingSpeech) SetSpellingDelay(d int)   {}
 func (t *typingSpeech) IsSpellingComplete() bool { return t.spellingComplete }
-func (t *typingSpeech) CompleteSpelling() { t.spellingComplete = true }
-func (t *typingSpeech) Count() int { return 0 }
+func (t *typingSpeech) CompleteSpelling()        { t.spellingComplete = true }
+func (t *typingSpeech) Count() int               { return 0 }
 func (t *typingSpeech) Update() error {
 	t.spelled++
 	return nil
 }
 func (t *typingSpeech) Draw(screen *ebiten.Image, text string) {}
-func (t *typingSpeech) SetPosition(pos string) {}
-func (t *typingSpeech) SetSpeed(speed int) {}
-func (t *typingSpeech) SetColor(c color.Color) {}
-func (t *typingSpeech) Color() color.Color { return color.Black }
-func (t *typingSpeech) SetSkipFlash(frames int) {}
-func (t *typingSpeech) IsAccumulative() bool { return false }
-func (t *typingSpeech) SetAccumulative(bool) {}
+func (t *typingSpeech) SetPosition(pos string)                 {}
+func (t *typingSpeech) SetSpeed(speed int)                     {}
+func (t *typingSpeech) SetColor(c color.Color)                 {}
+func (t *typingSpeech) Color() color.Color                     { return color.Black }
+func (t *typingSpeech) SetSkipFlash(frames int)                {}
+func (t *typingSpeech) IsAccumulative() bool                   { return false }
+func (t *typingSpeech) SetAccumulative(bool)                   {}
 
 func TestManager_ApplyDefaultSpeechAudio_Rotates(t *testing.T) {
 	config.Set(&config.AppConfig{})

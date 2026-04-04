@@ -10,8 +10,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/boilerplate/ebiten-template/internal/engine/app"
 	"github.com/boilerplate/ebiten-template/internal/engine/assets/font"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/schemas"
@@ -19,6 +17,8 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/render/camera"
 	"github.com/boilerplate/ebiten-template/internal/engine/render/particles"
 	"github.com/boilerplate/ebiten-template/internal/engine/render/vfx/text"
+	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
 
 type VFXConfig struct {

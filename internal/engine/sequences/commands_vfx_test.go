@@ -78,14 +78,6 @@ func (m *mockVignetteScene) DisableVignetteDarkness() {
 	m.log = append(m.log, "disable")
 }
 
-type mockSceneManager struct {
-	current interface{}
-}
-
-func (m *mockSceneManager) CurrentScene() interface{} {
-	return m.current
-}
-
 func TestVignetteRadiusCommandInitNoScene(t *testing.T) {
 	cmd := &VignetteRadiusCommand{
 		InitialRadius: 10,

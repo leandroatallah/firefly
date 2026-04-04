@@ -3,8 +3,8 @@ package mocks
 import (
 	"image"
 
-	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 // MockOneWayPlatform implements body.OneWayPlatform for testing.
@@ -50,22 +50,24 @@ func (m *MockOneWayPlatform) Update() {
 }
 
 // body.Body stubs
-func (m *MockOneWayPlatform) ID() string                          { return m.id }
-func (m *MockOneWayPlatform) SetID(id string)                     { m.id = id }
-func (m *MockOneWayPlatform) Position() image.Rectangle           { return m.pos }
-func (m *MockOneWayPlatform) SetPosition(x, y int)                { m.pos = image.Rect(x, y, x+m.pos.Dx(), y+m.pos.Dy()) }
-func (m *MockOneWayPlatform) SetPosition16(x16, y16 int)          { m.SetPosition(x16/16, y16/16) }
-func (m *MockOneWayPlatform) SetSize(w, h int)                    { m.pos.Max = m.pos.Min.Add(image.Pt(w, h)) }
-func (m *MockOneWayPlatform) Scale() float64                      { return 1 }
-func (m *MockOneWayPlatform) SetScale(float64)                    {}
-func (m *MockOneWayPlatform) GetPosition16() (int, int)           { return m.pos.Min.X * 16, m.pos.Min.Y * 16 }
-func (m *MockOneWayPlatform) GetPositionMin() (int, int)          { return m.pos.Min.X, m.pos.Min.Y }
-func (m *MockOneWayPlatform) GetShape() body.Shape                { return m }
-func (m *MockOneWayPlatform) Width() int                          { return m.pos.Dx() }
-func (m *MockOneWayPlatform) Height() int                         { return m.pos.Dy() }
-func (m *MockOneWayPlatform) Owner() interface{}                  { return nil }
-func (m *MockOneWayPlatform) SetOwner(interface{})                {}
-func (m *MockOneWayPlatform) LastOwner() interface{}              { return nil }
+func (m *MockOneWayPlatform) ID() string                { return m.id }
+func (m *MockOneWayPlatform) SetID(id string)           { m.id = id }
+func (m *MockOneWayPlatform) Position() image.Rectangle { return m.pos }
+func (m *MockOneWayPlatform) SetPosition(x, y int) {
+	m.pos = image.Rect(x, y, x+m.pos.Dx(), y+m.pos.Dy())
+}
+func (m *MockOneWayPlatform) SetPosition16(x16, y16 int) { m.SetPosition(x16/16, y16/16) }
+func (m *MockOneWayPlatform) SetSize(w, h int)           { m.pos.Max = m.pos.Min.Add(image.Pt(w, h)) }
+func (m *MockOneWayPlatform) Scale() float64             { return 1 }
+func (m *MockOneWayPlatform) SetScale(float64)           {}
+func (m *MockOneWayPlatform) GetPosition16() (int, int)  { return m.pos.Min.X * 16, m.pos.Min.Y * 16 }
+func (m *MockOneWayPlatform) GetPositionMin() (int, int) { return m.pos.Min.X, m.pos.Min.Y }
+func (m *MockOneWayPlatform) GetShape() body.Shape       { return m }
+func (m *MockOneWayPlatform) Width() int                 { return m.pos.Dx() }
+func (m *MockOneWayPlatform) Height() int                { return m.pos.Dy() }
+func (m *MockOneWayPlatform) Owner() interface{}         { return nil }
+func (m *MockOneWayPlatform) SetOwner(interface{})       {}
+func (m *MockOneWayPlatform) LastOwner() interface{}     { return nil }
 
 // body.Collidable stubs
 func (m *MockOneWayPlatform) GetTouchable() body.Touchable                        { return m }

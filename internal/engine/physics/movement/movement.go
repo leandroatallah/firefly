@@ -9,10 +9,6 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/utils/fp16"
 )
 
-const (
-	gravityForce = 4
-)
-
 // increaseVelocity applies acceleration to the velocity for a single axis.
 // Capping is handled in the Update loop to correctly manage the 2D vector's magnitude.
 func increaseVelocity(velocity, acceleration int) int {

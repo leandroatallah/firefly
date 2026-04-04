@@ -3,7 +3,6 @@ package gamesetup
 import (
 	"io/fs"
 
-	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/boilerplate/ebiten-template/internal/engine/app"
 	"github.com/boilerplate/ebiten-template/internal/engine/assets/font"
 	"github.com/boilerplate/ebiten-template/internal/engine/audio"
@@ -19,6 +18,7 @@ import (
 	gamescene "github.com/boilerplate/ebiten-template/internal/game/scenes"
 	scenestypes "github.com/boilerplate/ebiten-template/internal/game/scenes/types"
 	gamespeech "github.com/boilerplate/ebiten-template/internal/game/ui/speech"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 func Setup(assets fs.FS) error {

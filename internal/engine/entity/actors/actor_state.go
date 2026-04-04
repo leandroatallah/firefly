@@ -12,6 +12,9 @@ type ActorState interface {
 
 type ActorStateEnum int
 
+// State enum: part of engine public API
+//
+//nolint:gochecknoglobals
 var (
 	Idle    ActorStateEnum
 	Walking ActorStateEnum

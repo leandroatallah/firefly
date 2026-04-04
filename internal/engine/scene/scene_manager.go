@@ -3,10 +3,10 @@ package scene
 import (
 	"log"
 
-	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/boilerplate/ebiten-template/internal/engine/app"
 	"github.com/boilerplate/ebiten-template/internal/engine/audio"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/navigation"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 type SceneManager struct {
@@ -115,7 +115,6 @@ func (m *SceneManager) AudioManager() *audio.AudioManager {
 	}
 	return m.AppContext().AudioManager
 }
-
 
 // CurrentScene returns the currently active scene.
 func (m *SceneManager) CurrentScene() navigation.Scene {

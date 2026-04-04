@@ -4,9 +4,9 @@ import (
 	"image"
 	"testing"
 
-	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/animation"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/schemas"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 func TestAnimatedSpriteImageFrameSelection(t *testing.T) {
@@ -70,9 +70,9 @@ func TestAnimatedSpriteImage_FrameCalculation(t *testing.T) {
 		{"frame 3 at count 3", 3, 1, true, 3},
 		{"wrap to frame 0 at count 4", 4, 1, true, 0},
 		{"frame 1 at count 5", 5, 1, true, 1},
-		{"slower animation (rate 2)", 2, 2, true, 1}, // count/rate = 2/2 = 1, frame 1, offset 32
+		{"slower animation (rate 2)", 2, 2, true, 1},         // count/rate = 2/2 = 1, frame 1, offset 32
 		{"slower animation (rate 2) frame 2", 4, 2, true, 2}, // count/rate = 4/2 = 2, frame 2, offset 64
-		{"non-loop clamps", 100, 1, false, 3}, // Should clamp to last frame (3)
+		{"non-loop clamps", 100, 1, false, 3},                // Should clamp to last frame (3)
 	}
 
 	for _, tt := range tests {
@@ -99,40 +99,40 @@ func TestAnimatedSpriteImage_EdgeCases(t *testing.T) {
 	se := NewSpriteEntity(SpriteMap{"test": sprite})
 
 	tests := []struct {
-		name   string
-		sprite *Sprite
-		rect   image.Rectangle
-		count  int
-		rate   int
+		name    string
+		sprite  *Sprite
+		rect    image.Rectangle
+		count   int
+		rate    int
 		wantNil bool
 	}{
 		{
-			name: "nil sprite",
+			name:   "nil sprite",
 			sprite: nil, rect: image.Rect(0, 0, 32, 32),
 			count: 0, rate: 1, wantNil: true,
 		},
 		{
-			name: "nil image",
+			name:   "nil image",
 			sprite: &Sprite{Image: nil}, rect: image.Rect(0, 0, 32, 32),
 			count: 0, rate: 1, wantNil: true,
 		},
 		{
-			name: "zero width rect",
+			name:   "zero width rect",
 			sprite: sprite, rect: image.Rect(0, 0, 0, 32),
 			count: 0, rate: 1, wantNil: false, // Returns full image
 		},
 		{
-			name: "zero height rect",
+			name:   "zero height rect",
 			sprite: sprite, rect: image.Rect(0, 0, 32, 0),
 			count: 0, rate: 1, wantNil: false,
 		},
 		{
-			name: "frame larger than image",
+			name:   "frame larger than image",
 			sprite: sprite, rect: image.Rect(0, 0, 128, 64),
 			count: 0, rate: 1, wantNil: false, // Returns full image
 		},
 		{
-			name: "negative count",
+			name:   "negative count",
 			sprite: sprite, rect: image.Rect(0, 0, 32, 32),
 			count: -10, rate: 1, wantNil: false,
 		},
@@ -180,9 +180,9 @@ func TestSpriteEntity_GetSpriteByState(t *testing.T) {
 	sprite1 := &Sprite{Image: ebiten.NewImage(32, 32), Loop: true}
 	sprite2 := &Sprite{Image: ebiten.NewImage(32, 32), Loop: false}
 	sprites := SpriteMap{
-		"idle":  sprite1,
-		"walk":  sprite2,
-		"jump":  sprite1,
+		"idle": sprite1,
+		"walk": sprite2,
+		"jump": sprite1,
 	}
 	se := NewSpriteEntity(sprites)
 

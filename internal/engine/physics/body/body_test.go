@@ -131,8 +131,8 @@ func TestBody_Position_WithFixedPoint(t *testing.T) {
 
 	// Set position with fractional part in fixed-point
 	// fp16 uses scale of 16, so 0.5 = 8, 0.25 = 4
-	x16 := fp16.To16(10) + 8  // 10.5 in fp16
-	y16 := fp16.To16(20) + 4  // 20.25 in fp16
+	x16 := fp16.To16(10) + 8 // 10.5 in fp16
+	y16 := fp16.To16(20) + 4 // 20.25 in fp16
 	b.SetPosition16(x16, y16)
 
 	pos := b.Position()
@@ -193,11 +193,6 @@ func TestBody_EmptyID(t *testing.T) {
 		t.Errorf("expected empty ID for new body; got '%s'", b.ID())
 	}
 }
-
-type mockShape struct{}
-
-func (s *mockShape) Width() int  { return 10 }
-func (s *mockShape) Height() int { return 10 }
 
 func TestBody_SetPosition_InvalidShape(t *testing.T) {
 	// log.Fatal path

@@ -56,7 +56,7 @@ func NewClimberPlayer(ctx *app.AppContext) (platformer.PlatformerActorEntity, er
 		return nil, err
 	}
 
-	character.StateCollisionManager.RefreshCollisions()
+	character.RefreshCollisions()
 	player.PlayerDeathBehavior = gameplayermethods.NewPlayerDeathBehavior(player)
 
 	return player, nil
@@ -66,12 +66,12 @@ func (p *ClimberPlayer) Update(space body.BodiesSpace) error {
 	// Check for ducking input
 	duckHeld := ebiten.IsKeyPressed(ebiten.KeyDown) || ebiten.IsKeyPressed(ebiten.KeyS)
 	p.SetDucking(duckHeld && !p.IsFalling() && !p.IsGoingUp())
-	
+
 	// When ducking, prevent horizontal movement but allow facing direction change
 	if p.IsDucking() {
 		p.SetSpeed(0)
 		p.SetHorizontalInertia(0)
-		
+
 		// Allow facing direction change while ducking
 		if ebiten.IsKeyPressed(ebiten.KeyLeft) || ebiten.IsKeyPressed(ebiten.KeyA) {
 			p.SetFaceDirection(animation.FaceDirectionLeft)
@@ -82,9 +82,9 @@ func (p *ClimberPlayer) Update(space body.BodiesSpace) error {
 		p.SetHorizontalInertia(-1.0)
 		p.SetSpeed(p.baseSpeed)
 	}
-	
+
 	p.SetJumpForceMultiplier(1.0)
-	
+
 	return p.Character.Update(space)
 }
 

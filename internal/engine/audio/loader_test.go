@@ -10,10 +10,10 @@ func TestLoadAudioAssetsFromFS(t *testing.T) {
 	wavData := createMinimalWAV()
 
 	mockFS := fstest.MapFS{
-		"assets/audio/test.wav": &fstest.MapFile{Data: wavData},
-		"assets/audio/test.ogg": &fstest.MapFile{Data: []byte("invalid ogg")}, // Should log error but not crash
-		"assets/audio/test.txt": &fstest.MapFile{Data: []byte("text file")},    // Should be ignored
-		"assets/audio/subdir/ignored.wav": &fstest.MapFile{Data: wavData},    // Should be ignored (IsDir)
+		"assets/audio/test.wav":           &fstest.MapFile{Data: wavData},
+		"assets/audio/test.ogg":           &fstest.MapFile{Data: []byte("invalid ogg")}, // Should log error but not crash
+		"assets/audio/test.txt":           &fstest.MapFile{Data: []byte("text file")},   // Should be ignored
+		"assets/audio/subdir/ignored.wav": &fstest.MapFile{Data: wavData},               // Should be ignored (IsDir)
 	}
 
 	LoadAudioAssetsFromFS(mockFS, am)

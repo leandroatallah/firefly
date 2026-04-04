@@ -99,14 +99,14 @@ func TestAudioManagerPlayMusic_Loop(t *testing.T) {
 	if p == nil {
 		t.Fatal("expected player for test_loop.wav")
 	}
-	
+
 	// Wait a bit to ensure goroutine starts
 	time.Sleep(50 * time.Millisecond)
-	
+
 	if !am.IsPlaying("test_loop.wav") {
 		t.Error("expected test_loop.wav to be playing")
 	}
-	
+
 	am.PauseMusic("test_loop.wav")
 }
 
@@ -117,7 +117,7 @@ func TestAudioManagerFadeOut_AlreadyZero(t *testing.T) {
 
 	p := am.PlayMusic("test_zero.wav", false)
 	p.SetVolume(0)
-	
+
 	am.FadeOut("test_zero.wav", 50*time.Millisecond)
 	// Should return early
 }
@@ -129,10 +129,10 @@ func TestAudioManagerFadeOut_Complete(t *testing.T) {
 
 	am.PlayMusic("test_fade_complete.wav", false)
 	am.FadeOut("test_fade_complete.wav", 50*time.Millisecond)
-	
+
 	// Wait enough for the ticker to trigger and duration to pass
 	time.Sleep(200 * time.Millisecond)
-	
+
 	if am.IsPlaying("test_fade_complete.wav") {
 		t.Error("expected test_fade_complete.wav to be stopped after fade out completion")
 	}
@@ -145,23 +145,23 @@ func TestAudioManagerFadeOut_CancelExisting(t *testing.T) {
 
 	am.PlayMusic("test_cancel.wav", false)
 	am.FadeOut("test_cancel.wav", 100*time.Millisecond)
-	
+
 	// FadeOut again should cancel the first one
 	am.FadeOut("test_cancel.wav", 100*time.Millisecond)
-	
+
 	// FadeOutAll should cancel it too
-	am.FadeOutAll(100*time.Millisecond)
-	
+	am.FadeOutAll(100 * time.Millisecond)
+
 	// PlayMusic should cancel it too
 	am.PlayMusic("test_cancel.wav", false)
 }
 
 func TestAudioManagerAdd_Formats(t *testing.T) {
 	am := getTestAudioManager()
-	
+
 	// Test invalid mp3
 	am.Add("test.mp3", []byte("invalid"))
-	
+
 	// Test invalid ogg
 	am.Add("test.ogg", []byte("invalid"))
 }
@@ -171,8 +171,8 @@ func TestAudioManagerFadeOutAll_AlreadyZero(t *testing.T) {
 	oldVolume := am.Volume()
 	am.SetVolume(0)
 	defer am.SetVolume(oldVolume)
-	
-	am.FadeOutAll(50*time.Millisecond)
+
+	am.FadeOutAll(50 * time.Millisecond)
 	// Should return early
 }
 
@@ -185,8 +185,8 @@ func TestAudioManagerPlaySound_Missing(t *testing.T) {
 
 func TestAudioManagerFadeOutAll_CancelExisting(t *testing.T) {
 	am := getTestAudioManager()
-	am.FadeOutAll(100*time.Millisecond)
-	am.FadeOutAll(100*time.Millisecond) // Should cancel the first one
+	am.FadeOutAll(100 * time.Millisecond)
+	am.FadeOutAll(100 * time.Millisecond) // Should cancel the first one
 }
 
 func TestAudioManagerNoSound(t *testing.T) {

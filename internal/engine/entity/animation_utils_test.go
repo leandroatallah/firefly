@@ -4,9 +4,9 @@ import (
 	"image"
 	"testing"
 
-	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/animation"
 	"github.com/boilerplate/ebiten-template/internal/engine/render/sprites"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 // mockAnimatable implements Animatable for testing

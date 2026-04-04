@@ -11,13 +11,13 @@ import (
 )
 
 // newDuckingTestCharacter creates a Character with a body of the given dimensions.
-func newDuckingTestCharacter(w, h int) *actors.Character {
+func newDuckingTestCharacter(_, _ int) *actors.Character {
 	img := ebiten.NewImage(1, 1)
 	sMap := sprites.SpriteMap{
 		actors.Idle:    &sprites.Sprite{Image: img},
 		actors.Ducking: &sprites.Sprite{Image: img},
 	}
-	rect := bodyphysics.NewRect(0, 0, w, h)
+	rect := bodyphysics.NewRect(0, 0, 16, 32)
 	return actors.NewCharacter(sMap, rect)
 }
 

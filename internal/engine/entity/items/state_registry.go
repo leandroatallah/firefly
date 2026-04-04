@@ -4,6 +4,9 @@ import "fmt"
 
 type StateConstructor func(base BaseState) ItemState
 
+// Singleton registry: intentional package-level state
+//
+//nolint:gochecknoglobals
 var (
 	stateConstructors = make(map[ItemStateEnum]StateConstructor)
 	stateEnums        = make(map[string]ItemStateEnum)

@@ -4,7 +4,6 @@ import (
 	"image"
 	"log"
 
-	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/animation"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/movement"
@@ -13,6 +12,7 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/physics/skill"
 	"github.com/boilerplate/ebiten-template/internal/engine/physics/space"
 	"github.com/boilerplate/ebiten-template/internal/engine/render/sprites"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 type Character struct {
@@ -166,7 +166,7 @@ func (c *Character) SetState(state ActorState) {
 
 		c.state = state
 		c.state.OnStart(c.count)
-		c.StateCollisionManager.RefreshCollisions()
+		c.RefreshCollisions()
 
 		if c.OnStateChange != nil {
 			c.OnStateChange(oldState, c.state.State())
@@ -410,7 +410,7 @@ func (c *Character) Image() *ebiten.Image {
 	// AnimatedSpriteImage only cares about rect dimensions for sub-image extraction.
 	frameRect := image.Rect(0, 0, frameWidth, frameHeight)
 	stateDurationCount := c.state.GetAnimationCount(c.count)
-	return c.AnimatedSpriteImage(sprite, frameRect, stateDurationCount, c.SpriteEntity.FrameRate())
+	return c.AnimatedSpriteImage(sprite, frameRect, stateDurationCount, c.FrameRate())
 }
 
 func (c *Character) ImageOptions() *ebiten.DrawImageOptions {

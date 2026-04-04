@@ -14,7 +14,6 @@ type CallSequenceCommand struct {
 	nestedSequence *Sequence
 	sequencePlayer *SequencePlayer
 	isComplete     bool
-	blockSequence  *bool
 }
 
 func (c *CallSequenceCommand) Init(appContext any) {

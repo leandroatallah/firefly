@@ -4,7 +4,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/animation"
 	contractsbody "github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
@@ -13,6 +12,7 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/physics/space"
 	"github.com/boilerplate/ebiten-template/internal/engine/utils/fp16"
 	"github.com/boilerplate/ebiten-template/internal/engine/utils/timing"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 // mockMovableCollidable for skill tests

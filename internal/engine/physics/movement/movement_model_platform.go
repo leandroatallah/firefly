@@ -79,9 +79,8 @@ func (m *PlatformMovementModel) UpdateHorizontalVelocity(body body.MovableCollid
 		// If inertia is disabled, check if we have acceleration pending from a state/command
 		accX, _ := body.Acceleration()
 		if accX != 0 {
-			vx16, vy16 := body.Velocity()
-			vx16 = accX
-			body.SetVelocity(vx16, vy16)
+			_, vy16 := body.Velocity()
+			body.SetVelocity(accX, vy16)
 		}
 	}
 
@@ -95,9 +94,8 @@ func (m *PlatformMovementModel) UpdateVerticalVelocity(body body.MovableCollidab
 
 	_, accY := body.Acceleration()
 	if accY != 0 {
-		vx16, vy16 := body.Velocity()
-		vy16 = accY
-		body.SetVelocity(vx16, vy16)
+		vx16, _ := body.Velocity()
+		body.SetVelocity(vx16, accY)
 	}
 	return body.Velocity()
 }
@@ -138,7 +136,8 @@ func (m *PlatformMovementModel) Update(body body.MovableCollidable, space body.B
 
 	cfg := config.Get()
 
-	vx16, vy16 := body.Velocity()
+	_, vy16 := body.Velocity()
+	var vx16 int
 
 	// Handle horizontal movement based on dash state or normal acceleration/friction
 	if m.dashActive {
@@ -153,10 +152,7 @@ func (m *PlatformMovementModel) Update(body body.MovableCollidable, space body.B
 	}
 
 	// Apply horizontal movement to the body and check for collisions.
-	_, _, isBlockingX := body.ApplyValidPosition(vx16, true, space)
-	if isBlockingX {
-		vx16 = 0
-	}
+	_, _, _ = body.ApplyValidPosition(vx16, true, space)
 
 	// Apply vertical movement to the body and check for collisions.
 	_, _, isBlockingY := body.ApplyValidPosition(vy16, false, space)

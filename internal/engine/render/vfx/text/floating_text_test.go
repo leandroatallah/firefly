@@ -6,11 +6,11 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/boilerplate/ebiten-template/internal/engine/assets/font"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
 	"github.com/boilerplate/ebiten-template/internal/engine/render/camera"
 	"github.com/boilerplate/ebiten-template/internal/engine/render/vfx/text"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 // getModuleRoot returns the absolute path to the module root

@@ -106,19 +106,6 @@ func applyFlips(op *ebiten.DrawImageOptions, h, v, d bool, tileW, tileH float64)
 	}
 }
 
-// drawTileOpts returns a DrawImageOptions translated to the destination pixel coordinates.
-// Now it only handles translation. Flips should be applied before.
-func drawTileOpts(i, layerWidth, tileWidth, tileHeight int) *ebiten.DrawImageOptions {
-	x := i % layerWidth
-	y := i / layerWidth
-	dx := x * tileWidth
-	dy := y * tileHeight
-
-	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Translate(float64(dx), float64(dy))
-	return op
-}
-
 func (t *Tilemap) ParseBase(layer *Layer, result *ebiten.Image) {
 	if layer == nil || result == nil {
 		return
@@ -142,17 +129,17 @@ func (t *Tilemap) ParseBase(layer *Layer, result *ebiten.Image) {
 		srcRect := tilesetSourceRect(ts, tileID)
 
 		tile := ts.EbitenImage.SubImage(srcRect).(*ebiten.Image)
-		
+
 		op := &ebiten.DrawImageOptions{}
 		applyFlips(op, flipH, flipV, flipD, float64(ts.Tilewidth), float64(ts.Tileheight))
-		
+
 		// Then translate to position
 		x := i % layer.Width
 		y := i / layer.Width
 		dx := float64(x * ts.Tilewidth)
 		dy := float64(y * ts.Tileheight)
 		op.GeoM.Translate(dx, dy)
-		
+
 		result.DrawImage(tile, op)
 	}
 }
@@ -167,7 +154,7 @@ func (t *Tilemap) ParseItems(layer *Layer, result *ebiten.Image) {
 		if rawID == 0 {
 			continue
 		}
-		
+
 		gid, flipH, flipV, flipD := extractGIDAndFlags(rawID)
 		if gid == 0 {
 			continue
@@ -180,11 +167,11 @@ func (t *Tilemap) ParseItems(layer *Layer, result *ebiten.Image) {
 
 		srcRect := tilesetSourceRect(ts, gid)
 		tileImg := ts.EbitenImage.SubImage(srcRect).(*ebiten.Image)
-		
+
 		op := &ebiten.DrawImageOptions{}
 		applyFlips(op, flipH, flipV, flipD, float64(ts.Tilewidth), float64(ts.Tileheight))
 		op.GeoM.Translate(obj.X, obj.Y-obj.Height)
-		
+
 		result.DrawImage(tileImg, op)
 	}
 }

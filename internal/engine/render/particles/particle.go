@@ -3,8 +3,8 @@ package particles
 import (
 	"image"
 
-	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/boilerplate/ebiten-template/internal/engine/render/camera"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 // Config defines the properties of a particle type.

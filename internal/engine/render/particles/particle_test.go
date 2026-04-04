@@ -4,8 +4,8 @@ import (
 	"image/color"
 	"testing"
 
-	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/boilerplate/ebiten-template/internal/engine/render/camera"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 func TestParticleUpdate(t *testing.T) {
@@ -66,25 +66,25 @@ func TestParticleUpdate_EdgeCases(t *testing.T) {
 		wantFrameTimer int
 	}{
 		{
-			name: "single frame no animation",
+			name:         "single frame no animation",
 			initialFrame: 0, initialTimer: 0,
 			frameCount: 1, frameRate: 1,
 			wantFrame: 0, wantFrameTimer: 0,
 		},
 		{
-			name: "frame advance at rate boundary",
+			name:         "frame advance at rate boundary",
 			initialFrame: 0, initialTimer: 4,
 			frameCount: 3, frameRate: 5,
 			wantFrame: 1, wantFrameTimer: 0,
 		},
 		{
-			name: "frame wrap around",
+			name:         "frame wrap around",
 			initialFrame: 2, initialTimer: 4,
 			frameCount: 3, frameRate: 5,
 			wantFrame: 0, wantFrameTimer: 0,
 		},
 		{
-			name: "zero frame rate advances immediately",
+			name:         "zero frame rate advances immediately",
 			initialFrame: 0, initialTimer: 0,
 			frameCount: 3, frameRate: 0,
 			wantFrame: 1, wantFrameTimer: 0, // 0 >= 0 triggers advance
@@ -116,29 +116,29 @@ func TestParticleUpdate_EdgeCases(t *testing.T) {
 
 func TestParticleUpdate_VelocityAndScale(t *testing.T) {
 	tests := []struct {
-		name        string
-		x, y        float64
-		velX, velY  float64
-		scale       float64
-		scaleSpeed  float64
+		name         string
+		x, y         float64
+		velX, velY   float64
+		scale        float64
+		scaleSpeed   float64
 		wantX, wantY float64
-		wantScale   float64
+		wantScale    float64
 	}{
 		{
 			name: "positive velocity",
-			x: 10, y: 20, velX: 5, velY: -3,
+			x:    10, y: 20, velX: 5, velY: -3,
 			scale: 1.0, scaleSpeed: 0.1,
 			wantX: 15, wantY: 17, wantScale: 1.1,
 		},
 		{
 			name: "zero velocity",
-			x: 100, y: 200, velX: 0, velY: 0,
+			x:    100, y: 200, velX: 0, velY: 0,
 			scale: 2.0, scaleSpeed: 0,
 			wantX: 100, wantY: 200, wantScale: 2.0,
 		},
 		{
 			name: "negative scale speed (shrinking)",
-			x: 0, y: 0, velX: 0, velY: 0,
+			x:    0, y: 0, velX: 0, velY: 0,
 			scale: 1.0, scaleSpeed: -0.05,
 			wantX: 0, wantY: 0, wantScale: 0.95,
 		},
@@ -151,7 +151,7 @@ func TestParticleUpdate_VelocityAndScale(t *testing.T) {
 				VelX: tt.velX, VelY: tt.velY,
 				Scale: tt.scale, ScaleSpeed: tt.scaleSpeed,
 				Duration: 10,
-				Config: &Config{FrameCount: 1},
+				Config:   &Config{FrameCount: 1},
 			}
 
 			p.Update()
@@ -281,7 +281,7 @@ func TestSystem_Draw(t *testing.T) {
 	p := &Particle{
 		X: 50, Y: 50,
 		Duration: 10,
-		Scale: 1.0,
+		Scale:    1.0,
 		Config: &Config{
 			Image:       img,
 			FrameWidth:  32,

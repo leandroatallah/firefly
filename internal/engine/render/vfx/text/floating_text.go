@@ -3,11 +3,11 @@ package text
 import (
 	"image/color"
 
-	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/text/v2"
 	"github.com/boilerplate/ebiten-template/internal/engine/assets/font"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
 	"github.com/boilerplate/ebiten-template/internal/engine/render/camera"
+	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/text/v2"
 )
 
 type FloatingText interface {
@@ -86,7 +86,7 @@ func (ft *SimpleFloatingText) Update() error {
 
 // Draw draws the floating text at its current position.
 func (ft *SimpleFloatingText) Draw(screen *ebiten.Image, cam *camera.Controller) {
-	ft.FloatingTextBase.DrawText(screen, ft.X, ft.Y, cam)
+	ft.DrawText(screen, ft.X, ft.Y, cam)
 }
 
 func (ft *FloatingTextBase) DrawText(screen *ebiten.Image, x, y float64, cam *camera.Controller) {

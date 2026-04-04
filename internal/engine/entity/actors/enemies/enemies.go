@@ -1,8 +1,8 @@
 package enemies
 
 import (
-	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
+	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
 )
 
 // To be initialized on game package.

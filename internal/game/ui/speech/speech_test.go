@@ -5,11 +5,11 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/boilerplate/ebiten-template/internal/engine/assets/font"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/i18n"
 	"github.com/boilerplate/ebiten-template/internal/engine/ui/speech"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 func getModuleRoot() string {
@@ -33,8 +33,8 @@ func TestMain(m *testing.M) {
 	}
 
 	cfg := &config.AppConfig{
-		ScreenWidth:  320,
-		ScreenHeight: 224,
+		ScreenWidth:   320,
+		ScreenHeight:  224,
 		MainFontFace:  "assets/fonts/pressstart2p.ttf",
 		SmallFontFace: "assets/fonts/tiny5.ttf",
 	}

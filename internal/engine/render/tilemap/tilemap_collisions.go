@@ -19,6 +19,9 @@ const (
 	EndpointLayer
 )
 
+// Immutable lookup table: read-only after init
+//
+//nolint:gochecknoglobals
 var LayerNameMap = map[string]LayerNameID{
 	"Obstacles":   ObstaclesLayer,
 	"Enemies":     EnemiesLayer,
@@ -65,7 +68,7 @@ func (t *Tilemap) CreateCollisionBodies(space body.BodiesSpace, endpointTriggerF
 			} else {
 				for _, obj := range layer.Objects {
 					obstacle := t.NewObstacleRect(obj, "Endpoint", false)
-					
+
 					// Get event type (e.g., "SPIKE", "CUTSCENE") and event_id
 					var eventType string
 					var eventID string
@@ -77,7 +80,7 @@ func (t *Tilemap) CreateCollisionBodies(space body.BodiesSpace, endpointTriggerF
 							eventID = p.Value
 						}
 					}
-					
+
 					// Use event_type if available, otherwise use event_id
 					triggerID := eventType
 					if triggerID == "" {
@@ -87,10 +90,10 @@ func (t *Tilemap) CreateCollisionBodies(space body.BodiesSpace, endpointTriggerF
 						triggerID = fmt.Sprintf("EVENT_%d", eventCount)
 						eventCount++
 					}
-					
+
 					// Set unique body ID using object's unique ID
 					obstacle.SetID(fmt.Sprintf("Endpoint_%d", obj.Id))
-					
+
 					if endpointTriggerFactory != nil {
 						obstacle.SetTouchable(endpointTriggerFactory(triggerID))
 					}

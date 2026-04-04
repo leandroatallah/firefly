@@ -4,10 +4,10 @@ import (
 	"image/color"
 	"math"
 
-	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
 	enginecamera "github.com/boilerplate/ebiten-template/internal/engine/render/camera"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 // Vignette draws a retro darkness overlay with a jagged circular opening.
@@ -129,11 +129,10 @@ func (v *Vignette) Draw(screen *ebiten.Image, cam *enginecamera.Controller, targ
 
 	w, h := cfg.ScreenWidth, cfg.ScreenHeight
 	pixels := v.BuildMaskPixels(cam, target, w, h)
-	v.overlay.ReplacePixels(pixels)
+	v.overlay.WritePixels(pixels)
 
 	op := &ebiten.DrawImageOptions{}
 	// Defensive: make sure the overlay is drawn as pure black regardless of blending artifacts.
 	op.ColorScale.ScaleWithColor(color.Black)
 	screen.DrawImage(v.overlay, op)
 }
-

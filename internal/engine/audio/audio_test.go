@@ -8,6 +8,9 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
 )
 
+// Test-level singleton: avoids re-initialising audio in each test
+//
+//nolint:gochecknoglobals
 var (
 	audioManagerOnce sync.Once
 	audioManager     *AudioManager

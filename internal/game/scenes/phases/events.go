@@ -6,7 +6,7 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/event"
 )
 
-func subscribeEvents(ctx *app.AppContext, scene *PhasesScene) {
+func subscribeEvents(ctx *app.AppContext, _ *PhasesScene) {
 
 	em := ctx.EventManager
 

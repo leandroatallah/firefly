@@ -5,9 +5,9 @@ import (
 	"image"
 	"image/color"
 
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/vector"
-	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 )
 
 type ObstacleRect struct {

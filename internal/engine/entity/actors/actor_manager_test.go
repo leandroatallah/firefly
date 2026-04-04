@@ -4,12 +4,12 @@ import (
 	"image"
 	"testing"
 
-	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/animation"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/movement"
 	physicsmovement "github.com/boilerplate/ebiten-template/internal/engine/physics/movement"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 // mockActor implements actors.ActorEntity for testing
@@ -32,16 +32,16 @@ type mockShape struct {
 func (m *mockShape) Width() int  { return m.width }
 func (m *mockShape) Height() int { return m.height }
 
-func (m *mockActor) ID() string                                           { return m.id }
-func (m *mockActor) SetID(id string)                                      { m.id = id }
-func (m *mockActor) Position() image.Rectangle                            { return m.pos }
-func (m *mockActor) SetPosition(x, y int)                                 { m.pos = image.Rect(x, y, x+10, y+10) }
+func (m *mockActor) ID() string                { return m.id }
+func (m *mockActor) SetID(id string)           { m.id = id }
+func (m *mockActor) Position() image.Rectangle { return m.pos }
+func (m *mockActor) SetPosition(x, y int)      { m.pos = image.Rect(x, y, x+10, y+10) }
 func (m *mockActor) SetSize(w, h int) {
 	m.pos.Max.X = m.pos.Min.X + w
 	m.pos.Max.Y = m.pos.Min.Y + h
 }
-func (m *mockActor) Scale() float64 { return 1.0 }
-func (m *mockActor) SetScale(s float64) {}
+func (m *mockActor) Scale() float64                                       { return 1.0 }
+func (m *mockActor) SetScale(s float64)                                   {}
 func (m *mockActor) SetPosition16(x16, y16 int)                           { m.SetPosition(x16/16, y16/16) }
 func (m *mockActor) GetPosition16() (int, int)                            { return m.pos.Min.X * 16, m.pos.Min.Y * 16 }
 func (m *mockActor) GetPositionMin() (int, int)                           { return m.pos.Min.X, m.pos.Min.Y }
@@ -79,7 +79,7 @@ func (m *mockActor) NewState(state actors.ActorStateEnum) (actors.ActorState, er
 }
 func (m *mockActor) Hurt(damage int)                                     {}
 func (m *mockActor) Owner() interface{}                                  { return nil }
-func (m *mockActor) SetOwner(interface{})                                { }
+func (m *mockActor) SetOwner(interface{})                                {}
 func (m *mockActor) LastOwner() interface{}                              { return nil }
 func (m *mockActor) Update(space body.BodiesSpace) error                 { return nil }
 func (m *mockActor) Health() int                                         { return 100 }

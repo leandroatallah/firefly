@@ -7,8 +7,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/text/v2"
 	"github.com/boilerplate/ebiten-template/internal/engine/app"
 	"github.com/boilerplate/ebiten-template/internal/engine/assets/font"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
@@ -19,6 +17,8 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/utils"
 	"github.com/boilerplate/ebiten-template/internal/engine/utils/timing"
 	scenestypes "github.com/boilerplate/ebiten-template/internal/game/scenes/types"
+	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/text/v2"
 )
 
 type MenuScene struct {

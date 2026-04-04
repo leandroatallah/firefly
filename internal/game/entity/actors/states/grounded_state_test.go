@@ -12,10 +12,10 @@ func newGroundedState(input *MockInputSource) *gamestates.GroundedState {
 
 func TestGroundedSubStateTransitions(t *testing.T) {
 	tests := []struct {
-		name          string
-		setupInput    func(*MockInputSource)
-		initialSetup  func(*gamestates.GroundedState)
-		wantSubState  gamestates.GroundedSubStateEnum
+		name         string
+		setupInput   func(*MockInputSource)
+		initialSetup func(*gamestates.GroundedState)
+		wantSubState gamestates.GroundedSubStateEnum
 	}{
 		{
 			name:         "no input stays Idle",

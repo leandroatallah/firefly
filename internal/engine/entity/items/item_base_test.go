@@ -3,9 +3,9 @@ package items
 import (
 	"testing"
 
-	"github.com/hajimehoshi/ebiten/v2"
 	bodyphysics "github.com/boilerplate/ebiten-template/internal/engine/physics/body"
 	"github.com/boilerplate/ebiten-template/internal/engine/render/sprites"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 func TestBaseItem_Lifecycle(t *testing.T) {

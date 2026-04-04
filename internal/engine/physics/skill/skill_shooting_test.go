@@ -158,47 +158,47 @@ func (m *mockMovableCollidable) IsDucking() bool {
 	return false
 }
 
-func (m *mockMovableCollidable) MoveX(distance int)                       {}
-func (m *mockMovableCollidable) MoveY(distance int)                       {}
-func (m *mockMovableCollidable) OnMoveLeft(distance int)                  {}
-func (m *mockMovableCollidable) OnMoveUpLeft(distance int)                {}
-func (m *mockMovableCollidable) OnMoveDownLeft(distance int)              {}
-func (m *mockMovableCollidable) OnMoveRight(distance int)                 {}
-func (m *mockMovableCollidable) OnMoveUpRight(distance int)               {}
-func (m *mockMovableCollidable) OnMoveDownRight(distance int)             {}
-func (m *mockMovableCollidable) OnMoveUp(distance int)                    {}
-func (m *mockMovableCollidable) OnMoveDown(distance int)                  {}
-func (m *mockMovableCollidable) Velocity() (vx16, vy16 int)               { return 0, 0 }
-func (m *mockMovableCollidable) SetVelocity(vx16, vy16 int)               {}
-func (m *mockMovableCollidable) Acceleration() (accX, accY int)           { return 0, 0 }
-func (m *mockMovableCollidable) SetAcceleration(accX, accY int)           {}
-func (m *mockMovableCollidable) SetSpeed(speed int) error                 { return nil }
-func (m *mockMovableCollidable) SetMaxSpeed(maxSpeed int) error           { return nil }
-func (m *mockMovableCollidable) GetPosition() (int, int)                  { return 0, 0 }
-func (m *mockMovableCollidable) SetPosition(x, y int)                     {}
-func (m *mockMovableCollidable) GetBounds() (x, y, width, height int)     { return 0, 0, 0, 0 }
-func (m *mockMovableCollidable) SetBounds(x, y, width, height int)        {}
-func (m *mockMovableCollidable) IsCollidingWith(interface{}) bool         { return false }
-func (m *mockMovableCollidable) OnCollision(interface{})                  {}
-func (m *mockMovableCollidable) GetTouchable() body.Touchable             { return m }
+func (m *mockMovableCollidable) MoveX(distance int)                              {}
+func (m *mockMovableCollidable) MoveY(distance int)                              {}
+func (m *mockMovableCollidable) OnMoveLeft(distance int)                         {}
+func (m *mockMovableCollidable) OnMoveUpLeft(distance int)                       {}
+func (m *mockMovableCollidable) OnMoveDownLeft(distance int)                     {}
+func (m *mockMovableCollidable) OnMoveRight(distance int)                        {}
+func (m *mockMovableCollidable) OnMoveUpRight(distance int)                      {}
+func (m *mockMovableCollidable) OnMoveDownRight(distance int)                    {}
+func (m *mockMovableCollidable) OnMoveUp(distance int)                           {}
+func (m *mockMovableCollidable) OnMoveDown(distance int)                         {}
+func (m *mockMovableCollidable) Velocity() (vx16, vy16 int)                      { return 0, 0 }
+func (m *mockMovableCollidable) SetVelocity(vx16, vy16 int)                      {}
+func (m *mockMovableCollidable) Acceleration() (accX, accY int)                  { return 0, 0 }
+func (m *mockMovableCollidable) SetAcceleration(accX, accY int)                  {}
+func (m *mockMovableCollidable) SetSpeed(speed int) error                        { return nil }
+func (m *mockMovableCollidable) SetMaxSpeed(maxSpeed int) error                  { return nil }
+func (m *mockMovableCollidable) GetPosition() (int, int)                         { return 0, 0 }
+func (m *mockMovableCollidable) SetPosition(x, y int)                            {}
+func (m *mockMovableCollidable) GetBounds() (x, y, width, height int)            { return 0, 0, 0, 0 }
+func (m *mockMovableCollidable) SetBounds(x, y, width, height int)               {}
+func (m *mockMovableCollidable) IsCollidingWith(interface{}) bool                { return false }
+func (m *mockMovableCollidable) OnCollision(interface{})                         {}
+func (m *mockMovableCollidable) GetTouchable() body.Touchable                    { return m }
 func (m *mockMovableCollidable) DrawCollisionBox(*ebiten.Image, image.Rectangle) {}
-func (m *mockMovableCollidable) CollisionPosition() []image.Rectangle     { return nil }
-func (m *mockMovableCollidable) CollisionShapes() []body.Collidable       { return nil }
-func (m *mockMovableCollidable) IsObstructive() bool                      { return false }
-func (m *mockMovableCollidable) SetIsObstructive(bool)                    {}
-func (m *mockMovableCollidable) AddCollision(...body.Collidable)          {}
-func (m *mockMovableCollidable) ClearCollisions()                         {}
-func (m *mockMovableCollidable) SetTouchable(body.Touchable)              {}
-func (m *mockMovableCollidable) OnTouch(body.Collidable)                  {}
-func (m *mockMovableCollidable) OnBlock(body.Collidable)                  {}
-func (m *mockMovableCollidable) ID() string                               { return "" }
-func (m *mockMovableCollidable) SetID(string)                             {}
-func (m *mockMovableCollidable) Position() image.Rectangle                { return image.Rectangle{} }
-func (m *mockMovableCollidable) SetPosition16(x16, y16 int)               {}
-func (m *mockMovableCollidable) SetSize(w, h int)                         {}
-func (m *mockMovableCollidable) Scale() float64                           { return 1.0 }
-func (m *mockMovableCollidable) SetScale(float64)                         {}
-func (m *mockMovableCollidable) GetPositionMin() (int, int)               { return 0, 0 }
+func (m *mockMovableCollidable) CollisionPosition() []image.Rectangle            { return nil }
+func (m *mockMovableCollidable) CollisionShapes() []body.Collidable              { return nil }
+func (m *mockMovableCollidable) IsObstructive() bool                             { return false }
+func (m *mockMovableCollidable) SetIsObstructive(bool)                           {}
+func (m *mockMovableCollidable) AddCollision(...body.Collidable)                 {}
+func (m *mockMovableCollidable) ClearCollisions()                                {}
+func (m *mockMovableCollidable) SetTouchable(body.Touchable)                     {}
+func (m *mockMovableCollidable) OnTouch(body.Collidable)                         {}
+func (m *mockMovableCollidable) OnBlock(body.Collidable)                         {}
+func (m *mockMovableCollidable) ID() string                                      { return "" }
+func (m *mockMovableCollidable) SetID(string)                                    {}
+func (m *mockMovableCollidable) Position() image.Rectangle                       { return image.Rectangle{} }
+func (m *mockMovableCollidable) SetPosition16(x16, y16 int)                      {}
+func (m *mockMovableCollidable) SetSize(w, h int)                                {}
+func (m *mockMovableCollidable) Scale() float64                                  { return 1.0 }
+func (m *mockMovableCollidable) SetScale(float64)                                {}
+func (m *mockMovableCollidable) GetPositionMin() (int, int)                      { return 0, 0 }
 func (m *mockMovableCollidable) GetShape() body.Shape {
 	if m.width > 0 {
 		return &mockShape{width: m.width}
@@ -208,23 +208,23 @@ func (m *mockMovableCollidable) GetShape() body.Shape {
 func (m *mockMovableCollidable) ApplyValidPosition(int, bool, body.BodiesSpace) (int, int, bool) {
 	return 0, 0, false
 }
-func (m *mockMovableCollidable) Owner() interface{}      { return nil }
-func (m *mockMovableCollidable) SetOwner(interface{})    {}
-func (m *mockMovableCollidable) LastOwner() interface{}  { return nil }
-func (m *mockMovableCollidable) Speed() int              { return 0 }
-func (m *mockMovableCollidable) MaxSpeed() int           { return 0 }
-func (m *mockMovableCollidable) Immobile() bool          { return false }
-func (m *mockMovableCollidable) SetImmobile(bool)        {}
-func (m *mockMovableCollidable) SetFreeze(bool)          {}
-func (m *mockMovableCollidable) Freeze() bool            { return false }
+func (m *mockMovableCollidable) Owner() interface{}                             { return nil }
+func (m *mockMovableCollidable) SetOwner(interface{})                           {}
+func (m *mockMovableCollidable) LastOwner() interface{}                         { return nil }
+func (m *mockMovableCollidable) Speed() int                                     { return 0 }
+func (m *mockMovableCollidable) MaxSpeed() int                                  { return 0 }
+func (m *mockMovableCollidable) Immobile() bool                                 { return false }
+func (m *mockMovableCollidable) SetImmobile(bool)                               {}
+func (m *mockMovableCollidable) SetFreeze(bool)                                 {}
+func (m *mockMovableCollidable) Freeze() bool                                   { return false }
 func (m *mockMovableCollidable) SetFaceDirection(animation.FacingDirectionEnum) {}
-func (m *mockMovableCollidable) IsIdle() bool            { return false }
-func (m *mockMovableCollidable) IsWalking() bool         { return false }
-func (m *mockMovableCollidable) IsFalling() bool         { return false }
-func (m *mockMovableCollidable) IsGoingUp() bool         { return false }
-func (m *mockMovableCollidable) CheckMovementDirectionX() {}
-func (m *mockMovableCollidable) TryJump(int)             {}
-func (m *mockMovableCollidable) SetJumpForceMultiplier(float64) {}
-func (m *mockMovableCollidable) JumpForceMultiplier() float64 { return 1.0 }
-func (m *mockMovableCollidable) SetHorizontalInertia(float64) {}
-func (m *mockMovableCollidable) HorizontalInertia() float64 { return 1.0 }
+func (m *mockMovableCollidable) IsIdle() bool                                   { return false }
+func (m *mockMovableCollidable) IsWalking() bool                                { return false }
+func (m *mockMovableCollidable) IsFalling() bool                                { return false }
+func (m *mockMovableCollidable) IsGoingUp() bool                                { return false }
+func (m *mockMovableCollidable) CheckMovementDirectionX()                       {}
+func (m *mockMovableCollidable) TryJump(int)                                    {}
+func (m *mockMovableCollidable) SetJumpForceMultiplier(float64)                 {}
+func (m *mockMovableCollidable) JumpForceMultiplier() float64                   { return 1.0 }
+func (m *mockMovableCollidable) SetHorizontalInertia(float64)                   {}
+func (m *mockMovableCollidable) HorizontalInertia() float64                     { return 1.0 }

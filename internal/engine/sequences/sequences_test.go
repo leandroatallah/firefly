@@ -160,16 +160,16 @@ func TestSequencePlayerInterruptibleAndOneTime(t *testing.T) {
 
 	// Create interruptible sequence (default)
 	interruptibleSeq := &mocks.MockSequence{
-		CommandsList:  []contractseq.Command{&mocks.MockCommand{CompleteAfter: 5}},
+		CommandsList:    []contractseq.Command{&mocks.MockCommand{CompleteAfter: 5}},
 		IsInterruptible: true,
-		Path:          "interruptible.json",
+		Path:            "interruptible.json",
 	}
 
 	// Create non-interruptible sequence
 	nonInterruptibleSeq := &mocks.MockSequence{
-		CommandsList:  []contractseq.Command{&mocks.MockCommand{CompleteAfter: 10}},
+		CommandsList:    []contractseq.Command{&mocks.MockCommand{CompleteAfter: 10}},
 		IsInterruptible: false,
-		Path:          "non_interruptible.json",
+		Path:            "non_interruptible.json",
 	}
 
 	// Test 1: Same sequence requested while playing - should not restart
@@ -185,9 +185,9 @@ func TestSequencePlayerInterruptibleAndOneTime(t *testing.T) {
 
 	// Test 2: Different interruptible sequence should interrupt current
 	anotherSeq := &mocks.MockSequence{
-		CommandsList:  []contractseq.Command{&mocks.MockCommand{CompleteAfter: 2}},
+		CommandsList:    []contractseq.Command{&mocks.MockCommand{CompleteAfter: 2}},
 		IsInterruptible: true,
-		Path:          "another.json",
+		Path:            "another.json",
 	}
 	player.Play(anotherSeq)
 	if !player.IsPlaying() {
@@ -206,9 +206,9 @@ func TestSequencePlayerInterruptibleAndOneTime(t *testing.T) {
 
 	// Try to interrupt with another sequence - should fail
 	interruptSeq := &mocks.MockSequence{
-		CommandsList:  []contractseq.Command{&mocks.MockCommand{CompleteAfter: 1}},
+		CommandsList:    []contractseq.Command{&mocks.MockCommand{CompleteAfter: 1}},
 		IsInterruptible: true,
-		Path:          "interrupt.json",
+		Path:            "interrupt.json",
 	}
 	player.Play(interruptSeq)
 	// Should still be running nonInterruptibleSeq, not interruptSeq
@@ -231,9 +231,9 @@ func TestSequencePlayerOneTimeSequence(t *testing.T) {
 
 	// Create a one-time sequence
 	oneTimeSeq := &mocks.MockSequence{
-		CommandsList:  []contractseq.Command{&mocks.MockCommand{CompleteAfter: 5}},
-		IsOneTime:       true,
-		Path:            "one_time.json",
+		CommandsList: []contractseq.Command{&mocks.MockCommand{CompleteAfter: 5}},
+		IsOneTime:    true,
+		Path:         "one_time.json",
 	}
 
 	// Play the sequence first time - should work
@@ -271,13 +271,12 @@ func TestSequencePlayerOneTimeSequence(t *testing.T) {
 
 	// Different sequence should still work
 	anotherSeq := &mocks.MockSequence{
-		CommandsList:  []contractseq.Command{&mocks.MockCommand{CompleteAfter: 1}},
-		IsOneTime:       false,
-		Path:            "another.json",
+		CommandsList: []contractseq.Command{&mocks.MockCommand{CompleteAfter: 1}},
+		IsOneTime:    false,
+		Path:         "another.json",
 	}
 	player.Play(anotherSeq)
 	if !player.IsPlaying() {
 		t.Fatalf("expected different sequence to play after one-time completed")
 	}
 }
-

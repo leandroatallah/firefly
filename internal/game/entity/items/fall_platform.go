@@ -12,6 +12,9 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/utils/timing"
 )
 
+// State enum: part of engine public API
+//
+//nolint:gochecknoglobals
 var (
 	Shaking items.ItemStateEnum
 	Break   items.ItemStateEnum
@@ -65,7 +68,7 @@ func NewFallingPlatformItem(ctx *app.AppContext, x, y int, id string) (*FallingP
 		return nil, fmt.Errorf("SetItemStats: %w", err)
 	}
 
-	fp.StateCollisionManager.RefreshCollisions()
+	fp.RefreshCollisions()
 
 	return fp, nil
 }
