@@ -109,7 +109,7 @@ func (m *SceneManager) NavigateBack(sceneTransition navigation.Transition) {
 	}
 }
 
-func (m *SceneManager) AudioManager() *audio.AudioManager {
+func (m *SceneManager) AudioManager() audio.Manager {
 	if m.AppContext() == nil {
 		return nil
 	}

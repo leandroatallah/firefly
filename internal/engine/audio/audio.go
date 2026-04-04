@@ -21,6 +21,17 @@ const (
 	sampleRate = 44100
 )
 
+// Manager defines the interface for audio management.
+type Manager interface {
+	PlayMusic(name string, loop bool)
+	IsPlaying(name string) bool
+	SetVolume(volume float64)
+	PauseAll()
+	FadeOutAll(duration time.Duration)
+	Stop(path string)
+	StopAll()
+}
+
 type AudioItem struct {
 	name string
 	data []byte

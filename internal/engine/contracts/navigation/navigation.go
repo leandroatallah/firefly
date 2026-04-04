@@ -25,7 +25,7 @@ type SceneFactory interface {
 type SceneMap map[SceneType]func() Scene
 
 type SceneManager interface {
-	AudioManager() *audio.AudioManager
+	AudioManager() audio.Manager
 	Draw(screen *ebiten.Image)
 	NavigateTo(sceneType SceneType, sceneTransition Transition, freshInstance bool)
 	NavigateBack(sceneTransition Transition)

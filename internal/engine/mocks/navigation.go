@@ -82,8 +82,8 @@ type MockSceneManager struct {
 	Transitioning  bool
 }
 
-func (m *MockSceneManager) AudioManager() *audio.AudioManager { return nil }
-func (m *MockSceneManager) Draw(screen *ebiten.Image)         { m.DrawCalled = true }
+func (m *MockSceneManager) AudioManager() audio.Manager { return nil }
+func (m *MockSceneManager) Draw(screen *ebiten.Image)   { m.DrawCalled = true }
 func (m *MockSceneManager) NavigateTo(sceneType navigation.SceneType, trans navigation.Transition, fresh bool) {
 	m.NavigateCalls++
 	m.LastSceneType = sceneType

@@ -295,3 +295,169 @@ func TestCameraZoomCommand_WithTarget(t *testing.T) {
 		t.Error("camera should not be nil")
 	}
 }
+
+func TestCameraZoomCommand_AllPhases_InstantZoom(t *testing.T) {
+	appContext := &app.AppContext{}
+	sceneManager := scene.NewSceneManager()
+	sceneManager.SetAppContext(appContext)
+	appContext.SceneManager = sceneManager
+	appContext.Space = space.NewSpace()
+	appContext.ActorManager = actors.NewManager()
+
+	cam := camera.NewController(0, 0)
+	cam.Kamera().ZoomFactor = 1.0
+
+	// Give the camera a follow target so origFollowTarget is non-nil
+	followTarget := &mocks.MockActor{Id: "follow_target"}
+	followTarget.SetPosition(0, 0)
+	cam.SetFollowTarget(followTarget)
+	cam.SetFollowing(true)
+
+	mockScene := &mockSceneWithCamera{cam: cam}
+	mockScene.SetAppContext(appContext)
+	appContext.SceneManager.SwitchTo(mockScene)
+
+	cmd := &CameraZoomCommand{
+		Zoom:     2.0,
+		Duration: 0, // instant zoom in
+		Delay:    0, // instant wait
+		// OutDuration defaults to Duration=0 → instant zoom out
+	}
+	cmd.Init(appContext)
+
+	if cmd.camera == nil {
+		t.Fatal("camera should not be nil after Init")
+	}
+
+	// Phase 0 (instant) → phase 1 → phase 2 (instant) → done
+	done := cmd.Update()
+	if !done {
+		done = cmd.Update()
+	}
+	if !done {
+		t.Error("CameraZoomCommand with Duration=0 and Delay=0 should complete quickly")
+	}
+}
+
+func TestCameraZoomCommand_AllPhases_TimedZoom(t *testing.T) {
+	appContext := &app.AppContext{}
+	sceneManager := scene.NewSceneManager()
+	sceneManager.SetAppContext(appContext)
+	appContext.SceneManager = sceneManager
+	appContext.Space = space.NewSpace()
+	appContext.ActorManager = actors.NewManager()
+
+	cam := camera.NewController(0, 0)
+	cam.Kamera().ZoomFactor = 1.0
+
+	// Give the camera a follow target so origFollowTarget is non-nil
+	followTarget := &mocks.MockActor{Id: "follow_target"}
+	followTarget.SetPosition(0, 0)
+	cam.SetFollowTarget(followTarget)
+	cam.SetFollowing(true)
+
+	mockScene := &mockSceneWithCamera{cam: cam}
+	mockScene.SetAppContext(appContext)
+	appContext.SceneManager.SwitchTo(mockScene)
+
+	cmd := &CameraZoomCommand{
+		Zoom:        2.0,
+		Duration:    3,
+		Delay:       2,
+		OutDuration: 3,
+	}
+	cmd.Init(appContext)
+
+	// Drive through all three phases
+	done := false
+	for i := 0; i < 20 && !done; i++ {
+		done = cmd.Update()
+	}
+
+	if !done {
+		t.Error("CameraZoomCommand should complete after driving through all phases")
+	}
+	// Zoom should be restored to original
+	if cam.Kamera().ZoomFactor != 1.0 {
+		t.Errorf("expected zoom restored to 1.0, got %f", cam.Kamera().ZoomFactor)
+	}
+}
+
+func TestCameraShakeCommand_InitAddsTrauma(t *testing.T) {
+	appContext := &app.AppContext{}
+	sceneManager := scene.NewSceneManager()
+	sceneManager.SetAppContext(appContext)
+	appContext.SceneManager = sceneManager
+
+	cam := camera.NewController(0, 0)
+	mockScene := &mockSceneWithCamera{cam: cam}
+	mockScene.SetAppContext(appContext)
+	appContext.SceneManager.SwitchTo(mockScene)
+
+	cmd := &CameraShakeCommand{Trauma: 0.5}
+	cmd.Init(appContext)
+
+	if cmd.camera == nil {
+		t.Fatal("camera should not be nil after Init")
+	}
+	// AddTrauma was called — Update should return true immediately
+	if !cmd.Update() {
+		t.Error("CameraShakeCommand.Update() should return true (instant command)")
+	}
+}
+
+func TestCameraMoveCommand_Update_DurationPath(t *testing.T) {
+	appContext := &app.AppContext{}
+	sceneManager := scene.NewSceneManager()
+	sceneManager.SetAppContext(appContext)
+	appContext.SceneManager = sceneManager
+
+	cam := camera.NewController(0, 0)
+	mockScene := &mockSceneWithCamera{cam: cam}
+	mockScene.SetAppContext(appContext)
+	appContext.SceneManager.SwitchTo(mockScene)
+
+	cmd := &CameraMoveCommand{X: 100, Y: 200, Duration: 5}
+	cmd.Init(appContext)
+
+	done := false
+	for i := 0; i < 10 && !done; i++ {
+		done = cmd.Update()
+	}
+
+	if !done {
+		t.Error("CameraMoveCommand should complete after Duration frames")
+	}
+	x, y := cam.Kamera().Center()
+	if x != 100 || y != 200 {
+		t.Errorf("expected camera at (100,200), got (%f,%f)", x, y)
+	}
+}
+
+func TestCameraResetCommand_Update_DurationPath(t *testing.T) {
+	appContext := &app.AppContext{}
+	sceneManager := scene.NewSceneManager()
+	sceneManager.SetAppContext(appContext)
+	appContext.SceneManager = sceneManager
+
+	cam := camera.NewController(0, 0)
+	cam.Kamera().ZoomFactor = 2.0
+	mockScene := &mockSceneWithCamera{cam: cam}
+	mockScene.SetAppContext(appContext)
+	appContext.SceneManager.SwitchTo(mockScene)
+
+	cmd := &CameraResetCommand{DefaultZoom: 1.0, Duration: 5}
+	cmd.Init(appContext)
+
+	done := false
+	for i := 0; i < 10 && !done; i++ {
+		done = cmd.Update()
+	}
+
+	if !done {
+		t.Error("CameraResetCommand should complete after Duration frames")
+	}
+	if cam.Kamera().ZoomFactor != 1.0 {
+		t.Errorf("expected zoom 1.0, got %f", cam.Kamera().ZoomFactor)
+	}
+}
