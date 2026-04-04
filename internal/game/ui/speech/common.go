@@ -4,10 +4,10 @@ import (
 	"math"
 	"strings"
 
-	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/text/v2"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/i18n"
 	"github.com/boilerplate/ebiten-template/internal/engine/ui/speech"
+	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/text/v2"
 )
 
 const (
@@ -103,7 +103,7 @@ func (s *baseSpeech) DrawText(screen *ebiten.Image, msg string, x, y float64, w,
 	if textW > 0 && textH > 0 {
 		op := &text.DrawOptions{
 			LayoutOptions: text.LayoutOptions{
-				LineSpacing: s.SpeechBase.FontSource.LineSpacing,
+				LineSpacing: s.FontSource.LineSpacing,
 			},
 		}
 		op.ColorScale.ScaleWithColor(s.Color())

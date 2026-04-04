@@ -35,7 +35,7 @@ func NewWolfEnemy(ctx *app.AppContext, x, y int, id string) (*WolfEnemy, error) 
 		return nil, err
 	}
 
-	enemy.Character.SetMovementState(
+	enemy.SetMovementState(
 		movement.SideToSide,
 		nil,
 		movement.WithWaitBeforeTurn(60),

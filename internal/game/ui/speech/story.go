@@ -3,10 +3,10 @@ package gamespeech
 import (
 	"image/color"
 
-	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/i18n"
 	"github.com/boilerplate/ebiten-template/internal/engine/ui/speech"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 type StorySpeech struct {
@@ -30,7 +30,7 @@ func NewStorySpeech(fontSource *speech.SpeechFont, i18nManager *i18n.I18nManager
 
 func (s *StorySpeech) Show() {
 	s.baseSpeech.Show()
-	s.SpeechBase.SetSpellingDelay(0)
+	s.SetSpellingDelay(0)
 }
 
 func (s *StorySpeech) TypingSoundEnabled() bool {

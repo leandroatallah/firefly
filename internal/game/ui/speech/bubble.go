@@ -6,12 +6,12 @@ import (
 	"io/fs"
 	"log"
 
-	"github.com/ebitenui/ebitenui/image"
-	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/i18n"
 	"github.com/boilerplate/ebiten-template/internal/engine/ui/speech"
+	"github.com/ebitenui/ebitenui/image"
+	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
 
 type SpeechBubble struct {
@@ -49,13 +49,13 @@ func NewSpeechBubble(fsys fs.FS, fontSource *speech.SpeechFont, i18nManager *i18
 
 func (s *SpeechBubble) Show() {
 	s.baseSpeech.Show()
-	s.SpeechBase.SetSpellingDelay(animDuration)
+	s.SetSpellingDelay(animDuration)
 }
 
 func (s *SpeechBubble) ResetText() {
 	s.baseSpeech.ResetText()
 	if s.Visible() && s.delay >= animDuration {
-		s.SpeechBase.SetSpellingDelay(0)
+		s.SetSpellingDelay(0)
 	}
 }
 

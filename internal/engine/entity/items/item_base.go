@@ -4,12 +4,12 @@ import (
 	"image"
 	"log"
 
-	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/boilerplate/ebiten-template/internal/engine/app"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	bodyphysics "github.com/boilerplate/ebiten-template/internal/engine/physics/body"
 	"github.com/boilerplate/ebiten-template/internal/engine/physics/space"
 	"github.com/boilerplate/ebiten-template/internal/engine/render/sprites"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 type BaseItem struct {
@@ -123,7 +123,7 @@ func (b *BaseItem) Image() *ebiten.Image {
 	}
 
 	pos := b.Position()
-	return b.AnimatedSpriteImage(img, pos, b.count, b.SpriteEntity.FrameRate())
+	return b.AnimatedSpriteImage(img, pos, b.count, b.FrameRate())
 }
 
 func (b *BaseItem) ImageOptions() *ebiten.DrawImageOptions {
@@ -146,7 +146,7 @@ func (b *BaseItem) State() ItemStateEnum {
 func (b *BaseItem) SetState(state ItemState) {
 	b.state = state
 	b.count = 0
-	b.StateCollisionManager.RefreshCollisions()
+	b.RefreshCollisions()
 	b.state.OnStart()
 }
 

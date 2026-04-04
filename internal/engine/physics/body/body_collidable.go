@@ -7,10 +7,10 @@ import (
 	"log"
 	"runtime/debug"
 
-	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/vector"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	"github.com/boilerplate/ebiten-template/internal/engine/utils/fp16"
+	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
 type CollidableBody struct {
@@ -123,8 +123,8 @@ func (b *CollidableBody) SetPosition(x, y int) {
 
 func (b *CollidableBody) SetPosition16(x16, y16 int) {
 	// Calculate the difference to move the collision areas as well
-	diffX16 := x16 - b.Body.x16
-	diffY16 := y16 - b.Body.y16
+	diffX16 := x16 - b.x16
+	diffY16 := y16 - b.y16
 
 	b.Body.SetPosition16(x16, y16)
 
