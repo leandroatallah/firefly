@@ -15,6 +15,10 @@ func (g *ReachEndpointGoal) IsCompleted() bool {
 
 func (g *ReachEndpointGoal) OnCompletion() {
 	g.scene.freezeAllActors()
-	g.scene.Audiomanager().FadeOutCurrentTrack(time.Second)
+	if g.scene.TilemapScene != nil {
+		if ctx := g.scene.AppContext(); ctx != nil && ctx.AudioManager != nil {
+			ctx.AudioManager.FadeOutCurrentTrack(time.Second)
+		}
+	}
 	g.scene.defaultCompletion()
 }
