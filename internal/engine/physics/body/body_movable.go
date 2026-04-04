@@ -192,11 +192,7 @@ func (b *MovableBody) IsGoingUp() bool {
 
 func (b *MovableBody) IsFalling() bool {
 	threshold := config.Get().Physics.DownwardGravity
-	if b.vy16 >= threshold {
-		return true
-	}
-
-	return false
+	return b.vy16 >= threshold
 }
 
 // Platform methods

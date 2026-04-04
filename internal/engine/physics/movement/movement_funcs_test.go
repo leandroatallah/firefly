@@ -8,10 +8,10 @@ import (
 
 func TestIncreaseVelocity(t *testing.T) {
 	tests := []struct {
-		name       string
-		velocity   int
-		accel      int
-		want       int
+		name     string
+		velocity int
+		accel    int
+		want     int
 	}{
 		{"positive acceleration", 0, 10, 10},
 		{"negative acceleration", 0, -10, -10},
@@ -66,8 +66,8 @@ func TestReduceVelocity(t *testing.T) {
 
 func TestSmoothDiagonalMovement(t *testing.T) {
 	tests := []struct {
-		name        string
-		accX, accY  int
+		name       string
+		accX, accY int
 	}{
 		{"zero input", 0, 0},
 		{"right only", 2, 0},
@@ -85,9 +85,7 @@ func TestSmoothDiagonalMovement(t *testing.T) {
 			if tt.accX != 0 && tt.accY != 0 {
 				// Diagonal: both components should be reduced by sqrt(2)
 				// We just verify they're non-zero and roughly equal magnitude
-				if gotX == 0 && gotY == 0 {
-					// This is acceptable for small values after normalization
-				}
+				// gotX == 0 && gotY == 0 is acceptable for small values after normalization
 			} else {
 				// Cardinal: just verify it's scaled and non-zero for non-zero input
 				if tt.accX != 0 && gotX == 0 {

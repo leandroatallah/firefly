@@ -17,7 +17,7 @@ func LoadAudioAssetsFromFS(assets fs.FS, am *AudioManager) {
 		if d.IsDir() {
 			return nil
 		}
-		if !(strings.HasSuffix(path, ".ogg") || strings.HasSuffix(path, ".wav") || strings.HasSuffix(path, ".mp3")) {
+		if !strings.HasSuffix(path, ".ogg") && !strings.HasSuffix(path, ".wav") && !strings.HasSuffix(path, ".mp3") {
 			return nil
 		}
 		data, err := fs.ReadFile(assets, path)

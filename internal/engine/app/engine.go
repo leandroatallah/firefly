@@ -5,17 +5,16 @@ import (
 	"image/color"
 	"strings"
 
+	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
-	"github.com/hajimehoshi/ebiten/v2/text"
-	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
-	"golang.org/x/image/font"
+	"github.com/hajimehoshi/ebiten/v2/text/v2"
 )
 
 type Game struct {
 	AppContext    *AppContext
 	debugVisible  bool
-	debugFontFace font.Face
+	debugFontFace *text.GoTextFace
 }
 
 func NewGame(ctx *AppContext) *Game {
@@ -74,6 +73,12 @@ func (g *Game) DebugPhysics(screen *ebiten.Image) {
 	fmt.Fprintf(&b, "DownwardGravity: %d\n", cfg.DownwardGravity)
 	fmt.Fprintf(&b, "MaxFallSpeed: %d\n", cfg.MaxFallSpeed)
 
-	text.Draw(screen, b.String(), g.debugFontFace, 5, 15, color.White)
+	if g.debugFontFace == nil {
+		return
+	}
+	op := &text.DrawOptions{}
+	op.GeoM.Translate(5, 15)
+	op.ColorScale.ScaleWithColor(color.White)
+	text.Draw(screen, b.String(), g.debugFontFace, op)
 
 }

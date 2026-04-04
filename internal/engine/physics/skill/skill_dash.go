@@ -3,13 +3,13 @@ package skill
 import (
 	"time"
 
-	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/animation"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	physicsmovement "github.com/boilerplate/ebiten-template/internal/engine/physics/movement"
 	"github.com/boilerplate/ebiten-template/internal/engine/utils/fp16"
 	"github.com/boilerplate/ebiten-template/internal/engine/utils/timing"
+	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
 // DashSkill implements a dash and air dash ability.
@@ -66,7 +66,7 @@ func (d *DashSkill) Update(b body.MovableCollidable, model *physicsmovement.Plat
 			model.SetDashActive(false, 0) // Signal to the movement model that dash is no longer active
 		} else {
 			// Apply dash movement by setting it in the movement model
-			var dirX int = 1
+			dirX := 1
 			if b.FaceDirection() == animation.FaceDirectionLeft {
 				dirX = -1
 			}
