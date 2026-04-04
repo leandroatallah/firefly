@@ -264,12 +264,17 @@ func (s *PhasesScene) initGoal() {
 }
 
 func (s *PhasesScene) freezeAllActors() {
-	if s.AppContext().ActorManager != nil {
-		s.AppContext().ActorManager.ForEach(func(actor actors.ActorEntity) {
-			actor.SetImmobile(true)
-			actor.SetFreeze(true)
-		})
+	if s.TilemapScene == nil {
+		return
 	}
+	ctx := s.AppContext()
+	if ctx == nil || ctx.ActorManager == nil {
+		return
+	}
+	ctx.ActorManager.ForEach(func(actor actors.ActorEntity) {
+		actor.SetImmobile(true)
+		actor.SetFreeze(true)
+	})
 }
 
 func (s *PhasesScene) defaultCompletion() {
@@ -309,11 +314,11 @@ func (s *PhasesScene) startDeathSequence() {
 		return
 	}
 
+	s.death.active = true
+
 	if s.player == nil {
 		return
 	}
-
-	s.death.active = true
 
 	// Spawn explosion VFX at player position
 	if s.AppContext().VFX != nil {
