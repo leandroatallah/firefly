@@ -24,6 +24,12 @@ A minimal, clean boilerplate for starting new game projects with Ebitengine, bas
 
 - `internal/engine/README.md`: Details about the engine core.
 - `internal/game/`: Example game implementation (menu + platformer phases).
+- `docs/adr/`: Architecture Decision Records explaining key non-obvious design choices:
+  - [ADR-001](docs/adr/ADR-001-fp16-fixed-point-arithmetic.md) — FP16 fixed-point arithmetic for positions
+  - [ADR-002](docs/adr/ADR-002-registry-based-state-pattern.md) — Registry-based actor state pattern with `init()` registration
+  - [ADR-003](docs/adr/ADR-003-goroutine-audio-looping.md) — Goroutine-based audio looping
+  - [ADR-004](docs/adr/ADR-004-space-body-model-physics.md) — Space / Body / MovementModel physics layers
+  - [ADR-005](docs/adr/ADR-005-composite-grounded-sub-state.md) — Composite grounded sub-state machine
 
 ## License
 

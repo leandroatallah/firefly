@@ -68,3 +68,13 @@ This module contains the core, reusable game engine components. It is designed t
   - `hud/`: Base components for Heads-Up Displays.
   - `menu/`: Components for creating interactive menus.
   - `speech/`: Components for speech bubbles and dialogue systems.
+
+## Architecture Decision Records
+
+Key non-obvious design choices are documented in [`docs/adr/`](../../docs/adr/):
+
+- [ADR-001](../../docs/adr/ADR-001-fp16-fixed-point-arithmetic.md) — Why positions use FP16 fixed-point instead of `float64`
+- [ADR-002](../../docs/adr/ADR-002-registry-based-state-pattern.md) — Why actor states use a global registry with `init()` registration
+- [ADR-003](../../docs/adr/ADR-003-goroutine-audio-looping.md) — Why audio looping uses goroutines instead of Ebitengine's built-in loop
+- [ADR-004](../../docs/adr/ADR-004-space-body-model-physics.md) — Why physics is split into Space / Body / MovementModel layers
+- [ADR-005](../../docs/adr/ADR-005-composite-grounded-sub-state.md) — Why the grounded state uses a sub-state machine instead of flat states
