@@ -7,6 +7,7 @@ import (
 
 	"github.com/boilerplate/ebiten-template/internal/engine/app"
 	contractseq "github.com/boilerplate/ebiten-template/internal/engine/contracts/sequences"
+	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
 	"github.com/boilerplate/ebiten-template/internal/engine/mocks"
 )
 
@@ -279,4 +280,66 @@ func TestSequencePlayerOneTimeSequence(t *testing.T) {
 	if !player.IsPlaying() {
 		t.Fatalf("expected different sequence to play after one-time completed")
 	}
+}
+
+func TestPlaySequence_ValidFile(t *testing.T) {
+	tmpDir := t.TempDir()
+	seqPath := tmpDir + "/test.json"
+	content := `{"commands":[{"command":"delay","frames":1}]}`
+	if err := os.WriteFile(seqPath, []byte(content), 0644); err != nil {
+		t.Fatalf("failed to write sequence file: %v", err)
+	}
+
+	ctx := &app.AppContext{}
+	// PlaySequence uses ctx.Assets as the fs.FS root; use os.DirFS of tmpDir
+	ctx.Assets = os.DirFS(tmpDir)
+	p := NewSequencePlayer(ctx)
+	p.PlaySequence("test.json")
+
+	if !p.IsPlaying() {
+		t.Error("player should be playing after PlaySequence with valid file")
+	}
+}
+
+func TestPlaySequence_InvalidPath(t *testing.T) {
+	ctx := &app.AppContext{}
+	p := NewSequencePlayer(ctx)
+	p.PlaySequence("nonexistent/path.json")
+
+	if p.IsPlaying() {
+		t.Error("player should remain idle when PlaySequence path is invalid")
+	}
+}
+
+func TestEndBlockingPhase_UnblocksPlayer(t *testing.T) {
+	ctx := &app.AppContext{}
+	am := actors.NewManager()
+	ctx.ActorManager = am
+
+	player := &mocks.MockActor{Id: "player"}
+	am.Register(player)
+
+	seqContent := `{"commands":[{"command":"delay","frames":1}],"block_player_movement":true}`
+	tmpDir := t.TempDir()
+	seqPath := filepath.Join(tmpDir, "blocking.json")
+	if err := os.WriteFile(seqPath, []byte(seqContent), 0644); err != nil {
+		t.Fatalf("failed to write sequence file: %v", err)
+	}
+	seq, err := NewSequenceFromJSON(seqPath)
+	if err != nil {
+		t.Fatalf("failed to load sequence: %v", err)
+	}
+
+	sp := NewSequencePlayer(ctx)
+	sp.Play(seq)
+
+	// Run to completion — endBlockingPhase should call player.UnblockMovement()
+	for i := 0; i < 10 && sp.IsPlaying(); i++ {
+		sp.Update()
+	}
+
+	if sp.IsPlaying() {
+		t.Error("sequence should have completed")
+	}
+	// UnblockMovement is a no-op on MockActor but the path is exercised
 }

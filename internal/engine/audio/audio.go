@@ -21,6 +21,23 @@ const (
 	sampleRate = 44100
 )
 
+// Manager defines the interface for audio management.
+type Manager interface {
+	PlayMusic(name string, loop bool)
+	PlaySound(name string)
+	PlaySoundAtVolume(name string, volume float64)
+	IsPlaying(name string) bool
+	IsPaused(name string) bool
+	SetVolume(volume float64)
+	PauseAll()
+	PauseCurrentMusic()
+	ResumeCurrentMusic()
+	FadeOutAll(duration time.Duration)
+	FadeOutCurrentTrack(duration time.Duration)
+	Stop(path string)
+	StopAll()
+}
+
 type AudioItem struct {
 	name string
 	data []byte
@@ -135,9 +152,9 @@ func (am *AudioManager) Add(name string, data []byte) {
 	am.audioPlayers[name] = p
 }
 
-func (am *AudioManager) PlayMusic(name string, loop bool) *audio.Player {
+func (am *AudioManager) PlayMusic(name string, loop bool) {
 	if am.noSound {
-		return nil
+		return
 	}
 
 	if cancel, ok := am.fadeCancel[name]; ok {
@@ -152,7 +169,7 @@ func (am *AudioManager) PlayMusic(name string, loop bool) *audio.Player {
 	player, ok := am.audioPlayers[name]
 	if !ok {
 		log.Printf("audio player not found: %s", name)
-		return nil
+		return
 	}
 
 	delete(am.paused, name)
@@ -190,8 +207,6 @@ func (am *AudioManager) PlayMusic(name string, loop bool) *audio.Player {
 			}
 		}()
 	}
-
-	return player
 }
 
 func (am *AudioManager) PauseMusic(name string) {
@@ -242,37 +257,35 @@ func (am *AudioManager) FadeOutCurrentTrack(duration time.Duration) {
 	am.FadeOut(am.currentTrack, duration)
 }
 
-func (am *AudioManager) PlaySound(name string) *audio.Player {
+func (am *AudioManager) PlaySound(name string) {
 	if am.noSound {
-		return nil
+		return
 	}
 	player, ok := am.audioPlayers[name]
 	if !ok {
 		log.Printf("audio player not found: %s", name)
-		return nil
+		return
 	}
 	player.SetVolume(am.volume)
 	// Always rewind to ensure sound can replay from the beginning
 	player.Rewind()
 	player.Play()
-	return player
 }
 
 // PlaySoundAtVolume plays a sound effect at a specific volume (0.0 to 1.0).
-func (am *AudioManager) PlaySoundAtVolume(name string, volume float64) *audio.Player {
+func (am *AudioManager) PlaySoundAtVolume(name string, volume float64) {
 	if am.noSound {
-		return nil
+		return
 	}
 	player, ok := am.audioPlayers[name]
 	if !ok {
 		log.Printf("audio player not found: %s", name)
-		return nil
+		return
 	}
 	player.SetVolume(volume)
 	// Always rewind to ensure sound can replay from the beginning
 	player.Rewind()
 	player.Play()
-	return player
 }
 
 func (am *AudioManager) SetVolume(volume float64) {
@@ -404,6 +417,22 @@ func (am *AudioManager) FadeOut(name string, duration time.Duration) {
 	}()
 }
 
+func (am *AudioManager) Stop(name string) {
+	player, ok := am.audioPlayers[name]
+	if !ok {
+		return
+	}
+	player.Pause()
+	player.Rewind()
+}
+
+func (am *AudioManager) StopAll() {
+	for _, p := range am.audioPlayers {
+		p.Pause()
+		p.Rewind()
+	}
+}
+
 func (am *AudioManager) IsPlayingSomething() bool {
 	for _, player := range am.audioPlayers {
 		if player.IsPlaying() {
@@ -419,4 +448,8 @@ func (am *AudioManager) IsPlaying(name string) bool {
 		return false
 	}
 	return audio.IsPlaying()
+}
+
+func (am *AudioManager) IsPaused(name string) bool {
+	return am.paused[name]
 }

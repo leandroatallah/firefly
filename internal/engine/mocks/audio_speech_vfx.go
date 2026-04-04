@@ -29,8 +29,26 @@ func (m *MockAudioManager) PlayMusic(path string, loop bool) {
 	m.LoopSettings[path] = loop
 }
 
+func (m *MockAudioManager) PlaySound(path string) {
+	m.PlayedPaths = append(m.PlayedPaths, path)
+}
+
+func (m *MockAudioManager) PlaySoundAtVolume(path string, _ float64) {
+	m.PlayedPaths = append(m.PlayedPaths, path)
+}
+
+func (m *MockAudioManager) PauseCurrentMusic() {}
+
+func (m *MockAudioManager) ResumeCurrentMusic() {}
+
+func (m *MockAudioManager) FadeOutCurrentTrack(_ time.Duration) {}
+
 func (m *MockAudioManager) IsPlaying(path string) bool {
 	return m.PlayingPaths[path]
+}
+
+func (m *MockAudioManager) IsPaused(path string) bool {
+	return false
 }
 
 func (m *MockAudioManager) SetVolume(volume float64) {

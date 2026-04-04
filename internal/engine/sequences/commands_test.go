@@ -1,13 +1,48 @@
 package sequences
 
 import (
+	"image/color"
 	"testing"
 
 	"github.com/boilerplate/ebiten-template/internal/engine/app"
 	"github.com/boilerplate/ebiten-template/internal/engine/event"
 	"github.com/boilerplate/ebiten-template/internal/engine/physics/space"
 	"github.com/boilerplate/ebiten-template/internal/engine/scene"
+	"github.com/boilerplate/ebiten-template/internal/engine/ui/speech"
+	"github.com/hajimehoshi/ebiten/v2"
 )
+
+// stubSpeech is a minimal Speech implementation for headless testing.
+type stubSpeech struct {
+	id              string
+	spellingDone    bool
+	accumulativeVal bool
+}
+
+func (s *stubSpeech) ID() string                     { return s.id }
+func (s *stubSpeech) Show()                          {}
+func (s *stubSpeech) Hide()                          {}
+func (s *stubSpeech) Visible() bool                  { return true }
+func (s *stubSpeech) Text(msg string) string         { return msg }
+func (s *stubSpeech) ResetText()                     {}
+func (s *stubSpeech) SetID(id string)                { s.id = id }
+func (s *stubSpeech) SetSpellingDelay(d int)         {}
+func (s *stubSpeech) IsSpellingComplete() bool       { return s.spellingDone }
+func (s *stubSpeech) CompleteSpelling()              { s.spellingDone = true }
+func (s *stubSpeech) Count() int                     { return 0 }
+func (s *stubSpeech) Update() error                  { return nil }
+func (s *stubSpeech) Draw(_ *ebiten.Image, _ string) {}
+func (s *stubSpeech) SetPosition(_ string)           {}
+func (s *stubSpeech) SetSpeed(_ int)                 {}
+func (s *stubSpeech) SetColor(_ color.Color)         {}
+func (s *stubSpeech) Color() color.Color             { return color.Black }
+func (s *stubSpeech) SetSkipFlash(_ int)             {}
+func (s *stubSpeech) IsAccumulative() bool           { return s.accumulativeVal }
+func (s *stubSpeech) SetAccumulative(v bool)         { s.accumulativeVal = v }
+
+func newTestDialogueManager() *speech.Manager {
+	return speech.NewManager(&stubSpeech{id: speech.BubbleSpeechID})
+}
 
 func setupTestAppContext() *app.AppContext {
 	ctx := &app.AppContext{
@@ -121,6 +156,35 @@ func TestDelayCommand_Init(t *testing.T) {
 
 	if cmd.timer != 0 {
 		t.Errorf("expected timer to be 0 after Init, got %d", cmd.timer)
+	}
+}
+
+func TestDialogueCommand_Init_ShowsMessages(t *testing.T) {
+	ctx := setupTestAppContext()
+	ctx.DialogueManager = newTestDialogueManager()
+
+	cmd := &DialogueCommand{
+		Lines:    []string{"Hello", "World"},
+		Position: "bottom",
+		Speed:    5,
+	}
+	cmd.Init(ctx)
+
+	if !ctx.DialogueManager.IsSpeaking() {
+		t.Error("DialogueManager should be speaking after Init")
+	}
+}
+
+func TestDialogueCommand_Update_ReturnsFalseWhileSpeaking(t *testing.T) {
+	ctx := setupTestAppContext()
+	ctx.DialogueManager = newTestDialogueManager()
+
+	cmd := &DialogueCommand{Lines: []string{"Test"}}
+	cmd.Init(ctx)
+
+	// IsSpeaking is true after ShowMessages with non-empty lines
+	if cmd.Update() {
+		t.Error("Update() should return false while dialogue manager is speaking")
 	}
 }
 

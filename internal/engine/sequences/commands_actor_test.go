@@ -392,3 +392,53 @@ func TestRemoveActorCommand_Init_NotFound(t *testing.T) {
 	// Should not panic
 	cmd.Init(ctx)
 }
+
+func TestTrivialUpdateMethods(t *testing.T) {
+	tests := []struct {
+		name string
+		cmd  interface{ Update() bool }
+	}{
+		{"FollowActorCommand", &FollowActorCommand{}},
+		{"FollowPlayerCommand", &FollowPlayerCommand{}},
+		{"StopFollowingCommand", &StopFollowingCommand{}},
+		{"RemoveActorCommand", &RemoveActorCommand{}},
+		{"SetSpeedCommand", &SetSpeedCommand{}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if !tt.cmd.Update() {
+				t.Errorf("%s.Update() should return true", tt.name)
+			}
+		})
+	}
+}
+
+func TestResolveActorTargets_QueryInvalidRegex(t *testing.T) {
+	ctx, _ := setupTestContext()
+	// Invalid regex — resolveActorTargets should return empty slice, not panic
+	result := resolveActorTargets(ctx, "@query:[invalid")
+	if len(result) != 0 {
+		t.Errorf("expected empty result for invalid regex, got %d", len(result))
+	}
+}
+
+func TestResolveActorTargets_QueryMatchingActors(t *testing.T) {
+	ctx, am := setupTestContext()
+	a1 := &mocks.MockActor{Id: "enemy_1"}
+	a2 := &mocks.MockActor{Id: "enemy_2"}
+	other := &mocks.MockActor{Id: "player"}
+	a1.SetPosition(0, 0)
+	a2.SetPosition(10, 0)
+	other.SetPosition(20, 0)
+	am.Register(a1)
+	am.Register(a2)
+	am.Register(other)
+	ctx.Space.AddBody(a1)
+	ctx.Space.AddBody(a2)
+	ctx.Space.AddBody(other)
+
+	result := resolveActorTargets(ctx, "@query:^enemy_")
+	if len(result) != 2 {
+		t.Errorf("expected 2 matching actors, got %d", len(result))
+	}
+}

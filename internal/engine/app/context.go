@@ -24,7 +24,7 @@ import (
 // the game to access systems like input, audio, and scene management without
 // relying on global variables.
 type AppContext struct {
-	AudioManager    *audio.AudioManager
+	AudioManager    audio.Manager
 	ImageManager    *imagemanager.ImageManager
 	DataManager     *datamanager.Manager
 	DialogueManager *speech.Manager

@@ -90,7 +90,7 @@ func (s *TilemapScene) Tilemap() *tilemap.Tilemap {
 	return s.tilemap
 }
 
-func (s *TilemapScene) Audiomanager() *audio.AudioManager {
+func (s *TilemapScene) Audiomanager() audio.Manager {
 	return s.AppContext().AudioManager
 }
 

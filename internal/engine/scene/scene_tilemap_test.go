@@ -12,7 +12,7 @@ import (
 
 func TestTilemapScene_Basics(t *testing.T) {
 	config.Set(&config.AppConfig{ScreenWidth: 320, ScreenHeight: 240})
-	am := &audio.AudioManager{}
+	var am audio.Manager = audio.NewAudioManager()
 	ctx := &app.AppContext{AudioManager: am}
 
 	s := NewTilemapScene(ctx)

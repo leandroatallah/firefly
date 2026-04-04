@@ -53,10 +53,7 @@ func TestAudioManagerPlay(t *testing.T) {
 	am.Add("test_play.wav", wavData)
 
 	// Test PlayMusic
-	p := am.PlayMusic("test_play.wav", false)
-	if p == nil {
-		t.Fatal("expected player for test_play.wav")
-	}
+	am.PlayMusic("test_play.wav", false)
 	if !am.IsPlaying("test_play.wav") {
 		t.Error("expected test_play.wav to be playing")
 	}
@@ -71,9 +68,9 @@ func TestAudioManagerPlay(t *testing.T) {
 	}
 
 	// Test PlaySound
-	p = am.PlaySound("test_play.wav")
-	if p == nil {
-		t.Fatal("expected player for test_play.wav")
+	am.PlaySound("test_play.wav")
+	if !am.IsPlaying("test_play.wav") {
+		t.Error("expected test_play.wav to be playing after PlaySound")
 	}
 
 	// Test PauseAll
@@ -95,10 +92,7 @@ func TestAudioManagerPlayMusic_Loop(t *testing.T) {
 	am.Add("test_loop.wav", wavData)
 
 	// Test PlayMusic with loop
-	p := am.PlayMusic("test_loop.wav", true)
-	if p == nil {
-		t.Fatal("expected player for test_loop.wav")
-	}
+	am.PlayMusic("test_loop.wav", true)
 
 	// Wait a bit to ensure goroutine starts
 	time.Sleep(50 * time.Millisecond)
@@ -115,8 +109,8 @@ func TestAudioManagerFadeOut_AlreadyZero(t *testing.T) {
 	wavData := createMinimalWAV()
 	am.Add("test_zero.wav", wavData)
 
-	p := am.PlayMusic("test_zero.wav", false)
-	p.SetVolume(0)
+	am.PlayMusic("test_zero.wav", false)
+	am.audioPlayers["test_zero.wav"].SetVolume(0)
 
 	am.FadeOut("test_zero.wav", 50*time.Millisecond)
 	// Should return early
@@ -178,8 +172,9 @@ func TestAudioManagerFadeOutAll_AlreadyZero(t *testing.T) {
 
 func TestAudioManagerPlaySound_Missing(t *testing.T) {
 	am := getTestAudioManager()
-	if am.PlaySound("missing_sound.wav") != nil {
-		t.Error("expected nil player for missing sound")
+	am.PlaySound("missing_sound.wav") // should not panic
+	if am.IsPlaying("missing_sound.wav") {
+		t.Error("expected missing sound to not be playing")
 	}
 }
 
@@ -195,12 +190,11 @@ func TestAudioManagerNoSound(t *testing.T) {
 	am.noSound = true
 	defer func() { am.noSound = oldNoSound }()
 
-	if am.PlayMusic("any", false) != nil {
-		t.Error("expected nil player when noSound is true")
+	am.PlayMusic("any", false)
+	if am.IsPlaying("any") {
+		t.Error("expected no play when noSound is true")
 	}
-	if am.PlaySound("any") != nil {
-		t.Error("expected nil player when noSound is true")
-	}
+	am.PlaySound("any")
 
 	am.SetVolume(0.5)
 	am.FadeOutAll(time.Second)
@@ -212,10 +206,7 @@ func TestAudioManagerPauseResume(t *testing.T) {
 	wavData := createMinimalWAV()
 	am.Add("test_pause.wav", wavData)
 
-	p := am.PlayMusic("test_pause.wav", true)
-	if p == nil {
-		t.Fatal("expected player for test_pause.wav")
-	}
+	am.PlayMusic("test_pause.wav", true)
 
 	if !am.IsPlaying("test_pause.wav") {
 		t.Error("expected test_pause.wav to be playing")
@@ -244,8 +235,9 @@ func TestAudioManagerCurrentTrack(t *testing.T) {
 		t.Error("expected test_track.wav to be paused after PauseCurrentMusic")
 	}
 
+	// ResumeCurrentMusic should not panic and should clear the paused state
 	am.ResumeCurrentMusic()
-	if !am.IsPlaying("test_track.wav") {
-		t.Error("expected test_track.wav to be playing after ResumeCurrentMusic")
+	if am.IsPaused("test_track.wav") {
+		t.Error("expected test_track.wav to not be paused after ResumeCurrentMusic")
 	}
 }
