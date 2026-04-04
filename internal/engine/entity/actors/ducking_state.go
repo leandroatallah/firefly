@@ -9,6 +9,8 @@ func init() {
 	Ducking = RegisterState("duck", func(b BaseState) ActorState { return &DuckingState{BaseState: b} })
 }
 
+// DuckingState is active while the character is crouching.
+// On entry it zeroes horizontal velocity; collision rects handle the reduced hitbox.
 type DuckingState struct {
 	BaseState
 }

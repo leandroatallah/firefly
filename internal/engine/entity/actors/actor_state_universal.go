@@ -1,11 +1,11 @@
 package actors
 
-// Dieable interface for actors that have a death behavior.
+// Dieable is implemented by actors that have custom death behaviour.
 type Dieable interface {
 	OnDie()
 }
 
-// Dying
+// DyingState plays the death animation; transitions to DeadState when the animation finishes.
 type DyingState struct {
 	BaseState
 }
@@ -18,7 +18,7 @@ func (s *DyingState) OnStart(currentCount int) {
 	}
 }
 
-// Dead
+// DeadState freezes and immobilises the actor after the death animation completes.
 type DeadState struct {
 	BaseState
 }
@@ -31,7 +31,7 @@ func (s *DeadState) OnStart(currentCount int) {
 	actor.SetImmobile(true)
 }
 
-// Exiting
+// ExitingState is a terminal state used when the actor leaves the scene (e.g. level exit).
 type ExitingState struct {
 	BaseState
 }

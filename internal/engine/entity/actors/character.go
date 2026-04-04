@@ -15,28 +15,34 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
+// Character is the central entity type that combines physics, animation, and the
+// actor state machine. It embeds movable/collidable/alive body components and
+// delegates per-frame state transitions to handleState.
 type Character struct {
 	sprites.SpriteEntity
 
-	*bodyphysics.MovableBody
-	*bodyphysics.CollidableBody
-	*bodyphysics.AliveBody
+	*bodyphysics.MovableBody    // primary physics body; owns position and velocity
+	*bodyphysics.CollidableBody // collision shape management
+	*bodyphysics.AliveBody      // health and invulnerability tracking
 	*space.StateCollisionManager[ActorStateEnum]
 
-	Touchable body.Touchable
+	Touchable body.Touchable // optional touch-interaction handler
 
-	count                int
-	state                ActorState
-	movementState        movement.MovementState
-	movementModel        physicsmovement.MovementModel
-	movementBlockers     int
-	invulnerabilityTimer int
+	count                int                           // frame counter, incremented each Update
+	state                ActorState                    // current animation/logic state
+	movementState        movement.MovementState        // optional scripted movement (e.g. patrol)
+	movementModel        physicsmovement.MovementModel // platform physics model
+	movementBlockers     int                           // reference-counted movement lock
+	invulnerabilityTimer int                           // frames remaining of post-hurt invulnerability
 	imageOptions         *ebiten.DrawImageOptions
 
-	skills []skill.Skill
+	skills []skill.Skill // active gameplay skills (jump, dash, …)
 
+	// StateTransitionHandler, when non-nil, is called before the default handleState
+	// logic. Return true to suppress the default transitions.
 	StateTransitionHandler func(*Character) bool
-	OnStateChange          func(oldState, newState ActorStateEnum)
+	// OnStateChange is called after every successful state change with the old and new state.
+	OnStateChange func(oldState, newState ActorStateEnum)
 	bodyphysics.Ownership
 }
 
