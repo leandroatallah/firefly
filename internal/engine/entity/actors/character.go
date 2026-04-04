@@ -316,13 +316,13 @@ func (c *Character) handleState() {
 		return
 	}
 
-	if c.Health() <= 0 && state != Dying {
-		c.SetNewStateFatal(Dying)
+	// Allow game-specific logic to override the default behavior
+	if c.StateTransitionHandler != nil && c.StateTransitionHandler(c) {
 		return
 	}
 
-	// Allow game-specific logic to override the default behavior
-	if c.StateTransitionHandler != nil && c.StateTransitionHandler(c) {
+	if c.Health() <= 0 && state != Dying {
+		c.SetNewStateFatal(Dying)
 		return
 	}
 
