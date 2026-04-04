@@ -6,6 +6,8 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/event"
 )
 
+// subscribeEvents registers scene-level event handlers (jump puffs, landing puffs, etc.)
+// on the app context's EventManager for the duration of the phase.
 func subscribeEvents(ctx *app.AppContext, _ *PhasesScene) {
 
 	em := ctx.EventManager

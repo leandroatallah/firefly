@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-// ReachEndpointGoal: Complete when player reaches endpoint
+// ReachEndpointGoal completes the phase when the player reaches the level endpoint.
 type ReachEndpointGoal struct {
 	scene *PhasesScene
 }

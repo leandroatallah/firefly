@@ -1,3 +1,6 @@
+// Package gamescenephases implements the main platformer phase scene.
+// It wires together the tilemap, actor manager, physics space, camera, VFX,
+// sequences, and goal system into a playable level scene.
 package gamescenephases
 
 import (
