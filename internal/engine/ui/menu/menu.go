@@ -4,8 +4,8 @@ import (
 	"image/color"
 
 	"github.com/boilerplate/ebiten-template/internal/engine/assets/font"
+	"github.com/boilerplate/ebiten-template/internal/engine/input"
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
 )
 
@@ -27,6 +27,10 @@ type Menu struct {
 	onNavigate  func()
 	onSelect    func()
 	onCancel    func()
+	prevUp      bool
+	prevDown    bool
+	prevConfirm bool
+	prevCancel  bool
 }
 
 // NewMenu creates a new menu with default settings.
@@ -108,29 +112,31 @@ func (m *Menu) Update() {
 		return
 	}
 
+	cmds := input.CommandsReader()
+
 	// Navigate up
-	if inpututil.IsKeyJustPressed(ebiten.KeyW) || inpututil.IsKeyJustPressed(ebiten.KeyUp) {
+	if cmds.Up && !m.prevUp {
 		m.NavigateUp()
-		return
 	}
+	m.prevUp = cmds.Up
 
 	// Navigate down
-	if inpututil.IsKeyJustPressed(ebiten.KeyS) || inpututil.IsKeyJustPressed(ebiten.KeyDown) {
+	if cmds.Down && !m.prevDown {
 		m.NavigateDown()
-		return
 	}
+	m.prevDown = cmds.Down
 
 	// Select
-	if inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
+	if cmds.Confirm && !m.prevConfirm {
 		m.Select()
-		return
 	}
+	m.prevConfirm = cmds.Confirm
 
 	// Cancel
-	if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
+	if cmds.Cancel && !m.prevCancel {
 		m.Cancel()
-		return
 	}
+	m.prevCancel = cmds.Cancel
 }
 
 // NavigateUp moves selection up with wrap-around.

@@ -3,6 +3,7 @@ package skill
 import (
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/animation"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
+	"github.com/boilerplate/ebiten-template/internal/engine/input"
 	physicsmovement "github.com/boilerplate/ebiten-template/internal/engine/physics/movement"
 	"github.com/hajimehoshi/ebiten/v2"
 )
@@ -73,17 +74,12 @@ func (s *ShootingSkill) HandleInputWithDirection(b body.MovableCollidable, model
 }
 
 func (s *ShootingSkill) HandleInput(b body.MovableCollidable, model *physicsmovement.PlatformMovementModel, space body.BodiesSpace) {
-	shootPressed := ebiten.IsKeyPressed(ebiten.KeyX)
-	if !shootPressed {
+	cmds := input.CommandsReader()
+	if !cmds.Shoot {
 		return
 	}
 
-	up := ebiten.IsKeyPressed(ebiten.KeyUp) || ebiten.IsKeyPressed(ebiten.KeyW)
-	down := ebiten.IsKeyPressed(ebiten.KeyDown) || ebiten.IsKeyPressed(ebiten.KeyS)
-	left := ebiten.IsKeyPressed(ebiten.KeyLeft) || ebiten.IsKeyPressed(ebiten.KeyA)
-	right := ebiten.IsKeyPressed(ebiten.KeyRight) || ebiten.IsKeyPressed(ebiten.KeyD)
-
-	s.HandleInputWithDirection(b, model, space, up, down, left, right)
+	s.HandleInputWithDirection(b, model, space, cmds.Up, cmds.Down, cmds.Left, cmds.Right)
 }
 
 func (s *ShootingSkill) Update(b body.MovableCollidable, model *physicsmovement.PlatformMovementModel) {
@@ -95,7 +91,7 @@ func (s *ShootingSkill) Update(b body.MovableCollidable, model *physicsmovement.
 	}
 
 	wasHeld := s.shootHeld
-	s.shootHeld = ebiten.IsKeyPressed(ebiten.KeyX)
+	s.shootHeld = input.CommandsReader().Shoot
 
 	if !s.shootHeld && wasHeld && s.handler != nil {
 		s.handler.TransitionFromShooting()

@@ -5,8 +5,8 @@ import (
 
 	"github.com/boilerplate/ebiten-template/internal/engine/audio"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
+	"github.com/boilerplate/ebiten-template/internal/engine/input"
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
 // Manager handles the display of dialogue and speech bubbles.
@@ -30,6 +30,7 @@ type Manager struct {
 	defaultSpeechAudio    []string
 	defaultSpeechIndex    int
 	dialogueSkipEnabled   bool
+	prevConfirm           bool
 }
 
 type typingSoundPolicy interface {
@@ -179,7 +180,8 @@ func (m *Manager) Update() error {
 	}
 
 	if m.waitingForInput {
-		if inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
+		cmds := input.CommandsReader()
+		if cmds.Confirm && !m.prevConfirm {
 			m.currentLine++
 			if m.currentLine >= len(m.lines) {
 				s.Hide()
@@ -196,6 +198,7 @@ func (m *Manager) Update() error {
 				m.startSpeechAudioIfNeeded()
 			}
 		}
+		m.prevConfirm = cmds.Confirm
 	}
 	return nil
 }
@@ -225,7 +228,7 @@ func (m *Manager) shouldSkipTyping() bool {
 	if !m.dialogueSkipEnabled && (cfg == nil || !cfg.EnableSpeechSkip) {
 		return false
 	}
-	return inpututil.IsKeyJustPressed(ebiten.KeyEnter)
+	return input.CommandsReader().Confirm
 }
 
 func (m *Manager) startSpeechAudioIfNeeded() {

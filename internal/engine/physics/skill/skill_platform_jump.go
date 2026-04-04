@@ -3,10 +3,10 @@ package skill
 import (
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
+	"github.com/boilerplate/ebiten-template/internal/engine/input"
 	physicsmovement "github.com/boilerplate/ebiten-template/internal/engine/physics/movement"
 	spacephysics "github.com/boilerplate/ebiten-template/internal/engine/physics/space"
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
 type JumpSkill struct {
@@ -18,6 +18,7 @@ type JumpSkill struct {
 
 	jumpCutMultiplier float64
 	jumpCutPending    bool
+	jumpPressed       bool
 
 	OnJump func(body body.MovableCollidable)
 }
@@ -52,12 +53,15 @@ func (s *JumpSkill) HandleInput(body body.MovableCollidable, model *physicsmovem
 	if model != nil && model.IsInputBlocked() {
 		return
 	}
-	if inpututil.IsKeyJustPressed(s.activationKey) {
+	cmds := input.CommandsReader()
+	jumpPressed := cmds.Jump
+	if jumpPressed && !s.jumpPressed {
 		s.tryActivate(body, model, space)
 	}
-	if inpututil.IsKeyJustReleased(s.activationKey) && s.jumpCutPending {
+	if !jumpPressed && s.jumpPressed && s.jumpCutPending {
 		s.applyJumpCut(body)
 	}
+	s.jumpPressed = jumpPressed
 }
 
 func (s *JumpSkill) Update(b body.MovableCollidable, model *physicsmovement.PlatformMovementModel) {
