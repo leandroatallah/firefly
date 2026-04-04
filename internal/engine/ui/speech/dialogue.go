@@ -302,10 +302,7 @@ func (m *Manager) updateTypingSound(s Speech) {
 		if len(m.typingSounds) > 0 {
 			path := m.typingSounds[m.typingSoundIndex%len(m.typingSounds)]
 			if !m.audioManager.IsPlaying(path) {
-				player := m.audioManager.PlaySound(path)
-				if player != nil {
-					player.SetVolume(m.audioManager.Volume() * cfg.TypingSoundVolume)
-				}
+				m.audioManager.PlaySoundAtVolume(path, m.audioManager.Volume()*cfg.TypingSoundVolume)
 			}
 			m.typingSoundIndex = (m.typingSoundIndex + 1) % len(m.typingSounds)
 		}

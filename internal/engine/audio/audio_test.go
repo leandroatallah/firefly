@@ -41,8 +41,9 @@ func TestNewAudioManagerRespectsNoSound(t *testing.T) {
 func TestPlayAndSetVolumeAndPauseAllNoPlayers(t *testing.T) {
 	am := getTestAudioManager()
 
-	if am.PlayMusic("missing", false) != nil {
-		t.Fatalf("expected nil player for missing key")
+	am.PlayMusic("missing", false)
+	if am.IsPlaying("missing") {
+		t.Fatalf("expected missing key to not be playing")
 	}
 
 	am.SetVolume(0.5)
