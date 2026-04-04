@@ -1,8 +1,8 @@
 package navigation
 
 import (
-	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/boilerplate/ebiten-template/internal/engine/audio"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 type SceneType int

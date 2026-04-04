@@ -1,11 +1,11 @@
 package vfx
 
 import (
-	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/boilerplate/ebiten-template/internal/engine/assets/font"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
 	"github.com/boilerplate/ebiten-template/internal/engine/render/camera"
 	"github.com/boilerplate/ebiten-template/internal/engine/render/particles"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 type Manager interface {
