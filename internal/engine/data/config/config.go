@@ -59,6 +59,9 @@ type AppConfig struct {
 	FadeVisibleDuration time.Duration // black screen after scene change (before fade in)
 }
 
+// Package-level config singleton: loaded once at startup
+//
+//nolint:gochecknoglobals
 var cfg AppConfig
 
 func Set(newCfg *AppConfig) {

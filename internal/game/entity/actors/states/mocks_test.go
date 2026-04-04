@@ -82,60 +82,60 @@ func (m *MockBody) Acceleration() (int, int) {
 }
 
 // Stub methods to satisfy MovableCollidable interface
-func (m *MockBody) MoveX(distance int)                                  {}
-func (m *MockBody) MoveY(distance int)                                  {}
-func (m *MockBody) OnMoveLeft(distance int)                             {}
-func (m *MockBody) OnMoveUpLeft(distance int)                           {}
-func (m *MockBody) OnMoveDownLeft(distance int)                         {}
-func (m *MockBody) OnMoveRight(distance int)                            {}
-func (m *MockBody) OnMoveUpRight(distance int)                          {}
-func (m *MockBody) OnMoveDownRight(distance int)                        {}
-func (m *MockBody) OnMoveUp(distance int)                               {}
-func (m *MockBody) OnMoveDown(distance int)                             {}
-func (m *MockBody) SetAcceleration(accX, accY int)                      {}
-func (m *MockBody) SetSpeed(speed int) error                            { return nil }
-func (m *MockBody) SetMaxSpeed(maxSpeed int) error                      { return nil }
-func (m *MockBody) Speed() int                                          { return 0 }
-func (m *MockBody) MaxSpeed() int                                       { return 0 }
-func (m *MockBody) Immobile() bool                                      { return false }
-func (m *MockBody) SetImmobile(immobile bool)                           {}
-func (m *MockBody) SetFreeze(freeze bool)                               {}
-func (m *MockBody) Freeze() bool                                        { return false }
-func (m *MockBody) SetFaceDirection(value animation.FacingDirectionEnum) {}
-func (m *MockBody) IsIdle() bool                                        { return false }
-func (m *MockBody) IsWalking() bool                                     { return false }
-func (m *MockBody) IsFalling() bool                                     { return false }
-func (m *MockBody) IsGoingUp() bool                                     { return false }
-func (m *MockBody) CheckMovementDirectionX()                            {}
-func (m *MockBody) TryJump(force int)                                   {}
-func (m *MockBody) SetJumpForceMultiplier(multiplier float64)           {}
-func (m *MockBody) JumpForceMultiplier() float64                        { return 1.0 }
-func (m *MockBody) SetHorizontalInertia(inertia float64)                {}
-func (m *MockBody) HorizontalInertia() float64                          { return 0 }
-func (m *MockBody) GetTouchable() contractsbody.Touchable               { return nil }
+func (m *MockBody) MoveX(distance int)                                              {}
+func (m *MockBody) MoveY(distance int)                                              {}
+func (m *MockBody) OnMoveLeft(distance int)                                         {}
+func (m *MockBody) OnMoveUpLeft(distance int)                                       {}
+func (m *MockBody) OnMoveDownLeft(distance int)                                     {}
+func (m *MockBody) OnMoveRight(distance int)                                        {}
+func (m *MockBody) OnMoveUpRight(distance int)                                      {}
+func (m *MockBody) OnMoveDownRight(distance int)                                    {}
+func (m *MockBody) OnMoveUp(distance int)                                           {}
+func (m *MockBody) OnMoveDown(distance int)                                         {}
+func (m *MockBody) SetAcceleration(accX, accY int)                                  {}
+func (m *MockBody) SetSpeed(speed int) error                                        { return nil }
+func (m *MockBody) SetMaxSpeed(maxSpeed int) error                                  { return nil }
+func (m *MockBody) Speed() int                                                      { return 0 }
+func (m *MockBody) MaxSpeed() int                                                   { return 0 }
+func (m *MockBody) Immobile() bool                                                  { return false }
+func (m *MockBody) SetImmobile(immobile bool)                                       {}
+func (m *MockBody) SetFreeze(freeze bool)                                           {}
+func (m *MockBody) Freeze() bool                                                    { return false }
+func (m *MockBody) SetFaceDirection(value animation.FacingDirectionEnum)            {}
+func (m *MockBody) IsIdle() bool                                                    { return false }
+func (m *MockBody) IsWalking() bool                                                 { return false }
+func (m *MockBody) IsFalling() bool                                                 { return false }
+func (m *MockBody) IsGoingUp() bool                                                 { return false }
+func (m *MockBody) CheckMovementDirectionX()                                        {}
+func (m *MockBody) TryJump(force int)                                               {}
+func (m *MockBody) SetJumpForceMultiplier(multiplier float64)                       {}
+func (m *MockBody) JumpForceMultiplier() float64                                    { return 1.0 }
+func (m *MockBody) SetHorizontalInertia(inertia float64)                            {}
+func (m *MockBody) HorizontalInertia() float64                                      { return 0 }
+func (m *MockBody) GetTouchable() contractsbody.Touchable                           { return nil }
 func (m *MockBody) DrawCollisionBox(screen *ebiten.Image, position image.Rectangle) {}
-func (m *MockBody) CollisionPosition() []image.Rectangle               { return nil }
-func (m *MockBody) CollisionShapes() []contractsbody.Collidable         { return nil }
-func (m *MockBody) IsObstructive() bool                                 { return false }
-func (m *MockBody) SetIsObstructive(value bool)                         {}
-func (m *MockBody) AddCollision(list ...contractsbody.Collidable)       {}
-func (m *MockBody) ClearCollisions()                                    {}
-func (m *MockBody) SetPosition(x int, y int)                            {}
-func (m *MockBody) SetPosition16(x16, y16 int)                          {}
-func (m *MockBody) SetTouchable(t contractsbody.Touchable)              {}
+func (m *MockBody) CollisionPosition() []image.Rectangle                            { return nil }
+func (m *MockBody) CollisionShapes() []contractsbody.Collidable                     { return nil }
+func (m *MockBody) IsObstructive() bool                                             { return false }
+func (m *MockBody) SetIsObstructive(value bool)                                     {}
+func (m *MockBody) AddCollision(list ...contractsbody.Collidable)                   {}
+func (m *MockBody) ClearCollisions()                                                {}
+func (m *MockBody) SetPosition(x int, y int)                                        {}
+func (m *MockBody) SetPosition16(x16, y16 int)                                      {}
+func (m *MockBody) SetTouchable(t contractsbody.Touchable)                          {}
 func (m *MockBody) ApplyValidPosition(distance16 int, isXAxis bool, space contractsbody.BodiesSpace) (x, y int, wasBlocked bool) {
 	return 0, 0, false
 }
-func (m *MockBody) OnTouch(other contractsbody.Collidable)              {}
-func (m *MockBody) OnBlock(other contractsbody.Collidable)              {}
-func (m *MockBody) ID() string                                          { return "" }
-func (m *MockBody) SetID(id string)                                     {}
-func (m *MockBody) GetShape() contractsbody.Shape                       { return nil }
-func (m *MockBody) SetOwner(owner interface{})                          {}
-func (m *MockBody) LastOwner() interface{}                              { return nil }
-func (m *MockBody) GetPositionMin() (x, y int)                          { return 0, 0 }
-func (m *MockBody) Scale() float64                                      { return 1.0 }
-func (m *MockBody) SetScale(scale float64)                              {}
+func (m *MockBody) OnTouch(other contractsbody.Collidable) {}
+func (m *MockBody) OnBlock(other contractsbody.Collidable) {}
+func (m *MockBody) ID() string                             { return "" }
+func (m *MockBody) SetID(id string)                        {}
+func (m *MockBody) GetShape() contractsbody.Shape          { return nil }
+func (m *MockBody) SetOwner(owner interface{})             {}
+func (m *MockBody) LastOwner() interface{}                 { return nil }
+func (m *MockBody) GetPositionMin() (x, y int)             { return 0, 0 }
+func (m *MockBody) Scale() float64                         { return 1.0 }
+func (m *MockBody) SetScale(scale float64)                 {}
 
 type MockInputSource struct {
 	DuckHeldFunc            func() bool

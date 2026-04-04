@@ -4,13 +4,16 @@ import (
 	"image"
 	"image/color"
 
-	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
 	bodyphysics "github.com/boilerplate/ebiten-template/internal/engine/physics/body"
+	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/setanarut/kamera/v2"
 )
 
+// Lazily initialised debug image: allocated once per process
+//
+//nolint:gochecknoglobals
 var collisionBoxImage *ebiten.Image
 
 func init() {
@@ -19,12 +22,12 @@ func init() {
 }
 
 type Controller struct {
-	cam              *kamera.Camera
-	target           body.Collidable
-	followTarget     body.Body
-	DeadZoneRadius   float64
-	SmoothingFactor  float64
-	isFollowing      bool
+	cam                *kamera.Camera
+	target             body.Collidable
+	followTarget       body.Body
+	DeadZoneRadius     float64
+	SmoothingFactor    float64
+	isFollowing        bool
 	centerX, centerY   float64
 	screenWidth        float64
 	screenHeight       float64

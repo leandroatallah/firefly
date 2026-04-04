@@ -4,17 +4,10 @@ import (
 	"image"
 	"testing"
 
-	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
 	bodyphysics "github.com/boilerplate/ebiten-template/internal/engine/physics/body"
+	"github.com/hajimehoshi/ebiten/v2"
 )
-
-// saveConfig saves the current config for restoration
-func saveConfig(t *testing.T) {
-	t.Helper()
-	// Note: config package doesn't expose a way to save/restore,
-	// so we just ensure tests set their own config values explicitly
-}
 
 func TestControllerFollowTargetAndBounds(t *testing.T) {
 	// Save and restore config state
@@ -238,10 +231,10 @@ func TestControllerSetCenter(t *testing.T) {
 	config.Set(&config.AppConfig{ScreenWidth: 320, ScreenHeight: 240})
 
 	tests := []struct {
-		name   string
-		x, y   float64
-		wantX  float64
-		wantY  float64
+		name  string
+		x, y  float64
+		wantX float64
+		wantY float64
 	}{
 		{"center at origin", 0, 0, 0, 0},
 		{"center positive", 100, 200, 100, 200},
@@ -269,14 +262,14 @@ func TestControllerSetPositionTopLeft(t *testing.T) {
 	config.Set(&config.AppConfig{ScreenWidth: 320, ScreenHeight: 240})
 
 	tests := []struct {
-		name      string
-		x, y      float64
-		wantCX    float64 // expected center X
-		wantCY    float64 // expected center Y
+		name   string
+		x, y   float64
+		wantCX float64 // expected center X
+		wantCY float64 // expected center Y
 	}{
-		{"top-left at origin", 0, 0, 160, 120},      // 320/2, 240/2
-		{"top-left at 10,20", 10, 20, 170, 140},    // 10+160, 20+120
-		{"top-left negative", -10, -20, 150, 100},  // -10+160, -20+120
+		{"top-left at origin", 0, 0, 160, 120},    // 320/2, 240/2
+		{"top-left at 10,20", 10, 20, 170, 140},   // 10+160, 20+120
+		{"top-left negative", -10, -20, 150, 100}, // -10+160, -20+120
 	}
 
 	for _, tt := range tests {
@@ -323,13 +316,13 @@ func TestControllerSetFollowTarget(t *testing.T) {
 	config.Set(&config.AppConfig{ScreenWidth: 320, ScreenHeight: 240})
 
 	tests := []struct {
-		name       string
-		targetX    int
-		targetY    int
-		targetW    int
-		targetH    int
-		wantCX     float64
-		wantCY     float64
+		name    string
+		targetX int
+		targetY int
+		targetW int
+		targetH int
+		wantCX  float64
+		wantCY  float64
 	}{
 		// SetFollowTarget sets camera center to target center
 		// Target center = position + size/2
@@ -344,17 +337,17 @@ func TestControllerSetFollowTarget(t *testing.T) {
 			ctrl := NewController(0, 0)
 			rect := bodyphysics.NewRect(tt.targetX, tt.targetY, tt.targetW, tt.targetH)
 			target := bodyphysics.NewCollidableBodyFromRect(rect)
-			
+
 			// SetPosition must be called after creating the body
 			// NewCollidableBodyFromRect creates body at origin
 			target.SetPosition(tt.targetX, tt.targetY)
-			
+
 			// Verify target position before setting
 			tx, ty := target.GetPositionMin()
 			if tx != tt.targetX || ty != tt.targetY {
 				t.Errorf("target position = (%d, %d), want (%d, %d)", tx, ty, tt.targetX, tt.targetY)
 			}
-			
+
 			ctrl.SetFollowTarget(target)
 
 			cx, cy := ctrl.Kamera().Center()

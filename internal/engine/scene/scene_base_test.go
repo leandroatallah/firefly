@@ -4,11 +4,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/boilerplate/ebiten-template/internal/engine/app"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
 	"github.com/boilerplate/ebiten-template/internal/engine/mocks"
 	"github.com/boilerplate/ebiten-template/internal/engine/physics/space"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 func TestBaseScene_Lifecycle(t *testing.T) {
@@ -88,14 +88,14 @@ func TestBaseScene_Schedule(t *testing.T) {
 }
 
 func TestBaseScene_Music(t *testing.T) {
-	// scene_test already has some audio manager mocking patterns, 
+	// scene_test already has some audio manager mocking patterns,
 	// but BaseScene uses AppContext.AudioManager directly.
 	// Since I haven't centralized MockAudioManager yet, I'll skip complex music tests
 	// or just smoke test with nil checks if possible.
-	
+
 	s := NewScene()
 	s.SetAppContext(&app.AppContext{}) // Nil AudioManager
-	
+
 	// Should not panic
 	s.PauseAllMusic()
 	s.PlayMusic("test.ogg", true)

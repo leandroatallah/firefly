@@ -6,11 +6,11 @@ import (
 	"image/color"
 	"io/fs"
 
+	"github.com/boilerplate/ebiten-template/internal/engine/assets/font"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
-	"github.com/boilerplate/ebiten-template/internal/engine/assets/font"
-	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 )
 
 const (

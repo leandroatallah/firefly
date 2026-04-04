@@ -4,8 +4,8 @@ import "fmt"
 
 // Manager holds a registry of all active actors in a scene.
 type Manager struct {
-	actors        map[string]ActorEntity
-	primaryActor  ActorEntity
+	actors       map[string]ActorEntity
+	primaryActor ActorEntity
 }
 
 // NewManager creates a new actor manager.

@@ -140,7 +140,7 @@ func TestChaseMovementState_CalculatePath(t *testing.T) {
 		target := &mockActor{pos: image.Rect(40, 0, 50, 10), speed: 2, id: "target"}
 		base := NewBaseMovementState(Chase, actor, target)
 		state := NewChaseMovementState(base)
-		
+
 		// Add obstacle in the middle
 		obstacle := newMockMovableCollidable(15, 0, 10, 10)
 		state.obstacles = []body.MovableCollidable{obstacle}
@@ -158,13 +158,13 @@ func TestChaseMovementState_CalculatePath(t *testing.T) {
 		target := &mockActor{pos: image.Rect(100, 100, 110, 110), speed: 2, id: "target"}
 		base := NewBaseMovementState(Chase, actor, target)
 		state := NewChaseMovementState(base)
-		
+
 		// Surround actor with obstacles
 		obstacles := []body.MovableCollidable{
-			newMockMovableCollidable(30, 20, 5, 10),  // right
-			newMockMovableCollidable(15, 20, 5, 10),  // left
-			newMockMovableCollidable(20, 30, 10, 5),  // down
-			newMockMovableCollidable(20, 15, 10, 5),  // up
+			newMockMovableCollidable(30, 20, 5, 10), // right
+			newMockMovableCollidable(15, 20, 5, 10), // left
+			newMockMovableCollidable(20, 30, 10, 5), // down
+			newMockMovableCollidable(20, 15, 10, 5), // up
 		}
 		state.obstacles = obstacles
 
@@ -291,14 +291,4 @@ func TestChaseMovementState_Move_PathRecalculation(t *testing.T) {
 
 	// Count should reset or path should be recalculated
 	// This test verifies the recalculation logic runs
-}
-
-// mockActorWithSpace wraps mockActor to provide Space() method
-type mockActorWithSpace struct {
-	*mockActor
-	space body.BodiesSpace
-}
-
-func (m *mockActorWithSpace) Space() body.BodiesSpace {
-	return m.space
 }

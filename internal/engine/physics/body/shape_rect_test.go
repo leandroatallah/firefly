@@ -64,11 +64,11 @@ func TestRect_Height(t *testing.T) {
 
 func TestRect_Dimensions(t *testing.T) {
 	tests := []struct {
-		name        string
-		x, y        int
+		name          string
+		x, y          int
 		width, height int
-		wantWidth   int
-		wantHeight  int
+		wantWidth     int
+		wantHeight    int
 	}{
 		{"square", 0, 0, 10, 10, 10, 10},
 		{"wide", 0, 0, 100, 10, 100, 10},

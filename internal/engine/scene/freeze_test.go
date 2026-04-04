@@ -4,9 +4,9 @@ import "testing"
 
 func TestFreezeController(t *testing.T) {
 	tests := []struct {
-		name    string
-		setup   func(f *FreezeController)
-		want    bool
+		name  string
+		setup func(f *FreezeController)
+		want  bool
 	}{
 		{
 			name:  "no freeze",

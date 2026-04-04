@@ -3,11 +3,11 @@ package movement
 import (
 	"math"
 
-	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
 	"github.com/boilerplate/ebiten-template/internal/engine/input"
 	"github.com/boilerplate/ebiten-template/internal/engine/utils/fp16"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 type TopDownMovementModel struct {

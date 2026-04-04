@@ -72,7 +72,7 @@ func TestTilemapDrawing(t *testing.T) {
 	if tm.findTileset(1) != ts {
 		t.Error("expected ts for gid 1")
 	}
-	
+
 	// Test tilesetSourceRect
 	rect := tilesetSourceRect(ts, 1)
 	if rect != image.Rect(0, 0, 16, 16) {
@@ -82,10 +82,10 @@ func TestTilemapDrawing(t *testing.T) {
 	// Test applyFlips (smoke test)
 	op := &ebiten.DrawImageOptions{}
 	applyFlips(op, true, true, true, 16, 16)
-	
+
 	// Test ParseItems
 	tm.ParseItems(tm.Layers[1], img)
-	
+
 	// Test ImageOptions
 	if tm.ImageOptions() == nil {
 		t.Error("expected non-nil ImageOptions")
@@ -171,7 +171,7 @@ func TestTilemapHelpers(t *testing.T) {
 	if tmNil.GetNpcsPositionID() != nil {
 		t.Error("expected nil npcs for nil tilemap")
 	}
-	
+
 	valid, _ := tmNil.isTilemapValid()
 	if valid {
 		t.Error("expected nil tilemap to be invalid")

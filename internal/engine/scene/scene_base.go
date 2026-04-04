@@ -5,18 +5,16 @@ package scene
 import (
 	"time"
 
-	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/boilerplate/ebiten-template/internal/engine/app"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
-	"github.com/boilerplate/ebiten-template/internal/engine/physics/space"
 	"github.com/boilerplate/ebiten-template/internal/engine/utils/timing"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 type BaseScene struct {
 	app.AppContextHolder
 
 	count          int
-	space          *space.Space
 	IsKeysDisabled bool
 
 	scheduledActions []scheduledAction

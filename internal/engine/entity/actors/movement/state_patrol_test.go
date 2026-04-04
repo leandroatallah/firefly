@@ -15,7 +15,7 @@ func TestPatrolMovementState(t *testing.T) {
 
 	base := NewBaseMovementState(Patrol, actor, nil)
 	state := NewPatrolMovementState(base)
-	
+
 	state.SetWaypointConfig(config)
 	state.OnStart()
 

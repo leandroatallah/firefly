@@ -75,7 +75,7 @@ func TestPlatformerCharacter_OnJump(t *testing.T) {
 		character := &PlatformerCharacter{
 			Character: char,
 		}
-		
+
 		var capturedPos image.Point
 
 		character.SetOnJump(func(pos image.Point) {
@@ -114,7 +114,7 @@ func TestPlatformerCharacter_OnLand(t *testing.T) {
 		character := &PlatformerCharacter{
 			Character: char,
 		}
-		
+
 		var capturedPos image.Point
 
 		character.SetOnLand(func(pos image.Point) {
@@ -151,7 +151,7 @@ func TestPlatformerCharacter_OnFall(t *testing.T) {
 		character := &PlatformerCharacter{
 			Character: char,
 		}
-		
+
 		var capturedPos image.Point
 
 		character.SetOnFall(func(pos image.Point) {

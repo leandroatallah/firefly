@@ -85,18 +85,18 @@ func TestSequence_ToCommand_Dialogue(t *testing.T) {
 		{
 			name: "move_actor",
 			cmdData: CommandData{
-				Type:   "move_actor",
+				Type:     "move_actor",
 				TargetID: "actor1",
-				EndX:   100.0,
+				EndX:     100.0,
 			},
 			wantType: "*sequences.MoveActorCommand",
 		},
 		{
 			name: "set_speed",
 			cmdData: CommandData{
-				Type:   "set_speed",
+				Type:     "set_speed",
 				TargetID: "actor1",
-				Speed:  5.0,
+				Speed:    5.0,
 			},
 			wantType: "*sequences.SetSpeedCommand",
 		},
@@ -137,8 +137,8 @@ func TestSequence_ToCommand_Dialogue(t *testing.T) {
 		{
 			name: "camera_zoom",
 			cmdData: CommandData{
-				Type:   "camera_zoom",
-				Zoom:   2.0,
+				Type:     "camera_zoom",
+				Zoom:     2.0,
 				Duration: 30,
 			},
 			wantType: "*sequences.CameraZoomCommand",

@@ -2,8 +2,8 @@ package gamestates
 
 type aimLockSubState struct{}
 
-func (s *aimLockSubState) OnStart(_ int)  {}
-func (s *aimLockSubState) OnFinish()      {}
+func (s *aimLockSubState) OnStart(_ int) {}
+func (s *aimLockSubState) OnFinish()     {}
 func (s *aimLockSubState) transitionTo(input GroundedInput) GroundedSubStateEnum {
 	if !input.AimLockHeld() {
 		return SubStateIdle

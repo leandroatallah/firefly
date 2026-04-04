@@ -24,7 +24,7 @@ func TestRegisterMovementState_NewState(t *testing.T) {
 	}
 
 	// Verify enum value starts at 100 or higher (safe from hardcoded)
-	// Note: First registration after cleanup returns 100 
+	// Note: First registration after cleanup returns 100
 	// (nextMovementEnumValue starts at 0, gets set to 100, and returns that value)
 	if enum < 100 {
 		t.Errorf("RegisterMovementState() first enum = %d, want >= 100", enum)

@@ -10,7 +10,7 @@ import (
 func TestGetSpritesFromAssetsSmoke(t *testing.T) {
 	// Since GetSpritesFromAssets calls LoadSprites which hits the disk,
 	// we test the mapping logic but expect an error unless we have a real image.
-	
+
 	assets := map[string]schemas.AssetData{
 		"idle": {Path: "non_existent.png"},
 	}
@@ -22,7 +22,7 @@ func TestGetSpritesFromAssetsSmoke(t *testing.T) {
 	if err == nil {
 		t.Error("expected error for non-existent image path")
 	}
-	
+
 	// Test with no matching states (should be empty map but no error)
 	emptyStateMap := map[string]animation.SpriteState{}
 	res, err := GetSpritesFromAssetsOS(assets, emptyStateMap)

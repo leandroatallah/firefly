@@ -3,12 +3,12 @@ package app
 import (
 	"testing"
 
-	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/navigation"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
 	"github.com/boilerplate/ebiten-template/internal/engine/mocks"
 	"github.com/boilerplate/ebiten-template/internal/engine/scene/phases"
 	"github.com/boilerplate/ebiten-template/internal/engine/ui/speech"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 func TestGameUpdateAndDrawIntegration(t *testing.T) {

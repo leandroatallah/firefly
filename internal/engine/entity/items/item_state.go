@@ -12,6 +12,9 @@ type ItemState interface {
 
 type ItemStateEnum int
 
+// State enum: part of engine public API
+//
+//nolint:gochecknoglobals
 var (
 	Idle    ItemStateEnum
 	Walking ItemStateEnum

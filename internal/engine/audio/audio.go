@@ -10,11 +10,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
 	"github.com/hajimehoshi/ebiten/v2/audio"
 	"github.com/hajimehoshi/ebiten/v2/audio/mp3"
 	"github.com/hajimehoshi/ebiten/v2/audio/vorbis"
 	"github.com/hajimehoshi/ebiten/v2/audio/wav"
-	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
 )
 
 const (

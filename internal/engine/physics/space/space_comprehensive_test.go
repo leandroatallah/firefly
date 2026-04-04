@@ -556,12 +556,14 @@ type mockStateBasedCollisioner struct {
 	collisions []contractsbody.Collidable
 }
 
-func (m *mockStateBasedCollisioner) State() int                    { return m.state }
-func (m *mockStateBasedCollisioner) GetPositionMin() (int, int)    { return m.x, m.y }
-func (m *mockStateBasedCollisioner) ClearCollisions()              { m.collisions = nil }
-func (m *mockStateBasedCollisioner) AddCollision(c ...contractsbody.Collidable) { m.collisions = append(m.collisions, c...) }
-func (m *mockStateBasedCollisioner) ID() string                    { return m.id }
-func (m *mockStateBasedCollisioner) Scale() float64                 { return 1.0 }
+func (m *mockStateBasedCollisioner) State() int                 { return m.state }
+func (m *mockStateBasedCollisioner) GetPositionMin() (int, int) { return m.x, m.y }
+func (m *mockStateBasedCollisioner) ClearCollisions()           { m.collisions = nil }
+func (m *mockStateBasedCollisioner) AddCollision(c ...contractsbody.Collidable) {
+	m.collisions = append(m.collisions, c...)
+}
+func (m *mockStateBasedCollisioner) ID() string     { return m.id }
+func (m *mockStateBasedCollisioner) Scale() float64 { return 1.0 }
 
 // dimsProvider for tilemap tests
 type dimsProvider struct{ w, h int }

@@ -97,7 +97,7 @@ func (m *MockDialogueManager) SetSpeaking(val bool) {
 
 // MockVFXManager implements vfx.Manager for testing
 type MockVFXManager struct {
-	SpawnedTexts        []string
+	SpawnedTexts         []string
 	SpawnedTextPositions []struct {
 		X, Y float64
 		Text string
@@ -107,7 +107,7 @@ type MockVFXManager struct {
 
 func NewMockVFXManager() *MockVFXManager {
 	return &MockVFXManager{
-		SpawnedTexts:        make([]string, 0),
+		SpawnedTexts: make([]string, 0),
 		SpawnedTextPositions: make([]struct {
 			X, Y float64
 			Text string

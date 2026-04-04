@@ -71,10 +71,10 @@ func TestAliveBody_SetMaxHealth(t *testing.T) {
 	ab := NewAliveBody(NewBody(NewRect(0, 0, 10, 10)))
 
 	tests := []struct {
-		name      string
-		maxHealth int
+		name       string
+		maxHealth  int
 		wantHealth int
-		wantMax   int
+		wantMax    int
 	}{
 		{"positive", 100, 100, 100},
 		{"zero", 0, 0, 0},
@@ -94,10 +94,10 @@ func TestAliveBody_SetMaxHealth(t *testing.T) {
 
 func TestAliveBody_LoseHealth(t *testing.T) {
 	tests := []struct {
-		name       string
+		name        string
 		startHealth int
-		damage     int
-		wantHealth int
+		damage      int
+		wantHealth  int
 	}{
 		{"normal damage", 100, 30, 70},
 		{"damage to zero", 50, 50, 0},
@@ -123,11 +123,11 @@ func TestAliveBody_LoseHealth(t *testing.T) {
 
 func TestAliveBody_RestoreHealth(t *testing.T) {
 	tests := []struct {
-		name       string
+		name        string
 		startHealth int
-		maxHealth  int
-		heal       int
-		wantHealth int
+		maxHealth   int
+		heal        int
+		wantHealth  int
 	}{
 		{"normal heal", 50, 100, 30, 80},
 		{"heal to max", 50, 100, 50, 100},

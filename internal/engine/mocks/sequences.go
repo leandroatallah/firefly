@@ -20,7 +20,7 @@ func (c *MockCommand) Update() bool {
 
 // MockSequence implements sequences.Sequence
 type MockSequence struct {
-	CommandsList  []contractseq.Command
+	CommandsList    []contractseq.Command
 	IsInterruptible bool
 	IsOneTime       bool
 	Path            string

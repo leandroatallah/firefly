@@ -126,11 +126,11 @@ func TestDelayCommand_Init(t *testing.T) {
 
 func TestDelayCommand_Update(t *testing.T) {
 	tests := []struct {
-		name          string
-		frames        int
-		updateCount   int
-		wantComplete  bool
-		wantTimer     int
+		name         string
+		frames       int
+		updateCount  int
+		wantComplete bool
+		wantTimer    int
 	}{
 		{"Zero frames", 0, 1, true, 1},
 		{"One frame", 1, 1, true, 1},

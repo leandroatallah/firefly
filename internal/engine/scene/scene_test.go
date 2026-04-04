@@ -4,13 +4,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/boilerplate/ebiten-template/internal/engine/app"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/navigation"
 	"github.com/boilerplate/ebiten-template/internal/engine/mocks"
 	bodyphysics "github.com/boilerplate/ebiten-template/internal/engine/physics/body"
 	"github.com/boilerplate/ebiten-template/internal/engine/physics/space"
 	"github.com/boilerplate/ebiten-template/internal/engine/utils/timing"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 func TestSceneManagerNavigateWithTransition(t *testing.T) {

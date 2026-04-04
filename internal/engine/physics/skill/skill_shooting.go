@@ -38,7 +38,7 @@ func (s *ShootingSkill) SetStateTransitionHandler(handler body.StateTransitionHa
 
 func (s *ShootingSkill) HandleInputWithDirection(b body.MovableCollidable, model *physicsmovement.PlatformMovementModel, space body.BodiesSpace, up, down, left, right bool) {
 	direction := s.detectShootDirection(b, model, up, down, left, right)
-	
+
 	directionChanged := s.directionSet && direction != s.lastDirection
 	if directionChanged && s.handler != nil {
 		s.handler.TransitionToShooting(direction)
@@ -54,19 +54,19 @@ func (s *ShootingSkill) HandleInputWithDirection(b body.MovableCollidable, model
 		if s.handler != nil {
 			s.handler.TransitionToShooting(direction)
 		}
-		
+
 		x16, y16 := b.GetPosition16()
-		
+
 		// Adjust spawn position to account for player width when facing right
 		if b.FaceDirection() == animation.FaceDirectionRight {
 			x16 += b.GetShape().Width() << 4
 		}
-		
+
 		vx16, vy16 := s.calculateBulletVelocity(direction, b.FaceDirection())
 		offsetX, offsetY := s.calculateSpawnOffset(direction, b.FaceDirection())
-		
+
 		s.shooter.SpawnBullet(x16+offsetX, y16+offsetY, vx16, vy16, b)
-		
+
 		s.state = StateActive
 		s.timer = s.cooldown
 	}
@@ -77,12 +77,12 @@ func (s *ShootingSkill) HandleInput(b body.MovableCollidable, model *physicsmove
 	if !shootPressed {
 		return
 	}
-	
+
 	up := ebiten.IsKeyPressed(ebiten.KeyUp) || ebiten.IsKeyPressed(ebiten.KeyW)
 	down := ebiten.IsKeyPressed(ebiten.KeyDown) || ebiten.IsKeyPressed(ebiten.KeyS)
 	left := ebiten.IsKeyPressed(ebiten.KeyLeft) || ebiten.IsKeyPressed(ebiten.KeyA)
 	right := ebiten.IsKeyPressed(ebiten.KeyRight) || ebiten.IsKeyPressed(ebiten.KeyD)
-	
+
 	s.HandleInputWithDirection(b, model, space, up, down, left, right)
 }
 
@@ -111,27 +111,27 @@ func (s *ShootingSkill) detectShootDirection(b body.MovableCollidable, model *ph
 	if duckable, ok := b.(interface{ IsDucking() bool }); ok {
 		isDucking = duckable.IsDucking()
 	}
-	
+
 	if isDucking {
 		return body.ShootDirectionStraight
 	}
-	
+
 	isGrounded := model != nil && model.OnGround()
-	
+
 	if down && !isGrounded {
 		if left || right {
 			return body.ShootDirectionDiagonalDownForward
 		}
 		return body.ShootDirectionDown
 	}
-	
+
 	if up {
 		if left || right {
 			return body.ShootDirectionDiagonalUpForward
 		}
 		return body.ShootDirectionUp
 	}
-	
+
 	return body.ShootDirectionStraight
 }
 
@@ -141,7 +141,7 @@ func (s *ShootingSkill) calculateBulletVelocity(direction body.ShootDirection, f
 	if faceDir == animation.FaceDirectionLeft {
 		sign = -1
 	}
-	
+
 	switch direction {
 	case body.ShootDirectionStraight:
 		return sign * speed, 0
@@ -163,7 +163,7 @@ func (s *ShootingSkill) calculateSpawnOffset(direction body.ShootDirection, face
 	if faceDir == animation.FaceDirectionLeft {
 		sign = -1
 	}
-	
+
 	switch direction {
 	case body.ShootDirectionStraight:
 		return sign * offset, s.toggler.Next()

@@ -39,7 +39,7 @@ func TestPauseScreen_Toggle(t *testing.T) {
 
 func TestPauseScreen_UpdateAndCount(t *testing.T) {
 	p := NewPauseScreen(ebiten.KeyEscape, 0)
-	
+
 	p.Update() // Should not increment count while not paused
 	if p.Count() != 0 {
 		t.Errorf("expected count 0; got %d", p.Count())
@@ -59,7 +59,7 @@ func TestPauseScreen_UpdateAndCount(t *testing.T) {
 
 func TestPauseScreen_DisableFor(t *testing.T) {
 	// Pause for 10 frames (approx 166ms at 60fps)
-	disableFor := 100 * time.Millisecond 
+	disableFor := 100 * time.Millisecond
 	p := NewPauseScreen(ebiten.KeyEscape, disableFor)
 
 	p.Toggle() // Should set disable = true

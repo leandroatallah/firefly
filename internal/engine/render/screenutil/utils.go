@@ -3,10 +3,10 @@ package screenutil
 import (
 	"image/color"
 
-	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/text/v2"
 	"github.com/boilerplate/ebiten-template/internal/engine/assets/font"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
+	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/text/v2"
 )
 
 func GetCenterOfScreenPosition(width, height int) (int, int) {

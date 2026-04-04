@@ -9,7 +9,7 @@ func TestRegisterState_NewState(t *testing.T) {
 	savedConstructors := stateConstructors
 	savedEnums := stateEnums
 	savedNextValue := nextEnumValue
-	
+
 	// Clean up registry after test
 	defer func() {
 		stateConstructors = savedConstructors
@@ -39,7 +39,7 @@ func TestRegisterState_DuplicateName(t *testing.T) {
 	savedConstructors := stateConstructors
 	savedEnums := stateEnums
 	savedNextValue := nextEnumValue
-	
+
 	// Clean up registry after test
 	defer func() {
 		stateConstructors = savedConstructors

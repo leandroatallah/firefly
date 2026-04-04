@@ -4,10 +4,10 @@ import (
 	"image"
 	"testing"
 
-	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
 	bodyphysics "github.com/boilerplate/ebiten-template/internal/engine/physics/body"
 	enginecamera "github.com/boilerplate/ebiten-template/internal/engine/render/camera"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 func setupConfig() {
@@ -121,20 +121,20 @@ func TestControllerSettersUpdateLastCameraY(t *testing.T) {
 
 	// SetCenter should update lastCameraY
 	ctrl.SetCenter(100, 200)
-	
+
 	// If we now follow a target at 300, it should NOT move down
 	rect := bodyphysics.NewRect(100, 300, 32, 16)
 	target := bodyphysics.NewCollidableBodyFromRect(rect)
 	target.SetPosition(100, 300) // center Y is 308
 	ctrl.SetFollowTarget(target) // SetFollowTarget also updates lastCameraY to target center
 	ctrl.SetFollowing(true)
-	
+
 	ctrl.Update()
 	_, cy := base.Kamera().Center()
 	if cy != 308 {
 		t.Errorf("expected center Y 308 after SetFollowTarget, got %f", cy)
 	}
-	
+
 	// Move target down
 	target.SetPosition(100, 400) // center Y is 408
 	ctrl.Update()
@@ -151,7 +151,7 @@ func TestControllerSettersUpdateLastCameraY(t *testing.T) {
 	if cy != 120 {
 		t.Errorf("expected center Y 120 after SetPositionTopLeft, got %f", cy)
 	}
-	
+
 	// Move target to 200 center Y (down from 120)
 	target.SetPosition(100, 192) // center Y 200
 	ctrl.Update()
@@ -178,7 +178,7 @@ func TestControllerDelegations(t *testing.T) {
 	if ctrl.FollowTarget() != nil {
 		t.Error("expected FollowTarget to be nil initially")
 	}
-	
+
 	rect := bodyphysics.NewRect(0, 0, 32, 16)
 	target := bodyphysics.NewCollidableBodyFromRect(rect)
 	ctrl.SetFollowTarget(target)
@@ -205,11 +205,11 @@ func TestControllerDelegations(t *testing.T) {
 
 	ctrl.AddTrauma(0.5)
 	ctrl.CamDebug()
-	
+
 	if ctrl.Kamera() != nil {
 		t.Error("expected Kamera() to return nil as per placeholder")
 	}
-	
+
 	pos := ctrl.Position()
 	if pos.Dx() != 32 || pos.Dy() != 16 {
 		t.Errorf("expected Position to return target rect, got %v", pos)

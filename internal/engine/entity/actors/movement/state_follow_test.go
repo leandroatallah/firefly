@@ -157,13 +157,13 @@ func TestFollowMovementState_Move_Hysteresis(t *testing.T) {
 
 func TestFollowMovementState_Move_Directions(t *testing.T) {
 	tests := []struct {
-		name       string
-		actorPos   image.Rectangle
-		targetPos  image.Rectangle
-		wantLeft   bool
-		wantRight  bool
-		wantUp     bool
-		wantDown   bool
+		name      string
+		actorPos  image.Rectangle
+		targetPos image.Rectangle
+		wantLeft  bool
+		wantRight bool
+		wantUp    bool
+		wantDown  bool
 	}{
 		{
 			name:      "target to right",
@@ -184,10 +184,10 @@ func TestFollowMovementState_Move_Directions(t *testing.T) {
 			wantDown:  true,
 		},
 		{
-			name:     "target above",
-			actorPos: image.Rect(0, 100, 10, 110),
+			name:      "target above",
+			actorPos:  image.Rect(0, 100, 10, 110),
 			targetPos: image.Rect(0, 0, 10, 10),
-			wantUp:  true,
+			wantUp:    true,
 		},
 	}
 
@@ -249,8 +249,8 @@ func TestFollowMovementState_FilterSafeDirections(t *testing.T) {
 	t.Run("ground exists - keep directions", func(t *testing.T) {
 		// Ground at both left and right check points
 		groundPositions := []image.Point{
-			{49, 61},  // Left ground check
-			{60, 61},  // Right ground check
+			{49, 61}, // Left ground check
+			{60, 61}, // Right ground check
 		}
 		space := newMockSpaceWithGround(groundPositions)
 		directions := MovementDirections{Left: true, Right: true}

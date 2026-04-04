@@ -4,8 +4,8 @@ import (
 	"image"
 	"testing"
 
-	"github.com/hajimehoshi/ebiten/v2"
 	contractsbody "github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 type testCollidable struct {

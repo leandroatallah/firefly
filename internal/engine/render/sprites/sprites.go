@@ -6,9 +6,9 @@ import (
 	"io/fs"
 	"os"
 
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/animation"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
-	"github.com/boilerplate/ebiten-template/internal/engine/contracts/animation"
 )
 
 type Sprite struct {

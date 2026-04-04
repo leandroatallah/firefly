@@ -37,7 +37,7 @@ func TestScreenFlipper_SnapAndTrigger(t *testing.T) {
 	cam := camera.NewController(0, 0)
 	player := &mocks.MockActor{Id: "player"}
 	player.SetPosition(160, 120)
-	
+
 	tm := &tilemap.Tilemap{
 		Width:      40, // 640 wide
 		Height:     20, // 320 high
@@ -47,7 +47,7 @@ func TestScreenFlipper_SnapAndTrigger(t *testing.T) {
 	ctx := &app.AppContext{}
 
 	sf := NewScreenFlipper(cam, player, tm, ctx)
-	
+
 	// Test Snap
 	sf.SnapToCurrentRoom()
 	if sf.currentRoom == nil || sf.currentRoom.Min.X != 0 {
@@ -57,16 +57,16 @@ func TestScreenFlipper_SnapAndTrigger(t *testing.T) {
 	// Move player to the right edge
 	player.SetPosition(330, 120)
 	sf.Update() // checkTrigger -> triggerFlip
-	
+
 	if !sf.IsFlipping() {
 		t.Error("expected IsFlipping to be true after trigger")
 	}
-	
+
 	// Update flip to completion
 	for sf.IsFlipping() {
 		sf.Update()
 	}
-	
+
 	if sf.currentRoom.Min.X != 320 {
 		t.Errorf("expected current room to be second room; got minX=%d", sf.currentRoom.Min.X)
 	}
@@ -77,7 +77,7 @@ func TestScreenFlipper_InstantFlip(t *testing.T) {
 	cam := camera.NewController(0, 0)
 	player := &mocks.MockActor{Id: "player"}
 	player.SetPosition(160, 120)
-	
+
 	tm := &tilemap.Tilemap{
 		Width: 40, Height: 20, Tilewidth: 16, Tileheight: 16,
 	}
@@ -85,14 +85,14 @@ func TestScreenFlipper_InstantFlip(t *testing.T) {
 
 	sf := NewScreenFlipper(cam, player, tm, ctx)
 	sf.FlipStrategy = func(dx, dy int) FlipType { return FlipTypeInstant }
-	
+
 	// Start in first room
 	sf.SnapToCurrentRoom()
-	
+
 	// Trigger flip
 	player.SetPosition(330, 120)
 	sf.Update()
-	
+
 	if sf.IsFlipping() {
 		t.Error("expected instant flip to not set isFlipping=true")
 	}
@@ -108,22 +108,22 @@ func TestScreenFlipper_Hooks(t *testing.T) {
 	tm := &tilemap.Tilemap{
 		Width: 40, Height: 20, Tilewidth: 16, Tileheight: 16,
 	}
-	
+
 	sf := NewScreenFlipper(cam, player, tm, nil)
-	
+
 	startCalled := false
 	finishCalled := false
 	sf.OnFlipStart = func() { startCalled = true }
 	sf.OnFlipFinish = func() { finishCalled = true }
-	
+
 	sf.SnapToCurrentRoom()
 	player.SetPosition(330, 120)
 	sf.Update() // trigger
-	
+
 	if !startCalled {
 		t.Error("OnFlipStart not called")
 	}
-	
+
 	sf.Update() // complete (speed 1.0)
 	if !finishCalled {
 		t.Error("OnFlipFinish not called")
@@ -144,19 +144,19 @@ func TestScreenFlipper_VerticalFlip(t *testing.T) {
 	tm := &tilemap.Tilemap{
 		Width: 20, Height: 40, Tilewidth: 16, Tileheight: 16,
 	} // 320x640 map
-	
+
 	sf := NewScreenFlipper(cam, player, tm, nil)
 	sf.SnapToCurrentRoom()
-	
+
 	// Flip Down
 	player.SetPosition(160, 250)
 	sf.Update() // trigger
 	sf.Update() // complete
-	
+
 	if sf.currentRoom.Min.Y != 240 {
 		t.Errorf("vertical flip failed; got minY=%d", sf.currentRoom.Min.Y)
 	}
-	
+
 	// Flip Up
 	player.SetPosition(160, 230)
 	sf.Update() // trigger

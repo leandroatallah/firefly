@@ -5,10 +5,10 @@ import (
 	"os"
 	"testing"
 
-	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/schemas"
 	"github.com/boilerplate/ebiten-template/internal/engine/render/camera"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 func TestManager(t *testing.T) {

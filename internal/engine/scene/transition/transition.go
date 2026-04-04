@@ -26,4 +26,3 @@ func (t *BaseTransition) EndTransition(cb func()) {}
 func (t *BaseTransition) IsRunning() bool {
 	return t.active
 }
-

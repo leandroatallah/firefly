@@ -4,8 +4,8 @@ import (
 	"image"
 	"testing"
 
-	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 // mockInputSource covers the three input signals needed for drop-through disambiguation.
@@ -56,44 +56,46 @@ func (p *mockOneWayPlatform) Update() {
 
 // body.Body stubs
 func (p *mockOneWayPlatform) ID() string                 { return p.id }
-func (p *mockOneWayPlatform) SetID(id string)             { p.id = id }
-func (p *mockOneWayPlatform) Position() image.Rectangle   { return p.pos }
-func (p *mockOneWayPlatform) SetPosition(x, y int)        {}
-func (p *mockOneWayPlatform) SetPosition16(x16, y16 int)  {}
-func (p *mockOneWayPlatform) SetSize(w, h int)             {}
-func (p *mockOneWayPlatform) Scale() float64               { return 1 }
-func (p *mockOneWayPlatform) SetScale(float64)             {}
-func (p *mockOneWayPlatform) GetPosition16() (int, int)    { return 0, 0 }
-func (p *mockOneWayPlatform) GetPositionMin() (int, int)   { return p.pos.Min.X, p.pos.Min.Y }
-func (p *mockOneWayPlatform) GetShape() body.Shape         { return p }
-func (p *mockOneWayPlatform) Width() int                   { return p.pos.Dx() }
-func (p *mockOneWayPlatform) Height() int                  { return p.pos.Dy() }
-func (p *mockOneWayPlatform) Owner() interface{}           { return nil }
-func (p *mockOneWayPlatform) SetOwner(interface{})         {}
-func (p *mockOneWayPlatform) LastOwner() interface{}       { return nil }
+func (p *mockOneWayPlatform) SetID(id string)            { p.id = id }
+func (p *mockOneWayPlatform) Position() image.Rectangle  { return p.pos }
+func (p *mockOneWayPlatform) SetPosition(x, y int)       {}
+func (p *mockOneWayPlatform) SetPosition16(x16, y16 int) {}
+func (p *mockOneWayPlatform) SetSize(w, h int)           {}
+func (p *mockOneWayPlatform) Scale() float64             { return 1 }
+func (p *mockOneWayPlatform) SetScale(float64)           {}
+func (p *mockOneWayPlatform) GetPosition16() (int, int)  { return 0, 0 }
+func (p *mockOneWayPlatform) GetPositionMin() (int, int) { return p.pos.Min.X, p.pos.Min.Y }
+func (p *mockOneWayPlatform) GetShape() body.Shape       { return p }
+func (p *mockOneWayPlatform) Width() int                 { return p.pos.Dx() }
+func (p *mockOneWayPlatform) Height() int                { return p.pos.Dy() }
+func (p *mockOneWayPlatform) Owner() interface{}         { return nil }
+func (p *mockOneWayPlatform) SetOwner(interface{})       {}
+func (p *mockOneWayPlatform) LastOwner() interface{}     { return nil }
 
 // body.Collidable stubs
-func (p *mockOneWayPlatform) GetTouchable() body.Touchable                                          { return p }
-func (p *mockOneWayPlatform) DrawCollisionBox(_ *ebiten.Image, _ image.Rectangle)                   {}
-func (p *mockOneWayPlatform) CollisionPosition() []image.Rectangle                                  { return []image.Rectangle{p.pos} }
-func (p *mockOneWayPlatform) CollisionShapes() []body.Collidable                                    { return nil }
-func (p *mockOneWayPlatform) IsObstructive() bool                                                   { return true }
-func (p *mockOneWayPlatform) SetIsObstructive(bool)                                                 {}
-func (p *mockOneWayPlatform) AddCollision(...body.Collidable)                                       {}
-func (p *mockOneWayPlatform) ClearCollisions()                                                      {}
-func (p *mockOneWayPlatform) SetTouchable(body.Touchable)                                           {}
-func (p *mockOneWayPlatform) OnTouch(body.Collidable)                                               {}
-func (p *mockOneWayPlatform) OnBlock(body.Collidable)                                               {}
-func (p *mockOneWayPlatform) ApplyValidPosition(_ int, _ bool, _ body.BodiesSpace) (int, int, bool) { return 0, 0, false }
+func (p *mockOneWayPlatform) GetTouchable() body.Touchable                        { return p }
+func (p *mockOneWayPlatform) DrawCollisionBox(_ *ebiten.Image, _ image.Rectangle) {}
+func (p *mockOneWayPlatform) CollisionPosition() []image.Rectangle                { return []image.Rectangle{p.pos} }
+func (p *mockOneWayPlatform) CollisionShapes() []body.Collidable                  { return nil }
+func (p *mockOneWayPlatform) IsObstructive() bool                                 { return true }
+func (p *mockOneWayPlatform) SetIsObstructive(bool)                               {}
+func (p *mockOneWayPlatform) AddCollision(...body.Collidable)                     {}
+func (p *mockOneWayPlatform) ClearCollisions()                                    {}
+func (p *mockOneWayPlatform) SetTouchable(body.Touchable)                         {}
+func (p *mockOneWayPlatform) OnTouch(body.Collidable)                             {}
+func (p *mockOneWayPlatform) OnBlock(body.Collidable)                             {}
+func (p *mockOneWayPlatform) ApplyValidPosition(_ int, _ bool, _ body.BodiesSpace) (int, int, bool) {
+	return 0, 0, false
+}
 
 func TestDropThrough(t *testing.T) {
 	tests := []struct {
-		name              string
-		input             *mockInputSource
-		platformIsOneWay  bool
-		vyBefore          int
-		wantPassThrough   bool
-		wantVyUnchanged   bool
+		name             string
+		input            *mockInputSource
+		platformIsOneWay bool
+		vyBefore         int
+		wantPassThrough  bool
+		wantVyUnchanged  bool
 	}{
 		{
 			name:             "down+jump on one-way triggers drop-through",

@@ -11,7 +11,7 @@ import (
 func TestDefaultSceneFactory_Create(t *testing.T) {
 	ctx := &app.AppContext{}
 	sceneType := navigation.SceneType(1)
-	
+
 	sceneMap := navigation.SceneMap{
 		sceneType: func() navigation.Scene {
 			return &mocks.MockScene{}

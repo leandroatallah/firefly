@@ -1,12 +1,12 @@
 package skill
 
 import (
-	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
 	physicsmovement "github.com/boilerplate/ebiten-template/internal/engine/physics/movement"
 	spacephysics "github.com/boilerplate/ebiten-template/internal/engine/physics/space"
+	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
 type JumpSkill struct {

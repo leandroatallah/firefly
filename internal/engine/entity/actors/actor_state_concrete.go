@@ -60,7 +60,6 @@ func (s *LandingState) OnStart(currentCount int) {
 // Hurt
 type HurtState struct {
 	BaseState
-	count         int
 	durationLimit int
 }
 

@@ -10,23 +10,23 @@ import (
 
 // CameraZoomCommand sets the camera zoom level and always rewinds back
 type CameraZoomCommand struct {
-	Zoom            float64
-	Duration        int    // Duration of zoom in frames (0 for instant)
-	Delay           int    // Frames to wait at peak zoom before rewinding
-	OutDuration     int    // Duration of zoom out in frames (0 to use same as Duration)
-	TargetID        string // Optional: body/actor ID to center camera on
-	currentZoom     float64
-	targetZoom      float64
-	timer           int
-	camera          *camera.Controller
-	startX          float64
-	startY          float64
-	phase           int // 0=zooming in, 1=waiting, 2=zooming out
-	rewindDur       int
-	targetActor     actors.ActorEntity
-	origFollowing   bool       // Store original following state
+	Zoom             float64
+	Duration         int    // Duration of zoom in frames (0 for instant)
+	Delay            int    // Frames to wait at peak zoom before rewinding
+	OutDuration      int    // Duration of zoom out in frames (0 to use same as Duration)
+	TargetID         string // Optional: body/actor ID to center camera on
+	currentZoom      float64
+	targetZoom       float64
+	timer            int
+	camera           *camera.Controller
+	startX           float64
+	startY           float64
+	phase            int // 0=zooming in, 1=waiting, 2=zooming out
+	rewindDur        int
+	targetActor      actors.ActorEntity
+	origFollowing    bool      // Store original following state
 	origFollowTarget body.Body // Store original follow target
-	sameTarget      bool // True if target is same as current follow target
+	sameTarget       bool      // True if target is same as current follow target
 }
 
 func (c *CameraZoomCommand) Init(appContext any) {

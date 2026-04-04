@@ -1,5 +1,8 @@
 package actors
 
+// State enum: part of engine public API
+//
+//nolint:gochecknoglobals
 var Ducking ActorStateEnum
 
 func init() {

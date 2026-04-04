@@ -50,7 +50,6 @@ type PhasesScene struct {
 
 	// Complete phase
 	reachedEndpoint bool
-	hasEndpoints    bool
 	hasPlayer       bool
 	goal            phases.Goal
 
@@ -71,9 +70,9 @@ type PhasesScene struct {
 
 	vignette *enginevfx.Vignette
 
-	death   deathSequence
-	bullets []*gamestates.Bullet
-	bulletImg *ebiten.Image
+	death         deathSequence
+	bullets       []*gamestates.Bullet
+	bulletImg     *ebiten.Image
 	bulletCounter int
 }
 
@@ -81,15 +80,15 @@ type PhasesScene struct {
 func (s *PhasesScene) SpawnBullet(x16, y16, vx16, vy16 int, owner interface{}) {
 	baseBody := bodyphysics.NewBody(bodyphysics.NewRect(0, 0, 2, 1))
 	baseBody.SetPosition16(x16, y16)
-	
+
 	s.bulletCounter++
 	bulletID := fmt.Sprintf("bullet_%d", s.bulletCounter)
 	baseBody.SetID(bulletID)
-	
+
 	movableBody := bodyphysics.NewMovableBody(baseBody)
 	collidableBody := bodyphysics.NewCollidableBody(baseBody)
 	collidableBody.SetOwner(owner)
-	
+
 	bullet := gamestates.NewBullet(movableBody, collidableBody, s.PhysicsSpace(), vx16, vy16)
 	collidableBody.SetTouchable(bullet)
 	s.PhysicsSpace().AddBody(collidableBody)
@@ -98,10 +97,10 @@ func (s *PhasesScene) SpawnBullet(x16, y16, vx16, vy16 int, owner interface{}) {
 
 func NewPhasesScene(ctx *app.AppContext) *PhasesScene {
 	tilemapScene := scene.NewTilemapScene(ctx)
-	
+
 	bulletImg := ebiten.NewImage(2, 1)
 	bulletImg.Fill(color.RGBA{255, 255, 255, 255})
-	
+
 	scene := &PhasesScene{
 		TilemapScene: tilemapScene,
 		mainText:     ctx.Font,

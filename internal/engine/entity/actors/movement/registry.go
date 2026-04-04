@@ -4,6 +4,9 @@ import "fmt"
 
 type MovementStateConstructor func(base BaseMovementState) MovementState
 
+// Singleton registry: intentional package-level state
+//
+//nolint:gochecknoglobals
 var (
 	movementStateConstructors = make(map[MovementStateEnum]MovementStateConstructor)
 	movementStateEnums        = make(map[string]MovementStateEnum)

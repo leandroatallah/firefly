@@ -7,6 +7,9 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 )
 
+// State enum: part of engine public API
+//
+//nolint:gochecknoglobals
 var Wander MovementStateEnum
 
 func init() {

@@ -9,6 +9,9 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/physics/tween"
 )
 
+// State enum: part of engine public API
+//
+//nolint:gochecknoglobals
 var StateDashing actors.ActorStateEnum
 
 func init() {

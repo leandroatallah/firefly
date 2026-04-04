@@ -23,7 +23,7 @@ func (b *Bullet) Update() {
 	x += b.speedX16
 	y += b.speedY16
 	b.body.SetPosition16(x, y)
-	
+
 	b.space.ResolveCollisions(b.body)
 
 	provider := b.space.GetTilemapDimensionsProvider()

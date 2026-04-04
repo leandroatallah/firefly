@@ -4,7 +4,7 @@ package gamestates
 type GroundedSubStateEnum int
 
 const (
-	SubStateIdle    GroundedSubStateEnum = iota
+	SubStateIdle GroundedSubStateEnum = iota
 	SubStateWalking
 	SubStateDucking
 	SubStateAimLock

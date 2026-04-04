@@ -4,8 +4,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 func setupConfig() {
@@ -175,14 +175,14 @@ func TestFader_StartTransition(t *testing.T) {
 	if !f.active || !f.exiting {
 		t.Error("StartTransition did not initialize fade out")
 	}
-	
+
 	// StartTransition calls fadeOut with a callback that calls fadeIn
 	// fadeIn sets starting = true and calls the user callback immediately
-	
+
 	// Simulate reaching end of fade out
 	f.alpha = 255
 	f.Update()
-	
+
 	if !called {
 		t.Error("callback should be called via fadeIn when fadeOut completes")
 	}

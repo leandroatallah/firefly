@@ -3,12 +3,12 @@ package mocks
 import (
 	"image"
 
-	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/animation"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/movement"
 	physicsmovement "github.com/boilerplate/ebiten-template/internal/engine/physics/movement"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 // MockActor implements actors.ActorEntity for testing
@@ -26,16 +26,16 @@ type MockActor struct {
 	MoveRightForce int
 }
 
-func (m *MockActor) ID() string                                           { return m.Id }
-func (m *MockActor) SetID(id string)                                      { m.Id = id }
-func (m *MockActor) Position() image.Rectangle                            { return m.Pos }
-func (m *MockActor) SetPosition(x, y int)                                 { m.Pos = image.Rect(x, y, x+10, y+10) }
+func (m *MockActor) ID() string                { return m.Id }
+func (m *MockActor) SetID(id string)           { m.Id = id }
+func (m *MockActor) Position() image.Rectangle { return m.Pos }
+func (m *MockActor) SetPosition(x, y int)      { m.Pos = image.Rect(x, y, x+10, y+10) }
 func (m *MockActor) SetSize(w, h int) {
 	m.Pos.Max.X = m.Pos.Min.X + w
 	m.Pos.Max.Y = m.Pos.Min.Y + h
 }
-func (m *MockActor) Scale() float64 { return 1.0 }
-func (m *MockActor) SetScale(s float64) {}
+func (m *MockActor) Scale() float64                                       { return 1.0 }
+func (m *MockActor) SetScale(s float64)                                   {}
 func (m *MockActor) SetPosition16(x16, y16 int)                           { m.SetPosition(x16/16, y16/16) }
 func (m *MockActor) GetPosition16() (int, int)                            { return m.Pos.Min.X * 16, m.Pos.Min.Y * 16 }
 func (m *MockActor) GetPositionMin() (int, int)                           { return m.Pos.Min.X, m.Pos.Min.Y }
@@ -72,17 +72,17 @@ func (m *MockActor) NewState(state actors.ActorStateEnum) (actors.ActorState, er
 	return nil, nil
 }
 func (m *MockActor) Hurt(damage int)                                     {}
-func (m *MockActor) OnDie()                                             {}
-func (m *MockActor) OnJump()                                            {}
-func (m *MockActor) OnLand()                                            {}
-func (m *MockActor) OnFall()                                            {}
-func (m *MockActor) SetOnJump(f func(image.Point))                      {}
-func (m *MockActor) SetOnFall(f func(image.Point))                      {}
-func (m *MockActor) SetOnLand(f func(image.Point))                      {}
-func (m *MockActor) SetAppContext(_ any)                                {}
-func (m *MockActor) AppContext() any                                    { return nil }
+func (m *MockActor) OnDie()                                              {}
+func (m *MockActor) OnJump()                                             {}
+func (m *MockActor) OnLand()                                             {}
+func (m *MockActor) OnFall()                                             {}
+func (m *MockActor) SetOnJump(f func(image.Point))                       {}
+func (m *MockActor) SetOnFall(f func(image.Point))                       {}
+func (m *MockActor) SetOnLand(f func(image.Point))                       {}
+func (m *MockActor) SetAppContext(_ any)                                 {}
+func (m *MockActor) AppContext() any                                     { return nil }
 func (m *MockActor) Owner() interface{}                                  { return nil }
-func (m *MockActor) SetOwner(interface{})                                { }
+func (m *MockActor) SetOwner(interface{})                                {}
 func (m *MockActor) LastOwner() interface{}                              { return nil }
 func (m *MockActor) Update(space body.BodiesSpace) error                 { return nil }
 func (m *MockActor) Health() int                                         { return m.HealthVal }

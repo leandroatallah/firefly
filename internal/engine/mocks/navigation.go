@@ -1,9 +1,9 @@
 package mocks
 
 import (
-	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/boilerplate/ebiten-template/internal/engine/audio"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/navigation"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 // MockScene implements navigation.Scene

@@ -123,4 +123,3 @@ func (s *FollowMovementState) hasGroundInDirection(space body.BodiesSpace, isRig
 
 	return false
 }
-

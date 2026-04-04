@@ -43,9 +43,9 @@ func TestEuclideanDistance(t *testing.T) {
 
 func TestReconstructPath(t *testing.T) {
 	tests := []struct {
-		name     string
+		name      string
 		buildPath func() *Node
-		want     []image.Point
+		want      []image.Point
 	}{
 		{
 			name: "single node",

@@ -3,9 +3,9 @@ package assets
 import (
 	"log"
 
+	"github.com/boilerplate/ebiten-template/internal/engine/app"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
-	"github.com/boilerplate/ebiten-template/internal/engine/app"
 )
 
 func LoadImageFromFs(ctx *app.AppContext, path string) *ebiten.Image {

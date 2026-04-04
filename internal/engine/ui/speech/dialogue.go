@@ -3,10 +3,10 @@ package speech
 import (
 	"strings"
 
-	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/boilerplate/ebiten-template/internal/engine/audio"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
+	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
 // Manager handles the display of dialogue and speech bubbles.

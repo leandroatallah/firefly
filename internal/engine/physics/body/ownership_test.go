@@ -4,11 +4,6 @@ import (
 	"testing"
 )
 
-// ownerGetter is a helper interface for testing ownership hierarchy
-type ownerGetter interface {
-	Owner() interface{}
-}
-
 func TestOwnership_SetOwner(t *testing.T) {
 	var o Ownership
 
