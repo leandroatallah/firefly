@@ -71,7 +71,7 @@ type mockSceneManager struct {
 	navigateBackCalled bool
 }
 
-func (m *mockSceneManager) AudioManager() *audio.AudioManager { return nil }
+func (m *mockSceneManager) AudioManager() audio.Manager { return nil }
 func (m *mockSceneManager) Draw(_ *ebiten.Image)              {}
 func (m *mockSceneManager) NavigateTo(_ navigation.SceneType, _ navigation.Transition, _ bool) {
 	m.navigateToCalled = true
