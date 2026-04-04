@@ -6,8 +6,8 @@ import (
 
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
 	bodyphysics "github.com/boilerplate/ebiten-template/internal/engine/physics/body"
-	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/boilerplate/ebiten-template/internal/engine/render/sprites"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 // newDuckingTestCharacter creates a Character with a body of the given dimensions.
