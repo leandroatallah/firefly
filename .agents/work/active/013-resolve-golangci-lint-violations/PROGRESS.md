@@ -10,7 +10,7 @@
 | Spec Engineer       | ✅ Complete | `SPEC.md` written from fresh linter run (130 issues confirmed) |
 | Mock Generator      | ⬜ Pending  | |
 | TDD Specialist      | ⬜ Pending  | |
-| Feature Implementer | ✅ Complete | Step 1 (`gofmt`) done |
+| Feature Implementer | ✅ Complete | Steps 1 & 3 (`gofmt`, `unparam`) done |
 | Gatekeeper          | ⬜ Pending  | |
 
 ## Log
@@ -26,3 +26,9 @@
   - `internal/engine/contracts/vfx/vfx.go`
   
   `golangci-lint run internal/engine/contracts/...` → `0 issues`. ✅
+- **Feature Implementer 2026-04-04 — Step 3 (`unparam`):** Fixed 3 spec violations:
+  - `internal/engine/entity/actors/ducking_state_test.go:14` — `w, h` → `_, _` (both always `16`/`32`), hardcoded constants inline.
+  - `internal/engine/physics/body/body_builder_test.go:25` — `state` → `_`.
+  - `internal/game/scenes/phases/events.go:9` — `scene` → `_`.
+  - Remaining `unparam` issue in `item_power_base.go` is covered by step 5 (`unused` dead code removal).
+  - Pre-existing test failure in `ducking_state_test.go` confirmed unrelated to these changes. ✅

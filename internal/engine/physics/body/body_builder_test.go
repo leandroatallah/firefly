@@ -22,7 +22,7 @@ func newMockEntity() *mockEntity {
 	}
 }
 
-func (m *mockEntity) addCollisionRect(state animation.SpriteState, rect body.Collidable) {
+func (m *mockEntity) addCollisionRect(_ animation.SpriteState, rect body.Collidable) {
 	m.collisionRects = append(m.collisionRects, rect)
 }
 
