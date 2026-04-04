@@ -6,12 +6,14 @@ import (
 	physicsmovement "github.com/boilerplate/ebiten-template/internal/engine/physics/movement"
 )
 
+// StatData holds the base numeric stats loaded from configuration for an actor.
 type StatData struct {
 	Health   int `json:"health"`
 	Speed    int `json:"speed"`
 	MaxSpeed int `json:"max_speed"`
 }
 
+// Controllable is implemented by actors that accept directional movement input.
 type Controllable interface {
 	OnMoveLeft(force int)
 	OnMoveRight(force int)
@@ -39,14 +41,17 @@ type Damageable interface {
 	Hurt(damage int)
 }
 
+// Jumpable is implemented by actors that have custom on-jump behaviour.
 type Jumpable interface {
 	OnJump()
 }
 
+// Landable is implemented by actors that have custom on-land behaviour.
 type Landable interface {
 	OnLand()
 }
 
+// Fallable is implemented by actors that have custom on-fall behaviour.
 type Fallable interface {
 	OnFall()
 }

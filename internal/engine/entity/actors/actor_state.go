@@ -1,7 +1,12 @@
+// Package actors implements the registry-based state machine for game entities.
+// Each actor state is registered at init time via RegisterState, which assigns a
+// unique ActorStateEnum value and a constructor. The Character drives transitions
+// through handleState, delegating per-state behaviour to ActorState implementations.
 package actors
 
 import "github.com/boilerplate/ebiten-template/internal/engine/entity"
 
+// ActorState is the interface every concrete state must satisfy.
 type ActorState interface {
 	State() ActorStateEnum
 	OnStart(currentCount int)
@@ -10,6 +15,7 @@ type ActorState interface {
 	IsAnimationFinished() bool
 }
 
+// ActorStateEnum is an integer token that uniquely identifies a registered state.
 type ActorStateEnum int
 
 // State enum: part of engine public API
@@ -49,6 +55,7 @@ func init() {
 	FallingShooting = RegisterState("fall_shoot", func(b BaseState) ActorState { return &FallingShootingState{BaseState: b} })
 }
 
+// BaseState provides shared bookkeeping (entry count, tick) for all concrete states.
 type BaseState struct {
 	actor      ActorEntity
 	state      ActorStateEnum

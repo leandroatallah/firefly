@@ -56,6 +56,7 @@ func (m *Manager) GetPlayer() (ActorEntity, bool) {
 	return m.Find("player")
 }
 
+// ForEach calls f for every registered actor in an unspecified order.
 func (m *Manager) ForEach(f func(ActorEntity)) {
 	for _, actor := range m.actors {
 		f(actor)
