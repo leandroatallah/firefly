@@ -5,11 +5,11 @@ import (
 
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/animation"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
+	"github.com/boilerplate/ebiten-template/internal/engine/input"
 	physicsmovement "github.com/boilerplate/ebiten-template/internal/engine/physics/movement"
 	"github.com/boilerplate/ebiten-template/internal/engine/utils/fp16"
 	"github.com/boilerplate/ebiten-template/internal/engine/utils/timing"
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
 // DashSkill implements a dash and air dash ability.
@@ -19,6 +19,7 @@ type DashSkill struct {
 	canAirDash    bool
 	airDashUsed   bool
 	activationKey ebiten.Key
+	dashPressed   bool
 }
 
 // NewDashSkill creates a new DashSkill with default values.
@@ -43,9 +44,12 @@ func (d *DashSkill) ActivationKey() ebiten.Key {
 
 // HandleInput checks for the dash activation key.
 func (d *DashSkill) HandleInput(body body.MovableCollidable, model *physicsmovement.PlatformMovementModel, space body.BodiesSpace) {
-	if inpututil.IsKeyJustPressed(d.activationKey) {
+	cmds := input.CommandsReader()
+	dashPressed := cmds.Dash
+	if dashPressed && !d.dashPressed {
 		d.tryActivate(body, model, space)
 	}
+	d.dashPressed = dashPressed
 }
 
 // Update manages the skill's state, timers, and applies its effects.

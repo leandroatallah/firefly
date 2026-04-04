@@ -7,9 +7,9 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/builder"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/platformer"
+	"github.com/boilerplate/ebiten-template/internal/engine/input"
 	gameplayermethods "github.com/boilerplate/ebiten-template/internal/game/entity/actors/methods"
 	gamestates "github.com/boilerplate/ebiten-template/internal/game/entity/actors/states"
-	"github.com/hajimehoshi/ebiten/v2"
 )
 
 // climberStateTransitionLogic provides custom state handling for the ClimberPlayer.
@@ -63,8 +63,10 @@ func NewClimberPlayer(ctx *app.AppContext) (platformer.PlatformerActorEntity, er
 }
 
 func (p *ClimberPlayer) Update(space body.BodiesSpace) error {
+	cmds := input.CommandsReader()
+
 	// Check for ducking input
-	duckHeld := ebiten.IsKeyPressed(ebiten.KeyDown) || ebiten.IsKeyPressed(ebiten.KeyS)
+	duckHeld := cmds.Down
 	p.SetDucking(duckHeld && !p.IsFalling() && !p.IsGoingUp())
 
 	// When ducking, prevent horizontal movement but allow facing direction change
@@ -73,9 +75,9 @@ func (p *ClimberPlayer) Update(space body.BodiesSpace) error {
 		p.SetHorizontalInertia(0)
 
 		// Allow facing direction change while ducking
-		if ebiten.IsKeyPressed(ebiten.KeyLeft) || ebiten.IsKeyPressed(ebiten.KeyA) {
+		if cmds.Left {
 			p.SetFaceDirection(animation.FaceDirectionLeft)
-		} else if ebiten.IsKeyPressed(ebiten.KeyRight) || ebiten.IsKeyPressed(ebiten.KeyD) {
+		} else if cmds.Right {
 			p.SetFaceDirection(animation.FaceDirectionRight)
 		}
 	} else {

@@ -49,8 +49,9 @@ func (s *HorizontalMovementSkill) HandleInput(body body.MovableCollidable, model
 	cfg := config.Get()
 	vx16, vy16 := body.Velocity()
 
-	moveLeft := input.IsSomeKeyPressed(ebiten.KeyA, ebiten.KeyLeft)
-	moveRight := input.IsSomeKeyPressed(ebiten.KeyD, ebiten.KeyRight)
+	cmds := input.CommandsReader()
+	moveLeft := cmds.Left
+	moveRight := cmds.Right
 
 	if moveLeft && !s.prevLeft {
 		s.axis.Press(-1)
