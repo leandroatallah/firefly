@@ -8,9 +8,9 @@ package sequences
 import (
 	"log"
 
+	"github.com/boilerplate/ebiten-template/internal/engine/core"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
-	"github.com/boilerplate/ebiten-template/internal/engine/core"
 )
 
 // The following is an example of how to integrate the SequencePlayer into a scene.
