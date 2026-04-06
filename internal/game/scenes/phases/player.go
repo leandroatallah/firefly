@@ -50,12 +50,6 @@ func createPlayer(ctx *app.AppContext, playerType gameentitytypes.PlayerType) (p
 		},
 	}
 
-	if currentScene := ctx.SceneManager.CurrentScene(); currentScene != nil {
-		if shooter, ok := currentScene.(body.Shooter); ok {
-			deps.Shooter = shooter
-		}
-	}
-
 	skills := skill.FromConfig(spriteData.Skills, deps)
 	for _, s := range skills {
 		p.GetCharacter().AddSkill(s)

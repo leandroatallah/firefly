@@ -6,120 +6,186 @@ import (
 
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/animation"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/combat"
+	"github.com/boilerplate/ebiten-template/internal/engine/input"
 	"github.com/boilerplate/ebiten-template/internal/engine/mocks"
 	"github.com/boilerplate/ebiten-template/internal/engine/physics/skill"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-func TestShootingSkill_CooldownGating(t *testing.T) {
-	spawnCount := 0
-	shooter := &mocks.MockShooter{
-		SpawnBulletFunc: func(x16, y16, vx16, vy16 int, owner interface{}) {
-			spawnCount++
+// Red Phase Tests: Inventory-Aware Shooting Skill
+
+func TestShootingSkill_FireDelegatesToActiveWeapon(t *testing.T) {
+	fireCalled := false
+	mockWeapon := &mocks.MockWeapon{
+		CanFireFunc: func() bool { return true },
+		FireFunc: func(x16, y16 int, faceDir animation.FacingDirectionEnum, direction body.ShootDirection) {
+			fireCalled = true
 		},
 	}
 
-	s := skill.NewShootingSkill(shooter, 3, 16<<4, 32<<4, 4)
+	mockInventory := &mocks.MockInventory{
+		ActiveWeaponFunc: func() combat.Weapon { return mockWeapon },
+	}
+
+	s := skill.NewShootingSkill(mockInventory)
 	body := &mockMovableCollidable{
 		getPosition16Func: func() (int, int) { return 100 << 4, 50 << 4 },
 		faceDirectionFunc: func() animation.FacingDirectionEnum { return animation.FaceDirectionRight },
 	}
 
-	s.HandleInputWithDirection(body, nil, nil, false, false, false, false)
-	s.Update(body, nil)
-	s.HandleInputWithDirection(body, nil, nil, false, false, false, false)
-	s.Update(body, nil)
-	s.HandleInputWithDirection(body, nil, nil, false, false, false, false)
-	s.Update(body, nil)
-	s.HandleInputWithDirection(body, nil, nil, false, false, false, false)
-	s.Update(body, nil)
+	// Inject shoot command
+	oldReader := input.CommandsReader
+	defer func() { input.CommandsReader = oldReader }()
+	input.CommandsReader = func() input.PlayerCommands {
+		return input.PlayerCommands{Shoot: true}
+	}
 
-	if spawnCount != 2 {
-		t.Errorf("with cooldown=3, 4 frames should spawn 2 bullets (frame 1 and 4), got %d", spawnCount)
+	s.HandleInput(body, nil, nil)
+
+	if !fireCalled {
+		t.Error("expected weapon.Fire() to be called, but it was not")
 	}
 }
 
-func TestShootingSkill_AlternatingYOffset(t *testing.T) {
-	var yOffsets []int
-	shooter := &mocks.MockShooter{
-		SpawnBulletFunc: func(x16, y16, vx16, vy16 int, owner interface{}) {
-			yOffsets = append(yOffsets, y16)
+func TestShootingSkill_NoFireWhenWeaponOnCooldown(t *testing.T) {
+	fireCalled := false
+	mockWeapon := &mocks.MockWeapon{
+		CanFireFunc: func() bool { return false },
+		FireFunc: func(x16, y16 int, faceDir animation.FacingDirectionEnum, direction body.ShootDirection) {
+			fireCalled = true
 		},
 	}
 
-	s := skill.NewShootingSkill(shooter, 0, 0, 32<<4, 4)
+	mockInventory := &mocks.MockInventory{
+		ActiveWeaponFunc: func() combat.Weapon { return mockWeapon },
+	}
+
+	s := skill.NewShootingSkill(mockInventory)
 	body := &mockMovableCollidable{
-		getPosition16Func: func() (int, int) { return 0, 50 << 4 },
+		getPosition16Func: func() (int, int) { return 100 << 4, 50 << 4 },
 		faceDirectionFunc: func() animation.FacingDirectionEnum { return animation.FaceDirectionRight },
 	}
 
-	for i := 0; i < 4; i++ {
-		s.HandleInputWithDirection(body, nil, nil, false, false, false, false)
-		s.Update(body, nil)
+	// Inject shoot command
+	oldReader := input.CommandsReader
+	defer func() { input.CommandsReader = oldReader }()
+	input.CommandsReader = func() input.PlayerCommands {
+		return input.PlayerCommands{Shoot: true}
 	}
 
-	want := []int{(50 << 4) + 4, (50 << 4) - 4, (50 << 4) + 4, (50 << 4) - 4}
-	if len(yOffsets) != len(want) {
-		t.Fatalf("got %d offsets, want %d", len(yOffsets), len(want))
-	}
-	for i, got := range yOffsets {
-		if got != want[i] {
-			t.Errorf("offset[%d]: got %d, want %d", i, got, want[i])
-		}
+	s.HandleInput(body, nil, nil)
+
+	if fireCalled {
+		t.Error("expected weapon.Fire() NOT to be called when CanFire() is false, but it was")
 	}
 }
 
-func TestShootingSkill_StateTransitions(t *testing.T) {
-	shooter := &mocks.MockShooter{
-		SpawnBulletFunc: func(x16, y16, vx16, vy16 int, owner interface{}) {},
+func TestShootingSkill_NoFireWhenInventoryEmpty(t *testing.T) {
+	mockInventory := &mocks.MockInventory{
+		ActiveWeaponFunc: func() combat.Weapon { return nil },
 	}
 
-	s := skill.NewShootingSkill(shooter, 2, 0, 32<<4, 4)
+	s := skill.NewShootingSkill(mockInventory)
+	body := &mockMovableCollidable{
+		getPosition16Func: func() (int, int) { return 100 << 4, 50 << 4 },
+		faceDirectionFunc: func() animation.FacingDirectionEnum { return animation.FaceDirectionRight },
+	}
+
+	// Inject shoot command
+	oldReader := input.CommandsReader
+	defer func() { input.CommandsReader = oldReader }()
+	input.CommandsReader = func() input.PlayerCommands {
+		return input.PlayerCommands{Shoot: true}
+	}
+
+	// Should not panic
+	s.HandleInput(body, nil, nil)
+}
+
+func TestShootingSkill_WeaponSwitchingOnInput(t *testing.T) {
+	switchNextCalled := false
+	switchPrevCalled := false
+
+	mockInventory := &mocks.MockInventory{
+		ActiveWeaponFunc: func() combat.Weapon { return nil },
+		SwitchNextFunc: func() {
+			switchNextCalled = true
+		},
+		SwitchPrevFunc: func() {
+			switchPrevCalled = true
+		},
+	}
+
+	s := skill.NewShootingSkill(mockInventory)
+	body := &mockMovableCollidable{
+		getPosition16Func: func() (int, int) { return 100 << 4, 50 << 4 },
+		faceDirectionFunc: func() animation.FacingDirectionEnum { return animation.FaceDirectionRight },
+	}
+
+	// Test WeaponNext
+	oldReader := input.CommandsReader
+	defer func() { input.CommandsReader = oldReader }()
+	input.CommandsReader = func() input.PlayerCommands {
+		return input.PlayerCommands{WeaponNext: true}
+	}
+
+	s.HandleInput(body, nil, nil)
+
+	if !switchNextCalled {
+		t.Error("expected inv.SwitchNext() to be called on WeaponNext input, but it was not")
+	}
+
+	// Test WeaponPrev
+	switchNextCalled = false
+	input.CommandsReader = func() input.PlayerCommands {
+		return input.PlayerCommands{WeaponPrev: true}
+	}
+
+	s.HandleInput(body, nil, nil)
+
+	if !switchPrevCalled {
+		t.Error("expected inv.SwitchPrev() to be called on WeaponPrev input, but it was not")
+	}
+}
+
+func TestShootingSkill_UpdateHandlesShootRelease(t *testing.T) {
+	transitionFromShootingCalled := false
+	handler := &mocks.MockStateTransitionHandler{
+		TransitionFromShootingFunc: func() {
+			transitionFromShootingCalled = true
+		},
+	}
+
+	mockInventory := &mocks.MockInventory{
+		ActiveWeaponFunc: func() combat.Weapon { return nil },
+	}
+
+	s := skill.NewShootingSkill(mockInventory)
+	s.SetStateTransitionHandler(handler)
+
 	body := &mockMovableCollidable{
 		getPosition16Func: func() (int, int) { return 0, 0 },
 		faceDirectionFunc: func() animation.FacingDirectionEnum { return animation.FaceDirectionRight },
 	}
 
-	if s.IsActive() {
-		t.Error("initial state should be Ready (IsActive=false)")
+	oldReader := input.CommandsReader
+	defer func() { input.CommandsReader = oldReader }()
+
+	// Simulate shoot held
+	input.CommandsReader = func() input.PlayerCommands {
+		return input.PlayerCommands{Shoot: true}
 	}
-
-	s.HandleInputWithDirection(body, nil, nil, false, false, false, false)
-
-	if !s.IsActive() {
-		t.Error("after HandleInputWithDirection with spawn, state should be Cooldown (IsActive=true)")
-	}
-
-	s.Update(body, nil)
 	s.Update(body, nil)
 
-	if s.IsActive() {
-		t.Error("after 2 Update calls, state should return to Ready (IsActive=false)")
+	// Simulate shoot released
+	input.CommandsReader = func() input.PlayerCommands {
+		return input.PlayerCommands{Shoot: false}
 	}
-}
+	s.Update(body, nil)
 
-func TestShootingSkill_NoSpawnWhenNotReady(t *testing.T) {
-	spawnCount := 0
-	shooter := &mocks.MockShooter{
-		SpawnBulletFunc: func(x16, y16, vx16, vy16 int, owner interface{}) {
-			spawnCount++
-		},
-	}
-
-	s := skill.NewShootingSkill(shooter, 3, 0, 32<<4, 4)
-	body := &mockMovableCollidable{
-		getPosition16Func: func() (int, int) { return 0, 0 },
-		faceDirectionFunc: func() animation.FacingDirectionEnum { return animation.FaceDirectionRight },
-	}
-
-	s.HandleInputWithDirection(body, nil, nil, false, false, false, false)
-	if spawnCount != 1 {
-		t.Fatalf("first call should spawn, got %d spawns", spawnCount)
-	}
-
-	s.HandleInputWithDirection(body, nil, nil, false, false, false, false)
-	if spawnCount != 1 {
-		t.Errorf("second call during cooldown should not spawn, got %d spawns", spawnCount)
+	if !transitionFromShootingCalled {
+		t.Error("expected TransitionFromShooting() to be called on shoot release, but it was not")
 	}
 }
 
