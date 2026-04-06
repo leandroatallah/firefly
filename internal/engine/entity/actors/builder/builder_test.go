@@ -599,6 +599,7 @@ func (m *mockInventory) SwitchTo(index int)                      {}
 func (m *mockInventory) HasAmmo(weaponID string) bool            { return true }
 func (m *mockInventory) ConsumeAmmo(weaponID string, amount int) {}
 func (m *mockInventory) SetAmmo(weaponID string, amount int)     {}
+func (m *mockInventory) Update()                                 {}
 
 // mockEventManager implements event.Manager interface
 type mockEventManager struct{}

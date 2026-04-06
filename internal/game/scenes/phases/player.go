@@ -37,8 +37,8 @@ func createPlayer(ctx *app.AppContext, playerType gameentitytypes.PlayerType) (p
 	}
 
 	deps := skill.SkillDeps{
-		Inventory:         nil,
-		ProjectileManager: nil,
+		Inventory:         gameplayer.NewClimberInventory(ctx.ProjectileManager),
+		ProjectileManager: ctx.ProjectileManager,
 		OnJump: func(b interface{}) {
 			bodyObj, ok := b.(body.MovableCollidable)
 			if !ok {

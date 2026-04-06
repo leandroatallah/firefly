@@ -14,6 +14,7 @@ type ProjectileWeapon struct {
 	projectileType  string
 	projectileSpeed int
 	manager         combat.ProjectileManager
+	owner           interface{}
 }
 
 // NewProjectileWeapon creates a new projectile weapon.
@@ -25,7 +26,13 @@ func NewProjectileWeapon(id string, cooldownFrames int, projectileType string, p
 		projectileType:  projectileType,
 		projectileSpeed: projectileSpeed,
 		manager:         manager,
+		owner:           nil,
 	}
+}
+
+// SetOwner sets the owner of projectiles fired by this weapon.
+func (w *ProjectileWeapon) SetOwner(owner interface{}) {
+	w.owner = owner
 }
 
 // ID returns the weapon's unique identifier.
@@ -36,7 +43,7 @@ func (w *ProjectileWeapon) ID() string {
 // Fire spawns a projectile if the weapon can fire.
 func (w *ProjectileWeapon) Fire(x16, y16 int, faceDir animation.FacingDirectionEnum, direction body.ShootDirection) {
 	vx16, vy16 := w.calculateVelocity(direction, faceDir)
-	w.manager.SpawnProjectile(w.projectileType, x16, y16, vx16, vy16, nil)
+	w.manager.SpawnProjectile(w.projectileType, x16, y16, vx16, vy16, w.owner)
 	w.currentCooldown = w.cooldownFrames
 }
 

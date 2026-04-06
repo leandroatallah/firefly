@@ -65,6 +65,7 @@ type MockInventory struct {
 	HasAmmoFunc      func(weaponID string) bool
 	ConsumeAmmoFunc  func(weaponID string, amount int)
 	SetAmmoFunc      func(weaponID string, amount int)
+	UpdateFunc       func()
 }
 
 func (m *MockInventory) AddWeapon(weapon combat.Weapon) {
@@ -114,5 +115,11 @@ func (m *MockInventory) ConsumeAmmo(weaponID string, amount int) {
 func (m *MockInventory) SetAmmo(weaponID string, amount int) {
 	if m.SetAmmoFunc != nil {
 		m.SetAmmoFunc(weaponID, amount)
+	}
+}
+
+func (m *MockInventory) Update() {
+	if m.UpdateFunc != nil {
+		m.UpdateFunc()
 	}
 }

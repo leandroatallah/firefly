@@ -481,9 +481,12 @@ func (s *PhasesScene) Draw(screen *ebiten.Image) {
 		}
 	}
 
-	// Draw bullets
+	// Draw bullets with camera offset
 	if s.AppContext().ProjectileManager != nil {
-		s.AppContext().ProjectileManager.Draw(screen)
+		camX, camY := s.Camera().Base().GetActualCenter()
+		camX -= float64(config.Get().ScreenWidth) / 2
+		camY -= float64(config.Get().ScreenHeight) / 2
+		s.AppContext().ProjectileManager.DrawWithOffset(screen, camX, camY)
 	}
 
 	if s.ShowDrawScreenFlash > 0 {
