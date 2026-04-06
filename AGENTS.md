@@ -45,6 +45,10 @@ tests := []struct {
 ### 3. Physics & Fixed-Point Arithmetic
 
 - Always validate positions using `fp16.From16()` and `fp16.To16()` when checking `x16` and `y16` values.
+- **Important**: The fp16 scale factor is 16, not 65536. See [ADR-007](docs/adr/ADR-007-fp16-scale-factor.md).
+  - 1 pixel = 16 units (not 65536)
+  - Use `<<4` for pixel-to-fp16 conversion (not `<<16`)
+  - Velocity of 6 pixels/frame = 96 units/frame (not 393216)
 - Test edge cases for collisions:
   - One pixel before collision.
   - Partial overlap.
@@ -123,6 +127,7 @@ func (t *Transition) Draw(_ *ebiten.Image) {}  // Use blank in param list
 | `entity/items` | 52.3% | Item collection and state transitions |
 | `scene` | 73.0% | Scene transitions and tilemap initialization |
 | `data/i18n` | (new) | `I18nManager.Load()` and `T()` methods, error handling |
+| `combat` | (new) | Inventory, weapons, projectiles (US-028) |
 
 ## 🛠 Story Management Scripts
 
