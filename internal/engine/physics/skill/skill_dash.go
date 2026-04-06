@@ -67,7 +67,8 @@ func (d *DashSkill) Update(b body.MovableCollidable, model *physicsmovement.Plat
 		if d.timer <= 0 {
 			d.state = StateCooldown
 			d.timer = d.cooldown
-			model.SetDashActive(false, 0) // Signal to the movement model that dash is no longer active
+			model.SetDashActive(false, 0)
+			model.SetGravityEnabled(true)
 		} else {
 			// Apply dash movement by setting it in the movement model
 			dirX := 1
@@ -75,6 +76,12 @@ func (d *DashSkill) Update(b body.MovableCollidable, model *physicsmovement.Plat
 				dirX = -1
 			}
 			model.SetDashActive(true, d.speed*dirX)
+			// Override gravity during air dash to maintain height (Cuphead-style)
+			if !model.OnGround() {
+				model.SetGravityEnabled(false)
+				vx, _ := b.Velocity()
+				b.SetVelocity(vx, 0)
+			}
 		}
 	case StateCooldown:
 		d.timer--
