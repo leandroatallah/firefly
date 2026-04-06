@@ -50,13 +50,13 @@ func FromConfig(cfg *schemas.SkillsConfig, deps SkillDeps) []Skill {
 	if cfg.Dash != nil && isEnabled(cfg.Dash.Enabled) {
 		dashSkill := NewDashSkill()
 		if cfg.Dash.DurationMs > 0 {
-			dashSkill.SkillBase.duration = timing.FromDuration(time.Duration(cfg.Dash.DurationMs) * time.Millisecond)
+			dashSkill.duration = timing.FromDuration(time.Duration(cfg.Dash.DurationMs) * time.Millisecond)
 		}
 		if cfg.Dash.CooldownMs > 0 {
-			dashSkill.SkillBase.cooldown = timing.FromDuration(time.Duration(cfg.Dash.CooldownMs) * time.Millisecond)
+			dashSkill.cooldown = timing.FromDuration(time.Duration(cfg.Dash.CooldownMs) * time.Millisecond)
 		}
 		if cfg.Dash.Speed > 0 {
-			dashSkill.SkillBase.speed = fp16.To16(cfg.Dash.Speed)
+			dashSkill.speed = fp16.To16(cfg.Dash.Speed)
 		}
 		if cfg.Dash.CanAirDash != nil {
 			dashSkill.canAirDash = *cfg.Dash.CanAirDash

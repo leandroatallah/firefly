@@ -55,8 +55,8 @@ func TestFromConfig_AllSkillsEnabled(t *testing.T) {
 	if shootingSkill == nil {
 		t.Fatal("shooting skill not found")
 	}
-	if shootingSkill.SkillBase.cooldown != 15 {
-		t.Errorf("expected shooting cooldown 15, got %d", shootingSkill.SkillBase.cooldown)
+	if shootingSkill.cooldown != 15 {
+		t.Errorf("expected shooting cooldown 15, got %d", shootingSkill.cooldown)
 	}
 }
 
