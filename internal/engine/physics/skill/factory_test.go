@@ -3,6 +3,7 @@ package skill
 import (
 	"testing"
 
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/combat"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/schemas"
 )
 
@@ -10,9 +11,18 @@ func ptrBool(b bool) *bool {
 	return &b
 }
 
-type mockShooter struct{}
+type mockInventory struct {
+	activeWeaponFunc func() combat.Weapon
+}
 
-func (m *mockShooter) SpawnBullet(x16, y16, vx16, vy16 int, owner interface{}) {}
+func (m *mockInventory) AddWeapon(weapon combat.Weapon)          {}
+func (m *mockInventory) ActiveWeapon() combat.Weapon             { return m.activeWeaponFunc() }
+func (m *mockInventory) SwitchNext()                             {}
+func (m *mockInventory) SwitchPrev()                             {}
+func (m *mockInventory) SwitchTo(index int)                      {}
+func (m *mockInventory) HasAmmo(weaponID string) bool            { return false }
+func (m *mockInventory) ConsumeAmmo(weaponID string, amount int) {}
+func (m *mockInventory) SetAmmo(weaponID string, amount int)     {}
 
 func TestFromConfig_AllSkillsEnabled(t *testing.T) {
 	cfg := &schemas.SkillsConfig{
@@ -21,7 +31,12 @@ func TestFromConfig_AllSkillsEnabled(t *testing.T) {
 		Dash:     &schemas.DashConfig{Enabled: ptrBool(true)},
 		Shooting: &schemas.ShootingConfig{Enabled: ptrBool(true), CooldownFrames: 15},
 	}
-	deps := SkillDeps{Shooter: &mockShooter{}}
+
+	mockInv := &mockInventory{
+		activeWeaponFunc: func() combat.Weapon { return nil },
+	}
+
+	deps := SkillDeps{Inventory: mockInv}
 
 	skills := FromConfig(cfg, deps)
 
@@ -44,7 +59,7 @@ func TestFromConfig_AllSkillsEnabled(t *testing.T) {
 		t.Errorf("expected jump cut multiplier 0.4, got %f", jumpSkill.jumpCutMultiplier)
 	}
 
-	// Verify Shooting skill has correct cooldown
+	// Verify Shooting skill exists
 	var shootingSkill *ShootingSkill
 	for _, s := range skills {
 		if ss, ok := s.(*ShootingSkill); ok {
@@ -54,9 +69,6 @@ func TestFromConfig_AllSkillsEnabled(t *testing.T) {
 	}
 	if shootingSkill == nil {
 		t.Fatal("shooting skill not found")
-	}
-	if shootingSkill.cooldown != 15 {
-		t.Errorf("expected shooting cooldown 15, got %d", shootingSkill.cooldown)
 	}
 }
 
@@ -76,7 +88,12 @@ func TestFromConfig_DisabledSkills(t *testing.T) {
 		Dash:     &schemas.DashConfig{Enabled: ptrBool(false)},
 		Shooting: &schemas.ShootingConfig{Enabled: ptrBool(false)},
 	}
-	deps := SkillDeps{Shooter: &mockShooter{}}
+
+	mockInv := &mockInventory{
+		activeWeaponFunc: func() combat.Weapon { return nil },
+	}
+
+	deps := SkillDeps{Inventory: mockInv}
 
 	skills := FromConfig(cfg, deps)
 
@@ -85,14 +102,14 @@ func TestFromConfig_DisabledSkills(t *testing.T) {
 	}
 }
 
-func TestFromConfig_MissingShooter(t *testing.T) {
+func TestFromConfig_MissingInventory(t *testing.T) {
 	cfg := &schemas.SkillsConfig{
 		Movement: &schemas.MovementConfig{Enabled: ptrBool(true)},
 		Jump:     &schemas.JumpConfig{Enabled: ptrBool(true)},
 		Dash:     &schemas.DashConfig{Enabled: ptrBool(true)},
 		Shooting: &schemas.ShootingConfig{Enabled: ptrBool(true)},
 	}
-	deps := SkillDeps{Shooter: nil}
+	deps := SkillDeps{Inventory: nil}
 
 	skills := FromConfig(cfg, deps)
 
@@ -103,7 +120,7 @@ func TestFromConfig_MissingShooter(t *testing.T) {
 	// Verify shooting skill is not present
 	for _, s := range skills {
 		if _, ok := s.(*ShootingSkill); ok {
-			t.Fatal("shooting skill should not be present when Shooter is nil")
+			t.Fatal("shooting skill should not be present when Inventory is nil")
 		}
 	}
 }

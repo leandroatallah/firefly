@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/combat"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/schemas"
 	"github.com/boilerplate/ebiten-template/internal/engine/utils/fp16"
 	"github.com/boilerplate/ebiten-template/internal/engine/utils/timing"
@@ -11,7 +12,7 @@ import (
 
 // SkillDeps contains all dependencies required to instantiate skills from config.
 type SkillDeps struct {
-	Shooter      body.Shooter
+	Inventory    combat.Inventory
 	OnJump       func(interface{})
 	EventManager interface{ Publish(interface{}) }
 }
@@ -19,7 +20,7 @@ type SkillDeps struct {
 // FromConfig instantiates skills from a SkillsConfig.
 // Returns an empty slice if cfg is nil.
 // Skips skills with nil sub-config or Enabled == false.
-// Skips shooting skill if Shooter is nil.
+// Skips shooting skill if Inventory is nil.
 func FromConfig(cfg *schemas.SkillsConfig, deps SkillDeps) []Skill {
 	if cfg == nil {
 		return []Skill{}
@@ -65,14 +66,8 @@ func FromConfig(cfg *schemas.SkillsConfig, deps SkillDeps) []Skill {
 	}
 
 	// Shooting skill
-	if cfg.Shooting != nil && isEnabled(cfg.Shooting.Enabled) && deps.Shooter != nil {
-		shootingSkill := NewShootingSkill(
-			deps.Shooter,
-			cfg.Shooting.CooldownFrames,
-			0, // spawnOffsetX16 - default
-			cfg.Shooting.ProjectileSpeed,
-			0, // yOffset - default
-		)
+	if cfg.Shooting != nil && isEnabled(cfg.Shooting.Enabled) && deps.Inventory != nil {
+		shootingSkill := NewShootingSkill(deps.Inventory)
 		skills = append(skills, shootingSkill)
 	}
 
