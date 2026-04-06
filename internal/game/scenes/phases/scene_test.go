@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/boilerplate/ebiten-template/internal/engine/app"
-	"github.com/boilerplate/ebiten-template/internal/engine/combat/projectile"
 	"github.com/boilerplate/ebiten-template/internal/engine/scene"
 	"github.com/boilerplate/ebiten-template/internal/engine/scene/phases"
 )
@@ -90,22 +89,6 @@ func TestBodyCounter_CountsWolfBodies(t *testing.T) {
 	// No WolfEnemy bodies — wolf count must be zero.
 	if bc.wolf != 0 {
 		t.Errorf("wolf = %d, want 0", bc.wolf)
-	}
-}
-
-func TestSpawnBullet_AddsToSpace(t *testing.T) {
-	space := &mockBodiesSpace{}
-	s := &PhasesScene{
-		TilemapScene: &scene.TilemapScene{},
-	}
-	ctx := &app.AppContext{
-		Space:             space,
-		ProjectileManager: projectile.NewManager(space),
-	}
-	s.SetAppContext(ctx)
-	s.SpawnBullet(16, 16, 10, 0, nil)
-	if len(space.Bodies()) != 1 {
-		t.Errorf("space bodies = %d, want 1", len(space.Bodies()))
 	}
 }
 

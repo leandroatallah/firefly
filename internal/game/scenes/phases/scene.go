@@ -10,7 +10,6 @@ import (
 
 	"github.com/boilerplate/ebiten-template/internal/engine/app"
 	"github.com/boilerplate/ebiten-template/internal/engine/assets/font"
-	"github.com/boilerplate/ebiten-template/internal/engine/combat/projectile"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	sequencestypes "github.com/boilerplate/ebiten-template/internal/engine/contracts/sequences"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
@@ -74,13 +73,6 @@ type PhasesScene struct {
 	vignette *enginevfx.Vignette
 
 	death deathSequence
-}
-
-// SpawnBullet implements body.Shooter interface for shooting skill.
-func (s *PhasesScene) SpawnBullet(x16, y16, vx16, vy16 int, owner interface{}) {
-	if s.AppContext().ProjectileManager != nil {
-		s.AppContext().ProjectileManager.Spawn(projectile.ProjectileConfig{Width: 2, Height: 1}, x16, y16, vx16, vy16, owner)
-	}
 }
 
 func NewPhasesScene(ctx *app.AppContext) *PhasesScene {
