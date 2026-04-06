@@ -4,6 +4,7 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/app"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/animation"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
+	"github.com/boilerplate/ebiten-template/internal/engine/data/schemas"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/builder"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/platformer"
@@ -25,7 +26,8 @@ func climberStateTransitionLogic(c *actors.Character) bool {
 
 type ClimberPlayer struct {
 	*platformer.PlatformerCharacter
-	baseSpeed int
+	baseSpeed  int
+	spriteData *schemas.SpriteData
 
 	*gameplayermethods.PlayerDeathBehavior
 }
@@ -58,6 +60,9 @@ func NewClimberPlayer(ctx *app.AppContext) (platformer.PlatformerActorEntity, er
 
 	character.RefreshCollisions()
 	player.PlayerDeathBehavior = gameplayermethods.NewPlayerDeathBehavior(player)
+
+	// Store spriteData for later skill configuration
+	player.spriteData = &spriteData
 
 	return player, nil
 }
@@ -92,6 +97,10 @@ func (p *ClimberPlayer) Update(space body.BodiesSpace) error {
 
 func (p *ClimberPlayer) GetCharacter() *actors.Character {
 	return p.Character
+}
+
+func (p *ClimberPlayer) GetSpriteData() *schemas.SpriteData {
+	return p.spriteData
 }
 
 func (p *ClimberPlayer) Hurt(damage int) {
