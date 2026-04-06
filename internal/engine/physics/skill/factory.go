@@ -6,15 +6,17 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/combat"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/schemas"
+	"github.com/boilerplate/ebiten-template/internal/engine/event"
 	"github.com/boilerplate/ebiten-template/internal/engine/utils/fp16"
 	"github.com/boilerplate/ebiten-template/internal/engine/utils/timing"
 )
 
 // SkillDeps contains all dependencies required to instantiate skills from config.
 type SkillDeps struct {
-	Inventory    combat.Inventory
-	OnJump       func(interface{})
-	EventManager interface{ Publish(interface{}) }
+	Inventory         combat.Inventory
+	ProjectileManager combat.ProjectileManager
+	OnJump            func(interface{})
+	EventManager      interface{ Publish(event.Event) }
 }
 
 // FromConfig instantiates skills from a SkillsConfig.

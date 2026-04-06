@@ -12,6 +12,7 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/platformer"
 	bodyphysics "github.com/boilerplate/ebiten-template/internal/engine/physics/body"
 	physicsmovement "github.com/boilerplate/ebiten-template/internal/engine/physics/movement"
+	"github.com/boilerplate/ebiten-template/internal/engine/physics/skill"
 )
 
 type collisionRectSetter interface {
@@ -125,6 +126,23 @@ func ConfigureCharacter(
 	}
 	if err := SetCharacterStats(character, statData); err != nil {
 		return err
+	}
+	return nil
+}
+
+// ApplySkills instantiates skills from spriteData and adds them to the character.
+func ApplySkills(
+	character actors.ActorEntity,
+	spriteData schemas.SpriteData,
+	deps skill.SkillDeps,
+) error {
+	if spriteData.Skills == nil {
+		return nil
+	}
+
+	skills := skill.FromConfig(spriteData.Skills, deps)
+	for _, s := range skills {
+		character.GetCharacter().AddSkill(s)
 	}
 	return nil
 }

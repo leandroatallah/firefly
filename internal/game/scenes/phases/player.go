@@ -5,6 +5,7 @@ import (
 
 	"github.com/boilerplate/ebiten-template/internal/engine/app"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
+	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/builder"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/events"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/platformer"
 	"github.com/boilerplate/ebiten-template/internal/engine/physics/skill"
@@ -31,28 +32,30 @@ func createPlayer(ctx *app.AppContext, playerType gameentitytypes.PlayerType) (p
 	}
 
 	spriteData := climber.GetSpriteData()
-	if spriteData == nil || spriteData.Skills == nil {
+	if spriteData == nil {
 		return p, nil
 	}
 
 	deps := skill.SkillDeps{
+		Inventory:         nil,
+		ProjectileManager: nil,
 		OnJump: func(b interface{}) {
-			body, ok := b.(body.MovableCollidable)
+			bodyObj, ok := b.(body.MovableCollidable)
 			if !ok {
 				return
 			}
-			pos := body.Position()
+			pos := bodyObj.Position()
 			jumpPos := image.Point{X: pos.Min.X + pos.Dx()/2, Y: pos.Max.Y}
 			ctx.EventManager.Publish(&events.ActorJumpedEvent{
 				X: float64(jumpPos.X),
 				Y: float64(jumpPos.Y),
 			})
 		},
+		EventManager: ctx.EventManager,
 	}
 
-	skills := skill.FromConfig(spriteData.Skills, deps)
-	for _, s := range skills {
-		p.GetCharacter().AddSkill(s)
+	if err := builder.ApplySkills(p, *spriteData, deps); err != nil {
+		return nil, err
 	}
 
 	return p, nil

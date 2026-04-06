@@ -6,11 +6,14 @@ import (
 
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/animation"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/combat"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/schemas"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/movement"
+	"github.com/boilerplate/ebiten-template/internal/engine/event"
 	bodyphysics "github.com/boilerplate/ebiten-template/internal/engine/physics/body"
 	physicsmovement "github.com/boilerplate/ebiten-template/internal/engine/physics/movement"
+	"github.com/boilerplate/ebiten-template/internal/engine/physics/skill"
 	"github.com/boilerplate/ebiten-template/internal/engine/render/sprites"
 	"github.com/hajimehoshi/ebiten/v2"
 )
@@ -473,8 +476,7 @@ func TestApplyPlatformerPhysics(t *testing.T) {
 		character := actors.NewCharacter(sprites.SpriteMap{}, bodyphysics.NewRect(0, 0, 16, 16))
 		actor.SetCharacter(character)
 
-		// Create a mock blocker that implements PlayerMovementBlocker
-		blocker := &mockBlocker{}
+		blocker := &mockMovementBlocker{}
 
 		err := ApplyPlatformerPhysics(actor, blocker)
 		if err != nil {
@@ -484,14 +486,137 @@ func TestApplyPlatformerPhysics(t *testing.T) {
 		if actor.MovementModel() == nil {
 			t.Error("Expected movement model to be set")
 		}
-
-		// Note: SetTouchable is called on the character, but GetTouchable()
-		// returns the CollidableBody's Touchable which is separate from Character's Touchable field
-		// The important thing is that no panic occurred
 	})
 }
 
-// mockBlocker implements physicsmovement.PlayerMovementBlocker
-type mockBlocker struct{}
+func TestApplySkills(t *testing.T) {
+	t.Run("all skills enabled with inventory", func(t *testing.T) {
+		actor := newMockActorWithCollision()
+		character := actors.NewCharacter(sprites.SpriteMap{}, bodyphysics.NewRect(0, 0, 16, 16))
+		actor.SetCharacter(character)
 
-func (m *mockBlocker) IsMovementBlocked() bool { return false }
+		spriteData := schemas.SpriteData{
+			Skills: &schemas.SkillsConfig{
+				Movement: &schemas.MovementConfig{
+					Enabled: boolPtr(true),
+				},
+				Jump: &schemas.JumpConfig{
+					Enabled:           boolPtr(true),
+					JumpCutMultiplier: 0.5,
+				},
+				Dash: &schemas.DashConfig{
+					Enabled:    boolPtr(true),
+					DurationMs: 200,
+					CooldownMs: 1000,
+					Speed:      10,
+					CanAirDash: boolPtr(true),
+				},
+				Shooting: &schemas.ShootingConfig{
+					Enabled: boolPtr(true),
+				},
+			},
+		}
+
+		deps := skill.SkillDeps{
+			Inventory:         &mockInventory{},
+			ProjectileManager: &mockProjectileManager{},
+			OnJump:            func(b interface{}) {},
+			EventManager:      &mockEventManager{},
+		}
+
+		err := ApplySkills(actor, spriteData, deps)
+		if err != nil {
+			t.Fatalf("ApplySkills returned error: %v", err)
+		}
+	})
+
+	t.Run("nil skills config", func(t *testing.T) {
+		actor := newMockActorWithCollision()
+		character := actors.NewCharacter(sprites.SpriteMap{}, bodyphysics.NewRect(0, 0, 16, 16))
+		actor.SetCharacter(character)
+
+		spriteData := schemas.SpriteData{
+			Skills: nil,
+		}
+
+		deps := skill.SkillDeps{
+			Inventory:         &mockInventory{},
+			ProjectileManager: &mockProjectileManager{},
+			OnJump:            func(b interface{}) {},
+			EventManager:      &mockEventManager{},
+		}
+
+		err := ApplySkills(actor, spriteData, deps)
+		if err != nil {
+			t.Fatalf("ApplySkills returned error: %v", err)
+		}
+	})
+
+	t.Run("shooting skill omitted when inventory is nil", func(t *testing.T) {
+		actor := newMockActorWithCollision()
+		character := actors.NewCharacter(sprites.SpriteMap{}, bodyphysics.NewRect(0, 0, 16, 16))
+		actor.SetCharacter(character)
+
+		spriteData := schemas.SpriteData{
+			Skills: &schemas.SkillsConfig{
+				Movement: &schemas.MovementConfig{
+					Enabled: boolPtr(true),
+				},
+				Jump: &schemas.JumpConfig{
+					Enabled: boolPtr(true),
+				},
+				Dash: &schemas.DashConfig{
+					Enabled: boolPtr(true),
+				},
+				Shooting: &schemas.ShootingConfig{
+					Enabled: boolPtr(true),
+				},
+			},
+		}
+
+		deps := skill.SkillDeps{
+			Inventory:         nil,
+			ProjectileManager: &mockProjectileManager{},
+			OnJump:            func(b interface{}) {},
+			EventManager:      &mockEventManager{},
+		}
+
+		err := ApplySkills(actor, spriteData, deps)
+		if err != nil {
+			t.Fatalf("ApplySkills returned error: %v", err)
+		}
+	})
+}
+
+// mockInventory implements combat.Inventory
+type mockInventory struct{}
+
+func (m *mockInventory) AddWeapon(weapon combat.Weapon)          {}
+func (m *mockInventory) ActiveWeapon() combat.Weapon             { return nil }
+func (m *mockInventory) SwitchNext()                             {}
+func (m *mockInventory) SwitchPrev()                             {}
+func (m *mockInventory) SwitchTo(index int)                      {}
+func (m *mockInventory) HasAmmo(weaponID string) bool            { return true }
+func (m *mockInventory) ConsumeAmmo(weaponID string, amount int) {}
+func (m *mockInventory) SetAmmo(weaponID string, amount int)     {}
+
+// mockEventManager implements event.Manager interface
+type mockEventManager struct{}
+
+func (m *mockEventManager) Publish(e event.Event) {}
+
+// mockProjectileManager implements combat.ProjectileManager
+type mockProjectileManager struct{}
+
+func (m *mockProjectileManager) SpawnProjectile(projectileType string, x16, y16, vx16, vy16 int, owner interface{}) {
+}
+
+// mockMovementBlocker implements physicsmovement.PlayerMovementBlocker
+type mockMovementBlocker struct{}
+
+func (m *mockMovementBlocker) IsMovementBlocked() bool { return false }
+
+// Helper function
+func boolPtr(b bool) *bool {
+	return &b
+}
