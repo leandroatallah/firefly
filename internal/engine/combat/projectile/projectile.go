@@ -29,6 +29,7 @@ func (p *projectile) Update() {
 	w := provider.GetTilemapWidth()
 	h := provider.GetTilemapHeight()
 
+	// Bounds are in fp16 units (scale factor 16: 1 pixel = 16 units)
 	if x < 0 || y < 0 || x > w<<4 || y > h<<4 {
 		p.space.QueueForRemoval(p.body)
 	}
@@ -40,6 +41,6 @@ func (p *projectile) OnTouch(other contractsbody.Collidable) {
 	}
 }
 
-func (p *projectile) OnBlock(_ contractsbody.Collidable) {
+func (p *projectile) OnBlock(other contractsbody.Collidable) {
 	p.space.QueueForRemoval(p.body)
 }

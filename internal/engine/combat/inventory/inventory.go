@@ -71,3 +71,10 @@ func (i *Inventory) ConsumeAmmo(weaponID string, amount int) {
 func (i *Inventory) SetAmmo(weaponID string, amount int) {
 	i.ammo[weaponID] = amount
 }
+
+// Update updates all weapons in the inventory.
+func (i *Inventory) Update() {
+	for _, weapon := range i.weapons {
+		weapon.Update()
+	}
+}

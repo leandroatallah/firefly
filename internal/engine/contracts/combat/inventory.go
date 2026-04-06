@@ -10,4 +10,5 @@ type Inventory interface {
 	HasAmmo(weaponID string) bool
 	ConsumeAmmo(weaponID string, amount int)
 	SetAmmo(weaponID string, amount int)
+	Update()
 }

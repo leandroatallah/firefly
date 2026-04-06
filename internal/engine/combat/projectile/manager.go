@@ -66,6 +66,12 @@ func (m *Manager) Spawn(cfg interface{}, x16, y16, vx16, vy16 int, owner interfa
 	m.space.AddBody(collidableBody)
 }
 
+// SpawnProjectile implements the ProjectileManager interface.
+func (m *Manager) SpawnProjectile(projectileType string, x16, y16, vx16, vy16 int, owner interface{}) {
+	cfg := ProjectileConfig{Width: 2, Height: 1}
+	m.Spawn(cfg, x16, y16, vx16, vy16, owner)
+}
+
 // Update advances all active projectiles and removes those that are despawned.
 func (m *Manager) Update() {
 	// First, update all projectiles
@@ -73,7 +79,7 @@ func (m *Manager) Update() {
 		p.Update()
 	}
 
-	// Process removals in the space to actually remove the bodies
+	// Process any queued removals
 	m.space.ProcessRemovals()
 
 	// Then, remove projectiles whose bodies are no longer in the space
@@ -101,6 +107,16 @@ func (m *Manager) Draw(screen *ebiten.Image) {
 		opts := &ebiten.DrawImageOptions{}
 		x, y := p.body.GetPositionMin()
 		opts.GeoM.Translate(float64(x), float64(y))
+		screen.DrawImage(getDefaultBulletImg(), opts)
+	}
+}
+
+// DrawWithOffset renders all active projectiles with camera offset applied.
+func (m *Manager) DrawWithOffset(screen *ebiten.Image, camX, camY float64) {
+	for _, p := range m.projectiles {
+		opts := &ebiten.DrawImageOptions{}
+		x, y := p.body.GetPositionMin()
+		opts.GeoM.Translate(float64(x)-camX, float64(y)-camY)
 		screen.DrawImage(getDefaultBulletImg(), opts)
 	}
 }
