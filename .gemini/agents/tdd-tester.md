@@ -35,7 +35,7 @@ Acts as the "Tester". Strictly follows the **Red Phase** of TDD. Writes failing 
 
 ## Outputs
 
-- Failing `*_test.go` file.
+- Failing `*_test.go` file (formatted with `gofmt` after write).
 - Error report showing the test failed (The **Red** proof), including *why* it fails (behavior missing, not just missing symbol).
 - Updated `PROGRESS.md` with test file path(s) noted.
 

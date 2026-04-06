@@ -31,7 +31,7 @@ Inspects `internal/engine/contracts/` interfaces and existing `internal/engine/m
 
 ## Outputs
 
-- Generated mock files:
+- Generated mock files (formatted with `gofmt` after write):
   - `internal/engine/mocks/mock_*.go` for shared mocks.
   - Package-local mock code snippets for TDD Specialist.
 - Updated `PROGRESS.md`.

@@ -34,7 +34,7 @@ Acts as the "Developer". Follows the **Green Phase** of TDD. Writes the minimal 
 
 ## Outputs
 
-- Passing production code.
+- Passing production code (formatted with `gofmt` after write).
 - Report showing the test is now **Green**.
 - Updated `PROGRESS.md` with production file path(s) noted.
 
