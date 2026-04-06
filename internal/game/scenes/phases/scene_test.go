@@ -4,9 +4,9 @@ import (
 	"testing"
 
 	"github.com/boilerplate/ebiten-template/internal/engine/app"
+	"github.com/boilerplate/ebiten-template/internal/engine/combat/projectile"
 	"github.com/boilerplate/ebiten-template/internal/engine/scene"
 	"github.com/boilerplate/ebiten-template/internal/engine/scene/phases"
-	gamestates "github.com/boilerplate/ebiten-template/internal/game/entity/actors/states"
 )
 
 // OnStart() is not unit-tested directly — it requires a full AppContext with GPU resources.
@@ -93,55 +93,17 @@ func TestBodyCounter_CountsWolfBodies(t *testing.T) {
 	}
 }
 
-func TestBulletCleanup_RemovesWhenBodyGone(t *testing.T) {
-	space := &mockBodiesSpace{}
-
-	bodyA := &mockCollidable{id: "bullet_1"}
-	bodyB := &mockCollidable{id: "bullet_2"}
-	space.AddBody(bodyA)
-	// bodyB is NOT added to space — simulates removal
-
-	bulletA := gamestates.NewBullet(nil, bodyA, space, 0, 0)
-	bulletB := gamestates.NewBullet(nil, bodyB, space, 0, 0)
-
-	bullets := []*gamestates.Bullet{bulletA, bulletB}
-
-	// Replicate the cleanup loop from PhasesScene.Update
-	active := make([]*gamestates.Bullet, 0, len(bullets))
-	bodies := space.Bodies()
-	for _, bullet := range bullets {
-		found := false
-		for _, b := range bodies {
-			if b == bullet.Body() {
-				found = true
-				break
-			}
-		}
-		if found {
-			active = append(active, bullet)
-		}
-	}
-
-	if len(active) != 1 {
-		t.Errorf("active bullets = %d, want 1", len(active))
-	}
-	if active[0].Body().ID() != "bullet_1" {
-		t.Errorf("remaining bullet ID = %q, want %q", active[0].Body().ID(), "bullet_1")
-	}
-}
-
 func TestSpawnBullet_AddsToSpace(t *testing.T) {
 	space := &mockBodiesSpace{}
 	s := &PhasesScene{
 		TilemapScene: &scene.TilemapScene{},
-		bullets:      []*gamestates.Bullet{},
 	}
-	ctx := &app.AppContext{Space: space}
+	ctx := &app.AppContext{
+		Space:             space,
+		ProjectileManager: projectile.NewManager(space),
+	}
 	s.SetAppContext(ctx)
 	s.SpawnBullet(16, 16, 10, 0, nil)
-	if len(s.bullets) != 1 {
-		t.Errorf("bullets = %d, want 1", len(s.bullets))
-	}
 	if len(space.Bodies()) != 1 {
 		t.Errorf("space bodies = %d, want 1", len(space.Bodies()))
 	}
