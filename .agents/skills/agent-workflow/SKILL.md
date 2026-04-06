@@ -82,7 +82,7 @@ Writes the minimum production code to make the failing tests pass (Green phase).
 - Updates `PROGRESS.md` with production file path(s).
 
 **6. Workflow Gatekeeper**
-Validates spec compliance, TDD cycle, and code quality. Runs Coverage Analyzer to confirm a positive delta.
+Validates spec compliance, TDD cycle, and code quality. Runs Coverage Analyzer to confirm a positive delta. Only if all checks pass, runs `golangci-lint run ./...` as the final gate before marking done.
 - Updates `PROGRESS.md` to `✅ Done`.
 - Moves folder from `active/` to `done/` using `bash scripts/story.sh done <id-slug>`.
 

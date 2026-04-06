@@ -3,9 +3,9 @@
 ---
 name: Coverage Analyzer
 description: Runs go test coverage analysis and produces prioritized list of low-coverage files/functions
-permissions:
-  shell: true
-  write: true
+tools:
+  - run_shell_command
+  - write_file
 ---
 
 

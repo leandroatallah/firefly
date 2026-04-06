@@ -3,10 +3,10 @@
 ---
 name: Spec Engineer
 description: Technical Designer. Transforms stories into Technical Specifications in .agents/work/active/
-permissions:
-  read: true
-  write: true
-  shell: true
+tools:
+  - read_file
+  - write_file
+  - run_shell_command
 ---
 
 

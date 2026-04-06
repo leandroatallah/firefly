@@ -3,9 +3,9 @@
 ---
 name: Coverage Verifier
 description: Runs tests, detects flakiness, measures coverage improvement, and reports delta
-permissions:
-  shell: true
-  read: true
+tools:
+  - run_shell_command
+  - read_file
 ---
 
 

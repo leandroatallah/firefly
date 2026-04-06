@@ -18,10 +18,13 @@ for agent_file in "$AGENTS_DIR"/*.md; do
     fi
     
     filename=$(basename "$agent_file")
-    
+
     # Extract name and description
     name=$(awk '/^name:/ {sub(/^name: /, ""); print; exit}' "$agent_file")
     description=$(awk '/^description:/ {sub(/^description: /, ""); print; exit}' "$agent_file")
+    
+    # Convert name to lowercase identifier for Qwen (e.g., "Coverage Analyzer" -> "coverage-analyzer")
+    qwen_name=$(echo "$name" | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
     
     # Extract capabilities
     capabilities=$(awk '/^capabilities:/,/^---$/ {
@@ -89,26 +92,26 @@ EOF
 }
 EOF
     
-    # Map to OpenCode format
-    opencode_perms=""
+    # Map to Qwen format
+    qwen_tools=""
     while IFS= read -r cap; do
         case "$cap" in
-            "execute_commands"|"run_shell_command") opencode_perms="${opencode_perms}  shell: true\n" ;;
-            "write_files") opencode_perms="${opencode_perms}  write: true\n" ;;
-            "read_files") opencode_perms="${opencode_perms}  read: true\n" ;;
-            "code_intelligence") opencode_perms="${opencode_perms}  grep: true\n  glob: true\n" ;;
-            "delegate_subagents") opencode_perms="${opencode_perms}  delegate: true\n" ;;
+            "execute_commands"|"run_shell_command") qwen_tools="${qwen_tools}  - run_shell_command\n" ;;
+            "write_files") qwen_tools="${qwen_tools}  - write_file\n" ;;
+            "read_files") qwen_tools="${qwen_tools}  - read_file\n" ;;
+            "code_intelligence") qwen_tools="${qwen_tools}  - grep_search\n  - glob\n" ;;
+            "delegate_subagents") qwen_tools="${qwen_tools}  - task\n" ;;
         esac
     done <<< "$capabilities"
-    
+
     cat > "$QWEN_DIR/$filename" <<EOF
 $HEADER
 
 ---
 name: $name
 description: $description
-permissions:
-$(printf "%b" "$opencode_perms")
+tools:
+$(printf "%b" "$qwen_tools" | sed '/^$/d')
 ---
 
 $content

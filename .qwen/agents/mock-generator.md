@@ -3,11 +3,11 @@
 ---
 name: Mock Generator
 description: Generates or updates mock implementations from contracts interfaces
-permissions:
-  grep: true
-  glob: true
-  read: true
-  write: true
+tools:
+  - grep_search
+  - glob
+  - read_file
+  - write_file
 ---
 
 

@@ -18,6 +18,7 @@ Acts as the "Lead Engineer" and "QA". Validates that the implementation matches 
 - Verify the **Red-Green-Refactor** cycle has been followed.
 - Check that the implementation exactly matches `SPEC.md` in `active/[ID]-[slug]/`.
 - Run `Coverage Analyzer` to confirm a positive coverage delta for the changed packages.
+- Only if all checks above pass, run `golangci-lint run ./...`. If it reports errors, reject and backtrack to Feature Implementer.
 - Move the entire story folder from `active/` to `done/`: `.agents/work/done/[ID]-[slug]/`.
 - Update `PROGRESS.md` before moving: mark "Gatekeeper" ✅, set top-level **Status** to `✅ Done`, and append a `## Log` entry with the coverage delta and confirmation. If rejecting, append the rejection reason and which agent to backtrack to — do NOT move the folder.
 - Enforce project-wide standards:

@@ -3,10 +3,10 @@
 ---
 name: Story Architect
 description: Agile Analyst. Writes User Stories (DDD-inspired) in .agents/work/backlog/
-permissions:
-  read: true
-  write: true
-  shell: true
+tools:
+  - read_file
+  - write_file
+  - run_shell_command
 ---
 
 

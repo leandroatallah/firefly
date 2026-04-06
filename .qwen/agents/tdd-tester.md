@@ -3,10 +3,10 @@
 ---
 name: TDD Specialist
 description: TDD Expert. Writes failing tests (Red Stage) based on Technical Specifications.
-permissions:
-  read: true
-  write: true
-  shell: true
+tools:
+  - read_file
+  - write_file
+  - run_shell_command
 ---
 
 

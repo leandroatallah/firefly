@@ -3,10 +3,10 @@
 ---
 name: Gap Detector
 description: Analyzes source files to extract function signatures, branches, and interface dependencies for gap reporting
-permissions:
-  read: true
-  grep: true
-  glob: true
+tools:
+  - read_file
+  - grep_search
+  - glob
 ---
 
 

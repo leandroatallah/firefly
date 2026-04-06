@@ -3,10 +3,10 @@
 ---
 name: Feature Implementer
 description: Implementation Specialist. Writes code to pass failing TDD tests.
-permissions:
-  read: true
-  write: true
-  shell: true
+tools:
+  - read_file
+  - write_file
+  - run_shell_command
 ---
 
 
