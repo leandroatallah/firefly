@@ -151,7 +151,26 @@
       }
     },
     "facing_direction": 0,
-    "frame_rate": 9
+    "frame_rate": 9,
+    "skills": {
+      "movement": {
+        "enabled": true
+      },
+      "jump": {
+        "enabled": true,
+        "jump_cut_multiplier": 0.4
+      },
+      "dash": {
+        "enabled": true
+      },
+      "shooting": {
+        "enabled": true,
+        "cooldown_frames": 15,
+        "projectile_speed": 6,
+        "projectile_range": 4,
+        "directions": 4
+      }
+    }
   },
   "stats": {
     "health": 1,

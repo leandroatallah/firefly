@@ -24,6 +24,46 @@ type AssetData struct {
 	Loop           *bool       `json:"loop,omitempty"`
 }
 
+// MovementConfig defines horizontal movement parameters.
+type MovementConfig struct {
+	Enabled         *bool   `json:"enabled,omitempty"`
+	HorizontalSpeed float64 `json:"horizontal_speed,omitempty"`
+}
+
+// JumpConfig defines jump ability parameters.
+type JumpConfig struct {
+	Enabled           *bool   `json:"enabled,omitempty"`
+	JumpCutMultiplier float64 `json:"jump_cut_multiplier,omitempty"`
+	CoyoteTimeFrames  int     `json:"coyote_time_frames,omitempty"`
+	JumpBufferFrames  int     `json:"jump_buffer_frames,omitempty"`
+}
+
+// DashConfig defines dash ability parameters.
+type DashConfig struct {
+	Enabled    *bool `json:"enabled,omitempty"`
+	DurationMs int   `json:"duration_ms,omitempty"`
+	CooldownMs int   `json:"cooldown_ms,omitempty"`
+	Speed      int   `json:"speed,omitempty"`
+	CanAirDash *bool `json:"can_air_dash,omitempty"`
+}
+
+// ShootingConfig defines shooting ability parameters.
+type ShootingConfig struct {
+	Enabled         *bool `json:"enabled,omitempty"`
+	CooldownFrames  int   `json:"cooldown_frames,omitempty"`
+	ProjectileSpeed int   `json:"projectile_speed,omitempty"`
+	ProjectileRange int   `json:"projectile_range,omitempty"`
+	Directions      int   `json:"directions,omitempty"`
+}
+
+// SkillsConfig defines all skill configurations for an entity.
+type SkillsConfig struct {
+	Movement *MovementConfig `json:"movement,omitempty"`
+	Jump     *JumpConfig     `json:"jump,omitempty"`
+	Dash     *DashConfig     `json:"dash,omitempty"`
+	Shooting *ShootingConfig `json:"shooting,omitempty"`
+}
+
 // SpriteData contains all data related to a sprite's appearance and behavior,
 // including its body rectangle, assets for different states, animation frame rate, and initial facing direction.
 type SpriteData struct {
@@ -31,6 +71,7 @@ type SpriteData struct {
 	Assets          map[string]AssetData          `json:"assets"`
 	FrameRate       int                           `json:"frame_rate"`
 	FacingDirection animation.FacingDirectionEnum `json:"facing_direction"` // 0 - right, 1 - left
+	Skills          *SkillsConfig                 `json:"skills,omitempty"`
 }
 
 // ParticleData defines the configuration for a particle effect.
