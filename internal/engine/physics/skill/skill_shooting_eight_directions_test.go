@@ -5,6 +5,7 @@ import (
 
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/animation"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/combat"
 	"github.com/boilerplate/ebiten-template/internal/engine/mocks"
 	"github.com/boilerplate/ebiten-template/internal/engine/physics/movement"
 	"github.com/boilerplate/ebiten-template/internal/engine/physics/skill"
@@ -18,15 +19,18 @@ func TestShootingSkill_ShootStraight(t *testing.T) {
 		},
 	}
 
-	var capturedVx, capturedVy int
-	shooter := &mocks.MockShooter{
-		SpawnBulletFunc: func(x16, y16, vx16, vy16 int, owner interface{}) {
-			capturedVx = vx16
-			capturedVy = vy16
+	mockWeapon := &mocks.MockWeapon{
+		CanFireFunc: func() bool { return true },
+		FireFunc: func(x16, y16 int, faceDir animation.FacingDirectionEnum, direction body.ShootDirection) {
+			capturedDir = direction
 		},
 	}
 
-	s := skill.NewShootingSkill(shooter, 0, 0, 32<<4, 0)
+	mockInventory := &mocks.MockInventory{
+		ActiveWeaponFunc: func() combat.Weapon { return mockWeapon },
+	}
+
+	s := skill.NewShootingSkill(mockInventory)
 	s.SetStateTransitionHandler(handler)
 
 	mockBody := &mockMovableCollidable{
@@ -39,10 +43,6 @@ func TestShootingSkill_ShootStraight(t *testing.T) {
 	if capturedDir != body.ShootDirectionStraight {
 		t.Errorf("expected ShootDirectionStraight, got %v", capturedDir)
 	}
-
-	if capturedVx != 32<<4 || capturedVy != 0 {
-		t.Errorf("expected vx=512, vy=0, got vx=%d, vy=%d", capturedVx, capturedVy)
-	}
 }
 
 func TestShootingSkill_ShootUp(t *testing.T) {
@@ -53,15 +53,18 @@ func TestShootingSkill_ShootUp(t *testing.T) {
 		},
 	}
 
-	var capturedVx, capturedVy int
-	shooter := &mocks.MockShooter{
-		SpawnBulletFunc: func(x16, y16, vx16, vy16 int, owner interface{}) {
-			capturedVx = vx16
-			capturedVy = vy16
+	mockWeapon := &mocks.MockWeapon{
+		CanFireFunc: func() bool { return true },
+		FireFunc: func(x16, y16 int, faceDir animation.FacingDirectionEnum, direction body.ShootDirection) {
+			capturedDir = direction
 		},
 	}
 
-	s := skill.NewShootingSkill(shooter, 0, 0, 32<<4, 0)
+	mockInventory := &mocks.MockInventory{
+		ActiveWeaponFunc: func() combat.Weapon { return mockWeapon },
+	}
+
+	s := skill.NewShootingSkill(mockInventory)
 	s.SetStateTransitionHandler(handler)
 
 	mockBody := &mockMovableCollidable{
@@ -74,10 +77,6 @@ func TestShootingSkill_ShootUp(t *testing.T) {
 	if capturedDir != body.ShootDirectionUp {
 		t.Errorf("expected ShootDirectionUp, got %v", capturedDir)
 	}
-
-	if capturedVx != 0 || capturedVy != -(32<<4) {
-		t.Errorf("expected vx=0, vy=-512, got vx=%d, vy=%d", capturedVx, capturedVy)
-	}
 }
 
 func TestShootingSkill_ShootDownAirborne(t *testing.T) {
@@ -88,15 +87,18 @@ func TestShootingSkill_ShootDownAirborne(t *testing.T) {
 		},
 	}
 
-	var capturedVx, capturedVy int
-	shooter := &mocks.MockShooter{
-		SpawnBulletFunc: func(x16, y16, vx16, vy16 int, owner interface{}) {
-			capturedVx = vx16
-			capturedVy = vy16
+	mockWeapon := &mocks.MockWeapon{
+		CanFireFunc: func() bool { return true },
+		FireFunc: func(x16, y16 int, faceDir animation.FacingDirectionEnum, direction body.ShootDirection) {
+			capturedDir = direction
 		},
 	}
 
-	s := skill.NewShootingSkill(shooter, 0, 0, 32<<4, 0)
+	mockInventory := &mocks.MockInventory{
+		ActiveWeaponFunc: func() combat.Weapon { return mockWeapon },
+	}
+
+	s := skill.NewShootingSkill(mockInventory)
 	s.SetStateTransitionHandler(handler)
 
 	mockBody := &mockMovableCollidable{
@@ -112,10 +114,6 @@ func TestShootingSkill_ShootDownAirborne(t *testing.T) {
 	if capturedDir != body.ShootDirectionDown {
 		t.Errorf("expected ShootDirectionDown, got %v", capturedDir)
 	}
-
-	if capturedVx != 0 || capturedVy != 32<<4 {
-		t.Errorf("expected vx=0, vy=512, got vx=%d, vy=%d", capturedVx, capturedVy)
-	}
 }
 
 func TestShootingSkill_ShootDownGrounded_Ignored(t *testing.T) {
@@ -126,11 +124,18 @@ func TestShootingSkill_ShootDownGrounded_Ignored(t *testing.T) {
 		},
 	}
 
-	shooter := &mocks.MockShooter{
-		SpawnBulletFunc: func(x16, y16, vx16, vy16 int, owner interface{}) {},
+	mockWeapon := &mocks.MockWeapon{
+		CanFireFunc: func() bool { return true },
+		FireFunc: func(x16, y16 int, faceDir animation.FacingDirectionEnum, direction body.ShootDirection) {
+			capturedDir = direction
+		},
 	}
 
-	s := skill.NewShootingSkill(shooter, 0, 0, 32<<4, 0)
+	mockInventory := &mocks.MockInventory{
+		ActiveWeaponFunc: func() combat.Weapon { return mockWeapon },
+	}
+
+	s := skill.NewShootingSkill(mockInventory)
 	s.SetStateTransitionHandler(handler)
 
 	mockBody := &mockMovableCollidable{
@@ -156,15 +161,18 @@ func TestShootingSkill_DiagonalUpForward(t *testing.T) {
 		},
 	}
 
-	var capturedVx, capturedVy int
-	shooter := &mocks.MockShooter{
-		SpawnBulletFunc: func(x16, y16, vx16, vy16 int, owner interface{}) {
-			capturedVx = vx16
-			capturedVy = vy16
+	mockWeapon := &mocks.MockWeapon{
+		CanFireFunc: func() bool { return true },
+		FireFunc: func(x16, y16 int, faceDir animation.FacingDirectionEnum, direction body.ShootDirection) {
+			capturedDir = direction
 		},
 	}
 
-	s := skill.NewShootingSkill(shooter, 0, 0, 32<<4, 0)
+	mockInventory := &mocks.MockInventory{
+		ActiveWeaponFunc: func() combat.Weapon { return mockWeapon },
+	}
+
+	s := skill.NewShootingSkill(mockInventory)
 	s.SetStateTransitionHandler(handler)
 
 	mockBody := &mockMovableCollidable{
@@ -176,13 +184,6 @@ func TestShootingSkill_DiagonalUpForward(t *testing.T) {
 
 	if capturedDir != body.ShootDirectionDiagonalUpForward {
 		t.Errorf("expected ShootDirectionDiagonalUpForward, got %v", capturedDir)
-	}
-
-	expectedVx := (32 << 4) * 707 / 1000
-	expectedVy := -((32 << 4) * 707 / 1000)
-
-	if capturedVx != expectedVx || capturedVy != expectedVy {
-		t.Errorf("expected vx=%d, vy=%d, got vx=%d, vy=%d", expectedVx, expectedVy, capturedVx, capturedVy)
 	}
 }
 
@@ -196,11 +197,17 @@ func TestShootingSkill_DirectionChangeMidShooting(t *testing.T) {
 		},
 	}
 
-	shooter := &mocks.MockShooter{
-		SpawnBulletFunc: func(x16, y16, vx16, vy16 int, owner interface{}) {},
+	mockWeapon := &mocks.MockWeapon{
+		CanFireFunc: func() bool { return true },
+		FireFunc: func(x16, y16 int, faceDir animation.FacingDirectionEnum, direction body.ShootDirection) {
+		},
 	}
 
-	s := skill.NewShootingSkill(shooter, 3, 0, 32<<4, 0)
+	mockInventory := &mocks.MockInventory{
+		ActiveWeaponFunc: func() combat.Weapon { return mockWeapon },
+	}
+
+	s := skill.NewShootingSkill(mockInventory)
 	s.SetStateTransitionHandler(handler)
 
 	mockBody := &mockMovableCollidable{
@@ -219,10 +226,6 @@ func TestShootingSkill_DirectionChangeMidShooting(t *testing.T) {
 	if transitionCount != 2 || directions[1] != body.ShootDirectionUp {
 		t.Errorf("direction change should trigger transition to Up, got %d transitions, direction=%v", transitionCount, directions)
 	}
-
-	if s.IsActive() {
-		t.Error("cooldown should not reset on direction change")
-	}
 }
 
 func TestShootingSkill_ReleaseDirectionalInput(t *testing.T) {
@@ -233,11 +236,17 @@ func TestShootingSkill_ReleaseDirectionalInput(t *testing.T) {
 		},
 	}
 
-	shooter := &mocks.MockShooter{
-		SpawnBulletFunc: func(x16, y16, vx16, vy16 int, owner interface{}) {},
+	mockWeapon := &mocks.MockWeapon{
+		CanFireFunc: func() bool { return true },
+		FireFunc: func(x16, y16 int, faceDir animation.FacingDirectionEnum, direction body.ShootDirection) {
+		},
 	}
 
-	s := skill.NewShootingSkill(shooter, 0, 0, 32<<4, 0)
+	mockInventory := &mocks.MockInventory{
+		ActiveWeaponFunc: func() combat.Weapon { return mockWeapon },
+	}
+
+	s := skill.NewShootingSkill(mockInventory)
 	s.SetStateTransitionHandler(handler)
 
 	mockBody := &mockMovableCollidable{
@@ -266,15 +275,18 @@ func TestShootingSkill_DuckingShooting(t *testing.T) {
 		},
 	}
 
-	var capturedVx, capturedVy int
-	shooter := &mocks.MockShooter{
-		SpawnBulletFunc: func(x16, y16, vx16, vy16 int, owner interface{}) {
-			capturedVx = vx16
-			capturedVy = vy16
+	mockWeapon := &mocks.MockWeapon{
+		CanFireFunc: func() bool { return true },
+		FireFunc: func(x16, y16 int, faceDir animation.FacingDirectionEnum, direction body.ShootDirection) {
+			capturedDir = direction
 		},
 	}
 
-	s := skill.NewShootingSkill(shooter, 0, 0, 32<<4, 0)
+	mockInventory := &mocks.MockInventory{
+		ActiveWeaponFunc: func() combat.Weapon { return mockWeapon },
+	}
+
+	s := skill.NewShootingSkill(mockInventory)
 	s.SetStateTransitionHandler(handler)
 
 	mockBody := &mockMovableCollidable{
@@ -290,9 +302,5 @@ func TestShootingSkill_DuckingShooting(t *testing.T) {
 
 	if capturedDir != body.ShootDirectionStraight {
 		t.Errorf("ducking should only allow straight shooting, got %v", capturedDir)
-	}
-
-	if capturedVx != 32<<4 || capturedVy != 0 {
-		t.Errorf("expected vx=512, vy=0, got vx=%d, vy=%d", capturedVx, capturedVy)
 	}
 }
