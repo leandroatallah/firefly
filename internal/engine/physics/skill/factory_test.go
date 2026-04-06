@@ -23,6 +23,7 @@ func (m *mockInventory) SwitchTo(index int)                      {}
 func (m *mockInventory) HasAmmo(weaponID string) bool            { return false }
 func (m *mockInventory) ConsumeAmmo(weaponID string, amount int) {}
 func (m *mockInventory) SetAmmo(weaponID string, amount int)     {}
+func (m *mockInventory) Update()                                 {}
 
 func TestFromConfig_AllSkillsEnabled(t *testing.T) {
 	cfg := &schemas.SkillsConfig{
