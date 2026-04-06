@@ -1,0 +1,67 @@
+---
+name: doc-update
+description: Guidelines for writing and updating project documentation files based on the current user story.
+---
+
+# Documentation Update
+
+When a story adds, changes, or removes behaviour, the relevant docs must be updated as part of the same story — not as a follow-up.
+
+## Which Agent Is Responsible
+
+- **Feature Implementer**: updates inline code docs (package `README.md`, `internal/engine/README.md`, `internal/game/README.md`, `internal/engine/physics/README.md`) when the implementation changes a public API, adds a new component, or removes one.
+- **Workflow Gatekeeper**: verifies that docs are consistent with the final implementation before closing the story. Rejects if docs are stale.
+
+## What to Update
+
+| Changed | Doc to update |
+|---|---|
+| New engine component or package | `internal/engine/README.md` |
+| New game component or package | `internal/game/README.md` |
+| New physics mechanic | `internal/engine/physics/README.md` |
+| New non-obvious design decision | `docs/adr/ADR-NNN-<slug>.md` + link in `README.md` |
+| New agent skill | `AGENTS.md` → "Consult Skills" step |
+| Coverage numbers changed | `AGENTS.md` → "Key Packages to Target" table |
+| Story management scripts changed | `AGENTS.md` → "Story Management Scripts" table |
+
+## Rules
+
+- **Never bloat `README.md` or `AGENTS.md`**. If the content is longer than a short paragraph, create a dedicated file and add a single-line reference in the main doc.
+- **ADRs are append-only**. Never edit an existing ADR. If a decision is superseded, create a new ADR that references the old one.
+- **Coverage numbers in `AGENTS.md` must reflect reality**. After the Gatekeeper runs the coverage check, update the table with the new percentages.
+
+## Adding a New ADR
+
+1. Run `ls docs/adr/` to find the next number.
+2. Create `docs/adr/ADR-NNN-<short-slug>.md` using the template below.
+3. Add a one-line entry to the `docs/adr/` list in `README.md`.
+
+```markdown
+# ADR-NNN — <Title>
+
+## Status
+Accepted
+
+## Context
+<Why this decision was needed.>
+
+## Decision
+<What was decided.>
+
+## Consequences
+<Trade-offs and implications.>
+```
+
+## Adding a New Engine or Game Component
+
+Add a bullet to the relevant section of `internal/engine/README.md` or `internal/game/README.md`. Keep it to one or two lines — link to the source file or an ADR for details.
+
+## Updating Coverage Numbers
+
+After the Gatekeeper confirms a positive delta, update the "Key Packages to Target" table in `AGENTS.md`:
+
+```markdown
+| `entity/actors` | 61.0% | `handleState` state machine, animation logic |
+```
+
+Only update the percentage — do not rewrite the focus area unless the story explicitly changed it.
