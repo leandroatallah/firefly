@@ -10,15 +10,12 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-var (
-	// defaultBulletImg is a white 2x1 image used if no specific image is provided.
-	// In a more advanced implementation, this could be part of the config.
-	defaultBulletImg *ebiten.Image
-)
-
-func init() {
-	defaultBulletImg = ebiten.NewImage(2, 1)
-	defaultBulletImg.Fill(color.White)
+// getDefaultBulletImg creates and returns a white 2x1 image.
+// This is called per Draw to avoid global state.
+func getDefaultBulletImg() *ebiten.Image {
+	img := ebiten.NewImage(2, 1)
+	img.Fill(color.White)
+	return img
 }
 
 // Manager handles the lifecycle of all projectiles in the game.
@@ -104,7 +101,7 @@ func (m *Manager) Draw(screen *ebiten.Image) {
 		opts := &ebiten.DrawImageOptions{}
 		x, y := p.body.GetPositionMin()
 		opts.GeoM.Translate(float64(x), float64(y))
-		screen.DrawImage(defaultBulletImg, opts)
+		screen.DrawImage(getDefaultBulletImg(), opts)
 	}
 }
 
