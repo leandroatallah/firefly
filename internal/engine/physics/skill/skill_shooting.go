@@ -1,6 +1,7 @@
 package skill
 
 import (
+	combatweapon "github.com/boilerplate/ebiten-template/internal/engine/combat/weapon"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/animation"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/combat"
@@ -11,11 +12,13 @@ import (
 
 type ShootingSkill struct {
 	SkillBase
-	inv           combat.Inventory
-	shootHeld     bool
-	handler       body.StateTransitionHandler
-	lastDirection body.ShootDirection
-	directionSet  bool
+	inv            combat.Inventory
+	shootHeld      bool
+	weaponNextHeld bool
+	weaponPrevHeld bool
+	handler        body.StateTransitionHandler
+	lastDirection  body.ShootDirection
+	directionSet   bool
 }
 
 func NewShootingSkill(inv combat.Inventory) *ShootingSkill {
@@ -53,18 +56,27 @@ func (s *ShootingSkill) HandleInputWithDirection(b body.MovableCollidable, model
 		x16 += b.GetShape().Width() << 4
 	}
 
+	// Set owner to prevent projectile from immediately colliding with player
+	if pw, ok := weapon.(*combatweapon.ProjectileWeapon); ok {
+		pw.SetOwner(b)
+	}
+
+	weapon.Fire(x16, y16, b.FaceDirection(), direction)
 	weapon.Fire(x16, y16, b.FaceDirection(), direction)
 }
 
 func (s *ShootingSkill) HandleInput(b body.MovableCollidable, model *physicsmovement.PlatformMovementModel, space body.BodiesSpace) {
 	cmds := input.CommandsReader()
 
-	if cmds.WeaponNext {
+	if cmds.WeaponNext && !s.weaponNextHeld {
 		s.inv.SwitchNext()
 	}
-	if cmds.WeaponPrev {
+	s.weaponNextHeld = cmds.WeaponNext
+
+	if cmds.WeaponPrev && !s.weaponPrevHeld {
 		s.inv.SwitchPrev()
 	}
+	s.weaponPrevHeld = cmds.WeaponPrev
 
 	if !cmds.Shoot {
 		return
@@ -74,6 +86,9 @@ func (s *ShootingSkill) HandleInput(b body.MovableCollidable, model *physicsmove
 }
 
 func (s *ShootingSkill) Update(b body.MovableCollidable, model *physicsmovement.PlatformMovementModel) {
+	// Update inventory weapons (cooldowns)
+	s.inv.Update()
+
 	wasHeld := s.shootHeld
 	s.shootHeld = input.CommandsReader().Shoot
 
