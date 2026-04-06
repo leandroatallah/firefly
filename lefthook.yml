@@ -1,5 +1,8 @@
 pre-commit:
   commands:
+    gofmt:
+      glob: "**/*.go"
+      run: gofmt -w {staged_files} && git add {staged_files}
     sync-skills:
       glob: ".agents/skills/**"
       run: make sync-skills && git add .claude/skills/ .qwen/skills/ .kiro/skills/
