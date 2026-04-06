@@ -4,13 +4,13 @@
 package gamescenephases
 
 import (
-	"fmt"
 	"image/color"
 	"log"
 	"time"
 
 	"github.com/boilerplate/ebiten-template/internal/engine/app"
 	"github.com/boilerplate/ebiten-template/internal/engine/assets/font"
+	"github.com/boilerplate/ebiten-template/internal/engine/combat/projectile"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	sequencestypes "github.com/boilerplate/ebiten-template/internal/engine/contracts/sequences"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
@@ -73,43 +73,24 @@ type PhasesScene struct {
 
 	vignette *enginevfx.Vignette
 
-	death         deathSequence
-	bullets       []*gamestates.Bullet
-	bulletImg     *ebiten.Image
-	bulletCounter int
+	death deathSequence
 }
 
 // SpawnBullet implements body.Shooter interface for shooting skill.
 func (s *PhasesScene) SpawnBullet(x16, y16, vx16, vy16 int, owner interface{}) {
-	baseBody := bodyphysics.NewBody(bodyphysics.NewRect(0, 0, 2, 1))
-	baseBody.SetPosition16(x16, y16)
-
-	s.bulletCounter++
-	bulletID := fmt.Sprintf("bullet_%d", s.bulletCounter)
-	baseBody.SetID(bulletID)
-
-	movableBody := bodyphysics.NewMovableBody(baseBody)
-	collidableBody := bodyphysics.NewCollidableBody(baseBody)
-	collidableBody.SetOwner(owner)
-
-	bullet := gamestates.NewBullet(movableBody, collidableBody, s.PhysicsSpace(), vx16, vy16)
-	collidableBody.SetTouchable(bullet)
-	s.PhysicsSpace().AddBody(collidableBody)
-	s.bullets = append(s.bullets, bullet)
+	if s.AppContext().ProjectileManager != nil {
+		s.AppContext().ProjectileManager.Spawn(projectile.ProjectileConfig{Width: 2, Height: 1}, x16, y16, vx16, vy16, owner)
+	}
 }
 
 func NewPhasesScene(ctx *app.AppContext) *PhasesScene {
 	tilemapScene := scene.NewTilemapScene(ctx)
-
-	bulletImg := ebiten.NewImage(2, 1)
-	bulletImg.Fill(color.RGBA{255, 255, 255, 255})
 
 	scene := &PhasesScene{
 		TilemapScene: tilemapScene,
 		mainText:     ctx.Font,
 		bodyCounter:  &BodyCounter{},
 		vignette:     enginevfx.NewVignette(),
-		bulletImg:    bulletImg,
 	}
 	scene.SetAppContext(ctx)
 
@@ -452,9 +433,9 @@ func (s *PhasesScene) Update() error {
 		}
 	}
 
-	// Update bullets
-	for _, bullet := range s.bullets {
-		bullet.Update()
+	// Update projectiles
+	if s.AppContext().ProjectileManager != nil {
+		s.AppContext().ProjectileManager.Update()
 	}
 
 	// Check for trigger collisions (spikes, endpoints, etc.)
@@ -466,23 +447,6 @@ func (s *PhasesScene) Update() error {
 
 	// Remove bodies queued for removal
 	space.ProcessRemovals()
-
-	// Clean up removed bullets by checking if body still exists in space
-	activeBullets := make([]*gamestates.Bullet, 0, len(s.bullets))
-	bodies := space.Bodies()
-	for _, bullet := range s.bullets {
-		found := false
-		for _, b := range bodies {
-			if b == bullet.Body() {
-				found = true
-				break
-			}
-		}
-		if found {
-			activeBullets = append(activeBullets, bullet)
-		}
-	}
-	s.bullets = activeBullets
 
 	return nil
 }
@@ -526,11 +490,8 @@ func (s *PhasesScene) Draw(screen *ebiten.Image) {
 	}
 
 	// Draw bullets
-	for _, bullet := range s.bullets {
-		opts := &ebiten.DrawImageOptions{}
-		x, y := bullet.Body().GetPositionMin()
-		opts.GeoM.Translate(float64(x), float64(y))
-		s.Camera().Draw(s.bulletImg, opts, screen)
+	if s.AppContext().ProjectileManager != nil {
+		s.AppContext().ProjectileManager.Draw(screen)
 	}
 
 	if s.ShowDrawScreenFlash > 0 {
@@ -554,6 +515,9 @@ func (s *PhasesScene) Draw(screen *ebiten.Image) {
 
 func (s *PhasesScene) OnFinish() {
 	s.TilemapScene.OnFinish()
+	if s.AppContext().ProjectileManager != nil {
+		s.AppContext().ProjectileManager.Clear()
+	}
 	// Ensure we remove any movement block applied at phase start (for whichever actor is the current player)
 	if s.hasPlayer {
 		if p, ok := s.AppContext().ActorManager.GetPlayer(); ok {

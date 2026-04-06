@@ -7,6 +7,7 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/assets/font"
 	"github.com/boilerplate/ebiten-template/internal/engine/assets/imagemanager"
 	"github.com/boilerplate/ebiten-template/internal/engine/audio"
+	combatprojectile "github.com/boilerplate/ebiten-template/internal/engine/combat/projectile"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/navigation"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/vfx"
@@ -24,20 +25,21 @@ import (
 // the game to access systems like input, audio, and scene management without
 // relying on global variables.
 type AppContext struct {
-	AudioManager    audio.Manager
-	ImageManager    *imagemanager.ImageManager
-	DataManager     *datamanager.Manager
-	DialogueManager *speech.Manager
-	EventManager    *event.Manager
-	ActorManager    *actors.Manager
-	SceneManager    navigation.SceneManager
-	PhaseManager    *phases.Manager
-	I18n            *i18n.I18nManager
-	Assets          fs.FS
-	Config          *config.AppConfig
-	Space           body.BodiesSpace
-	VFX             vfx.Manager
-	Font            *font.FontText
+	AudioManager      audio.Manager
+	ImageManager      *imagemanager.ImageManager
+	DataManager       *datamanager.Manager
+	DialogueManager   *speech.Manager
+	EventManager      *event.Manager
+	ActorManager      *actors.Manager
+	SceneManager      navigation.SceneManager
+	PhaseManager      *phases.Manager
+	I18n              *i18n.I18nManager
+	Assets            fs.FS
+	Config            *config.AppConfig
+	Space             body.BodiesSpace
+	ProjectileManager *combatprojectile.Manager
+	VFX               vfx.Manager
+	Font              *font.FontText
 
 	// Global frame counter
 	FrameCount uint64

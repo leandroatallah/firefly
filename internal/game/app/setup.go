@@ -6,6 +6,7 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/app"
 	"github.com/boilerplate/ebiten-template/internal/engine/assets/font"
 	"github.com/boilerplate/ebiten-template/internal/engine/audio"
+	"github.com/boilerplate/ebiten-template/internal/engine/combat/projectile"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/i18n"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
@@ -89,6 +90,7 @@ func Setup(assets fs.FS) error {
 		VFX:             vfxManager,
 		Font:            fontMain,
 	}
+	appContext.ProjectileManager = projectile.NewManager(appContext.Space)
 
 	sceneFactory := scene.NewDefaultSceneFactory(gamescene.InitSceneMap(appContext))
 	sceneFactory.SetAppContext(appContext)
