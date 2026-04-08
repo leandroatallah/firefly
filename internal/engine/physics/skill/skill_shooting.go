@@ -62,7 +62,6 @@ func (s *ShootingSkill) HandleInputWithDirection(b body.MovableCollidable, model
 	}
 
 	weapon.Fire(x16, y16, b.FaceDirection(), direction)
-	weapon.Fire(x16, y16, b.FaceDirection(), direction)
 }
 
 func (s *ShootingSkill) HandleInput(b body.MovableCollidable, model *physicsmovement.PlatformMovementModel, space body.BodiesSpace) {
