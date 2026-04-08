@@ -1,4 +1,4 @@
-# 022 — Weapon System
+# US-022 — Weapon System
 
 **Branch:** `022-weapon-system`
 **Bounded Context:** Engine (`internal/engine/combat/`)

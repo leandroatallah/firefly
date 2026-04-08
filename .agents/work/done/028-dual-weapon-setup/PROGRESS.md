@@ -1,4 +1,4 @@
-# Progress — 028 Dual Weapon Setup
+# PROGRESS-028 — Dual Weapon Setup
 
 ## Status: ✅ Done
 

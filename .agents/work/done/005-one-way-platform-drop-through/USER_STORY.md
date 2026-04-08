@@ -1,4 +1,4 @@
-# USER STORY 005 — One-Way Platform Drop-Through
+# US-005 — One-Way Platform Drop-Through
 
 **Branch:** `005-one-way-platform-drop-through`
 **Bounded Context:** Physics / Entity

@@ -1,4 +1,4 @@
-# User Story 013 — Resolve golangci-lint Violations
+# US-013 — Resolve golangci-lint Violations
 
 **Branch:** `013-resolve-golangci-lint-violations`
 **Bounded Context:** Cross-cutting (Engine + Game)

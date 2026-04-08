@@ -1,4 +1,4 @@
-# USER STORY 006 — Composite Grounded State (Sub-State Machine)
+# US-006 — Composite Grounded State (Sub-State Machine)
 
 **Branch:** `006-composite-grounded-state`
 **Bounded Context:** Entity

@@ -1,4 +1,4 @@
-# 023 — Projectile Manager
+# US-023 — Projectile Manager
 
 **Branch:** `023-projectile-manager`
 **Bounded Context:** Engine (`internal/engine/combat/projectile/`)

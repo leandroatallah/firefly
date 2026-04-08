@@ -1,4 +1,4 @@
-# PROGRESS 009 — Variable Jump Height
+# PROGRESS-009 — Variable Jump Height
 
 **Status:** ✅ Done
 **Completed:** 2026-04-01

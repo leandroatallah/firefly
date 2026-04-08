@@ -1,4 +1,4 @@
-# PROGRESS — 008-bullet-spawn-offset-toggler
+# PROGRESS-008 — Alternating Bullet Spawn Offset (OffsetToggler)
 
 **Status:** ✅ Done
 

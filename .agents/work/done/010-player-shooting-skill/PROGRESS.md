@@ -1,4 +1,4 @@
-# PROGRESS — 010-player-shooting-skill
+# PROGRESS-010 — Player Shooting Skill (Cuphead-style)
 
 **Status:** ✅ Complete
 

@@ -1,4 +1,4 @@
-# 018 — I18nManager Test Coverage
+# US-018 — I18nManager Test Coverage
 
 **Branch:** `018-i18n-manager-tests`
 **Bounded Context:** i18n

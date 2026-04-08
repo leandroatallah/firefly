@@ -1,4 +1,4 @@
-# SPEC — 022-weapon-system
+# SPEC-022 — Weapon System
 
 **Branch:** `022-weapon-system`
 **Bounded Context:** Engine (`internal/engine/combat/weapon/`)

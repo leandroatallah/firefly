@@ -1,4 +1,4 @@
-# Technical Specification: Skill Factory
+# SPEC-027 — Skill Factory (JSON-to-Skills Instantiation)
 
 **Branch:** `027-skill-factory`  
 **Bounded Context:** Engine (`internal/engine/physics/skill/`, `internal/engine/entity/actors/builder/`)

@@ -1,4 +1,4 @@
-# SPEC — 013 Resolve golangci-lint Violations
+# SPEC-013 — Resolve golangci-lint Violations
 
 **Branch:** `013-resolve-golangci-lint-violations`
 **Bounded Context:** Cross-cutting (`internal/engine/` + `internal/game/`)

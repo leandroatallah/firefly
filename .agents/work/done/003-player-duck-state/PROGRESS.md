@@ -1,4 +1,4 @@
-# PROGRESS — 003-player-duck-state
+# PROGRESS-003 — Duck State with Reduced Hitbox
 
 **Status:** ✅ Done
 

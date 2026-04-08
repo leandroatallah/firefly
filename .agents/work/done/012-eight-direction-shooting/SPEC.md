@@ -1,4 +1,4 @@
-# SPEC 012 — 8-Direction Shooting (Cuphead-style)
+# SPEC-012 — 8-Direction Shooting (Cuphead-style)
 
 **Branch:** `012-eight-direction-shooting`  
 **Story:** `.agents/work/active/USER_STORY_012.md`  

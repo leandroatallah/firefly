@@ -1,4 +1,4 @@
-# PROGRESS — 005-one-way-platform-drop-through
+# PROGRESS-005 — One-Way Platform Drop-Through
 
 **Status:** ✅ Done
 

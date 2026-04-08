@@ -1,4 +1,4 @@
-# PROGRESS — 022-weapon-system
+# PROGRESS-022 — Weapon System
 
 **Status:** ✅ Done
 

@@ -1,4 +1,4 @@
-# USER STORY 008 — Alternating Bullet Spawn Offset (OffsetToggler)
+# US-008 — Alternating Bullet Spawn Offset (OffsetToggler)
 
 **Branch:** `008-bullet-spawn-offset-toggler`
 **Bounded Context:** Entity / Game Logic

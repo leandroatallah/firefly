@@ -1,4 +1,4 @@
-# SPEC 002 — Last-Pressed-Wins Horizontal Input
+# SPEC-002 — Last-Pressed-Wins Horizontal Input
 
 **Branch:** `002-last-pressed-wins-input`
 **Bounded Context:** Input

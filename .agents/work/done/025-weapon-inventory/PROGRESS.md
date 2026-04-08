@@ -1,4 +1,4 @@
-# Progress Tracker — 025 Weapon Inventory System
+# PROGRESS-025 — Weapon Inventory System
 
 ## Status
 

@@ -1,4 +1,4 @@
-# SPEC 003 — Duck State with Reduced Hitbox
+# SPEC-003 — Duck State with Reduced Hitbox
 
 **Branch:** `003-player-duck-state`
 **Bounded Context:** Entity / Physics

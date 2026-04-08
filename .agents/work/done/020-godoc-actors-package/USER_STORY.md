@@ -1,4 +1,4 @@
-# 020 — Godoc for Actors Package
+# US-020 — Godoc for Actors Package
 
 **Branch:** `020-godoc-actors-package`
 **Bounded Context:** Entity

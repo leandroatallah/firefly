@@ -1,4 +1,4 @@
-# SPEC 010 — Player Shooting Skill (Cuphead-style)
+# SPEC-010 — Player Shooting Skill (Cuphead-style)
 
 **Branch:** `010-player-shooting-skill`
 **Bounded Context:** Game Logic (`internal/game/`)

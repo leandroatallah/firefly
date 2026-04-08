@@ -1,4 +1,4 @@
-# Technical Specification — 024 JSON-Driven Skills Configuration
+# SPEC-024 — JSON-Driven Skills Configuration
 
 **Branch:** `024-json-skills-config`  
 **Bounded Context:** Engine (Data Schemas, Physics/Skill)  

@@ -1,4 +1,4 @@
-# SPEC — 014 Centralize Player Input Commands
+# SPEC-014 — Centralize Player Input Commands
 
 ## Branch
 

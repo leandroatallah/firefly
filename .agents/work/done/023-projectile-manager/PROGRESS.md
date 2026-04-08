@@ -1,4 +1,4 @@
-# PROGRESS — 023 Projectile Manager
+# PROGRESS-023 — Projectile Manager
 
 **Status:** ✅ Done
 

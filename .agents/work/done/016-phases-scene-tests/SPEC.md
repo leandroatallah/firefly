@@ -1,4 +1,4 @@
-# SPEC — 016: PhasesScene Test Coverage (Revision 2)
+# SPEC-016 — PhasesScene Test Coverage
 
 **Branch:** `016-phases-scene-tests`
 **Bounded Context:** Game Logic

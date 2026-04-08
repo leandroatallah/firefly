@@ -1,4 +1,4 @@
-# 025 — Weapon Inventory System
+# US-025 — Weapon Inventory System
 
 **Branch:** `025-weapon-inventory`
 **Bounded Context:** Engine (`internal/engine/combat/inventory/`)

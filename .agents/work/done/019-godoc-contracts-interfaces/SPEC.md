@@ -1,4 +1,4 @@
-# SPEC — 019 Godoc for Contracts Interfaces
+# SPEC-019 — Godoc for Contracts Interfaces
 
 ## Scope
 

@@ -1,4 +1,4 @@
-# USER STORY 004 — Tween-Based Dash Deceleration
+# US-004 — Tween-Based Dash Deceleration
 
 **Branch:** `004-tween-dash-deceleration`
 **Bounded Context:** Physics / Entity

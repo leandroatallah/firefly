@@ -1,4 +1,4 @@
-# 024 — JSON-Driven Skills Configuration
+# US-024 — JSON-Driven Skills Configuration
 
 **Branch:** `024-json-skills-config`
 **Bounded Context:** Engine (`internal/engine/data/schemas/`, `internal/engine/physics/skill/`)

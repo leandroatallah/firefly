@@ -1,4 +1,4 @@
-# PROGRESS — 012-eight-direction-shooting
+# PROGRESS-012 — 8-Direction Shooting (Cuphead-style)
 
 **Status:** 🔧 Active
 

@@ -1,4 +1,4 @@
-# USER STORY 009 — Variable Jump Height
+# US-009 — Variable Jump Height
 
 **Branch:** `009-variable-jump-height`
 

@@ -1,4 +1,4 @@
-# SPEC — 023 Projectile Manager
+# SPEC-023 — Projectile Manager
 
 **Branch:** `023-projectile-manager`
 **Bounded Context:** `internal/engine/combat/projectile/`

@@ -1,4 +1,4 @@
-# 021 — Architecture Decision Records Foundation
+# US-021 — Architecture Decision Records Foundation
 
 **Branch:** `021-adr-foundation`
 **Bounded Context:** Cross-cutting

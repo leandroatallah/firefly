@@ -1,4 +1,4 @@
-# SPEC 008 — Alternating Bullet Spawn Offset (OffsetToggler)
+# SPEC-008 — Alternating Bullet Spawn Offset (OffsetToggler)
 
 **Branch:** `008-bullet-spawn-offset-toggler`
 **Bounded Context:** Entity / Game Logic

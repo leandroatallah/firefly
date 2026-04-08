@@ -1,4 +1,4 @@
-# Certificate of Completion — USER STORY 010
+# CERT-010 — Player Shooting Skill (Cuphead-style)
 
 **Story:** Player Shooting Skill (Cuphead-style)  
 **Branch:** `010-player-shooting-skill`  

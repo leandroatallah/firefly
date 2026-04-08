@@ -1,4 +1,4 @@
-# USER STORY 011 — Refactor Shooting to Engine Skill
+# US-011 — Refactor Shooting to Engine Skill
 
 **Branch:** `011-refactor-shooting-to-engine-skill`
 **Bounded Context:** Physics (`internal/engine/physics/skill/`)

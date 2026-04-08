@@ -1,4 +1,4 @@
-# Technical Specification: Enhanced Shooting Skill (Inventory-Aware)
+# SPEC-026 — Enhanced Shooting Skill (Inventory-Aware)
 
 **Story ID:** 026  
 **Branch:** `026-shooting-skill-inventory`  

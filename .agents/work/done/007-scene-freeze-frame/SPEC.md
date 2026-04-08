@@ -1,4 +1,4 @@
-# SPEC 007 — Scene-Level Freeze Frame
+# SPEC-007 — Scene-Level Freeze Frame
 
 **Branch:** `007-scene-freeze-frame`
 **Bounded Context:** Scene / Entity

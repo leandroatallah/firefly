@@ -1,4 +1,4 @@
-# Technical Specification — 025 Weapon Inventory System
+# SPEC-025 — Weapon Inventory System
 
 **Branch:** `025-weapon-inventory`  
 **Bounded Context:** Engine (Combat)  

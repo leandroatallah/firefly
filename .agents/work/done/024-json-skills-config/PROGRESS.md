@@ -1,4 +1,4 @@
-# Progress Tracker — 024 JSON-Driven Skills Configuration
+# PROGRESS-024 — JSON-Driven Skills Configuration
 
 ## Status
 

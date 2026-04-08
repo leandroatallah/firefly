@@ -1,4 +1,4 @@
-# 026 — Enhanced Shooting Skill (Inventory-Aware)
+# US-026 — Enhanced Shooting Skill (Inventory-Aware)
 
 **Branch:** `026-shooting-skill-inventory`
 **Bounded Context:** Engine (`internal/engine/physics/skill/`)

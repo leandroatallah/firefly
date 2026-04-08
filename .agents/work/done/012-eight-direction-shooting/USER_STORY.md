@@ -1,4 +1,4 @@
-# USER STORY 012 — 8-Direction Shooting (Cuphead-style)
+# US-012 — 8-Direction Shooting (Cuphead-style)
 
 **Branch:** `012-eight-direction-shooting`
 **Bounded Context:** Game Logic (`internal/game/`) + Physics (`internal/engine/physics/skill/`)

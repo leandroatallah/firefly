@@ -1,4 +1,4 @@
-# Technical Specification — 028 Dual Weapon Setup
+# SPEC-028 — Dual Weapon Setup
 
 **Branch:** `028-dual-weapon-setup`  
 **Bounded Context:** Game (`internal/game/`)

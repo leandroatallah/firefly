@@ -1,4 +1,4 @@
-# SPEC — 017: Sequences Command Test Coverage
+# SPEC-017 — Sequences Command Test Coverage
 
 **Branch:** `017-sequences-command-tests`
 **Bounded Context:** Sequences (`internal/engine/sequences/`)

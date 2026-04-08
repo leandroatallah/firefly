@@ -1,4 +1,4 @@
-# 015 — Entity Actors handleState Test Coverage
+# US-015 — Entity Actors handleState Test Coverage
 
 **Branch:** `015-entity-actors-handlestate-tests`
 **Bounded Context:** Entity

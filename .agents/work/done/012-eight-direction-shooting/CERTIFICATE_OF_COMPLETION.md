@@ -1,4 +1,4 @@
-# Certificate of Completion — US-012 Eight-Direction Shooting
+# CERT-012 — 8-Direction Shooting (Cuphead-style)
 
 **Date:** 2026-04-02  
 **Workflow Gatekeeper:** Kiro  

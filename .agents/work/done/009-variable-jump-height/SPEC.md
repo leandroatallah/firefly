@@ -1,4 +1,4 @@
-# SPEC 009 — Variable Jump Height
+# SPEC-009 — Variable Jump Height
 
 **Story:** `USER_STORY.md`
 **Branch:** `009-variable-jump-height`

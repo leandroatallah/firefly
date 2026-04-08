@@ -1,4 +1,4 @@
-# Progress Tracker: 027-skill-factory
+# PROGRESS-027 — Skill Factory (JSON-to-Skills Instantiation)
 
 ## Status
 

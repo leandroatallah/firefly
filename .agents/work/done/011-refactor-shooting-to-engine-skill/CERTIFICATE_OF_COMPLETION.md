@@ -1,4 +1,4 @@
-# 🎓 CERTIFICATE OF COMPLETION
+# CERT-011 — Refactor Shooting to Engine Skill
 
 **Story ID:** 011  
 **Title:** Refactor Shooting to Engine Skill  

@@ -1,4 +1,4 @@
-# PROGRESS — 007-scene-freeze-frame
+# PROGRESS-007 — Scene-Level Freeze Frame
 
 **Status:** ✅ Done
 

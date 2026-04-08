@@ -1,4 +1,4 @@
-# USER STORY 007 — Scene-Level Freeze Frame
+# US-007 — Scene-Level Freeze Frame
 
 **Branch:** `007-scene-freeze-frame`
 **Bounded Context:** Scene / Entity

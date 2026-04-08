@@ -1,4 +1,4 @@
-# SPEC 011 — Refactor Shooting to Explicit Actor States
+# SPEC-011 — Refactor Shooting to Engine Skill
 
 **Branch:** `011-refactor-shooting-to-engine-skill`
 **Bounded Context:** Entity (`internal/engine/entity/actors/`)

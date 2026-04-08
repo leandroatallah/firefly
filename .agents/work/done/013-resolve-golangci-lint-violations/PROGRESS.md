@@ -1,4 +1,4 @@
-# PROGRESS — 013-resolve-golangci-lint-violations
+# PROGRESS-013 — Resolve golangci-lint Violations
 
 **Status:** ✅ Done
 

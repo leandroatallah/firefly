@@ -1,4 +1,4 @@
-# USER STORY 001 — Hitbox Resize Anchored to Bottom
+# US-001 — Hitbox Resize Anchored to Bottom
 
 **Branch:** `001-hitbox-resize-fixed-bottom`
 **Bounded Context:** Physics

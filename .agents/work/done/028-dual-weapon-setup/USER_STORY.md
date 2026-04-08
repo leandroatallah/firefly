@@ -1,4 +1,4 @@
-# User Story — 028 Dual Weapon Setup
+# US-028 — Dual Weapon Setup
 
 **As a** player,  
 **I want** the climber character to start with two different weapons in their inventory,  

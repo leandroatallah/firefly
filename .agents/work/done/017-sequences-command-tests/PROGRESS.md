@@ -1,4 +1,4 @@
-# PROGRESS — 017: Sequences Command Test Coverage
+# PROGRESS-017 — Sequences Command Test Coverage
 
 ## Status
 

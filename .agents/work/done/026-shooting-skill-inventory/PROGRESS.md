@@ -1,4 +1,4 @@
-# Progress Tracker
+# PROGRESS-026 — Enhanced Shooting Skill (Inventory-Aware)
 
 ## Status
 ✅ Done

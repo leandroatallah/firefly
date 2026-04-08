@@ -1,4 +1,4 @@
-# PROGRESS — 001-hitbox-resize-fixed-bottom
+# PROGRESS-001 — Hitbox Resize Anchored to Bottom
 
 **Status:** ✅ Done
 

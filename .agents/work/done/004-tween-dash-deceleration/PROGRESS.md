@@ -1,4 +1,4 @@
-# PROGRESS — 004-tween-dash-deceleration
+# PROGRESS-004 — Tween-Based Dash Deceleration
 
 **Status:** 🔄 Active
 

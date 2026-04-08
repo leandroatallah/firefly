@@ -1,4 +1,4 @@
-# PROGRESS — 002-last-pressed-wins-input
+# PROGRESS-002 — Last-Pressed-Wins Horizontal Input
 
 **Status:** ✅ Done
 

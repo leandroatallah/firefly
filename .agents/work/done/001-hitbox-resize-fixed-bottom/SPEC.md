@@ -1,4 +1,4 @@
-# SPEC 001 — Hitbox Resize Anchored to Bottom
+# SPEC-001 — Hitbox Resize Anchored to Bottom
 
 **Branch:** `001-hitbox-resize-fixed-bottom`
 **Bounded Context:** Physics

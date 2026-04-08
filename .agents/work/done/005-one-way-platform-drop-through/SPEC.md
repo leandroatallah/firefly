@@ -1,4 +1,4 @@
-# SPEC 005 — One-Way Platform Drop-Through
+# SPEC-005 — One-Way Platform Drop-Through
 
 **Branch:** `005-one-way-platform-drop-through`
 **Bounded Context:** Physics / Entity

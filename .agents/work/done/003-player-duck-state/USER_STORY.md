@@ -1,4 +1,4 @@
-# USER STORY 003 — Duck State with Reduced Hitbox
+# US-003 — Duck State with Reduced Hitbox
 
 **Branch:** `003-player-duck-state`
 **Bounded Context:** Entity / Physics

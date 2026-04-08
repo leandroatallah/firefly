@@ -1,4 +1,4 @@
-# PROGRESS — 006-composite-grounded-state
+# PROGRESS-006 — Composite Grounded State (Sub-State Machine)
 
 **Status:** ✅ Complete
 

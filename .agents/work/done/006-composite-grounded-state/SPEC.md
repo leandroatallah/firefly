@@ -1,4 +1,4 @@
-# SPEC 006 — Composite Grounded State (Sub-State Machine)
+# SPEC-006 — Composite Grounded State (Sub-State Machine)
 
 **Branch:** `006-composite-grounded-state`
 **Bounded Context:** Entity
