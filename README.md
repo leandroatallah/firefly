@@ -23,6 +23,7 @@ A minimal, clean boilerplate for starting new game projects with Ebitengine, bas
 ## Documentation
 
 - `internal/engine/README.md`: Details about the engine core.
+- `internal/engine/combat/README.md`: Combat system overview (weapons, projectiles, inventory).
 - `internal/game/`: Example game implementation (menu + platformer phases).
 - `docs/adr/`: Architecture Decision Records explaining key non-obvious design choices:
   - [ADR-001](docs/adr/ADR-001-fp16-fixed-point-arithmetic.md) — FP16 fixed-point arithmetic for positions

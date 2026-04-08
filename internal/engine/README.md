@@ -5,6 +5,10 @@ This module contains the core, reusable game engine components. It is designed t
 ## Core Components
 
 - `app/`: Manages the main engine loop, context, and initialization (`engine.go`, `context.go`).
+- `combat/`: Handles weapon management, inventory, and projectile lifecycles.
+  - `inventory/`: Manages weapon collections and ammo.
+  - `weapon/`: Logic for firing and cooldowns.
+  - `projectile/`: High-performance projectile management.
 - `contracts/`: Defines the Go interfaces (contracts) for key engine components like animations, bodies, configuration, context, navigation, sequences, tilemap layers, and visual effects (vfx). This promotes a decoupled architecture.
 - `data/`: Handles data loading, management, and configuration schemas (e.g., from JSON files).
   - `config/`: Engine-specific configuration structures.
