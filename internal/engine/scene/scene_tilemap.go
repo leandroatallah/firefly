@@ -151,8 +151,6 @@ func InitItems[T items.Item](s *TilemapScene, factory *items.ItemFactory[T]) err
 
 	for _, i := range itemsPos {
 		item, err := factory.Create(items.ItemType(i.ItemType), i.X, i.Y, i.ID)
-		// pos := item.Position()
-		// item.SetPosition(pos.Min.X, pos.Min.Y-pos.Dy()) // Adjust Y position based on npc height
 		if err != nil {
 			return err
 		}

@@ -229,7 +229,6 @@ func (t *Tilemap) GetItemsPositionID() []*ItemPosition {
 			id = fmt.Sprintf("ITEM_%s_%d", itemType, itemCount)
 			itemCount++
 		}
-		// o.SetID(fmt.Sprintf("%v_%v", prefix, id))
 		res = append(res, &ItemPosition{X: x16, Y: y16, ItemType: itemType, ID: id})
 	}
 

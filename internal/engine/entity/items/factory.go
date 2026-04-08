@@ -13,7 +13,7 @@ func NewItemFactory[T Item](itemMap ItemMap[T]) *ItemFactory[T] {
 func (f *ItemFactory[T]) Create(itemType ItemType, x, y int, id string) (Item, error) {
 	itemFunc, ok := f.itemMap[itemType]
 	if !ok {
-		return nil, fmt.Errorf("unknown item type")
+		return nil, fmt.Errorf("unknown item type: %s", itemType)
 	}
 
 	item := itemFunc(x, y, id)

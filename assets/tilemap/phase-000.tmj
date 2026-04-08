@@ -272,6 +272,24 @@
                  "width":16,
                  "x":32,
                  "y":544
+                }, 
+                {
+                 "gid":184,
+                 "height":16,
+                 "id":74,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"item_type",
+                         "type":"string",
+                         "value":"ITEM_WEAPON_CANNON"
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":128,
+                 "y":976
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -401,7 +419,7 @@
          "y":0
         }],
  "nextlayerid":15,
- "nextobjectid":74,
+ "nextobjectid":75,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",

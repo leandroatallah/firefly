@@ -54,6 +54,8 @@ func createPlayer(ctx *app.AppContext, playerType gameentitytypes.PlayerType) (p
 		EventManager: ctx.EventManager,
 	}
 
+	climber.SetInventory(deps.Inventory)
+
 	if err := builder.ApplySkills(p, *spriteData, deps); err != nil {
 		return nil, err
 	}

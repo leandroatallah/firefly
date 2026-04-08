@@ -28,6 +28,7 @@ type ClimberPlayer struct {
 	*platformer.PlatformerCharacter
 	baseSpeed  int
 	spriteData *schemas.SpriteData
+	inventory  interface{}
 
 	*gameplayermethods.PlayerDeathBehavior
 }
@@ -117,4 +118,12 @@ func (p *ClimberPlayer) OnTouch(other body.Collidable) {
 
 func (p *ClimberPlayer) OnBlock(other body.Collidable) {
 	// Required to implement body.Touchable to avoid recursion if we rely on embedded CollidableBody.OnBlock
+}
+
+func (p *ClimberPlayer) SetInventory(inv interface{}) {
+	p.inventory = inv
+}
+
+func (p *ClimberPlayer) Inventory() interface{} {
+	return p.inventory
 }
