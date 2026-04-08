@@ -51,6 +51,12 @@ func (m *Manager) Spawn(cfg interface{}, x16, y16, vx16, vy16 int, owner interfa
 	collidableBody := bodyphysics.NewCollidableBody(baseBody)
 	collidableBody.SetOwner(owner)
 
+	b := bodyphysics.NewCollidableBodyFromRect(baseBody.GetShape())
+	x, y := baseBody.GetPositionMin()
+	b.SetPosition(x, y)
+	b.SetID(fmt.Sprintf("%v_COLLISION_0", id))
+	collidableBody.AddCollision(b)
+
 	p := &projectile{
 		movable:  movableBody,
 		body:     collidableBody,
