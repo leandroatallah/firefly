@@ -75,10 +75,20 @@ type SpriteData struct {
 }
 
 // ParticleData defines the configuration for a particle effect.
+// A particle entry is either image-based (Image set) or pixel-based (Pixel set).
 type ParticleData struct {
-	Image       string  `json:"image"`
-	FrameWidth  int     `json:"frame_width"`
-	FrameHeight int     `json:"frame_height"`
-	FrameRate   int     `json:"frame_rate"` // Ticks per frame
-	Scale       float64 `json:"scale"`
+	Image       string             `json:"image,omitempty"`
+	FrameWidth  int                `json:"frame_width,omitempty"`
+	FrameHeight int                `json:"frame_height,omitempty"`
+	FrameRate   int                `json:"frame_rate,omitempty"` // Ticks per frame
+	Scale       float64            `json:"scale,omitempty"`
+	Pixel       *PixelParticleData `json:"pixel,omitempty"`
+}
+
+// PixelParticleData defines a pixel-based (no image asset) particle.
+// Color is a hex string limited to "#000000" or "#FFFFFF" (1-bit palette).
+type PixelParticleData struct {
+	Size           int    `json:"size"`
+	Color          string `json:"color"`
+	LifetimeFrames int    `json:"lifetime_frames"`
 }
