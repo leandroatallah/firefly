@@ -7,5 +7,10 @@
   "experimental": {
     "enableAgents": true
   },
-  "$version": 3
+  "$version": 3,
+  "permissions": {
+    "allow": [
+      "Bash(bash *)"
+    ]
+  }
 }
