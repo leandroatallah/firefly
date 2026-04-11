@@ -28,22 +28,61 @@ for skill_dir in "${skills[@]}"; do
     continue
   fi
 
+  # Extract frontmatter from source if present
+  if head -1 "$src" | grep -q '^---$'; then
+    # Find the closing --- line
+    closing_line=$(tail -n +2 "$src" | grep -n '^---$' | head -1 | cut -d: -f1)
+    if [[ -n "$closing_line" ]]; then
+      closing_line=$((closing_line + 1))
+      frontmatter=$(head -n "$closing_line" "$src")
+      body=$(tail -n +$((closing_line + 1)) "$src")
+    else
+      frontmatter=""
+      body=$(cat "$src")
+    fi
+  else
+    frontmatter=""
+    body=$(cat "$src")
+  fi
+
   # Claude Code
   dest=".claude/skills/$skill_name/SKILL.md"
   mkdir -p "$(dirname "$dest")"
-  echo -e "$HEADER\n\n$(cat "$src")" >"$dest"
+  {
+    [[ -n "$frontmatter" ]] && echo "$frontmatter" && echo
+    echo "$HEADER"
+    echo
+    echo "$body"
+  } >"$dest"
   echo "wrote $dest"
 
   # Qwen
   dest=".qwen/skills/$skill_name/SKILL.md"
   mkdir -p "$(dirname "$dest")"
-  echo -e "$HEADER\n\n$(cat "$src")" >"$dest"
+  {
+    [[ -n "$frontmatter" ]] && echo "$frontmatter" && echo
+    echo "$HEADER"
+    echo
+    echo "$body"
+  } >"$dest"
   echo "wrote $dest"
 
-  # Kiro (needs frontmatter)
+  # Gemini — use .agents/skills/ directly (Gemini CLI supports it as alias)
+
+  # Kiro
   dest=".kiro/skills/$skill_name/SKILL.md"
   mkdir -p "$(dirname "$dest")"
-  printf -- "---\ninclusion: always\n---\n\n%s\n\n%s" "$HEADER" "$(cat "$src")" >"$dest"
+  {
+    if [[ -n "$frontmatter" ]]; then
+      echo "$frontmatter"
+    else
+      printf -- "---\ninclusion: always\n---"
+    fi
+    echo
+    echo "$HEADER"
+    echo
+    echo "$body"
+  } >"$dest"
   echo "wrote $dest"
 done
 
