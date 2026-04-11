@@ -40,7 +40,6 @@ func TestVFXManager_PixelConfigLifetimeAndColor(t *testing.T) {
 	}
 
 	cases := map[string]int{
-		"muzzle_flash":   3,
 		"bullet_impact":  6,
 		"bullet_despawn": 8,
 	}
@@ -160,7 +159,7 @@ func TestVFXJSON_AllPixelEntriesUse1BitPalette(t *testing.T) {
 			t.Errorf("entry %q uses non-1bit color %q", e.Type, e.Pixel.Color)
 		}
 	}
-	if pixelCount < 3 {
-		t.Errorf("expected at least 3 pixel-mode entries (muzzle_flash, bullet_impact, bullet_despawn); found %d", pixelCount)
+	if pixelCount < 2 {
+		t.Errorf("expected at least 2 pixel-mode entries (bullet_impact, bullet_despawn); found %d", pixelCount)
 	}
 }

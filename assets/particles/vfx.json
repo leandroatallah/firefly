@@ -17,11 +17,11 @@
   },
   {
     "type": "muzzle_flash",
-    "pixel": {
-      "size": 2,
-      "color": "#FFFFFF",
-      "lifetime_frames": 3
-    }
+    "image": "assets/images/jump-particles-24.png",
+    "frame_width": 24,
+    "frame_height": 24,
+    "frame_rate": 5,
+    "scale": 1.0
   },
   {
     "type": "bullet_impact",
