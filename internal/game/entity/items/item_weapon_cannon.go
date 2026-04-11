@@ -35,7 +35,7 @@ func NewWeaponCannonItem(ctx *app.AppContext, x, y int, id string) (*WeaponCanno
 			currentAmmo := inv.GetAmmo("heavy_cannon")
 			inv.SetAmmo("heavy_cannon", currentAmmo+10)
 		} else {
-			weapon := gameplayer.NewHeavyCannonWeapon(ctx.ProjectileManager)
+			weapon := gameplayer.NewHeavyCannonWeapon(ctx.ProjectileManager, ctx.VFX)
 			inv.AddWeapon(weapon)
 			inv.SetAmmo("heavy_cannon", 10)
 		}
