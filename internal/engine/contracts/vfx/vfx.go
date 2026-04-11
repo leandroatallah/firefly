@@ -2,7 +2,7 @@ package vfx
 
 import (
 	"github.com/boilerplate/ebiten-template/internal/engine/assets/font"
-	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	"github.com/boilerplate/ebiten-template/internal/engine/render/camera"
 	"github.com/boilerplate/ebiten-template/internal/engine/render/particles"
 	"github.com/hajimehoshi/ebiten/v2"
@@ -35,8 +35,8 @@ type Manager interface {
 	SpawnFallingRocks(x float64, y float64, width float64, count int)
 	// SpawnFloatingText spawns a floating text label at the given position for the given duration.
 	SpawnFloatingText(msg string, x float64, y float64, duration int)
-	// SpawnFloatingTextAbove spawns a floating text label above the given actor.
-	SpawnFloatingTextAbove(actor actors.ActorEntity, msg string, duration int)
+	// SpawnFloatingTextAbove spawns a floating text label above the given body.
+	SpawnFloatingTextAbove(target body.Body, msg string, duration int)
 	// SpawnJumpPuff spawns a small puff of particles for a jump action.
 	SpawnJumpPuff(x float64, y float64, count int)
 	// SpawnLandingPuff spawns a small puff of particles for a landing action.

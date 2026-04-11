@@ -12,8 +12,8 @@ import (
 
 	"github.com/boilerplate/ebiten-template/internal/engine/app"
 	"github.com/boilerplate/ebiten-template/internal/engine/assets/font"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/schemas"
-	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
 	"github.com/boilerplate/ebiten-template/internal/engine/render/camera"
 	"github.com/boilerplate/ebiten-template/internal/engine/render/particles"
 	"github.com/boilerplate/ebiten-template/internal/engine/render/vfx/text"
@@ -229,11 +229,11 @@ func (m *Manager) SpawnFloatingText(msg string, x, y float64, duration int) {
 	m.textManager.Add(ft)
 }
 
-// SpawnFloatingTextAbove spawns floating text above an actor.
-func (m *Manager) SpawnFloatingTextAbove(actor actors.ActorEntity, msg string, duration int) {
-	pos := actor.Position()
+// SpawnFloatingTextAbove spawns floating text above a body.
+func (m *Manager) SpawnFloatingTextAbove(target body.Body, msg string, duration int) {
+	pos := target.Position()
 	x := float64(pos.Min.X + pos.Dx()/2) // Center horizontally
-	y := float64(pos.Min.Y)              // Top of actor
+	y := float64(pos.Min.Y)              // Top of target
 	m.SpawnFloatingText(msg, x, y, duration)
 }
 

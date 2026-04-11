@@ -2,8 +2,6 @@ package mocks
 
 import (
 	"time"
-
-	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
 )
 
 // MockAudioManager implements audio.Manager for testing
@@ -112,47 +110,3 @@ func (m *MockDialogueManager) Draw(screen interface{}) {}
 func (m *MockDialogueManager) SetSpeaking(val bool) {
 	m.IsSpeakingVal = val
 }
-
-// MockVFXManager implements vfx.Manager for testing
-type MockVFXManager struct {
-	SpawnedTexts         []string
-	SpawnedTextPositions []struct {
-		X, Y float64
-		Text string
-	}
-	SpawnedAboveTargets []string
-}
-
-func NewMockVFXManager() *MockVFXManager {
-	return &MockVFXManager{
-		SpawnedTexts: make([]string, 0),
-		SpawnedTextPositions: make([]struct {
-			X, Y float64
-			Text string
-		}, 0),
-		SpawnedAboveTargets: make([]string, 0),
-	}
-}
-
-func (m *MockVFXManager) SpawnFloatingText(text string, x, y float64, duration int) {
-	m.SpawnedTexts = append(m.SpawnedTexts, text)
-	m.SpawnedTextPositions = append(m.SpawnedTextPositions, struct {
-		X, Y float64
-		Text string
-	}{X: x, Y: y, Text: text})
-}
-
-func (m *MockVFXManager) SpawnFloatingTextAbove(actor actors.ActorEntity, text string, duration int) {
-	m.SpawnedAboveTargets = append(m.SpawnedAboveTargets, actor.ID())
-	m.SpawnedTexts = append(m.SpawnedTexts, text)
-}
-
-func (m *MockVFXManager) Update() error {
-	return nil
-}
-
-func (m *MockVFXManager) Draw(screen interface{}) {}
-
-func (m *MockVFXManager) Spawn(vfxType string, x, y float64) {}
-
-func (m *MockVFXManager) SetCamera(cam interface{}) {}

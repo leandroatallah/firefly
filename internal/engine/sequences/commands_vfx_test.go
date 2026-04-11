@@ -5,6 +5,7 @@ import (
 
 	"github.com/boilerplate/ebiten-template/internal/engine/app"
 	"github.com/boilerplate/ebiten-template/internal/engine/assets/font"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
 	"github.com/boilerplate/ebiten-template/internal/engine/mocks"
 	"github.com/boilerplate/ebiten-template/internal/engine/physics/space"
@@ -32,8 +33,8 @@ func (v *stubVFXManager) SpawnFallingRocks(_ float64, _ float64, _ float64, _ in
 func (v *stubVFXManager) SpawnFloatingText(msg string, _ float64, _ float64, _ int) {
 	v.spawnedTexts = append(v.spawnedTexts, msg)
 }
-func (v *stubVFXManager) SpawnFloatingTextAbove(actor actors.ActorEntity, msg string, _ int) {
-	v.spawnedAboveTargets = append(v.spawnedAboveTargets, actor.ID())
+func (v *stubVFXManager) SpawnFloatingTextAbove(target body.Body, msg string, _ int) {
+	v.spawnedAboveTargets = append(v.spawnedAboveTargets, target.ID())
 	v.spawnedTexts = append(v.spawnedTexts, msg)
 }
 func (v *stubVFXManager) SpawnJumpPuff(_ float64, _ float64, _ int)                  {}
