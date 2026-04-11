@@ -14,5 +14,29 @@
     "frame_height": 24,
     "frame_rate": 5,
     "scale": 1.0
+  },
+  {
+    "type": "muzzle_flash",
+    "pixel": {
+      "size": 2,
+      "color": "#FFFFFF",
+      "lifetime_frames": 3
+    }
+  },
+  {
+    "type": "bullet_impact",
+    "pixel": {
+      "size": 1,
+      "color": "#FFFFFF",
+      "lifetime_frames": 6
+    }
+  },
+  {
+    "type": "bullet_despawn",
+    "pixel": {
+      "size": 1,
+      "color": "#FFFFFF",
+      "lifetime_frames": 8
+    }
   }
 ]

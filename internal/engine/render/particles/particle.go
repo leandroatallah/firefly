@@ -2,6 +2,7 @@ package particles
 
 import (
 	"image"
+	"image/color"
 
 	"github.com/boilerplate/ebiten-template/internal/engine/render/camera"
 	"github.com/hajimehoshi/ebiten/v2"
@@ -14,6 +15,11 @@ type Config struct {
 	FrameHeight int
 	FrameCount  int
 	FrameRate   int // Ticks per frame
+
+	// Pixel mode (when set, SpawnPuff uses Lifetime instead of FrameCount*FrameRate
+	// and applies Color to each spawned particle).
+	Lifetime int
+	Color    color.Color // nil → no override (white)
 }
 
 // Particle represents an active particle instance.

@@ -3,6 +3,7 @@ package vfx
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"image/color"
 	"io/fs"
 	"log"
@@ -50,6 +51,10 @@ func NewManager(fsys fs.FS, path string) *Manager {
 		}
 
 		for _, vfx := range vfxList {
+			if vfx.Pixel != nil {
+				configs[vfx.Type] = createConfigFromPixel(vfx.Pixel)
+				continue
+			}
 			imgData, err := fs.ReadFile(fsys, vfx.Image)
 			if err != nil {
 				log.Printf("failed to load particle image %s: %v", vfx.Image, err)
@@ -109,6 +114,43 @@ func createConfigFromImage(img *ebiten.Image, vfx VFXConfig) *particles.Config {
 	}
 }
 
+func createConfigFromPixel(pd *schemas.PixelParticleData) *particles.Config {
+	size := pd.Size
+	if size <= 0 {
+		size = 1
+	}
+	img := ebiten.NewImage(size, size)
+	img.Fill(color.White)
+
+	c, err := parseHexColor(pd.Color)
+	if err != nil {
+		log.Printf("invalid pixel particle color %q: %v", pd.Color, err)
+		c = color.White
+	}
+
+	return &particles.Config{
+		Image:       img,
+		FrameWidth:  size,
+		FrameHeight: size,
+		FrameCount:  1,
+		FrameRate:   1,
+		Lifetime:    pd.LifetimeFrames,
+		Color:       c,
+	}
+}
+
+// parseHexColor accepts only "#000000" or "#FFFFFF" (1-bit palette enforcement).
+func parseHexColor(hex string) (color.Color, error) {
+	switch hex {
+	case "#FFFFFF":
+		return color.White, nil
+	case "#000000":
+		return color.Black, nil
+	default:
+		return nil, fmt.Errorf("color must be #000000 or #FFFFFF, got %q", hex)
+	}
+}
+
 // SetDefaultFont sets the default font for floating text effects.
 func (m *Manager) SetDefaultFont(f *font.FontText) {
 	m.textManager.SetDefaultFont(f)
@@ -121,17 +163,25 @@ func (m *Manager) SpawnPuff(typeKey string, x, y float64, count int, randRange f
 		return
 	}
 
+	duration := config.FrameCount * config.FrameRate
+	if config.Lifetime > 0 {
+		duration = config.Lifetime
+	}
+
 	for i := 0; i < count; i++ {
 		p := &particles.Particle{
 			X:           x,
 			Y:           y,
 			VelX:        (rand.Float64() - 0.5) * randRange,
 			VelY:        (rand.Float64() - 0.5) * randRange,
-			Duration:    config.FrameCount * config.FrameRate,
-			MaxDuration: config.FrameCount * config.FrameRate,
+			Duration:    duration,
+			MaxDuration: duration,
 			Scale:       1.0,
 			ScaleSpeed:  0,
 			Config:      config,
+		}
+		if config.Color != nil {
+			p.ColorScale.ScaleWithColor(config.Color)
 		}
 		m.system.Add(p)
 	}

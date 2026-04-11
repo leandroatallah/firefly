@@ -1,6 +1,7 @@
 package schemas
 
 import (
+	"encoding/json"
 	"testing"
 
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/animation"
@@ -85,5 +86,50 @@ func TestParticleData(t *testing.T) {
 	}
 	if particle.Scale != 1.5 {
 		t.Errorf("expected Scale 1.5, got %f", particle.Scale)
+	}
+}
+
+func TestParticleData_PixelMode(t *testing.T) {
+	raw := []byte(`{
+		"type": "muzzle_flash",
+		"pixel": {"size": 2, "color": "#FFFFFF", "lifetime_frames": 3}
+	}`)
+
+	var pd ParticleData
+	if err := json.Unmarshal(raw, &pd); err != nil {
+		t.Fatalf("unmarshal: %v", err)
+	}
+	if pd.Pixel == nil {
+		t.Fatal("Pixel field nil; expected populated PixelParticleData")
+	}
+	if pd.Pixel.Size != 2 {
+		t.Errorf("Pixel.Size = %d, want 2", pd.Pixel.Size)
+	}
+	if pd.Pixel.Color != "#FFFFFF" {
+		t.Errorf("Pixel.Color = %q, want %q", pd.Pixel.Color, "#FFFFFF")
+	}
+	if pd.Pixel.LifetimeFrames != 3 {
+		t.Errorf("Pixel.LifetimeFrames = %d, want 3", pd.Pixel.LifetimeFrames)
+	}
+}
+
+func TestParticleData_ImageModeOmitsPixel(t *testing.T) {
+	raw := []byte(`{
+		"image": "assets/images/jump-particles-24.png",
+		"frame_width": 24,
+		"frame_height": 24,
+		"frame_rate": 5,
+		"scale": 1.0
+	}`)
+
+	var pd ParticleData
+	if err := json.Unmarshal(raw, &pd); err != nil {
+		t.Fatalf("unmarshal: %v", err)
+	}
+	if pd.Pixel != nil {
+		t.Errorf("Pixel should be nil for image-mode entry, got %+v", pd.Pixel)
+	}
+	if pd.Image != "assets/images/jump-particles-24.png" {
+		t.Errorf("Image = %q, want jump-particles-24.png", pd.Image)
 	}
 }
