@@ -4,35 +4,44 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/animation"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/combat"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/vfx"
 )
 
 // ProjectileWeapon is a weapon that spawns projectiles.
 type ProjectileWeapon struct {
-	id              string
-	cooldownFrames  int
-	currentCooldown int
-	projectileType  string
-	projectileSpeed int
-	manager         combat.ProjectileManager
-	owner           interface{}
+	id               string
+	cooldownFrames   int
+	currentCooldown  int
+	projectileType   string
+	projectileSpeed  int
+	manager          combat.ProjectileManager
+	owner            interface{}
+	muzzleEffectType string
+	vfxManager       vfx.Manager
 }
 
 // NewProjectileWeapon creates a new projectile weapon.
-func NewProjectileWeapon(id string, cooldownFrames int, projectileType string, projectileSpeed int, manager combat.ProjectileManager) *ProjectileWeapon {
+func NewProjectileWeapon(id string, cooldownFrames int, projectileType string, projectileSpeed int, manager combat.ProjectileManager, muzzleEffectType string) *ProjectileWeapon {
 	return &ProjectileWeapon{
-		id:              id,
-		cooldownFrames:  cooldownFrames,
-		currentCooldown: 0,
-		projectileType:  projectileType,
-		projectileSpeed: projectileSpeed,
-		manager:         manager,
-		owner:           nil,
+		id:               id,
+		cooldownFrames:   cooldownFrames,
+		currentCooldown:  0,
+		projectileType:   projectileType,
+		projectileSpeed:  projectileSpeed,
+		manager:          manager,
+		owner:            nil,
+		muzzleEffectType: muzzleEffectType,
 	}
 }
 
 // SetOwner sets the owner of projectiles fired by this weapon.
 func (w *ProjectileWeapon) SetOwner(owner interface{}) {
 	w.owner = owner
+}
+
+// SetVFXManager sets the visual effects manager for this weapon.
+func (w *ProjectileWeapon) SetVFXManager(manager vfx.Manager) {
+	w.vfxManager = manager
 }
 
 // ID returns the weapon's unique identifier.
@@ -42,6 +51,13 @@ func (w *ProjectileWeapon) ID() string {
 
 // Fire spawns a projectile if the weapon can fire.
 func (w *ProjectileWeapon) Fire(x16, y16 int, faceDir animation.FacingDirectionEnum, direction body.ShootDirection) {
+	// Spawn muzzle flash VFX
+	if w.vfxManager != nil && w.muzzleEffectType != "" {
+		x := float64(x16) / 16.0
+		y := float64(y16) / 16.0
+		w.vfxManager.SpawnPuff(w.muzzleEffectType, x, y, 1, 0.0)
+	}
+
 	vx16, vy16 := w.calculateVelocity(direction, faceDir)
 	w.manager.SpawnProjectile(w.projectileType, x16, y16, vx16, vy16, w.owner)
 	w.currentCooldown = w.cooldownFrames

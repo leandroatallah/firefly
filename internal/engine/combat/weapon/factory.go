@@ -10,10 +10,11 @@ import (
 // NewWeaponFromJSON creates a Weapon from JSON configuration.
 func NewWeaponFromJSON(data []byte, manager combat.ProjectileManager) (combat.Weapon, error) {
 	var config struct {
-		ID             string `json:"id"`
-		Type           string `json:"type"`
-		CooldownFrames int    `json:"cooldown_frames"`
-		Projectile     *struct {
+		ID               string `json:"id"`
+		Type             string `json:"type"`
+		CooldownFrames   int    `json:"cooldown_frames"`
+		MuzzleEffectType string `json:"muzzle_effect_type"`
+		Projectile       *struct {
 			Type   string `json:"type"`
 			Speed  int    `json:"speed"`
 			Damage int    `json:"damage"`
@@ -32,5 +33,5 @@ func NewWeaponFromJSON(data []byte, manager combat.ProjectileManager) (combat.We
 		return nil, fmt.Errorf("projectile object is required for projectile weapons")
 	}
 
-	return NewProjectileWeapon(config.ID, config.CooldownFrames, config.Projectile.Type, config.Projectile.Speed, manager), nil
+	return NewProjectileWeapon(config.ID, config.CooldownFrames, config.Projectile.Type, config.Projectile.Speed, manager, config.MuzzleEffectType), nil
 }
