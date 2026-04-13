@@ -33,35 +33,25 @@ func TestVFXManager_LoadsCombatPixelTypes(t *testing.T) {
 	}
 }
 
-func TestVFXManager_PixelConfigLifetimeAndColor(t *testing.T) {
+func TestVFXManager_ImageConfigFrameSize(t *testing.T) {
 	m := NewManagerFromPath("../../../../../assets/particles/vfx.json")
 	if m == nil {
 		t.Fatal("NewManagerFromPath returned nil")
 	}
 
-	cases := map[string]int{
-		"bullet_impact":  6,
-		"bullet_despawn": 8,
-	}
+	cases := []string{"bullet_impact", "bullet_despawn"}
 
-	for typeKey, wantLifetime := range cases {
+	for _, typeKey := range cases {
 		cfg, ok := m.configs[typeKey]
 		if !ok {
 			t.Errorf("config %q missing", typeKey)
 			continue
 		}
-		if cfg.Lifetime != wantLifetime {
-			t.Errorf("%s: Lifetime = %d, want %d", typeKey, cfg.Lifetime, wantLifetime)
+		if cfg.FrameWidth != 24 || cfg.FrameHeight != 24 {
+			t.Errorf("%s: FrameWidth/Height = %d/%d, want 24/24", typeKey, cfg.FrameWidth, cfg.FrameHeight)
 		}
-		if cfg.Color == nil {
-			t.Errorf("%s: Color is nil, want color.White", typeKey)
-			continue
-		}
-		gotR, gotG, gotB, gotA := cfg.Color.RGBA()
-		wantR, wantG, wantB, wantA := color.White.RGBA()
-		if gotR != wantR || gotG != wantG || gotB != wantB || gotA != wantA {
-			t.Errorf("%s: Color RGBA = (%d,%d,%d,%d), want white (%d,%d,%d,%d)",
-				typeKey, gotR, gotG, gotB, gotA, wantR, wantG, wantB, wantA)
+		if cfg.FrameRate != 3 {
+			t.Errorf("%s: FrameRate = %d, want 3", typeKey, cfg.FrameRate)
 		}
 	}
 }
@@ -146,20 +136,16 @@ func TestVFXJSON_AllPixelEntriesUse1BitPalette(t *testing.T) {
 		t.Fatalf("unmarshal vfx.json: %v", err)
 	}
 
-	pixelCount := 0
+	// Any pixel-mode entries present must use the 1-bit palette.
 	for _, e := range entries {
 		if e.Pixel == nil {
 			continue
 		}
-		pixelCount++
 		switch e.Pixel.Color {
 		case "#000000", "#FFFFFF":
 			// ok
 		default:
 			t.Errorf("entry %q uses non-1bit color %q", e.Type, e.Pixel.Color)
 		}
-	}
-	if pixelCount < 2 {
-		t.Errorf("expected at least 2 pixel-mode entries (bullet_impact, bullet_despawn); found %d", pixelCount)
 	}
 }

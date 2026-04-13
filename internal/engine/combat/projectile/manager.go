@@ -6,6 +6,7 @@ import (
 	"image/color"
 
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
+	contractsvfx "github.com/boilerplate/ebiten-template/internal/engine/contracts/vfx"
 	bodyphysics "github.com/boilerplate/ebiten-template/internal/engine/physics/body"
 	"github.com/hajimehoshi/ebiten/v2"
 )
@@ -20,17 +21,27 @@ func getDefaultBulletImg() *ebiten.Image {
 
 // Manager handles the lifecycle of all projectiles in the game.
 type Manager struct {
-	projectiles []*projectile
-	space       body.BodiesSpace
-	counter     int
+	projectiles   []*projectile
+	space         body.BodiesSpace
+	counter       int
+	vfxManager    contractsvfx.Manager
+	impactEffect  string
+	despawnEffect string
 }
 
 // NewManager creates a new projectile manager.
 func NewManager(space body.BodiesSpace) *Manager {
 	return &Manager{
-		projectiles: make([]*projectile, 0),
-		space:       space,
+		projectiles:   make([]*projectile, 0),
+		space:         space,
+		impactEffect:  "bullet_impact",
+		despawnEffect: "bullet_despawn",
 	}
+}
+
+// SetVFXManager sets the VFX manager to be used for projectile effects.
+func (m *Manager) SetVFXManager(v contractsvfx.Manager) {
+	m.vfxManager = v
 }
 
 // Spawn creates a new projectile and registers it in the physics space.
@@ -58,11 +69,14 @@ func (m *Manager) Spawn(cfg interface{}, x16, y16, vx16, vy16 int, owner interfa
 	collidableBody.AddCollision(b)
 
 	p := &projectile{
-		movable:  movableBody,
-		body:     collidableBody,
-		space:    m.space,
-		speedX16: vx16,
-		speedY16: vy16,
+		movable:       movableBody,
+		body:          collidableBody,
+		space:         m.space,
+		speedX16:      vx16,
+		speedY16:      vy16,
+		vfxManager:    m.vfxManager,
+		impactEffect:  m.impactEffect,
+		despawnEffect: m.despawnEffect,
 	}
 
 	// Register collision callbacks

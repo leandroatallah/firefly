@@ -90,7 +90,9 @@ func Setup(assets fs.FS) error {
 		VFX:             vfxManager,
 		Font:            fontMain,
 	}
-	appContext.ProjectileManager = projectile.NewManager(appContext.Space)
+	projManager := projectile.NewManager(appContext.Space)
+	projManager.SetVFXManager(vfxManager)
+	appContext.ProjectileManager = projManager
 
 	sceneFactory := scene.NewDefaultSceneFactory(gamescene.InitSceneMap(appContext))
 	sceneFactory.SetAppContext(appContext)
