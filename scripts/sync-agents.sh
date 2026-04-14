@@ -19,9 +19,10 @@ for agent_file in "$AGENTS_DIR"/*.md; do
     
     filename=$(basename "$agent_file")
 
-    # Extract name and description
+    # Extract name, description, and tier
     name=$(awk '/^name:/ {sub(/^name: /, ""); print; exit}' "$agent_file")
     description=$(awk '/^description:/ {sub(/^description: /, ""); print; exit}' "$agent_file")
+    tier=$(awk '/^tier:/ {sub(/^tier: /, ""); print; exit}' "$agent_file")
 
     # Convert name to lowercase identifier for Claude (required: lowercase, hyphens only)
     claude_name=$(echo "$name" | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
@@ -51,12 +52,25 @@ for agent_file in "$AGENTS_DIR"/*.md; do
             "delegate_subagents") claude_tools="${claude_tools:+$claude_tools, }Task" ;;
         esac
     done <<< "$capabilities"
-    
+
+    # Map tier to Claude model
+    claude_model=""
+    case "$tier" in
+        "high")   claude_model="opus" ;;
+        "medium") claude_model="sonnet" ;;
+        "low")    claude_model="haiku" ;;
+    esac
+
+    # Build optional model line
+    claude_model_line=""
+    [ -n "$claude_model" ] && claude_model_line="model: $claude_model"
+
     cat > "$CLAUDE_DIR/$filename" <<EOF
 ---
 name: $claude_name
 description: $description
 tools: $claude_tools
+${claude_model_line}
 ---
 
 $content

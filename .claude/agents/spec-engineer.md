@@ -2,6 +2,7 @@
 name: spec-engineer
 description: Technical Designer. Transforms stories into Technical Specifications in .agents/work/active/
 tools: Read, Write, Bash
+model: opus
 ---
 
 

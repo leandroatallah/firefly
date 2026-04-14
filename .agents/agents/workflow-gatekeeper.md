@@ -1,6 +1,7 @@
 ---
 name: Workflow Gatekeeper
 description: Validator Agent. Ensures the SDD pipeline (Spec -> TDD -> Code) is valid and high-quality.
+tier: medium
 capabilities:
   - read_files
   - write_files

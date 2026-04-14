@@ -2,6 +2,7 @@
 name: tdd-specialist
 description: TDD Expert. Writes failing tests (Red Stage) based on Technical Specifications.
 tools: Read, Write, Bash
+model: opus
 ---
 
 

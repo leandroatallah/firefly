@@ -2,6 +2,7 @@
 name: workflow-gatekeeper
 description: Validator Agent. Ensures the SDD pipeline (Spec -> TDD -> Code) is valid and high-quality.
 tools: Read, Write, Bash
+model: sonnet
 ---
 
 

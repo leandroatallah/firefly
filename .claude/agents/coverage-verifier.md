@@ -2,6 +2,7 @@
 name: coverage-verifier
 description: Runs tests, detects flakiness, measures coverage improvement, and reports delta
 tools: Bash, Read
+model: haiku
 ---
 
 

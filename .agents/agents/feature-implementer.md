@@ -1,6 +1,7 @@
 ---
 name: Feature Implementer
 description: Implementation Specialist. Writes code to pass failing TDD tests.
+tier: medium
 capabilities:
   - read_files
   - write_files

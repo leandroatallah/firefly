@@ -1,6 +1,7 @@
 ---
 name: Workflow Orchestrator
 description: Coordinates the Spec-Driven Development pipeline from feature request to verified implementation
+tier: high
 capabilities:
   - delegate_subagents
   - read_files

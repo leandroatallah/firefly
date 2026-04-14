@@ -1,6 +1,7 @@
 ---
 name: Gap Detector
 description: Analyzes source files to extract function signatures, branches, and interface dependencies for gap reporting
+tier: medium
 capabilities:
   - read_files
   - code_intelligence

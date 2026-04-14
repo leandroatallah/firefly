@@ -2,6 +2,7 @@
 name: mock-generator
 description: Generates or updates mock implementations from contracts interfaces
 tools: Grep, Glob, Read, Write
+model: haiku
 ---
 
 

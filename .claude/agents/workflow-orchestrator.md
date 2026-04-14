@@ -2,6 +2,7 @@
 name: workflow-orchestrator
 description: Coordinates the Spec-Driven Development pipeline from feature request to verified implementation
 tools: Task, Read, Write
+model: opus
 ---
 
 

@@ -1,6 +1,7 @@
 ---
 name: Spec Engineer
 description: Technical Designer. Transforms stories into Technical Specifications in .agents/work/active/
+tier: high
 capabilities:
   - read_files
   - write_files

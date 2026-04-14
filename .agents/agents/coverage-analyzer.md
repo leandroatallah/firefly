@@ -1,6 +1,7 @@
 ---
 name: Coverage Analyzer
 description: Runs go test coverage analysis and produces prioritized list of low-coverage files/functions
+tier: low
 capabilities:
   - execute_commands
   - write_files

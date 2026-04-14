@@ -2,6 +2,7 @@
 name: gap-detector
 description: Analyzes source files to extract function signatures, branches, and interface dependencies for gap reporting
 tools: Read, Grep, Glob
+model: sonnet
 ---
 
 

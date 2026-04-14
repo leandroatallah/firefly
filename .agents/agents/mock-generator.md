@@ -1,6 +1,7 @@
 ---
 name: Mock Generator
 description: Generates or updates mock implementations from contracts interfaces
+tier: low
 capabilities:
   - code_intelligence
   - read_files

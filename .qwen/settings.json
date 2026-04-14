@@ -11,7 +11,9 @@
   "permissions": {
     "allow": [
       "Bash(bash *)",
-      "Read(//Users/leandroatallah/**)"
+      "Read(//Users/leandroatallah/**)",
+      "Bash(go *)",
+      "Bash(golangci-lint *)"
     ]
   }
 }

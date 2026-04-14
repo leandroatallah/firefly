@@ -2,6 +2,7 @@
 name: coverage-analyzer
 description: Runs go test coverage analysis and produces prioritized list of low-coverage files/functions
 tools: Bash, Write
+model: haiku
 ---
 
 

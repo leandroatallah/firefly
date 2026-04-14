@@ -2,6 +2,7 @@
 name: feature-implementer
 description: Implementation Specialist. Writes code to pass failing TDD tests.
 tools: Read, Write, Bash
+model: sonnet
 ---
 
 

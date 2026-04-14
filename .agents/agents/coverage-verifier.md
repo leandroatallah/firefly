@@ -1,6 +1,7 @@
 ---
 name: Coverage Verifier
 description: Runs tests, detects flakiness, measures coverage improvement, and reports delta
+tier: low
 capabilities:
   - execute_commands
   - read_files

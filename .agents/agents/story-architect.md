@@ -1,6 +1,7 @@
 ---
 name: Story Architect
 description: Agile Analyst. Writes User Stories (DDD-inspired) in .agents/work/backlog/
+tier: medium
 capabilities:
   - read_files
   - write_files

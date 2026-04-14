@@ -1,6 +1,7 @@
 ---
 name: Test Writer
 description: Writes comprehensive test files using table-driven patterns, mocks, and project conventions
+tier: medium
 capabilities:
   - read_files
   - write_files

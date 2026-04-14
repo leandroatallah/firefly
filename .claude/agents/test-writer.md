@@ -2,6 +2,7 @@
 name: test-writer
 description: Writes comprehensive test files using table-driven patterns, mocks, and project conventions
 tools: Read, Write, Grep, Glob
+model: sonnet
 ---
 
 

@@ -1,6 +1,7 @@
 ---
 name: TDD Specialist
 description: TDD Expert. Writes failing tests (Red Stage) based on Technical Specifications.
+tier: high
 capabilities:
   - read_files
   - write_files
