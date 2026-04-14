@@ -5,7 +5,7 @@
 ## Pipeline State
 
 - [ ] Story Architect
-- [x] Spec Engineer
+- [ ] Spec Engineer
 - [ ] Mock Generator
 - [ ] TDD Specialist
 - [ ] Feature Implementer
@@ -18,4 +18,3 @@ Story rewritten from out-of-bounds VFX to projectile lifetime system with despaw
 ## Log
 
 - 2026-04-08: Story rewritten. Changed from out-of-bounds VFX (off-screen, not visible) to frame-based lifetime system with optional despawn VFX at last visible position.
-- 2026-04-08: Spec Engineer — SPEC.md created. Adds LifetimeFrames to config, lifetime tracking to projectile, despawn VFX on expiration.

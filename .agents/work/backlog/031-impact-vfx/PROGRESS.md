@@ -5,7 +5,7 @@
 ## Pipeline State
 
 - [ ] Story Architect
-- [x] Spec Engineer
+- [ ] Spec Engineer
 - [ ] Mock Generator
 - [ ] TDD Specialist
 - [ ] Feature Implementer
