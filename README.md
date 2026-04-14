@@ -22,6 +22,8 @@ A minimal, clean boilerplate for starting new game projects with Ebitengine, bas
 
 ## Documentation
 
+- **[`.agents/WORKFLOW.md`](.agents/WORKFLOW.md)**: Spec-Driven Development (SDD) pipeline for implementing features with formal specs and TDD.
+- **[`AGENTS.md`](AGENTS.md)**: Testing strategy, patterns, and coverage guidelines for agent work.
 - `internal/engine/README.md`: Details about the engine core.
 - `internal/engine/combat/README.md`: Combat system overview (weapons, projectiles, inventory).
 - `internal/game/`: Example game implementation (menu + platformer phases).

@@ -76,7 +76,11 @@ tests := []struct {
   - Test formatting arguments: `T("key_with_%d", count)`.
   - Test missing language files (should return an error from `Load()`).
 
-## 📋 Standard Workflow for Agents
+## 📋 Feature Implementation Workflow
+
+See **[`.agents/WORKFLOW.md`](.agents/WORKFLOW.md)** for the complete Spec-Driven Development (SDD) pipeline: Story Architect → Spec Engineer → Mock Generator → TDD Specialist → Feature Implementer → Gatekeeper.
+
+## 📋 Standard Workflow for Coverage Tasks
 
 1. **Analyze Coverage**: Use the coverage tools to identify gaps:
    - For a specific package: `go test ./internal/engine/[package] -coverprofile=coverage.out && go tool cover -func=coverage.out`
