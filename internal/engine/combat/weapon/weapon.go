@@ -18,10 +18,12 @@ type ProjectileWeapon struct {
 	owner            interface{}
 	muzzleEffectType string
 	vfxManager       vfx.Manager
+	spawnOffsetX16   int
+	spawnOffsetY16   int
 }
 
 // NewProjectileWeapon creates a new projectile weapon.
-func NewProjectileWeapon(id string, cooldownFrames int, projectileType string, projectileSpeed int, manager combat.ProjectileManager, muzzleEffectType string) *ProjectileWeapon {
+func NewProjectileWeapon(id string, cooldownFrames int, projectileType string, projectileSpeed int, manager combat.ProjectileManager, muzzleEffectType string, spawnOffsetX16 int, spawnOffsetY16 int) *ProjectileWeapon {
 	return &ProjectileWeapon{
 		id:               id,
 		cooldownFrames:   cooldownFrames,
@@ -31,6 +33,8 @@ func NewProjectileWeapon(id string, cooldownFrames int, projectileType string, p
 		manager:          manager,
 		owner:            nil,
 		muzzleEffectType: muzzleEffectType,
+		spawnOffsetX16:   spawnOffsetX16,
+		spawnOffsetY16:   spawnOffsetY16,
 	}
 }
 
@@ -51,15 +55,23 @@ func (w *ProjectileWeapon) ID() string {
 
 // Fire spawns a projectile if the weapon can fire.
 func (w *ProjectileWeapon) Fire(x16, y16 int, faceDir animation.FacingDirectionEnum, direction body.ShootDirection) {
+	offsetX16 := w.spawnOffsetX16
+	if faceDir == animation.FaceDirectionLeft {
+		offsetX16 = -offsetX16
+	}
+
+	spawnX16 := x16 + offsetX16
+	spawnY16 := y16 + w.spawnOffsetY16
+
 	// Spawn muzzle flash VFX
 	if w.vfxManager != nil && w.muzzleEffectType != "" {
-		x := float64(x16) / 16.0
-		y := float64(y16) / 16.0
+		x := float64(spawnX16) / 16.0
+		y := float64(spawnY16) / 16.0
 		w.vfxManager.SpawnPuff(w.muzzleEffectType, x, y, 1, 0.0)
 	}
 
 	vx16, vy16 := w.calculateVelocity(direction, faceDir)
-	w.manager.SpawnProjectile(w.projectileType, x16, y16, vx16, vy16, w.owner)
+	w.manager.SpawnProjectile(w.projectileType, spawnX16, spawnY16, vx16, vy16, w.owner)
 	w.currentCooldown = w.cooldownFrames
 }
 
