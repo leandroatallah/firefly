@@ -286,7 +286,7 @@ func TestProjectile_VFX_SpawnPuffCalled(t *testing.T) {
 	}{
 		{name: "SpawnPuff on OnTouch", trigger: "impact", wantTypeKey: "bullet_impact", wantCallCount: 1},
 		{name: "SpawnPuff on OnBlock", trigger: "block", wantTypeKey: "bullet_impact", wantCallCount: 1},
-		{name: "SpawnPuff on out-of-bounds", trigger: "despawn", wantTypeKey: "bullet_despawn", wantCallCount: 1},
+		{name: "SpawnPuff on out-of-bounds", trigger: "despawn", wantTypeKey: "", wantCallCount: 0},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

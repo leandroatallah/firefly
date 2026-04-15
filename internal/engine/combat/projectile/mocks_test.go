@@ -80,11 +80,20 @@ func (p *mockTilemapDimensionsProvider) GetCameraBounds() (image.Rectangle, bool
 	return image.Rectangle{}, false
 }
 
+// spawnPuffCall records a single SpawnPuff invocation for assertions.
+type spawnPuffCall struct {
+	typeKey   string
+	x, y      float64
+	count     int
+	randRange float64
+}
+
 // mockVFXManager implements vfx.Manager for testing.
 type mockVFXManager struct {
 	spawnPuffCallCount int
 	lastTypeKey        string
 	lastX, lastY       float64
+	spawnPuffCalls     []spawnPuffCall
 	lastCount          int
 	lastRandRange      float64
 }
@@ -109,6 +118,13 @@ func (m *mockVFXManager) SpawnPuff(typeKey string, x, y float64, count int, rand
 	m.lastY = y
 	m.lastCount = count
 	m.lastRandRange = randRange
+	m.spawnPuffCalls = append(m.spawnPuffCalls, spawnPuffCall{
+		typeKey:   typeKey,
+		x:         x,
+		y:         y,
+		count:     count,
+		randRange: randRange,
+	})
 }
 func (m *mockVFXManager) TriggerScreenFlash() {}
 

@@ -68,15 +68,28 @@ func (m *Manager) Spawn(cfg interface{}, x16, y16, vx16, vy16 int, owner interfa
 	b.SetID(fmt.Sprintf("%v_COLLISION_0", id))
 	collidableBody.AddCollision(b)
 
+	lifetime := max(config.LifetimeFrames, 0)
+
+	impactEffect := config.ImpactEffect
+	if impactEffect == "" && config.LifetimeFrames == 0 {
+		impactEffect = m.impactEffect
+	}
+	despawnEffect := config.DespawnEffect
+	if despawnEffect == "" && config.LifetimeFrames == 0 {
+		despawnEffect = m.despawnEffect
+	}
+
 	p := &projectile{
-		movable:       movableBody,
-		body:          collidableBody,
-		space:         m.space,
-		speedX16:      vx16,
-		speedY16:      vy16,
-		vfxManager:    m.vfxManager,
-		impactEffect:  m.impactEffect,
-		despawnEffect: m.despawnEffect,
+		movable:         movableBody,
+		body:            collidableBody,
+		space:           m.space,
+		speedX16:        vx16,
+		speedY16:        vy16,
+		vfxManager:      m.vfxManager,
+		impactEffect:    impactEffect,
+		despawnEffect:   despawnEffect,
+		lifetimeFrames:  lifetime,
+		currentLifetime: lifetime,
 	}
 
 	// Register collision callbacks
