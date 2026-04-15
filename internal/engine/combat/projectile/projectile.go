@@ -8,14 +8,16 @@ import (
 
 // projectile is the internal state of a spawned projectile.
 type projectile struct {
-	movable       contractsbody.Movable
-	body          contractsbody.Collidable
-	space         contractsbody.BodiesSpace
-	speedX16      int
-	speedY16      int
-	vfxManager    contractsvfx.Manager
-	impactEffect  string
-	despawnEffect string
+	movable         contractsbody.Movable
+	body            contractsbody.Collidable
+	space           contractsbody.BodiesSpace
+	speedX16        int
+	speedY16        int
+	vfxManager      contractsvfx.Manager
+	impactEffect    string
+	despawnEffect   string
+	lifetimeFrames  int // configured total lifetime (0 = infinite)
+	currentLifetime int // frames remaining; only meaningful when lifetimeFrames > 0
 }
 
 func (p *projectile) Update() {
@@ -26,6 +28,16 @@ func (p *projectile) Update() {
 
 	p.space.ResolveCollisions(p.body)
 
+	// Lifetime tick: if lifetimeFrames > 0, decrement and despawn when expired.
+	if p.lifetimeFrames > 0 {
+		p.currentLifetime--
+		if p.currentLifetime <= 0 {
+			p.spawnVFX(p.despawnEffect)
+			p.space.QueueForRemoval(p.body)
+			return
+		}
+	}
+
 	provider := p.space.GetTilemapDimensionsProvider()
 	if provider == nil {
 		return
@@ -35,7 +47,6 @@ func (p *projectile) Update() {
 
 	// Bounds are in fp16 units (scale factor 16: 1 pixel = 16 units)
 	if x < 0 || y < 0 || x > w<<4 || y > h<<4 {
-		p.spawnVFX(p.despawnEffect)
 		p.space.QueueForRemoval(p.body)
 	}
 }

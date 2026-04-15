@@ -2,6 +2,7 @@ package projectile
 
 import (
 	"encoding/json"
+	"strings"
 	"testing"
 )
 
@@ -109,6 +110,97 @@ func TestProjectileConfig_JSONRoundTrip(t *testing.T) {
 				}
 				if got != tt.want {
 					t.Errorf("got %+v, want %+v", got, tt.want)
+				}
+				return
+			}
+
+			var got ProjectileConfig
+			if err := json.Unmarshal([]byte(tt.input), &got); err != nil {
+				t.Fatalf("json.Unmarshal error: %v", err)
+			}
+			if got != tt.want {
+				t.Errorf("got %+v, want %+v", got, tt.want)
+			}
+		})
+	}
+}
+
+// TestProjectileConfig_LifetimeFramesField verifies the new LifetimeFrames
+// field exists, defaults to zero (infinite), round-trips via JSON under the
+// `lifetime_frames` tag, and is omitted when empty.
+func TestProjectileConfig_LifetimeFramesField(t *testing.T) {
+	tests := []struct {
+		name         string
+		cfg          ProjectileConfig
+		wantLifetime int
+	}{
+		{
+			name:         "zero-value defaults to 0 (infinite)",
+			cfg:          ProjectileConfig{},
+			wantLifetime: 0,
+		},
+		{
+			name:         "positive lifetime stored",
+			cfg:          ProjectileConfig{LifetimeFrames: 60},
+			wantLifetime: 60,
+		},
+		{
+			name:         "negative lifetime stored as-is (clamped at use-site)",
+			cfg:          ProjectileConfig{LifetimeFrames: -5},
+			wantLifetime: -5,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.cfg.LifetimeFrames != tt.wantLifetime {
+				t.Errorf("LifetimeFrames = %d, want %d", tt.cfg.LifetimeFrames, tt.wantLifetime)
+			}
+		})
+	}
+}
+
+func TestProjectileConfig_LifetimeFramesJSON(t *testing.T) {
+	tests := []struct {
+		name    string
+		input   string
+		want    ProjectileConfig
+		omitTag bool // if true, marshal tt.want and assert lifetime_frames is omitted
+	}{
+		{
+			name:  "unmarshal lifetime_frames",
+			input: `{"Width":2,"Height":1,"lifetime_frames":120}`,
+			want: ProjectileConfig{
+				Width:          2,
+				Height:         1,
+				LifetimeFrames: 120,
+			},
+		},
+		{
+			name:  "legacy config has zero LifetimeFrames",
+			input: `{"Width":2,"Height":1,"Damage":10}`,
+			want: ProjectileConfig{
+				Width:  2,
+				Height: 1,
+				Damage: 10,
+			},
+		},
+		{
+			name:    "marshal omits zero LifetimeFrames",
+			want:    ProjectileConfig{Width: 2, Height: 1},
+			omitTag: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.omitTag {
+				data, err := json.Marshal(tt.want)
+				if err != nil {
+					t.Fatalf("json.Marshal error: %v", err)
+				}
+				if strings.Contains(string(data), "lifetime_frames") {
+					t.Errorf("expected lifetime_frames to be omitted, got %s", string(data))
 				}
 				return
 			}

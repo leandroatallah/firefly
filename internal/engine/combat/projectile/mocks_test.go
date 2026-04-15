@@ -80,11 +80,20 @@ func (p *mockTilemapDimensionsProvider) GetCameraBounds() (image.Rectangle, bool
 	return image.Rectangle{}, false
 }
 
+// spawnPuffCall records a single SpawnPuff invocation for assertions.
+type spawnPuffCall struct {
+	typeKey   string
+	x, y      float64
+	count     int
+	randRange float64
+}
+
 // mockVFXManager implements vfx.Manager for testing.
 type mockVFXManager struct {
 	spawnPuffCallCount int
 	lastTypeKey        string
 	lastX, lastY       float64
+	spawnPuffCalls     []spawnPuffCall
 }
 
 func (m *mockVFXManager) SetAppContext(_ any)                                 {}
@@ -100,11 +109,18 @@ func (m *mockVFXManager) SpawnFloatingText(_ string, _, _ float64, _ int)     {}
 func (m *mockVFXManager) SpawnFloatingTextAbove(_ body.Body, _ string, _ int) {}
 func (m *mockVFXManager) SpawnJumpPuff(_, _ float64, _ int)                   {}
 func (m *mockVFXManager) SpawnLandingPuff(_, _ float64, _ int)                {}
-func (m *mockVFXManager) SpawnPuff(typeKey string, x, y float64, _ int, _ float64) {
+func (m *mockVFXManager) SpawnPuff(typeKey string, x, y float64, count int, randRange float64) {
 	m.spawnPuffCallCount++
 	m.lastTypeKey = typeKey
 	m.lastX = x
 	m.lastY = y
+	m.spawnPuffCalls = append(m.spawnPuffCalls, spawnPuffCall{
+		typeKey:   typeKey,
+		x:         x,
+		y:         y,
+		count:     count,
+		randRange: randRange,
+	})
 }
 func (m *mockVFXManager) TriggerScreenFlash() {}
 
