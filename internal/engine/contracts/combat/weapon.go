@@ -8,7 +8,7 @@ import (
 // Weapon represents a combat weapon with cooldown-based firing.
 type Weapon interface {
 	ID() string
-	Fire(x16, y16 int, faceDir animation.FacingDirectionEnum, direction body.ShootDirection)
+	Fire(x16, y16 int, faceDir animation.FacingDirectionEnum, direction body.ShootDirection, state int)
 	CanFire() bool
 	Update()
 	Cooldown() int

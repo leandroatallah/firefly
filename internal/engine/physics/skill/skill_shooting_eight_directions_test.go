@@ -21,7 +21,7 @@ func TestShootingSkill_ShootStraight(t *testing.T) {
 
 	mockWeapon := &mocks.MockWeapon{
 		CanFireFunc: func() bool { return true },
-		FireFunc: func(x16, y16 int, faceDir animation.FacingDirectionEnum, direction body.ShootDirection) {
+		FireFunc: func(x16, y16 int, faceDir animation.FacingDirectionEnum, direction body.ShootDirection, _ int) {
 			capturedDir = direction
 		},
 	}
@@ -55,7 +55,7 @@ func TestShootingSkill_ShootUp(t *testing.T) {
 
 	mockWeapon := &mocks.MockWeapon{
 		CanFireFunc: func() bool { return true },
-		FireFunc: func(x16, y16 int, faceDir animation.FacingDirectionEnum, direction body.ShootDirection) {
+		FireFunc: func(x16, y16 int, faceDir animation.FacingDirectionEnum, direction body.ShootDirection, _ int) {
 			capturedDir = direction
 		},
 	}
@@ -89,7 +89,7 @@ func TestShootingSkill_ShootDownAirborne(t *testing.T) {
 
 	mockWeapon := &mocks.MockWeapon{
 		CanFireFunc: func() bool { return true },
-		FireFunc: func(x16, y16 int, faceDir animation.FacingDirectionEnum, direction body.ShootDirection) {
+		FireFunc: func(x16, y16 int, faceDir animation.FacingDirectionEnum, direction body.ShootDirection, _ int) {
 			capturedDir = direction
 		},
 	}
@@ -126,7 +126,7 @@ func TestShootingSkill_ShootDownGrounded_Ignored(t *testing.T) {
 
 	mockWeapon := &mocks.MockWeapon{
 		CanFireFunc: func() bool { return true },
-		FireFunc: func(x16, y16 int, faceDir animation.FacingDirectionEnum, direction body.ShootDirection) {
+		FireFunc: func(x16, y16 int, faceDir animation.FacingDirectionEnum, direction body.ShootDirection, _ int) {
 			capturedDir = direction
 		},
 	}
@@ -163,7 +163,7 @@ func TestShootingSkill_DiagonalUpForward(t *testing.T) {
 
 	mockWeapon := &mocks.MockWeapon{
 		CanFireFunc: func() bool { return true },
-		FireFunc: func(x16, y16 int, faceDir animation.FacingDirectionEnum, direction body.ShootDirection) {
+		FireFunc: func(x16, y16 int, faceDir animation.FacingDirectionEnum, direction body.ShootDirection, _ int) {
 			capturedDir = direction
 		},
 	}
@@ -199,7 +199,7 @@ func TestShootingSkill_DirectionChangeMidShooting(t *testing.T) {
 
 	mockWeapon := &mocks.MockWeapon{
 		CanFireFunc: func() bool { return true },
-		FireFunc: func(x16, y16 int, faceDir animation.FacingDirectionEnum, direction body.ShootDirection) {
+		FireFunc: func(x16, y16 int, faceDir animation.FacingDirectionEnum, direction body.ShootDirection, _ int) {
 		},
 	}
 
@@ -238,7 +238,7 @@ func TestShootingSkill_ReleaseDirectionalInput(t *testing.T) {
 
 	mockWeapon := &mocks.MockWeapon{
 		CanFireFunc: func() bool { return true },
-		FireFunc: func(x16, y16 int, faceDir animation.FacingDirectionEnum, direction body.ShootDirection) {
+		FireFunc: func(x16, y16 int, faceDir animation.FacingDirectionEnum, direction body.ShootDirection, _ int) {
 		},
 	}
 
@@ -277,7 +277,7 @@ func TestShootingSkill_DuckingShooting(t *testing.T) {
 
 	mockWeapon := &mocks.MockWeapon{
 		CanFireFunc: func() bool { return true },
-		FireFunc: func(x16, y16 int, faceDir animation.FacingDirectionEnum, direction body.ShootDirection) {
+		FireFunc: func(x16, y16 int, faceDir animation.FacingDirectionEnum, direction body.ShootDirection, _ int) {
 			capturedDir = direction
 		},
 	}

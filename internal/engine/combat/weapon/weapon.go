@@ -20,6 +20,7 @@ type ProjectileWeapon struct {
 	vfxManager       vfx.Manager
 	spawnOffsetX16   int
 	spawnOffsetY16   int
+	stateOffsets     map[int][2]int
 }
 
 // NewProjectileWeapon creates a new projectile weapon.
@@ -43,6 +44,12 @@ func (w *ProjectileWeapon) SetOwner(owner interface{}) {
 	w.owner = owner
 }
 
+// SetStateSpawnOffsets registers per-state spawn offsets. Values are fp16 (x16, y16).
+// Passing a nil or empty map clears all per-state overrides.
+func (w *ProjectileWeapon) SetStateSpawnOffsets(offsets map[int][2]int) {
+	w.stateOffsets = offsets
+}
+
 // SetVFXManager sets the visual effects manager for this weapon.
 func (w *ProjectileWeapon) SetVFXManager(manager vfx.Manager) {
 	w.vfxManager = manager
@@ -54,14 +61,23 @@ func (w *ProjectileWeapon) ID() string {
 }
 
 // Fire spawns a projectile if the weapon can fire.
-func (w *ProjectileWeapon) Fire(x16, y16 int, faceDir animation.FacingDirectionEnum, direction body.ShootDirection) {
+func (w *ProjectileWeapon) Fire(x16, y16 int, faceDir animation.FacingDirectionEnum, direction body.ShootDirection, state int) {
 	offsetX16 := w.spawnOffsetX16
+	offsetY16 := w.spawnOffsetY16
+
+	if w.stateOffsets != nil {
+		if override, ok := w.stateOffsets[state]; ok {
+			offsetX16 = override[0]
+			offsetY16 = override[1]
+		}
+	}
+
 	if faceDir == animation.FaceDirectionLeft {
 		offsetX16 = -offsetX16
 	}
 
 	spawnX16 := x16 + offsetX16
-	spawnY16 := y16 + w.spawnOffsetY16
+	spawnY16 := y16 + offsetY16
 
 	// Spawn muzzle flash VFX
 	if w.vfxManager != nil && w.muzzleEffectType != "" {

@@ -65,7 +65,7 @@ func TestProjectileWeapon_Fire_SpawnsProjectileWithCorrectVelocity(t *testing.T)
 
 			w := weapon.NewProjectileWeapon("test", 10, "bullet", 100, mock, "", 0, 0)
 
-			w.Fire(1000, 2000, tt.faceDir, tt.shootDir)
+			w.Fire(1000, 2000, tt.faceDir, tt.shootDir, 0)
 
 			if got.projectileType != "bullet" {
 				t.Errorf("projectileType: got %q, want %q", got.projectileType, "bullet")
@@ -89,7 +89,7 @@ func TestProjectileWeapon_Fire_SpawnsProjectileWithCorrectVelocity(t *testing.T)
 func TestProjectileWeapon_Update_DecrementsCooldown(t *testing.T) {
 	w := weapon.NewProjectileWeapon("test", 3, "bullet", 100, &mockProjectileManager{}, "", 0, 0)
 
-	w.Fire(0, 0, animation.FaceDirectionRight, body.ShootDirectionStraight)
+	w.Fire(0, 0, animation.FaceDirectionRight, body.ShootDirectionStraight, 0)
 	w.Update()
 
 	if w.Cooldown() != 2 {
@@ -100,7 +100,7 @@ func TestProjectileWeapon_Update_DecrementsCooldown(t *testing.T) {
 func TestProjectileWeapon_CanFire_TrueAfterCooldownExpires(t *testing.T) {
 	w := weapon.NewProjectileWeapon("test", 2, "bullet", 100, &mockProjectileManager{}, "", 0, 0)
 
-	w.Fire(0, 0, animation.FaceDirectionRight, body.ShootDirectionStraight)
+	w.Fire(0, 0, animation.FaceDirectionRight, body.ShootDirectionStraight, 0)
 	w.Update()
 	w.Update()
 
@@ -143,7 +143,7 @@ func TestProjectileWeapon_MuzzleFlashVFX_ExecutionOrder(t *testing.T) {
 	w := weapon.NewProjectileWeapon("gun", 10, "bullet", 160, mockProj, "muzzle_flash", 0, 0)
 	w.SetVFXManager(mockVFX)
 
-	w.Fire(0, 0, animation.FaceDirectionRight, body.ShootDirectionStraight)
+	w.Fire(0, 0, animation.FaceDirectionRight, body.ShootDirectionStraight, 0)
 
 	if len(callOrder) != 2 {
 		t.Fatalf("expected 2 calls, got %d", len(callOrder))
@@ -214,7 +214,7 @@ func TestProjectileWeapon_MuzzleFlashVFX(t *testing.T) {
 			w := weapon.NewProjectileWeapon("gun", 10, "bullet", 160, &mockProjectileManager{}, tt.effectKey, 0, 0)
 			w.SetVFXManager(mockVFX)
 
-			w.Fire(tt.x16, tt.y16, animation.FaceDirectionRight, body.ShootDirectionStraight)
+			w.Fire(tt.x16, tt.y16, animation.FaceDirectionRight, body.ShootDirectionStraight, 0)
 
 			if spawnCount != 1 {
 				t.Errorf("SpawnPuff call count: got %d, want 1", spawnCount)
@@ -245,7 +245,7 @@ func TestProjectileWeapon_NoVFXWhenManagerNil(t *testing.T) {
 	w := weapon.NewProjectileWeapon("gun", 10, "bullet", 160, &mockProjectileManager{}, "muzzle_flash", 0, 0)
 
 	// Must not panic.
-	w.Fire(320, 480, animation.FaceDirectionRight, body.ShootDirectionStraight)
+	w.Fire(320, 480, animation.FaceDirectionRight, body.ShootDirectionStraight, 0)
 }
 
 // TestProjectileWeapon_NoVFXWhenEffectTypeEmpty covers AC5:
@@ -262,7 +262,7 @@ func TestProjectileWeapon_NoVFXWhenEffectTypeEmpty(t *testing.T) {
 	w := weapon.NewProjectileWeapon("gun", 10, "bullet", 160, &mockProjectileManager{}, "", 0, 0)
 	w.SetVFXManager(mockVFX)
 
-	w.Fire(320, 480, animation.FaceDirectionRight, body.ShootDirectionStraight)
+	w.Fire(320, 480, animation.FaceDirectionRight, body.ShootDirectionStraight, 0)
 
 	if spawnCount != 0 {
 		t.Errorf("SpawnPuff call count: got %d, want 0 (empty effectType must suppress VFX)", spawnCount)
@@ -306,7 +306,7 @@ func TestProjectileWeapon_SetVFXManager(t *testing.T) {
 		called = true
 	}
 
-	w.Fire(0, 0, animation.FaceDirectionRight, body.ShootDirectionStraight)
+	w.Fire(0, 0, animation.FaceDirectionRight, body.ShootDirectionStraight, 0)
 
 	if !called {
 		t.Error("SpawnPuff was not called after SetVFXManager; manager injection may not be working")
@@ -419,7 +419,7 @@ func TestProjectileWeapon_Fire_SpawnOffset(t *testing.T) {
 				w.SetVFXManager(mockVFX)
 			}
 
-			w.Fire(tt.fireX16, tt.fireY16, tt.faceDir, body.ShootDirectionStraight)
+			w.Fire(tt.fireX16, tt.fireY16, tt.faceDir, body.ShootDirectionStraight, 0)
 
 			if gotProjX16 != tt.wantSpawnX16 {
 				t.Errorf("projectile x16: got %d, want %d", gotProjX16, tt.wantSpawnX16)
@@ -438,6 +438,112 @@ func TestProjectileWeapon_Fire_SpawnOffset(t *testing.T) {
 				if gotVFXY != tt.wantVFXY {
 					t.Errorf("VFX y: got %v, want %v", gotVFXY, tt.wantVFXY)
 				}
+			}
+		})
+	}
+}
+
+// TestProjectileWeapon_Fire_StateSpawnOffset covers US-037 AC3-AC6:
+// Per-state offset table overrides default offset when Fire's state arg matches
+// an entry; fallback to default when no match; facing-left negates resolved X;
+// nil table or (0,0) default reproduces pre-US-037 behavior.
+func TestProjectileWeapon_Fire_StateSpawnOffset(t *testing.T) {
+	tests := []struct {
+		name           string
+		spawnOffsetX16 int
+		spawnOffsetY16 int
+		stateOffsets   map[int][2]int // nil means do not call SetStateSpawnOffsets
+		state          int
+		faceDir        animation.FacingDirectionEnum
+		fireX16        int
+		fireY16        int
+		wantSpawnX16   int
+		wantSpawnY16   int
+	}{
+		{
+			name:           "state with matching offset uses it",
+			spawnOffsetX16: 80,
+			spawnOffsetY16: 160,
+			stateOffsets:   map[int][2]int{42: {96, 192}},
+			state:          42,
+			faceDir:        animation.FaceDirectionRight,
+			fireX16:        320,
+			fireY16:        480,
+			wantSpawnX16:   416, // 320 + 96
+			wantSpawnY16:   672, // 480 + 192
+		},
+		{
+			name:           "state without entry falls back to default",
+			spawnOffsetX16: 80,
+			spawnOffsetY16: 160,
+			stateOffsets:   map[int][2]int{42: {96, 192}},
+			state:          99,
+			faceDir:        animation.FaceDirectionRight,
+			fireX16:        320,
+			fireY16:        480,
+			wantSpawnX16:   400, // 320 + 80
+			wantSpawnY16:   640, // 480 + 160
+		},
+		{
+			name:           "facing left negates per-state X",
+			spawnOffsetX16: 80,
+			spawnOffsetY16: 160,
+			stateOffsets:   map[int][2]int{42: {96, 192}},
+			state:          42,
+			faceDir:        animation.FaceDirectionLeft,
+			fireX16:        320,
+			fireY16:        480,
+			wantSpawnX16:   224, // 320 - 96
+			wantSpawnY16:   672, // 480 + 192
+		},
+		{
+			name:           "nil state table uses default offset",
+			spawnOffsetX16: 80,
+			spawnOffsetY16: 160,
+			stateOffsets:   nil,
+			state:          0,
+			faceDir:        animation.FaceDirectionRight,
+			fireX16:        320,
+			fireY16:        480,
+			wantSpawnX16:   400, // 320 + 80
+			wantSpawnY16:   640, // 480 + 160
+		},
+		{
+			name:           "(0,0) default + no table = no offset",
+			spawnOffsetX16: 0,
+			spawnOffsetY16: 0,
+			stateOffsets:   nil,
+			state:          0,
+			faceDir:        animation.FaceDirectionRight,
+			fireX16:        320,
+			fireY16:        480,
+			wantSpawnX16:   320,
+			wantSpawnY16:   480,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var gotX16, gotY16 int
+			mock := &mockProjectileManager{
+				SpawnProjectileFunc: func(_ string, x16, y16, _, _ int, _ interface{}) {
+					gotX16 = x16
+					gotY16 = y16
+				},
+			}
+
+			w := weapon.NewProjectileWeapon("test", 10, "bullet", 100, mock, "", tt.spawnOffsetX16, tt.spawnOffsetY16)
+			if tt.stateOffsets != nil {
+				w.SetStateSpawnOffsets(tt.stateOffsets)
+			}
+
+			w.Fire(tt.fireX16, tt.fireY16, tt.faceDir, body.ShootDirectionStraight, tt.state)
+
+			if gotX16 != tt.wantSpawnX16 {
+				t.Errorf("spawnX16: got %d, want %d", gotX16, tt.wantSpawnX16)
+			}
+			if gotY16 != tt.wantSpawnY16 {
+				t.Errorf("spawnY16: got %d, want %d", gotY16, tt.wantSpawnY16)
 			}
 		})
 	}

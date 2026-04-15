@@ -61,7 +61,14 @@ func (s *ShootingSkill) HandleInputWithDirection(b body.MovableCollidable, model
 		pw.SetOwner(b)
 	}
 
-	weapon.Fire(x16, y16, b.FaceDirection(), direction)
+	state := 0
+	type actorStateReader interface {
+		State() int
+	}
+	if sr, ok := b.(actorStateReader); ok {
+		state = sr.State()
+	}
+	weapon.Fire(x16, y16, b.FaceDirection(), direction, state)
 }
 
 func (s *ShootingSkill) HandleInput(b body.MovableCollidable, model *physicsmovement.PlatformMovementModel, space body.BodiesSpace) {

@@ -19,7 +19,7 @@ func TestShootingSkill_FireDelegatesToActiveWeapon(t *testing.T) {
 	fireCalled := false
 	mockWeapon := &mocks.MockWeapon{
 		CanFireFunc: func() bool { return true },
-		FireFunc: func(x16, y16 int, faceDir animation.FacingDirectionEnum, direction body.ShootDirection) {
+		FireFunc: func(x16, y16 int, faceDir animation.FacingDirectionEnum, direction body.ShootDirection, _ int) {
 			fireCalled = true
 		},
 	}
@@ -52,7 +52,7 @@ func TestShootingSkill_NoFireWhenWeaponOnCooldown(t *testing.T) {
 	fireCalled := false
 	mockWeapon := &mocks.MockWeapon{
 		CanFireFunc: func() bool { return false },
-		FireFunc: func(x16, y16 int, faceDir animation.FacingDirectionEnum, direction body.ShootDirection) {
+		FireFunc: func(x16, y16 int, faceDir animation.FacingDirectionEnum, direction body.ShootDirection, _ int) {
 			fireCalled = true
 		},
 	}

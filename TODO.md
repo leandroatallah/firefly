@@ -1,2 +1,1 @@
 - Add player to the bottom of credit scene
-- Player is falling during the dash.

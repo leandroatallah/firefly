@@ -9,7 +9,7 @@ import (
 // MockWeapon is a shared mock for the Weapon interface.
 type MockWeapon struct {
 	IDFunc          func() string
-	FireFunc        func(x16, y16 int, faceDir animation.FacingDirectionEnum, direction body.ShootDirection)
+	FireFunc        func(x16, y16 int, faceDir animation.FacingDirectionEnum, direction body.ShootDirection, state int)
 	CanFireFunc     func() bool
 	UpdateFunc      func()
 	CooldownFunc    func() int
@@ -23,9 +23,9 @@ func (m *MockWeapon) ID() string {
 	return ""
 }
 
-func (m *MockWeapon) Fire(x16, y16 int, faceDir animation.FacingDirectionEnum, direction body.ShootDirection) {
+func (m *MockWeapon) Fire(x16, y16 int, faceDir animation.FacingDirectionEnum, direction body.ShootDirection, state int) {
 	if m.FireFunc != nil {
-		m.FireFunc(x16, y16, faceDir, direction)
+		m.FireFunc(x16, y16, faceDir, direction, state)
 	}
 }
 
