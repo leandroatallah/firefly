@@ -4,11 +4,12 @@
 #   scripts/story.sh start <id-slug>  — backlog → active  (Spec Engineer)
 #   scripts/story.sh done  <id-slug>  — active  → done    (Gatekeeper)
 #   scripts/story.sh status           — list all lanes
+#   scripts/story.sh dashboard        — real-time pipeline dashboard
 
 set -euo pipefail
 WORK=".agents/work"
 
-cmd="${1:-status}"
+cmd="${1:-dashboard}"
 slug="${2:-}"
 
 case "$cmd" in
@@ -32,18 +33,16 @@ EOF
 
 **Status:** 📋 Backlog
 
-## Pipeline Stages
-
-| Stage | Status | Notes |
-|---|---|---|
-| Story Architect    | ⬜ Pending | |
-| Spec Engineer      | ⬜ Pending | |
-| Mock Generator     | ⬜ Pending | |
-| TDD Specialist     | ⬜ Pending | |
-| Feature Implementer| ⬜ Pending | |
-| Gatekeeper         | ⬜ Pending | |
+## Pipeline State
+- [ ] Story Architect
+- [ ] Spec Engineer
+- [ ] Mock Generator
+- [ ] TDD Specialist
+- [ ] Feature Implementer
+- [ ] Workflow Gatekeeper
 
 ## Log
+# Format: - [Model] [Agent] [date]: Action/Decision
 EOF
     echo "✅ Created backlog/$slug"
     ;;
@@ -67,6 +66,11 @@ EOF
     done
     ;;
 
+  dashboard)
+    go run scripts/sdd-dashboard.go
+    ;;
+
   *)
     echo "Unknown command: $cmd"; exit 1 ;;
 esac
+

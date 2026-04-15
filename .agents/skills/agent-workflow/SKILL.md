@@ -72,24 +72,29 @@ Each story lives in a self-contained folder that moves through the pipeline:
 
 **Status:** 🔄 Active   (or ✅ Done)
 
-## Pipeline Stages
+## Pipeline State
 
-| Stage | Status | Notes |
-|---|---|---|
-| Story Architect    | ✅ Complete | `USER_STORY.md` written |
-| Spec Engineer      | ✅ Complete | `SPEC.md` written |
-| Mock Generator     | ✅ Complete | No mocks required |
-| TDD Specialist     | ✅ Complete | `path/to/foo_test.go` |
-| Feature Implementer| ✅ Complete | `path/to/foo.go` |
-| Gatekeeper         | ⬜ Pending  | |
+- [x] Story Architect
+- [x] Spec Engineer
+- [/] Mock Generator   ← Use [/] for In Progress
+- [ ] TDD Specialist
+- [ ] Feature Implementer
+- [ ] Workflow Gatekeeper
 
 ## Log
 
-- **[Agent] [date]**: What was done, decided, or why a backtrack occurred.
-  Example: `Gatekeeper rejected: coverage dropped 2% — missing edge case in TestFooExit. Backtracking to TDD Specialist.`
+Agents must log **twice** per stage: once at the start and once at completion.
+
+- **[Model] [Agent] [date] [Action]**: [Details]
+  Example:
+  `- [Gemini] [Mock Generator] 2026-04-15 [STARTED]: Generating mocks for ICombat interface.`
+  `- [Gemini] [Mock Generator] 2026-04-15 [FINISHED]: Mocks created in internal/engine/mocks/mock_combat.go.`
 ```
 
-The Log section is the agent's working memory across stateless sessions. Every agent **must** append an entry when it completes or when it rejects/backtracks. Keep entries concise — one or two lines max. This is the primary context source for the next agent starting a fresh session.
+The Log section is the agent's working memory across stateless sessions. **Mandatory Logging:**
+1. **Start of Task:** Immediately update `PROGRESS.md` with `[/]` (In Progress) and a `[STARTED]` log entry.
+2. **End of Task:** Update `PROGRESS.md` with `[x]` (Complete) and a `[FINISHED]` log entry with a summary of the work.
+3. **Model Prefix:** Always include your model name (e.g., [Gemini], [Claude], [Qwen]).
 
 ## Agents
 
