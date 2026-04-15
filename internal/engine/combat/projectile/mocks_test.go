@@ -85,6 +85,8 @@ type mockVFXManager struct {
 	spawnPuffCallCount int
 	lastTypeKey        string
 	lastX, lastY       float64
+	lastCount          int
+	lastRandRange      float64
 }
 
 func (m *mockVFXManager) SetAppContext(_ any)                                 {}
@@ -100,37 +102,42 @@ func (m *mockVFXManager) SpawnFloatingText(_ string, _, _ float64, _ int)     {}
 func (m *mockVFXManager) SpawnFloatingTextAbove(_ body.Body, _ string, _ int) {}
 func (m *mockVFXManager) SpawnJumpPuff(_, _ float64, _ int)                   {}
 func (m *mockVFXManager) SpawnLandingPuff(_, _ float64, _ int)                {}
-func (m *mockVFXManager) SpawnPuff(typeKey string, x, y float64, _ int, _ float64) {
+func (m *mockVFXManager) SpawnPuff(typeKey string, x, y float64, count int, randRange float64) {
 	m.spawnPuffCallCount++
 	m.lastTypeKey = typeKey
 	m.lastX = x
 	m.lastY = y
+	m.lastCount = count
+	m.lastRandRange = randRange
 }
 func (m *mockVFXManager) TriggerScreenFlash() {}
 
 // mockCollidable implements body.Collidable for testing.
 type mockCollidable struct {
-	id    string
-	owner interface{}
+	id       string
+	owner    interface{}
+	x16, y16 int
 }
 
-func (m *mockCollidable) ID() string                                          { return m.id }
-func (m *mockCollidable) SetID(id string)                                     { m.id = id }
-func (m *mockCollidable) Position() image.Rectangle                           { return image.Rectangle{} }
-func (m *mockCollidable) SetPosition(_, _ int)                                {}
-func (m *mockCollidable) SetPosition16(_, _ int)                              {}
-func (m *mockCollidable) SetSize(_, _ int)                                    {}
-func (m *mockCollidable) Scale() float64                                      { return 1.0 }
-func (m *mockCollidable) SetScale(_ float64)                                  {}
-func (m *mockCollidable) GetPosition16() (int, int)                           { return 0, 0 }
-func (m *mockCollidable) GetPositionMin() (int, int)                          { return 0, 0 }
-func (m *mockCollidable) GetShape() body.Shape                                { return nil }
-func (m *mockCollidable) Owner() interface{}                                  { return m.owner }
-func (m *mockCollidable) SetOwner(o interface{})                              { m.owner = o }
-func (m *mockCollidable) LastOwner() interface{}                              { return nil }
-func (m *mockCollidable) OnTouch(_ body.Collidable)                           {}
-func (m *mockCollidable) OnBlock(_ body.Collidable)                           {}
-func (m *mockCollidable) GetTouchable() body.Touchable                        { return m }
+func (m *mockCollidable) ID() string                 { return m.id }
+func (m *mockCollidable) SetID(id string)            { m.id = id }
+func (m *mockCollidable) Position() image.Rectangle  { return image.Rectangle{} }
+func (m *mockCollidable) SetPosition(_, _ int)       {}
+func (m *mockCollidable) SetPosition16(x, y int)     { m.x16 = x; m.y16 = y }
+func (m *mockCollidable) SetSize(_, _ int)           {}
+func (m *mockCollidable) Scale() float64             { return 1.0 }
+func (m *mockCollidable) SetScale(_ float64)         {}
+func (m *mockCollidable) GetPosition16() (int, int)  { return m.x16, m.y16 }
+func (m *mockCollidable) GetPositionMin() (int, int) { return 0, 0 }
+func (m *mockCollidable) GetShape() body.Shape       { return nil }
+func (m *mockCollidable) Owner() interface{}         { return m.owner }
+func (m *mockCollidable) SetOwner(o interface{})     { m.owner = o }
+func (m *mockCollidable) LastOwner() interface{}     { return nil }
+func (m *mockCollidable) OnTouch(_ body.Collidable)  {}
+func (m *mockCollidable) OnBlock(_ body.Collidable)  {}
+func (m *mockCollidable) GetTouchable() body.Touchable {
+	return m
+}
 func (m *mockCollidable) DrawCollisionBox(_ *ebiten.Image, _ image.Rectangle) {}
 func (m *mockCollidable) CollisionPosition() []image.Rectangle                { return nil }
 func (m *mockCollidable) CollisionShapes() []body.Collidable                  { return nil }
