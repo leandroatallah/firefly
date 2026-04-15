@@ -82,11 +82,13 @@ See **[`.agents/WORKFLOW.md`](.agents/WORKFLOW.md)** for the complete Spec-Drive
 
 ## 📋 Standard Workflow for Coverage Tasks
 
-1. **Analyze Coverage**: Use the coverage tools to identify gaps:
-   - For a specific package: `go test ./internal/engine/[package] -coverprofile=coverage.out && go tool cover -func=coverage.out`
-   - For a full project report: `bash scripts/test_coverage.sh`
-2. **Consult Skills**: Review the relevant AI Agent Skills in `.kiro/skills/` (e.g., `go-testing`, `mocking-strategies`, `fixed-point-physics`, `doc-update`) for specialized patterns and requirements.
-3. **Identify Gaps**: Read the source file and identify functions or branches with 0% coverage.
+1. **Check Dashboard**: Run `bash scripts/story.sh` to see what is currently in progress across all worktrees.
+2. **Analyze Coverage**: Use the coverage tools to identify gaps:
+...
+3. **Double-Logging**: 
+   - **Start**: Mark `[/]` in `PROGRESS.md` and log `[STARTED]`.
+   - **Finish**: Mark `[x]` in `PROGRESS.md` and log `[FINISHED]`.
+4. **Identify Gaps**: Read the source file and identify functions or branches with 0% coverage.
 4. **Create Test File**: If it doesn't exist, create `[filename]_test.go`.
 5. **Write Tests**: Follow the patterns in this document and the referenced skills. Ensure you test both "happy paths" and error/edge cases.
 6. **Verify**: Run the test and check the new coverage percentage.
