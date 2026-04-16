@@ -58,7 +58,7 @@ func TestProjectileWeapon_Fire_SpawnsProjectileWithCorrectVelocity(t *testing.T)
 
 			var got spawnCall
 			mock := &mockProjectileManager{
-				SpawnProjectileFunc: func(projectileType string, x16, y16, vx16, vy16 int, owner interface{}) {
+				SpawnProjectileFunc: func(projectileType string, x16, y16, vx16, vy16, _ int, owner interface{}) {
 					got = spawnCall{projectileType, x16, y16, vx16, vy16, owner}
 				},
 			}
@@ -135,7 +135,7 @@ func TestProjectileWeapon_MuzzleFlashVFX_ExecutionOrder(t *testing.T) {
 		},
 	}
 	mockProj := &mockProjectileManager{
-		SpawnProjectileFunc: func(_ string, _, _, _, _ int, _ interface{}) {
+		SpawnProjectileFunc: func(_ string, _, _, _, _, _ int, _ interface{}) {
 			callOrder = append(callOrder, "projectile")
 		},
 	}
@@ -398,7 +398,7 @@ func TestProjectileWeapon_Fire_SpawnOffset(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			var gotProjX16, gotProjY16 int
 			mockProj := &mockProjectileManager{
-				SpawnProjectileFunc: func(_ string, x16, y16, _, _ int, _ interface{}) {
+				SpawnProjectileFunc: func(_ string, x16, y16, _, _, _ int, _ interface{}) {
 					gotProjX16 = x16
 					gotProjY16 = y16
 				},
@@ -526,7 +526,7 @@ func TestProjectileWeapon_Fire_StateSpawnOffset(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			var gotX16, gotY16 int
 			mock := &mockProjectileManager{
-				SpawnProjectileFunc: func(_ string, x16, y16, _, _ int, _ interface{}) {
+				SpawnProjectileFunc: func(_ string, x16, y16, _, _, _ int, _ interface{}) {
 					gotX16 = x16
 					gotY16 = y16
 				},

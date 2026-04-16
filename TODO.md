@@ -1,1 +1,3 @@
 - Add player to the bottom of credit scene
+- validate if projectile kills enemy
+- Create sandbox examples for latest completed stories

@@ -408,6 +408,19 @@ func (s *PhasesScene) Update() error {
 		switch b := i.(type) {
 		// ActorEntity case should came first. It can be confused with body.Obstacle
 		case platformer.PlatformerActorEntity:
+			if b.State() == actors.Dead {
+				if s.AppContext().VFX != nil {
+					x, y := b.GetPositionMin()
+					w, h := b.GetShape().Width(), b.GetShape().Height()
+					s.AppContext().VFX.SpawnDeathExplosion(
+						float64(x)+float64(w)/2,
+						float64(y)+float64(h)/2,
+						30,
+					)
+				}
+				s.PhysicsSpace().RemoveBody(i)
+				continue
+			}
 			if err := b.Update(space); err != nil {
 				return err
 			}

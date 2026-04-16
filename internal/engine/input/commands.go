@@ -8,6 +8,7 @@ type PlayerCommands struct {
 	Left       bool
 	Right      bool
 	Shoot      bool
+	Melee      bool
 	Jump       bool
 	Dash       bool
 	Confirm    bool
@@ -25,6 +26,7 @@ func ReadPlayerCommands() PlayerCommands {
 		Left:       isKeyPressed(ebiten.KeyLeft) || isKeyPressed(ebiten.KeyA),
 		Right:      isKeyPressed(ebiten.KeyRight) || isKeyPressed(ebiten.KeyD),
 		Shoot:      isKeyPressed(ebiten.KeyX),
+		Melee:      isKeyPressed(ebiten.KeyZ),
 		Jump:       isKeyPressed(ebiten.KeySpace),
 		Dash:       isKeyPressed(ebiten.KeyShift),
 		Confirm:    isKeyPressed(ebiten.KeyEnter),

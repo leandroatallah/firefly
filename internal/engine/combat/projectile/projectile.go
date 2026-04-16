@@ -2,9 +2,32 @@
 package projectile
 
 import (
+	enginecombat "github.com/boilerplate/ebiten-template/internal/engine/combat"
 	contractsbody "github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
+	contractscombat "github.com/boilerplate/ebiten-template/internal/engine/contracts/combat"
 	contractsvfx "github.com/boilerplate/ebiten-template/internal/engine/contracts/vfx"
 )
+
+// factioned is a file-local interface for entities that expose their faction.
+type factioned interface {
+	Faction() enginecombat.Faction
+}
+
+// isPassthrough returns true if the body or its owner implements Passthrough.
+func isPassthrough(other contractsbody.Collidable) bool {
+	if other == nil {
+		return false
+	}
+	if pt, ok := other.(contractsbody.Passthrough); ok && pt.IsPassthrough() {
+		return true
+	}
+	if owner := other.Owner(); owner != nil {
+		if pt, ok := owner.(contractsbody.Passthrough); ok && pt.IsPassthrough() {
+			return true
+		}
+	}
+	return false
+}
 
 // projectile is the internal state of a spawned projectile.
 type projectile struct {
@@ -18,6 +41,8 @@ type projectile struct {
 	despawnEffect   string
 	lifetimeFrames  int // configured total lifetime (0 = infinite)
 	currentLifetime int // frames remaining; only meaningful when lifetimeFrames > 0
+	damage          int
+	faction         enginecombat.Faction
 }
 
 func (p *projectile) Update() {
@@ -52,15 +77,78 @@ func (p *projectile) Update() {
 }
 
 func (p *projectile) OnTouch(other contractsbody.Collidable) {
-	if other != p.body.Owner() {
-		p.spawnVFX(p.impactEffect)
-		p.space.QueueForRemoval(p.body)
+	if other == p.body.Owner() {
+		return
 	}
+	if isPassthrough(other) {
+		return
+	}
+	p.applyDamage(other)
+	p.spawnVFX(p.impactEffect)
+	p.space.QueueForRemoval(p.body)
 }
 
 func (p *projectile) OnBlock(other contractsbody.Collidable) {
+	if isPassthrough(other) {
+		return
+	}
+	p.applyDamage(other)
 	p.spawnVFX(p.impactEffect)
 	p.space.QueueForRemoval(p.body)
+}
+
+// applyDamage resolves a Damageable from the hit body and calls TakeDamage,
+// honouring faction and zero-damage guards. Safe on nil / non-damageable others.
+func (p *projectile) applyDamage(other contractsbody.Collidable) {
+	if p.damage == 0 {
+		return
+	}
+	if other == nil {
+		return
+	}
+
+	target, tFaction, ok := p.resolveDamageable(other)
+	if !ok {
+		return
+	}
+
+	// Faction gate: skip only when both sides are non-neutral AND equal.
+	if p.faction != enginecombat.FactionNeutral &&
+		tFaction != enginecombat.FactionNeutral &&
+		p.faction == tFaction {
+		return
+	}
+
+	target.TakeDamage(p.damage)
+}
+
+// resolveDamageable tries (1) the body itself, then (2) body.Owner().
+// Returns the Damageable, the target's faction (FactionNeutral when not factioned),
+// and whether resolution succeeded.
+func (p *projectile) resolveDamageable(other contractsbody.Collidable) (contractscombat.Damageable, enginecombat.Faction, bool) {
+	// Step 1: body itself.
+	if d, ok := other.(contractscombat.Damageable); ok {
+		f := enginecombat.FactionNeutral
+		if fac, ok := other.(factioned); ok {
+			f = fac.Faction()
+		}
+		return d, f, true
+	}
+
+	// Step 2: body.Owner().
+	owner := other.Owner()
+	if owner == nil {
+		return nil, enginecombat.FactionNeutral, false
+	}
+	if d, ok := owner.(contractscombat.Damageable); ok {
+		f := enginecombat.FactionNeutral
+		if fac, ok := owner.(factioned); ok {
+			f = fac.Faction()
+		}
+		return d, f, true
+	}
+
+	return nil, enginecombat.FactionNeutral, false
 }
 
 func (p *projectile) spawnVFX(typeKey string) {

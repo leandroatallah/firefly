@@ -609,7 +609,7 @@ func (m *mockEventManager) Publish(e event.Event) {}
 // mockProjectileManager implements combat.ProjectileManager
 type mockProjectileManager struct{}
 
-func (m *mockProjectileManager) SpawnProjectile(projectileType string, x16, y16, vx16, vy16 int, owner interface{}) {
+func (m *mockProjectileManager) SpawnProjectile(projectileType string, x16, y16, vx16, vy16, damage int, owner interface{}) {
 }
 
 // mockMovementBlocker implements physicsmovement.PlayerMovementBlocker

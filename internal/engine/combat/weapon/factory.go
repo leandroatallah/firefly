@@ -33,5 +33,7 @@ func NewWeaponFromJSON(data []byte, manager combat.ProjectileManager) (combat.We
 		return nil, fmt.Errorf("projectile object is required for projectile weapons")
 	}
 
-	return NewProjectileWeapon(config.ID, config.CooldownFrames, config.Projectile.Type, config.Projectile.Speed, manager, config.MuzzleEffectType, 0, 0), nil
+	w := NewProjectileWeapon(config.ID, config.CooldownFrames, config.Projectile.Type, config.Projectile.Speed, manager, config.MuzzleEffectType, 0, 0)
+	w.SetDamage(config.Projectile.Damage)
+	return w, nil
 }

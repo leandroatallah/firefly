@@ -59,6 +59,12 @@ func (e *WolfEnemy) GetCharacter() *actors.Character {
 }
 
 func (e *WolfEnemy) OnTouch(other body.Collidable) {
+	// Only react to actor bodies. A projectile's body.Owner() is a *MovableBody,
+	// which does not implement PlatformerActorEntity — this prevents projectile
+	// hits from being mistaken for player contact damage.
+	if _, ok := other.Owner().(platformer.PlatformerActorEntity); !ok {
+		return
+	}
 	owner := other.LastOwner()
 	switch owner.(type) {
 	case *gameplayer.ClimberPlayer:

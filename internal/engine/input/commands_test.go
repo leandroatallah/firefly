@@ -23,6 +23,16 @@ func TestReadPlayerCommands(t *testing.T) {
 			want:     PlayerCommands{Shoot: true},
 		},
 		{
+			name:     "melee only",
+			stubKeys: map[ebiten.Key]bool{ebiten.KeyZ: true},
+			want:     PlayerCommands{Melee: true},
+		},
+		{
+			name:     "shoot and melee are independent",
+			stubKeys: map[ebiten.Key]bool{ebiten.KeyX: true, ebiten.KeyZ: true},
+			want:     PlayerCommands{Shoot: true, Melee: true},
+		},
+		{
 			name:     "up via KeyUp",
 			stubKeys: map[ebiten.Key]bool{ebiten.KeyUp: true},
 			want:     PlayerCommands{Up: true},
@@ -110,6 +120,7 @@ func TestReadPlayerCommands(t *testing.T) {
 				ebiten.KeyLeft:   true,
 				ebiten.KeyRight:  true,
 				ebiten.KeyX:      true,
+				ebiten.KeyZ:      true,
 				ebiten.KeySpace:  true,
 				ebiten.KeyShift:  true,
 				ebiten.KeyEnter:  true,
@@ -121,6 +132,7 @@ func TestReadPlayerCommands(t *testing.T) {
 				Left:    true,
 				Right:   true,
 				Shoot:   true,
+				Melee:   true,
 				Jump:    true,
 				Dash:    true,
 				Confirm: true,

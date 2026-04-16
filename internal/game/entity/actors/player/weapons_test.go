@@ -12,7 +12,7 @@ import (
 
 type mockProjectileManager struct{}
 
-func (m *mockProjectileManager) SpawnProjectile(projectileType string, x16, y16, vx16, vy16 int, owner interface{}) {
+func (m *mockProjectileManager) SpawnProjectile(projectileType string, x16, y16, vx16, vy16, damage int, owner interface{}) {
 }
 
 func TestNewClimberInventory(t *testing.T) {

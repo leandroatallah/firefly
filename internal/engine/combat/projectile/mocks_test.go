@@ -4,7 +4,9 @@ import (
 	"image"
 
 	"github.com/boilerplate/ebiten-template/internal/engine/assets/font"
+	"github.com/boilerplate/ebiten-template/internal/engine/combat"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
+	contractscombat "github.com/boilerplate/ebiten-template/internal/engine/contracts/combat"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/tilemaplayer"
 	"github.com/boilerplate/ebiten-template/internal/engine/render/camera"
 	"github.com/boilerplate/ebiten-template/internal/engine/render/particles"
@@ -165,3 +167,111 @@ func (m *mockCollidable) SetTouchable(_ body.Touchable)                       {}
 func (m *mockCollidable) ApplyValidPosition(_ int, _ bool, _ body.BodiesSpace) (int, int, bool) {
 	return 0, 0, false
 }
+
+// fakeDamageable implements contractscombat.Damageable and tracks calls.
+// It also provides a Faction() method for faction checks.
+type fakeDamageable struct {
+	takeDamageCalls []int
+	faction         combat.Faction
+}
+
+func (f *fakeDamageable) TakeDamage(amount int) {
+	f.takeDamageCalls = append(f.takeDamageCalls, amount)
+}
+
+func (f *fakeDamageable) Faction() combat.Faction {
+	return f.faction
+}
+
+// fakeDamageableBody implements body.Collidable + contractscombat.Damageable with faction support.
+type fakeDamageableBody struct {
+	id              string
+	owner           interface{}
+	takeDamageCalls []int
+	faction         combat.Faction
+}
+
+func (f *fakeDamageableBody) ID() string                                          { return f.id }
+func (f *fakeDamageableBody) SetID(id string)                                     { f.id = id }
+func (f *fakeDamageableBody) Position() image.Rectangle                           { return image.Rectangle{} }
+func (f *fakeDamageableBody) SetPosition(_, _ int)                                {}
+func (f *fakeDamageableBody) SetPosition16(_, _ int)                              {}
+func (f *fakeDamageableBody) SetSize(_, _ int)                                    {}
+func (f *fakeDamageableBody) Scale() float64                                      { return 1.0 }
+func (f *fakeDamageableBody) SetScale(_ float64)                                  {}
+func (f *fakeDamageableBody) GetPosition16() (int, int)                           { return 0, 0 }
+func (f *fakeDamageableBody) GetPositionMin() (int, int)                          { return 0, 0 }
+func (f *fakeDamageableBody) GetShape() body.Shape                                { return nil }
+func (f *fakeDamageableBody) Owner() interface{}                                  { return f.owner }
+func (f *fakeDamageableBody) SetOwner(o interface{})                              { f.owner = o }
+func (f *fakeDamageableBody) LastOwner() interface{}                              { return nil }
+func (f *fakeDamageableBody) OnTouch(_ body.Collidable)                           {}
+func (f *fakeDamageableBody) OnBlock(_ body.Collidable)                           {}
+func (f *fakeDamageableBody) GetTouchable() body.Touchable                        { return f }
+func (f *fakeDamageableBody) DrawCollisionBox(_ *ebiten.Image, _ image.Rectangle) {}
+func (f *fakeDamageableBody) CollisionPosition() []image.Rectangle                { return nil }
+func (f *fakeDamageableBody) CollisionShapes() []body.Collidable                  { return nil }
+func (f *fakeDamageableBody) IsObstructive() bool                                 { return false }
+func (f *fakeDamageableBody) SetIsObstructive(_ bool)                             {}
+func (f *fakeDamageableBody) AddCollision(_ ...body.Collidable)                   {}
+func (f *fakeDamageableBody) ClearCollisions()                                    {}
+func (f *fakeDamageableBody) SetTouchable(_ body.Touchable)                       {}
+func (f *fakeDamageableBody) ApplyValidPosition(_ int, _ bool, _ body.BodiesSpace) (int, int, bool) {
+	return 0, 0, false
+}
+func (f *fakeDamageableBody) TakeDamage(amount int) {
+	f.takeDamageCalls = append(f.takeDamageCalls, amount)
+}
+func (f *fakeDamageableBody) Faction() combat.Faction {
+	return f.faction
+}
+
+// fakeDestructible implements contractscombat.Destructible (Damageable + IsDestroyed).
+// It also provides a Faction() method for faction checks.
+type fakeDestructible struct {
+	takeDamageCalls []int
+	destroyed       bool
+	faction         combat.Faction
+}
+
+func (f *fakeDestructible) TakeDamage(amount int) {
+	f.takeDamageCalls = append(f.takeDamageCalls, amount)
+}
+
+func (f *fakeDestructible) IsDestroyed() bool {
+	return f.destroyed
+}
+
+func (f *fakeDestructible) Faction() combat.Faction {
+	return f.faction
+}
+
+// fakeCollidableWithOwner creates a mockCollidable with a specified owner.
+// Useful for testing resolution of Damageable from body owners.
+func fakeCollidableWithOwner(owner interface{}) *mockCollidable {
+	return &mockCollidable{
+		id:    "fake-body",
+		owner: owner,
+	}
+}
+
+// mockPassthroughBody is a Collidable that also implements body.Passthrough.
+// Used to verify projectiles skip passthrough entities entirely.
+type mockPassthroughBody struct {
+	mockCollidable
+}
+
+func (m *mockPassthroughBody) IsPassthrough() bool { return true }
+
+// mockPassthroughOwner is a plain struct that implements body.Passthrough,
+// used as an owner of a mockCollidable.
+type mockPassthroughOwner struct{}
+
+func (m *mockPassthroughOwner) IsPassthrough() bool { return true }
+
+// Compile-time interface assertions to verify mock types satisfy their contracts.
+var (
+	_ contractscombat.Damageable   = (*fakeDamageable)(nil)
+	_ contractscombat.Damageable   = (*fakeDamageableBody)(nil)
+	_ contractscombat.Destructible = (*fakeDestructible)(nil)
+)

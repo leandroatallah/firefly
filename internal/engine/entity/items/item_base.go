@@ -150,6 +150,8 @@ func (b *BaseItem) SetState(state ItemState) {
 	b.state.OnStart()
 }
 
+func (b *BaseItem) IsPassthrough() bool { return true }
+
 func (b *BaseItem) IsAnimationFinished() bool {
 	if b.state == nil {
 		return true

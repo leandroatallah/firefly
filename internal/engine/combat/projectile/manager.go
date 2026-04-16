@@ -90,6 +90,8 @@ func (m *Manager) Spawn(cfg interface{}, x16, y16, vx16, vy16 int, owner interfa
 		despawnEffect:   despawnEffect,
 		lifetimeFrames:  lifetime,
 		currentLifetime: lifetime,
+		damage:          config.Damage,
+		faction:         config.Faction,
 	}
 
 	// Register collision callbacks
@@ -100,8 +102,8 @@ func (m *Manager) Spawn(cfg interface{}, x16, y16, vx16, vy16 int, owner interfa
 }
 
 // SpawnProjectile implements the ProjectileManager interface.
-func (m *Manager) SpawnProjectile(projectileType string, x16, y16, vx16, vy16 int, owner interface{}) {
-	cfg := ProjectileConfig{Width: 2, Height: 1}
+func (m *Manager) SpawnProjectile(projectileType string, x16, y16, vx16, vy16, damage int, owner interface{}) {
+	cfg := ProjectileConfig{Width: 2, Height: 1, Damage: damage}
 	m.Spawn(cfg, x16, y16, vx16, vy16, owner)
 }
 

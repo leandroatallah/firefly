@@ -4,6 +4,7 @@ import (
 	"image"
 	"log"
 
+	enginecombat "github.com/boilerplate/ebiten-template/internal/engine/combat"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/animation"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/movement"
@@ -35,6 +36,8 @@ type Character struct {
 	movementBlockers     int                           // reference-counted movement lock
 	invulnerabilityTimer int                           // frames remaining of post-hurt invulnerability
 	imageOptions         *ebiten.DrawImageOptions
+
+	faction enginecombat.Faction // faction for damage resolution; default FactionNeutral
 
 	skills []skill.Skill // active gameplay skills (jump, dash, …)
 
@@ -390,6 +393,22 @@ func (c *Character) Hurt(damage int) {
 	c.SetState(state)
 	c.SetInvulnerability(true)
 	c.invulnerabilityTimer = 120 // 2 seconds at 60fps
+}
+
+// TakeDamage implements contracts/combat.Damageable by delegating to Hurt.
+// This preserves existing invulnerability and state-transition logic.
+func (c *Character) TakeDamage(amount int) {
+	c.Hurt(amount)
+}
+
+// Faction returns the character's current faction.
+func (c *Character) Faction() enginecombat.Faction {
+	return c.faction
+}
+
+// SetFaction sets the character's faction.
+func (c *Character) SetFaction(f enginecombat.Faction) {
+	c.faction = f
 }
 
 func (c *Character) SetTouchable(t body.Touchable) {

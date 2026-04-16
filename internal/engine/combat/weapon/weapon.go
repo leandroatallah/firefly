@@ -21,6 +21,7 @@ type ProjectileWeapon struct {
 	spawnOffsetX16   int
 	spawnOffsetY16   int
 	stateOffsets     map[int][2]int
+	damage           int
 }
 
 // NewProjectileWeapon creates a new projectile weapon.
@@ -48,6 +49,11 @@ func (w *ProjectileWeapon) SetOwner(owner interface{}) {
 // Passing a nil or empty map clears all per-state overrides.
 func (w *ProjectileWeapon) SetStateSpawnOffsets(offsets map[int][2]int) {
 	w.stateOffsets = offsets
+}
+
+// SetDamage sets the damage dealt by each projectile fired by this weapon.
+func (w *ProjectileWeapon) SetDamage(d int) {
+	w.damage = d
 }
 
 // SetVFXManager sets the visual effects manager for this weapon.
@@ -87,7 +93,7 @@ func (w *ProjectileWeapon) Fire(x16, y16 int, faceDir animation.FacingDirectionE
 	}
 
 	vx16, vy16 := w.calculateVelocity(direction, faceDir)
-	w.manager.SpawnProjectile(w.projectileType, spawnX16, spawnY16, vx16, vy16, w.owner)
+	w.manager.SpawnProjectile(w.projectileType, spawnX16, spawnY16, vx16, vy16, w.damage, w.owner)
 	w.currentCooldown = w.cooldownFrames
 }
 

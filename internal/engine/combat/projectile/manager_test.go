@@ -51,7 +51,7 @@ func TestManager_Spawn(t *testing.T) {
 func TestManager_SpawnProjectile(t *testing.T) {
 	mockSpace := &mockBodiesSpace{}
 	mgr := NewManager(mockSpace)
-	mgr.SpawnProjectile("bullet", 100<<4, 50<<4, 5<<4, 0, "player")
+	mgr.SpawnProjectile("bullet", 100<<4, 50<<4, 5<<4, 0, 0, "player")
 
 	if len(mgr.projectiles) != 1 {
 		t.Errorf("expected 1 projectile, got %d", len(mgr.projectiles))
