@@ -11,11 +11,11 @@ Caveman is a skill that forces terse, fragmented AI responses to reduce output t
 
 ## Modes & Intensity
 
-| Level | Command | Behavior |
-|-------|---------|----------|
-| **Lite** | `/caveman lite` | Drops filler words, retains standard grammar |
-| **Full** | `/caveman full` or `/caveman` | Default. Drops articles, uses sentence fragments |
-| **Ultra** | `/caveman ultra` | Maximum compression. Telegraphic, heavy abbreviations |
+| Level     | Command                       | Behavior                                              |
+| --------- | ----------------------------- | ----------------------------------------------------- |
+| **Lite**  | `/caveman lite`               | Drops filler words, retains standard grammar          |
+| **Full**  | `/caveman full` or `/caveman` | Default. Drops articles, uses sentence fragments      |
+| **Ultra** | `/caveman ultra`              | Maximum compression. Telegraphic, heavy abbreviations |
 
 **Natural triggers**: "talk like caveman", "caveman mode", "less tokens please"
 **Deactivate**: "stop caveman" or "normal mode"
@@ -25,6 +25,7 @@ Levels persist until manually changed or session ends.
 ## Rules
 
 1. **Only prose compressed** - technical artifacts pass through untouched:
+
    - Code blocks
    - URLs
    - File paths
@@ -45,6 +46,7 @@ Levels persist until manually changed or session ends.
 ### caveman-commit
 
 Terse git commit messages.
+
 - ≤50 character subject
 - Focus on "why" over "what"
 - Imperative mood
@@ -52,6 +54,7 @@ Terse git commit messages.
 ### caveman-review
 
 One-line PR comments.
+
 - Direct feedback
 - Format: `L{line}: {emoji} {issue}: {fix}`
 - Example: `L42: 🔴 bug: user null. Add guard.`
@@ -59,23 +62,26 @@ One-line PR comments.
 ## Examples
 
 ### Normal Mode
+
 ```
 I can help you with that! Let me first check the current state of your project by examining the directory structure and any existing files. This will help me understand what we're working with and provide the best solution for your needs.
 ```
 
 ### Caveman Full
+
 ```
 Checking project structure. Examining files. Determining best approach.
 ```
 
 ### Caveman Ultra
+
 ```
 Chk proj struct. Exam files. Det best appr.
 ```
 
 ## Companion Tool: caveman-compress
 
-Utility to rewrite session memory files (e.g., `CLAUDE.md`) into compressed caveman-speak for AI to read, saving ~45% of *input* tokens.
+Utility to rewrite session memory files (e.g., `CLAUDE.md`) into compressed caveman-speak for AI to read, saving ~45% of _input_ tokens.
 
 - Keeps human-readable `.original.md` backups
 - Only compresses documentation/config files AI reads
@@ -86,5 +92,5 @@ Eval-backed with 3-arm evaluation harness measuring real API token counts agains
 
 ## References
 
-- Source: https://github.com/JuliusBrussee/caveman
+- Source: <https://github.com/JuliusBrussee/caveman>
 - Docs: `docs/` directory in source repo
