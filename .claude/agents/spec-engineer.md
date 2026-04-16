@@ -42,3 +42,15 @@ Acts as the "Architect". Transforms User Stories into detailed Technical Specifi
 ## Integration
 
 Feeds **TDD Specialist**.
+
+## Next Steps
+
+After `SPEC.md` is written and `PROGRESS.md` is updated, inform the developer of the pipeline sequence:
+
+1. **Mock Generator** — generate or update mock implementations for any new contracts defined in this spec (`internal/engine/contracts/`).
+2. **TDD Specialist** — write failing tests (Red Phase) based on the acceptance criteria in `SPEC.md`.
+3. **Feature Implementer** — write production code to make the failing tests pass (Green Phase).
+
+State which agents to invoke next and in what order, based on whether new contracts were introduced:
+- New contracts added → start with **Mock Generator**, then **TDD Specialist**, then **Feature Implementer**.
+- No new contracts → skip Mock Generator; start with **TDD Specialist**, then **Feature Implementer**.
