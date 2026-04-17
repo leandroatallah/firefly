@@ -15,6 +15,11 @@ const (
 	FactionEnemy
 )
 
+// Factioned is an interface for entities that belong to a Faction.
+type Factioned interface {
+	Faction() Faction
+}
+
 // Weapon represents a combat weapon with cooldown-based firing.
 type Weapon interface {
 	ID() string

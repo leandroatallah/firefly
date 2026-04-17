@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"image/color"
 
+	enginecombat "github.com/boilerplate/ebiten-template/internal/engine/combat"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	contractsvfx "github.com/boilerplate/ebiten-template/internal/engine/contracts/vfx"
 	bodyphysics "github.com/boilerplate/ebiten-template/internal/engine/physics/body"
@@ -79,6 +80,13 @@ func (m *Manager) Spawn(cfg interface{}, x16, y16, vx16, vy16 int, owner interfa
 		despawnEffect = m.despawnEffect
 	}
 
+	faction := config.Faction
+	if faction == enginecombat.FactionNeutral && owner != nil {
+		if f, ok := owner.(factioned); ok {
+			faction = f.Faction()
+		}
+	}
+
 	p := &projectile{
 		movable:         movableBody,
 		body:            collidableBody,
@@ -91,7 +99,7 @@ func (m *Manager) Spawn(cfg interface{}, x16, y16, vx16, vy16 int, owner interfa
 		lifetimeFrames:  lifetime,
 		currentLifetime: lifetime,
 		damage:          config.Damage,
-		faction:         config.Faction,
+		faction:         faction,
 	}
 
 	// Register collision callbacks

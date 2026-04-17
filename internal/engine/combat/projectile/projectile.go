@@ -13,6 +13,11 @@ type factioned interface {
 	Faction() enginecombat.Faction
 }
 
+// idable is a file-local interface for entities that have an ID.
+type idable interface {
+	ID() string
+}
+
 // isPassthrough returns true if the body or its owner implements Passthrough.
 func isPassthrough(other contractsbody.Collidable) bool {
 	if other == nil {
@@ -77,7 +82,7 @@ func (p *projectile) Update() {
 }
 
 func (p *projectile) OnTouch(other contractsbody.Collidable) {
-	if other == p.body.Owner() {
+	if p.isOwner(other) {
 		return
 	}
 	if isPassthrough(other) {
@@ -89,12 +94,55 @@ func (p *projectile) OnTouch(other contractsbody.Collidable) {
 }
 
 func (p *projectile) OnBlock(other contractsbody.Collidable) {
+	if p.isOwner(other) {
+		return
+	}
 	if isPassthrough(other) {
 		return
 	}
 	p.applyDamage(other)
 	p.spawnVFX(p.impactEffect)
 	p.space.QueueForRemoval(p.body)
+}
+
+// isOwner returns true if the other body is the projectile's owner or belongs to it.
+func (p *projectile) isOwner(other contractsbody.Collidable) bool {
+	if other == nil {
+		return false
+	}
+	owner := p.body.Owner()
+	if owner == nil {
+		return false
+	}
+
+	// Direct equality check
+	if other == owner {
+		return true
+	}
+
+	// Check if other's owner is our owner
+	otherOwner := other.Owner()
+	if otherOwner != nil && otherOwner == owner {
+		return true
+	}
+
+	// Robust check via ID if available
+	if ownerID, ok := owner.(idable); ok {
+		targetID := ""
+		if otherID, ok := other.(idable); ok {
+			targetID = otherID.ID()
+		} else if otherOwner != nil {
+			if ooID, ok := otherOwner.(idable); ok {
+				targetID = ooID.ID()
+			}
+		}
+
+		if targetID != "" && targetID == ownerID.ID() {
+			return true
+		}
+	}
+
+	return false
 }
 
 // applyDamage resolves a Damageable from the hit body and calls TakeDamage,

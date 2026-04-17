@@ -23,8 +23,8 @@
     "frame_rate": 8,
     "weapon": {
       "projectile_type": "bullet",
-      "speed": 3,
-      "cooldown": 60,
+      "speed": 16,
+      "cooldown": 90,
       "damage": 1,
       "range": 0,
       "shoot_mode": "always",
