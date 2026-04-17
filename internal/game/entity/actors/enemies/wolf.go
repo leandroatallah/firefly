@@ -2,7 +2,9 @@ package gameenemies
 
 import (
 	"github.com/boilerplate/ebiten-template/internal/engine/app"
+	enginecombat "github.com/boilerplate/ebiten-template/internal/engine/combat"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/combat"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/builder"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/movement"
@@ -13,6 +15,7 @@ import (
 
 type WolfEnemy struct {
 	*platformer.PlatformerCharacter
+	shooter combat.EnemyShooter
 }
 
 // NewWolfEnemy creates a new wolf enemy.
@@ -35,6 +38,13 @@ func NewWolfEnemy(ctx *app.AppContext, x, y int, id string) (*WolfEnemy, error) 
 		return nil, err
 	}
 
+	shooter, err := builder.ConfigureEnemyWeapon(enemy, spriteData.Weapon, ctx.ProjectileManager)
+	if err != nil {
+		return nil, err
+	}
+	enemy.shooter = shooter
+
+	enemy.GetCharacter().SetFaction(enginecombat.FactionEnemy)
 	enemy.SetMovementState(
 		movement.SideToSide,
 		nil,
@@ -47,10 +57,20 @@ func NewWolfEnemy(ctx *app.AppContext, x, y int, id string) (*WolfEnemy, error) 
 
 func (e *WolfEnemy) SetTarget(target body.MovableCollidable) {
 	e.Character.MovementState().SetTarget(target)
+	if e.shooter != nil {
+		e.shooter.SetTarget(target)
+	}
+}
+
+func (e *WolfEnemy) Shooter() combat.EnemyShooter {
+	return e.shooter
 }
 
 // Character Methods
 func (e *WolfEnemy) Update(space body.BodiesSpace) error {
+	if e.shooter != nil {
+		e.shooter.Update()
+	}
 	return e.Character.Update(space)
 }
 

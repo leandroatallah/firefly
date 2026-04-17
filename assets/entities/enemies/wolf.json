@@ -31,7 +31,16 @@
       }
     },
     "facing_direction": 0,
-    "frame_rate": 6
+    "frame_rate": 6,
+    "weapon": {
+      "projectile_type": "bullet",
+      "speed": 6,
+      "cooldown": 90,
+      "damage": 1,
+      "range": 160,
+      "shoot_mode": "on_sight",
+      "shoot_direction": "horizontal"
+    }
   },
   "stats": {
     "health": 1,

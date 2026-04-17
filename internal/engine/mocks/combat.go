@@ -14,6 +14,7 @@ type MockWeapon struct {
 	UpdateFunc      func()
 	CooldownFunc    func() int
 	SetCooldownFunc func(frames int)
+	SetOwnerFunc    func(owner interface{})
 }
 
 func (m *MockWeapon) ID() string {
@@ -52,6 +53,12 @@ func (m *MockWeapon) Cooldown() int {
 func (m *MockWeapon) SetCooldown(frames int) {
 	if m.SetCooldownFunc != nil {
 		m.SetCooldownFunc(frames)
+	}
+}
+
+func (m *MockWeapon) SetOwner(owner interface{}) {
+	if m.SetOwnerFunc != nil {
+		m.SetOwnerFunc(owner)
 	}
 }
 

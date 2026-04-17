@@ -64,6 +64,18 @@ type SkillsConfig struct {
 	Shooting *ShootingConfig `json:"shooting,omitempty"`
 }
 
+// EnemyWeaponConfig defines the weapon configuration for an enemy entity.
+type EnemyWeaponConfig struct {
+	ProjectileType string `json:"projectile_type"`
+	Speed          int    `json:"speed"`
+	Cooldown       int    `json:"cooldown"`
+	Damage         int    `json:"damage"`
+	Range          int    `json:"range"`
+	ShootMode      string `json:"shoot_mode,omitempty"`
+	ShootDirection string `json:"shoot_direction,omitempty"`
+	ShootState     string `json:"shoot_state,omitempty"`
+}
+
 // SpriteData contains all data related to a sprite's appearance and behavior,
 // including its body rectangle, assets for different states, animation frame rate, and initial facing direction.
 type SpriteData struct {
@@ -72,6 +84,7 @@ type SpriteData struct {
 	FrameRate       int                           `json:"frame_rate"`
 	FacingDirection animation.FacingDirectionEnum `json:"facing_direction"` // 0 - right, 1 - left
 	Skills          *SkillsConfig                 `json:"skills,omitempty"`
+	Weapon          *EnemyWeaponConfig            `json:"weapon,omitempty"`
 }
 
 // ParticleData defines the configuration for a particle effect.

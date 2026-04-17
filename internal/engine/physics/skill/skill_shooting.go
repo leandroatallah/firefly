@@ -1,7 +1,6 @@
 package skill
 
 import (
-	combatweapon "github.com/boilerplate/ebiten-template/internal/engine/combat/weapon"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/animation"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/combat"
@@ -57,9 +56,7 @@ func (s *ShootingSkill) HandleInputWithDirection(b body.MovableCollidable, model
 	}
 
 	// Set owner to prevent projectile from immediately colliding with player
-	if pw, ok := weapon.(*combatweapon.ProjectileWeapon); ok {
-		pw.SetOwner(b)
-	}
+	weapon.SetOwner(b)
 
 	state := 0
 	type actorStateReader interface {
