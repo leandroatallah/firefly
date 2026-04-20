@@ -57,6 +57,7 @@ Use these terms consistently across all stories, specs, and code:
 - Every story maps to a feature branch: `[ID]-[short-kebab-description]` (e.g., `42-player-dash-state`).
 - Branch is created before any code is written.
 - No commits are made by agents. The developer owns all version control operations.
+- No `Co-Authored-By` or similar AI attribution trailers in commit messages.
 
 ## Coverage Goal
 

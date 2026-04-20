@@ -97,6 +97,7 @@ See **[`.agents/WORKFLOW.md`](.agents/WORKFLOW.md)** for the complete Spec-Drive
 
 - **AI Agent Skills**: Skills are located in `.kiro/skills/` and synced from `.agents/skills/`. Modify source files in `.agents/skills/` and run `make sync-skills` to update.
 - **Never commit changes**. Do not use `git commit` or attempt to stage/commit files. The user is responsible for all version control operations.
+- **No AI attribution trailers**. Do not add `Co-Authored-By` or similar trailers to commit messages.
 - **Do not modify production code** unless you find a bug that makes it untestable (e.g., global state that needs to be injected).
 - **Keep tests fast**. Avoid long `time.Sleep` calls; use virtual time or frame counters.
 - **No Flaky Tests**. Ensure tests are deterministic.
