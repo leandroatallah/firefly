@@ -39,7 +39,8 @@ type Character struct {
 
 	faction enginecombat.Faction // faction for damage resolution; default FactionNeutral
 
-	skills []skill.Skill // active gameplay skills (jump, dash, …)
+	skills            []skill.Skill      // active gameplay skills (jump, dash, …)
+	stateContributors []StateContributor // optional per-frame state overrides
 
 	// StateTransitionHandler, when non-nil, is called before the default handleState
 	// logic. Return true to suppress the default transitions.
@@ -47,6 +48,9 @@ type Character struct {
 	// OnStateChange is called after every successful state change with the old and new state.
 	OnStateChange func(oldState, newState ActorStateEnum)
 	bodyphysics.Ownership
+
+	// TODO: Remove this
+	lastState ActorStateEnum
 }
 
 // SetStateTransitionHandler sets a function that can override the default state transition logic.
@@ -320,7 +324,7 @@ func (c *Character) handleState() {
 		return
 	}
 
-	// When the character is exiting, the state no longer changes.
+	// When the character is exiting, dying or dead, the state no longer changes.
 	if state == Exiting || state == Dying || state == Dead {
 		return
 	}
@@ -341,6 +345,17 @@ func (c *Character) handleState() {
 			log.Fatal(err)
 		}
 		c.SetState(state)
+	}
+
+	// Poll skill state contributors before default movement transitions.
+	// Skip during animation-critical states so Hurted/Landing/Jumping finish correctly.
+	if state != Hurted && state != Landing && state != Jumping {
+		for _, sc := range c.stateContributors {
+			if target, ok := sc.ContributeState(state); ok {
+				setNewState(target)
+				return
+			}
+		}
 	}
 
 	switch {
@@ -471,6 +486,14 @@ func (c *Character) MovementModel() physicsmovement.MovementModel {
 
 func (c *Character) AddSkill(s skill.Skill) {
 	c.skills = append(c.skills, s)
+}
+
+func (c *Character) Skills() []skill.Skill {
+	return c.skills
+}
+
+func (c *Character) AddStateContributor(sc StateContributor) {
+	c.stateContributors = append(c.stateContributors, sc)
 }
 
 func (c *Character) RemoveSkill(s skill.Skill) {

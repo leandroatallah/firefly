@@ -337,3 +337,70 @@ func TestCharacter_handleState_AllTransitions(t *testing.T) {
 		})
 	}
 }
+
+// stubStateContributor is a test-only StateContributor.
+type stubStateContributor struct {
+	target actors.ActorStateEnum
+	active bool
+	called bool
+}
+
+func (s *stubStateContributor) ContributeState(_ actors.ActorStateEnum) (actors.ActorStateEnum, bool) {
+	s.called = true
+	return s.target, s.active
+}
+
+func TestCharacter_handleState_StateContributorWins(t *testing.T) {
+	c := testCharacterWithState(actors.Idle)
+	contrib := &stubStateContributor{target: actors.Walking, active: true}
+	c.AddStateContributor(contrib)
+	c.Update(nil)
+	if !contrib.called {
+		t.Error("contributor was not called")
+	}
+	if c.State() != actors.Walking {
+		t.Errorf("expected Walking from contributor, got %v", c.State())
+	}
+}
+
+func TestCharacter_handleState_StateContributorDefers(t *testing.T) {
+	c := testCharacterWithState(actors.Idle)
+	contrib := &stubStateContributor{target: actors.Walking, active: false}
+	c.AddStateContributor(contrib)
+	c.Update(nil)
+	if !contrib.called {
+		t.Error("contributor was not called")
+	}
+	// Contributor deferred; default logic keeps Idle
+	if c.State() != actors.Idle {
+		t.Errorf("expected Idle when contributor defers, got %v", c.State())
+	}
+}
+
+func TestCharacter_handleState_StateTransitionHandlerBeatsContributor(t *testing.T) {
+	c := testCharacterWithState(actors.Idle)
+	contrib := &stubStateContributor{target: actors.Walking, active: true}
+	c.AddStateContributor(contrib)
+	// StateTransitionHandler returns true → short-circuits before contributors
+	c.SetStateTransitionHandler(func(_ *actors.Character) bool { return true })
+	c.Update(nil)
+	if contrib.called {
+		t.Error("contributor should not be called when StateTransitionHandler returns true")
+	}
+	if c.State() != actors.Idle {
+		t.Errorf("expected Idle (handler won), got %v", c.State())
+	}
+}
+
+func TestCharacter_handleState_ContributorSkippedDuringHurted(t *testing.T) {
+	c := testCharacterWithState(actors.Idle)
+	c.SetMaxHealth(10)
+	c.SetHealth(10)
+	c.Hurt(1) // transitions to Hurted
+	contrib := &stubStateContributor{target: actors.Walking, active: true}
+	c.AddStateContributor(contrib)
+	c.Update(nil)
+	if contrib.called {
+		t.Error("contributor must not be called while Hurted animation plays")
+	}
+}
