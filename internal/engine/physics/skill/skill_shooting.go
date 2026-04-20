@@ -88,6 +88,10 @@ func (s *ShootingSkill) HandleInput(b body.MovableCollidable, model *physicsmove
 	s.HandleInputWithDirection(b, model, space, cmds.Up, cmds.Down, cmds.Left, cmds.Right)
 }
 
+func (s *ShootingSkill) IsActive() bool {
+	return s.shootHeld
+}
+
 func (s *ShootingSkill) Update(b body.MovableCollidable, model *physicsmovement.PlatformMovementModel) {
 	// Update inventory weapons (cooldowns)
 	s.inv.Update()
