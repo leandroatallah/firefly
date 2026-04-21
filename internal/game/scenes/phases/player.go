@@ -60,7 +60,7 @@ func createPlayer(ctx *app.AppContext, playerType gameentitytypes.PlayerType) (p
 		return nil, err
 	}
 
-	gameplayer.WireStateContributors(climber)
+	gameplayer.WireStateContributors(climber.GetCharacter(), climber)
 
 	return p, nil
 }

@@ -48,9 +48,6 @@ type Character struct {
 	// OnStateChange is called after every successful state change with the old and new state.
 	OnStateChange func(oldState, newState ActorStateEnum)
 	bodyphysics.Ownership
-
-	// TODO: Remove this
-	lastState ActorStateEnum
 }
 
 // SetStateTransitionHandler sets a function that can override the default state transition logic.

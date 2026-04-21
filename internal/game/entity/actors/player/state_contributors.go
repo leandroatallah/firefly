@@ -13,6 +13,12 @@ type movementChecker interface {
 	IsFalling() bool
 }
 
+// characterWithSkills is the subset of character methods needed to wire state contributors.
+type characterWithSkills interface {
+	Skills() []engineskill.Skill
+	AddStateContributor(sc actors.StateContributor)
+}
+
 // activeChecker reports whether a skill is currently active.
 type activeChecker interface {
 	IsActive() bool
@@ -63,17 +69,15 @@ func NewDashContributorForTest(active bool) actors.StateContributor {
 	return &dashContributor{s: &staticActive{v: active}}
 }
 
-// WireStateContributors inspects skills on the ClimberPlayer and registers
-// state contributors for dash and shooting so state transitions reflect
-// active skills.
-func WireStateContributors(p *ClimberPlayer) {
-	char := p.GetCharacter()
+// WireStateContributors registers state contributors for dash and shooting
+// so state transitions reflect active skills.
+func WireStateContributors(char characterWithSkills, mov movementChecker) {
 	for _, s := range char.Skills() {
 		switch sk := s.(type) {
 		case *engineskill.DashSkill:
 			char.AddStateContributor(&dashContributor{s: sk})
 		case *engineskill.ShootingSkill:
-			char.AddStateContributor(&shootingContributor{s: sk, chr: p})
+			char.AddStateContributor(&shootingContributor{s: sk, chr: mov})
 		}
 	}
 }
