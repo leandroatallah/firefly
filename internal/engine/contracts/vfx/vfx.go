@@ -43,6 +43,9 @@ type Manager interface {
 	SpawnLandingPuff(x float64, y float64, count int)
 	// SpawnPuff spawns a named puff effect at the given position with optional random spread.
 	SpawnPuff(typeKey string, x float64, y float64, count int, randRange float64)
+	// SpawnDirectionalPuff spawns a named puff effect anchored to extend outward from the spawn point.
+	// faceRight=true anchors the sprite left edge at x; faceRight=false anchors the right edge.
+	SpawnDirectionalPuff(typeKey string, x float64, y float64, faceRight bool, count int, randRange float64)
 	// TriggerScreenFlash triggers a full-screen flash effect.
 	TriggerScreenFlash()
 }

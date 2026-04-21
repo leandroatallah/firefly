@@ -17,7 +17,7 @@
   },
   {
     "type": "muzzle_flash",
-    "image": "assets/images/jump-particles-24.png",
+    "image": "assets/images/muzzle-flash-24.png",
     "frame_width": 24,
     "frame_height": 24,
     "frame_rate": 5,

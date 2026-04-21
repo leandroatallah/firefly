@@ -47,3 +47,50 @@ func TestManager(t *testing.T) {
 
 	m.Draw(screen, cam)
 }
+
+func TestSpawnDirectionalPuff_AnchorAndFlip(t *testing.T) {
+	vfxData := []VFXConfig{
+		{
+			Type: "muzzle",
+			ParticleData: schemas.ParticleData{
+				Image:     "muzzle.png",
+				FrameRate: 1,
+			},
+		},
+	}
+	jsonData, _ := json.Marshal(vfxData)
+	_ = os.WriteFile("vfx_dir_test.json", jsonData, 0644)
+	defer os.Remove("vfx_dir_test.json")
+
+	tests := []struct {
+		name       string
+		faceRight  bool
+		wantAnchor float64
+		wantFlipX  bool
+	}{
+		{"facing right anchors left edge, no flip", true, 0.0, false},
+		{"facing left anchors right edge, flips sprite", false, 1.0, true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			m := NewManagerFromPath("vfx_dir_test.json")
+			if m == nil {
+				t.Fatal("NewManager returned nil")
+			}
+			m.SpawnDirectionalPuff("muzzle", 50, 60, tt.faceRight, 1, 0)
+
+			parts := m.system.Particles()
+			if len(parts) != 1 {
+				t.Fatalf("expected 1 particle, got %d", len(parts))
+			}
+			p := parts[0]
+			if p.AnchorX != tt.wantAnchor {
+				t.Errorf("AnchorX: got %v, want %v", p.AnchorX, tt.wantAnchor)
+			}
+			if p.FlipX != tt.wantFlipX {
+				t.Errorf("FlipX: got %v, want %v", p.FlipX, tt.wantFlipX)
+			}
+		})
+	}
+}

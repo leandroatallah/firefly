@@ -40,6 +40,7 @@ func SpawnAuraParticles(m contractvfx.Manager, x, y float64, colors []color.RGBA
 		p := &particles.Particle{
 			X:           rx,
 			Y:           ry,
+			AnchorX:     0.5,
 			VelX:        initialVelX,
 			VelY:        velY,
 			AccX:        -direction * 0.04, // Acceleration inward (creates wave: out → slow → in)

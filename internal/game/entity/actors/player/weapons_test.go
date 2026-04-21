@@ -18,7 +18,7 @@ func (m *mockProjectileManager) SpawnProjectile(projectileType string, x16, y16,
 func TestNewClimberInventory(t *testing.T) {
 	spawnPuffCalled := false
 	vfxMock := &mocks.MockVFXManager{
-		SpawnPuffFunc: func(typeKey string, x float64, y float64, count int, randRange float64) {
+		SpawnDirectionalPuffFunc: func(typeKey string, x float64, y float64, _ bool, count int, randRange float64) {
 			if typeKey == "muzzle_flash" {
 				spawnPuffCalled = true
 			}

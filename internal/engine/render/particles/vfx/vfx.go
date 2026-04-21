@@ -172,6 +172,46 @@ func (m *Manager) SpawnPuff(typeKey string, x, y float64, count int, randRange f
 		p := &particles.Particle{
 			X:           x,
 			Y:           y,
+			AnchorX:     0.5,
+			VelX:        (rand.Float64() - 0.5) * randRange,
+			VelY:        (rand.Float64() - 0.5) * randRange,
+			Duration:    duration,
+			MaxDuration: duration,
+			Scale:       1.0,
+			ScaleSpeed:  0,
+			Config:      config,
+		}
+		if config.Color != nil {
+			p.ColorScale.ScaleWithColor(config.Color)
+		}
+		m.system.Add(p)
+	}
+}
+
+// SpawnDirectionalPuff spawns a puff anchored to extend outward from the spawn point.
+// faceRight=true left-anchors the sprite; faceRight=false right-anchors it.
+func (m *Manager) SpawnDirectionalPuff(typeKey string, x, y float64, faceRight bool, count int, randRange float64) {
+	config, ok := m.configs[typeKey]
+	if !ok {
+		return
+	}
+
+	duration := config.FrameCount * config.FrameRate
+	if config.Lifetime > 0 {
+		duration = config.Lifetime
+	}
+
+	anchorX := 0.0 // left-anchor when facing right
+	if !faceRight {
+		anchorX = 1.0 // right-anchor when facing left
+	}
+
+	for i := 0; i < count; i++ {
+		p := &particles.Particle{
+			X:           x,
+			Y:           y,
+			AnchorX:     anchorX,
+			FlipX:       !faceRight,
 			VelX:        (rand.Float64() - 0.5) * randRange,
 			VelY:        (rand.Float64() - 0.5) * randRange,
 			Duration:    duration,
@@ -217,6 +257,7 @@ func (m *Manager) SpawnFallingRocks(x, y, width float64, count int) {
 		p := &particles.Particle{
 			X:           rx,
 			Y:           ry,
+			AnchorX:     0.5,
 			VelX:        (rand.Float64() - 0.5) * 0.2,
 			VelY:        rand.Float64() * 0.5,
 			AccY:        0.03 + rand.Float64()*0.05, // Lighter gravity for dust
@@ -250,6 +291,7 @@ func (m *Manager) SpawnDeathExplosion(x, y float64, count int) {
 		p := &particles.Particle{
 			X:           rx,
 			Y:           ry,
+			AnchorX:     0.5,
 			VelX:        velX,
 			VelY:        velY,
 			AccY:        0.15, // Gravity pulls particles down

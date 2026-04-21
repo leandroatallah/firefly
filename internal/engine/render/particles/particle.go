@@ -36,6 +36,12 @@ type Particle struct {
 
 	ColorScale ebiten.ColorScale
 
+	// AnchorX controls horizontal draw origin: 0=left, 0.5=center, 1=right.
+	AnchorX float64
+
+	// FlipX mirrors the sprite horizontally within its bounding box.
+	FlipX bool
+
 	// Animation state
 	Frame      int
 	FrameTimer int
@@ -74,10 +80,7 @@ func (p *Particle) Draw(screen *ebiten.Image, cam *camera.Controller) {
 	}
 
 	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Scale(p.Scale, p.Scale)
-	op.GeoM.Translate(p.X, p.Y)
 
-	// Center logic
 	w, h := p.Config.FrameWidth, p.Config.FrameHeight
 	if w == 0 {
 		w = p.Config.Image.Bounds().Dx()
@@ -86,8 +89,13 @@ func (p *Particle) Draw(screen *ebiten.Image, cam *camera.Controller) {
 		h = p.Config.Image.Bounds().Dy()
 	}
 
-	// Center the sprite
-	op.GeoM.Translate(-float64(w)*p.Scale/2, -float64(h)*p.Scale)
+	if p.FlipX {
+		op.GeoM.Scale(-1, 1)
+		op.GeoM.Translate(float64(w), 0)
+	}
+	op.GeoM.Translate(-float64(w)*p.AnchorX, -float64(h)/2)
+	op.GeoM.Scale(p.Scale, p.Scale)
+	op.GeoM.Translate(p.X, p.Y)
 
 	op.ColorScale = p.ColorScale
 

@@ -126,11 +126,11 @@ func TestProjectileWeapon_ID(t *testing.T) {
 }
 
 // TestProjectileWeapon_MuzzleFlashVFX_ExecutionOrder covers AC3:
-// Fire() must call SpawnPuff BEFORE calling SpawnProjectile.
+// Fire() must call SpawnDirectionalPuff BEFORE calling SpawnProjectile.
 func TestProjectileWeapon_MuzzleFlashVFX_ExecutionOrder(t *testing.T) {
 	var callOrder []string
 	mockVFX := &mocks.MockVFXManager{
-		SpawnPuffFunc: func(_ string, _, _ float64, _ int, _ float64) {
+		SpawnDirectionalPuffFunc: func(_ string, _, _ float64, _ bool, _ int, _ float64) {
 			callOrder = append(callOrder, "vfx")
 		},
 	}
@@ -154,8 +154,8 @@ func TestProjectileWeapon_MuzzleFlashVFX_ExecutionOrder(t *testing.T) {
 }
 
 // TestProjectileWeapon_MuzzleFlashVFX covers AC3/AC4/AC6:
-// Fire() must call SpawnPuff with the correct typeKey, fp16-converted coordinates,
-// count=1, and randRange=0.0.
+// Fire() must call SpawnDirectionalPuff with the correct typeKey, fp16-converted coordinates,
+// faceRight, count=1, and randRange=0.0.
 func TestProjectileWeapon_MuzzleFlashVFX(t *testing.T) {
 	tests := []struct {
 		name      string
@@ -163,22 +163,25 @@ func TestProjectileWeapon_MuzzleFlashVFX(t *testing.T) {
 		y16       int
 		wantX     float64
 		wantY     float64
+		faceRight bool
 		effectKey string
 	}{
 		{
-			name:      "standard position 320x480",
+			name:      "standard position 320x480 right",
 			x16:       320,
 			y16:       480,
 			wantX:     20.0,
 			wantY:     30.0,
+			faceRight: true,
 			effectKey: "muzzle_flash",
 		},
 		{
-			name:      "origin 0x0",
+			name:      "origin 0x0 left",
 			x16:       0,
 			y16:       0,
 			wantX:     0.0,
 			wantY:     0.0,
+			faceRight: false,
 			effectKey: "muzzle_flash",
 		},
 		{
@@ -187,6 +190,7 @@ func TestProjectileWeapon_MuzzleFlashVFX(t *testing.T) {
 			y16:       320,
 			wantX:     10.0,
 			wantY:     20.0,
+			faceRight: true,
 			effectKey: "muzzle_flash",
 		},
 	}
@@ -197,6 +201,7 @@ func TestProjectileWeapon_MuzzleFlashVFX(t *testing.T) {
 				typeKey   string
 				x         float64
 				y         float64
+				faceRight bool
 				count     int
 				randRange float64
 			}
@@ -205,34 +210,42 @@ func TestProjectileWeapon_MuzzleFlashVFX(t *testing.T) {
 			var spawnCount int
 
 			mockVFX := &mocks.MockVFXManager{
-				SpawnPuffFunc: func(typeKey string, x float64, y float64, count int, randRange float64) {
+				SpawnDirectionalPuffFunc: func(typeKey string, x float64, y float64, faceRight bool, count int, randRange float64) {
 					spawnCount++
-					got = puffCall{typeKey, x, y, count, randRange}
+					got = puffCall{typeKey, x, y, faceRight, count, randRange}
 				},
 			}
 
 			w := weapon.NewProjectileWeapon("gun", 10, "bullet", 160, &mockProjectileManager{}, tt.effectKey, 0, 0)
 			w.SetVFXManager(mockVFX)
 
-			w.Fire(tt.x16, tt.y16, animation.FaceDirectionRight, body.ShootDirectionStraight, 0)
+			faceDir := animation.FaceDirectionRight
+			if !tt.faceRight {
+				faceDir = animation.FaceDirectionLeft
+			}
+
+			w.Fire(tt.x16, tt.y16, faceDir, body.ShootDirectionStraight, 0)
 
 			if spawnCount != 1 {
-				t.Errorf("SpawnPuff call count: got %d, want 1", spawnCount)
+				t.Errorf("SpawnDirectionalPuff call count: got %d, want 1", spawnCount)
 			}
 			if got.typeKey != tt.effectKey {
-				t.Errorf("SpawnPuff typeKey: got %q, want %q", got.typeKey, tt.effectKey)
+				t.Errorf("SpawnDirectionalPuff typeKey: got %q, want %q", got.typeKey, tt.effectKey)
 			}
 			if got.x != tt.wantX {
-				t.Errorf("SpawnPuff x: got %v, want %v", got.x, tt.wantX)
+				t.Errorf("SpawnDirectionalPuff x: got %v, want %v", got.x, tt.wantX)
 			}
 			if got.y != tt.wantY {
-				t.Errorf("SpawnPuff y: got %v, want %v", got.y, tt.wantY)
+				t.Errorf("SpawnDirectionalPuff y: got %v, want %v", got.y, tt.wantY)
+			}
+			if got.faceRight != tt.faceRight {
+				t.Errorf("SpawnDirectionalPuff faceRight: got %v, want %v", got.faceRight, tt.faceRight)
 			}
 			if got.count != 1 {
-				t.Errorf("SpawnPuff count: got %d, want 1", got.count)
+				t.Errorf("SpawnDirectionalPuff count: got %d, want 1", got.count)
 			}
 			if got.randRange != 0.0 {
-				t.Errorf("SpawnPuff randRange: got %v, want 0.0", got.randRange)
+				t.Errorf("SpawnDirectionalPuff randRange: got %v, want 0.0", got.randRange)
 			}
 		})
 	}
@@ -300,16 +313,16 @@ func TestProjectileWeapon_SetVFXManager(t *testing.T) {
 	mockVFX := &mocks.MockVFXManager{}
 	w.SetVFXManager(mockVFX)
 
-	// Verify the manager was accepted by confirming SpawnPuff is called on Fire.
+	// Verify the manager was accepted by confirming SpawnDirectionalPuff is called on Fire.
 	called := false
-	mockVFX.SpawnPuffFunc = func(_ string, _ float64, _ float64, _ int, _ float64) {
+	mockVFX.SpawnDirectionalPuffFunc = func(_ string, _ float64, _ float64, _ bool, _ int, _ float64) {
 		called = true
 	}
 
 	w.Fire(0, 0, animation.FaceDirectionRight, body.ShootDirectionStraight, 0)
 
 	if !called {
-		t.Error("SpawnPuff was not called after SetVFXManager; manager injection may not be working")
+		t.Error("SpawnDirectionalPuff was not called after SetVFXManager; manager injection may not be working")
 	}
 }
 
@@ -410,7 +423,7 @@ func TestProjectileWeapon_Fire_SpawnOffset(t *testing.T) {
 			var vfxCalled bool
 			if tt.hasVFX {
 				mockVFX := &mocks.MockVFXManager{
-					SpawnPuffFunc: func(_ string, x, y float64, _ int, _ float64) {
+					SpawnDirectionalPuffFunc: func(_ string, x, y float64, _ bool, _ int, _ float64) {
 						vfxCalled = true
 						gotVFXX = x
 						gotVFXY = y
@@ -430,7 +443,7 @@ func TestProjectileWeapon_Fire_SpawnOffset(t *testing.T) {
 
 			if tt.hasVFX {
 				if !vfxCalled {
-					t.Fatal("expected SpawnPuff to be called")
+					t.Fatal("expected SpawnDirectionalPuff to be called")
 				}
 				if gotVFXX != tt.wantVFXX {
 					t.Errorf("VFX x: got %v, want %v", gotVFXX, tt.wantVFXX)
