@@ -40,7 +40,9 @@ func (v *stubVFXManager) SpawnFloatingTextAbove(target body.Body, msg string, _ 
 func (v *stubVFXManager) SpawnJumpPuff(_ float64, _ float64, _ int)                  {}
 func (v *stubVFXManager) SpawnLandingPuff(_ float64, _ float64, _ int)               {}
 func (v *stubVFXManager) SpawnPuff(_ string, _ float64, _ float64, _ int, _ float64) {}
-func (v *stubVFXManager) TriggerScreenFlash()                                        {}
+func (v *stubVFXManager) SpawnDirectionalPuff(_ string, _ float64, _ float64, _ bool, _ int, _ float64) {
+}
+func (v *stubVFXManager) TriggerScreenFlash() {}
 
 func TestSpawnTextCommand_Init_ScreenType(t *testing.T) {
 	ctx := &app.AppContext{}

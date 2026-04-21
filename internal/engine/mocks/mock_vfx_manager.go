@@ -25,6 +25,7 @@ type MockVFXManager struct {
 	SpawnJumpPuffFunc          func(x float64, y float64, count int)
 	SpawnLandingPuffFunc       func(x float64, y float64, count int)
 	SpawnPuffFunc              func(typeKey string, x float64, y float64, count int, randRange float64)
+	SpawnDirectionalPuffFunc   func(typeKey string, x float64, y float64, faceRight bool, count int, randRange float64)
 	TriggerScreenFlashFunc     func()
 }
 
@@ -110,6 +111,12 @@ func (m *MockVFXManager) SpawnLandingPuff(x float64, y float64, count int) {
 func (m *MockVFXManager) SpawnPuff(typeKey string, x float64, y float64, count int, randRange float64) {
 	if m.SpawnPuffFunc != nil {
 		m.SpawnPuffFunc(typeKey, x, y, count, randRange)
+	}
+}
+
+func (m *MockVFXManager) SpawnDirectionalPuff(typeKey string, x float64, y float64, faceRight bool, count int, randRange float64) {
+	if m.SpawnDirectionalPuffFunc != nil {
+		m.SpawnDirectionalPuffFunc(typeKey, x, y, faceRight, count, randRange)
 	}
 }
 

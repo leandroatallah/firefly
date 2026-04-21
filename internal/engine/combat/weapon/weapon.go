@@ -89,7 +89,7 @@ func (w *ProjectileWeapon) Fire(x16, y16 int, faceDir animation.FacingDirectionE
 	if w.vfxManager != nil && w.muzzleEffectType != "" {
 		x := float64(spawnX16) / 16.0
 		y := float64(spawnY16) / 16.0
-		w.vfxManager.SpawnPuff(w.muzzleEffectType, x, y, 1, 0.0)
+		w.vfxManager.SpawnDirectionalPuff(w.muzzleEffectType, x, y, faceDir == animation.FaceDirectionRight, 1, 0.0)
 	}
 
 	vx16, vy16 := w.calculateVelocity(direction, faceDir)
