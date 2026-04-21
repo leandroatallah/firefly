@@ -20,6 +20,18 @@ Velocity calculations use a 0.707 scaling factor for diagonal speeds to maintain
 
 Each weapon has a `cooldownFrames` setting. After firing, the weapon becomes "unready" until its `Update()` method has been called enough times to reduce the cooldown to zero.
 
+### Per-State Spawn Offset
+
+`ProjectileWeapon.SetStateSpawnOffsets(map[int][2]int)` registers spawn offsets keyed by the owner's current actor state (fp16 units). When `Fire(..., state)` is called, the weapon looks up the state in the map and overrides the default `spawnOffsetX16/Y16`. Useful when the barrel origin shifts across animation states (e.g., crouching, jumping). Pass a nil or empty map to clear overrides.
+
+### Muzzle Flash
+
+When a `vfx.Manager` is wired via `SetVFXManager`, `Fire` calls `SpawnDirectionalPuff(muzzleEffectType, x, y, faceRight, ...)` so the flash sprite extends outward from the barrel regardless of facing.
+
+### Enemy Shooting
+
+`enemy_shooting.go` defines `EnemyShooting`, which implements `combat.EnemyShooter`. It wraps a `ProjectileWeapon` and applies three gates per frame — state, range + `ShootMode`, and cooldown — before firing. See the [combat overview](../README.md#enemy-shooting) for the gate chain.
+
 ## Weapon Factory
 
 A JSON factory is available to create weapons from configuration data:

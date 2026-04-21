@@ -14,9 +14,22 @@ The `Manager` struct implements the `combat.ProjectileManager` interface and han
     - Physics collisions are resolved using the `BodiesSpace`.
     - Bounds checking removes the projectile if it leaves the tilemap.
 3.  **Removal**:
-    - Automatically removed if it touches a `Collidable` that isn't its owner.
-    - Automatically removed if it hits a blocking wall (`OnBlock`).
+    - Automatically removed if it touches a `Collidable` that isn't its owner; damages the target if it implements `combat.Damageable` (faction-gated).
+    - Automatically removed if it hits a blocking wall (`OnBlock`); damage rules identical to `OnTouch`.
     - Automatically removed if it goes out of bounds.
+    - Automatically removed when `LifetimeFrames` expires (triggers the configured `DespawnEffect`).
+
+## Damage & Faction
+
+- `ProjectileConfig.Damage` is applied to `Damageable` targets on contact.
+- `ProjectileConfig.Faction` gates damage: when both projectile and target are non-neutral and share the same faction, the hit is skipped. Neutral on either side always damages.
+- Faction on the target is resolved via `Factioned` on the body itself or its `Owner()`.
+
+## VFX Hooks
+
+- `ProjectileConfig.ImpactEffect` — spawned on `OnTouch` / `OnBlock` when set.
+- `ProjectileConfig.DespawnEffect` — spawned on lifetime expiry when set.
+- Both route through the injected `vfx.Manager` via `SpawnPuff`.
 
 ## Projectile Implementation
 
