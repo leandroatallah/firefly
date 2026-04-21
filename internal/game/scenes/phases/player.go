@@ -55,6 +55,7 @@ func createPlayer(ctx *app.AppContext, playerType gameentitytypes.PlayerType) (p
 	}
 
 	climber.SetInventory(deps.Inventory)
+	climber.SetMelee(gameplayer.NewPlayerMeleeWeapon(), ctx.VFX)
 
 	if err := builder.ApplySkills(p, *spriteData, deps); err != nil {
 		return nil, err
