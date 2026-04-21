@@ -78,7 +78,7 @@
         "collision_rect": []
       },
       "idle_shoot": {
-        "path": "assets/images/climber-idle.png",
+        "path": "assets/images/climber-idle-shoot.png",
         "loop": true,
         "collision_rect": [
           {
@@ -90,7 +90,7 @@
         ]
       },
       "walk_shoot": {
-        "path": "assets/images/climber-walk.png",
+        "path": "assets/images/climber-walk-shoot.png",
         "loop": true,
         "collision_rect": [
           {

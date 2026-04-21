@@ -294,3 +294,34 @@ func (m *mockMovableCollidable) SetJumpForceMultiplier(float64)                 
 func (m *mockMovableCollidable) JumpForceMultiplier() float64                   { return 1.0 }
 func (m *mockMovableCollidable) SetHorizontalInertia(float64)                   {}
 func (m *mockMovableCollidable) HorizontalInertia() float64                     { return 1.0 }
+
+func TestShootingSkill_IsActive_ReflectsShootHeld(t *testing.T) {
+	mockInventory := &mocks.MockInventory{
+		ActiveWeaponFunc: func() combat.Weapon { return nil },
+	}
+	s := skill.NewShootingSkill(mockInventory)
+
+	oldReader := input.CommandsReader
+	defer func() { input.CommandsReader = oldReader }()
+
+	shoot := false
+	input.CommandsReader = func() input.PlayerCommands {
+		return input.PlayerCommands{Shoot: shoot}
+	}
+
+	if s.IsActive() {
+		t.Error("expected IsActive() false before any Update")
+	}
+
+	shoot = true
+	s.Update(nil, nil)
+	if !s.IsActive() {
+		t.Error("expected IsActive() true when shoot is held")
+	}
+
+	shoot = false
+	s.Update(nil, nil)
+	if s.IsActive() {
+		t.Error("expected IsActive() false after shoot released")
+	}
+}
