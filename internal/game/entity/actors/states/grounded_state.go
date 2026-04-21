@@ -49,6 +49,9 @@ func (g *GroundedState) Update() actors.ActorStateEnum {
 	if input.DashPressed() {
 		return StateDashing
 	}
+	if input.MeleePressed() {
+		return StateMeleeAttack
+	}
 
 	next := g.activeSub.transitionTo(input)
 	if next != g.activeKey {

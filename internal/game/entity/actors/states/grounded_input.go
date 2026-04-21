@@ -12,6 +12,7 @@ type GroundedInput interface {
 	HasCeilingClearance() bool
 	JumpPressed() bool
 	DashPressed() bool
+	MeleePressed() bool
 	AimLockHeld() bool
 	ShootHeld() bool
 }
