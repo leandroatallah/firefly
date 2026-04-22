@@ -1,6 +1,6 @@
-# Agent Guidelines: Engine Test Coverage
+# Agent Guidelines
 
-This document provides specialized instructions for AI agents tasked with increasing test coverage for the `internal/engine` module.
+This document provides specialized instructions for AI agents working on this project. Coverage targets, testing patterns, workflow scripts, and code style rules are all here.
 
 ## 🎯 Goal
 
