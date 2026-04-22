@@ -2,13 +2,16 @@ package gameplayer
 
 import (
 	"github.com/boilerplate/ebiten-template/internal/engine/app"
+	"github.com/boilerplate/ebiten-template/internal/engine/combat/weapon"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/animation"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/vfx"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/schemas"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/builder"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/platformer"
 	"github.com/boilerplate/ebiten-template/internal/engine/input"
+	"github.com/boilerplate/ebiten-template/internal/engine/utils/fp16"
 	gameplayermethods "github.com/boilerplate/ebiten-template/internal/game/entity/actors/methods"
 	gamestates "github.com/boilerplate/ebiten-template/internal/game/entity/actors/states"
 )
@@ -26,9 +29,12 @@ func climberStateTransitionLogic(c *actors.Character) bool {
 
 type ClimberPlayer struct {
 	*platformer.PlatformerCharacter
-	baseSpeed  int
-	spriteData *schemas.SpriteData
-	inventory  interface{}
+	baseSpeed     int
+	spriteData    *schemas.SpriteData
+	inventory     interface{}
+	melee         *weapon.MeleeWeapon
+	meleeVFX      vfx.Manager
+	meleeHeldPrev bool
 
 	*gameplayermethods.PlayerDeathBehavior
 }
@@ -70,6 +76,20 @@ func NewClimberPlayer(ctx *app.AppContext) (platformer.PlatformerActorEntity, er
 
 func (p *ClimberPlayer) Update(space body.BodiesSpace) error {
 	cmds := input.CommandsReader()
+
+	if p.melee != nil {
+		p.melee.Update()
+		meleePressed := cmds.Melee && !p.meleeHeldPrev
+		if meleePressed && p.melee.CanFire() && !p.IsDucking() {
+			x16, y16 := p.GetPosition16()
+			p.melee.Fire(x16, y16, p.FaceDirection(), body.ShootDirectionStraight, 0)
+			p.spawnMeleeVFX(x16, y16)
+		}
+		if p.melee.IsHitboxActive() {
+			p.melee.ApplyHitbox(space)
+		}
+		p.meleeHeldPrev = cmds.Melee
+	}
 
 	// Check for ducking input
 	duckHeld := cmds.Down
@@ -126,4 +146,28 @@ func (p *ClimberPlayer) SetInventory(inv interface{}) {
 
 func (p *ClimberPlayer) Inventory() interface{} {
 	return p.inventory
+}
+
+// SetMelee wires the player's melee weapon and VFX manager. The owner is set
+// on the weapon so the faction gate in ApplyHitbox resolves against
+// Character.Faction().
+func (p *ClimberPlayer) SetMelee(w *weapon.MeleeWeapon, vfxMgr vfx.Manager) {
+	p.melee = w
+	p.meleeVFX = vfxMgr
+	if w != nil {
+		w.SetOwner(p)
+	}
+}
+
+func (p *ClimberPlayer) spawnMeleeVFX(x16, y16 int) {
+	if p.meleeVFX == nil {
+		return
+	}
+	offsetX16 := fp16.To16(12)
+	if p.FaceDirection() == animation.FaceDirectionLeft {
+		offsetX16 = -offsetX16
+	}
+	px := float64(fp16.From16(x16 + offsetX16))
+	py := float64(fp16.From16(y16))
+	p.meleeVFX.SpawnDirectionalPuff("melee_slash", px, py, p.FaceDirection() == animation.FaceDirectionRight, 1, 0.0)
 }

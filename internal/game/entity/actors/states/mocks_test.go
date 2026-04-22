@@ -143,6 +143,7 @@ type MockInputSource struct {
 	HorizontalInputFunc     func() int
 	JumpPressedFunc         func() bool
 	DashPressedFunc         func() bool
+	MeleePressedFunc        func() bool
 	AimLockHeldFunc         func() bool
 	ShootHeldFunc           func() bool
 }
@@ -178,6 +179,13 @@ func (m *MockInputSource) JumpPressed() bool {
 func (m *MockInputSource) DashPressed() bool {
 	if m.DashPressedFunc != nil {
 		return m.DashPressedFunc()
+	}
+	return false
+}
+
+func (m *MockInputSource) MeleePressed() bool {
+	if m.MeleePressedFunc != nil {
+		return m.MeleePressedFunc()
 	}
 	return false
 }

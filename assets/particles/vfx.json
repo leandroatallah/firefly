@@ -38,5 +38,13 @@
     "frame_height": 24,
     "frame_rate": 3,
     "scale": 1.0
+  },
+  {
+    "type": "melee_slash",
+    "image": "assets/images/melee-slash-24.png",
+    "frame_width": 24,
+    "frame_height": 24,
+    "frame_rate": 3,
+    "scale": 1
   }
 ]
