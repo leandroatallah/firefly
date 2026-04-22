@@ -36,6 +36,7 @@ A minimal, clean boilerplate for starting new game projects with Ebitengine, bas
   - [ADR-005](docs/adr/ADR-005-composite-grounded-sub-state.md) — Composite grounded sub-state machine
   - [ADR-006](docs/adr/ADR-006-engine-game-layer-separation.md) — Engine/Game two-layer architecture
   - [ADR-007](docs/adr/ADR-007-fp16-scale-factor.md) — FP16 scale factor is 16, not 65536
+  - [ADR-008](docs/adr/ADR-008-state-contributor-pattern.md) — `StateContributor` hook for extensible state transitions
 
 ## License
 

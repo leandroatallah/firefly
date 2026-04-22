@@ -8,14 +8,15 @@ Achieve **80%+ test coverage** across the codebase, prioritizing the engine's en
 
 ## 🔝 Priorities
 
-1. **Entity State Machine (`internal/engine/entity/actors`)**: 48.0% coverage. The `handleState` logic is the most critical and complex part of the engine and is currently under-tested.
-2. **Level Management (`internal/game/scenes/phases`)**: 0.0% coverage. This is the foundation for all game levels.
-3. **Player & Character Logic (`internal/game/entity/actors/player`)**: 52.2% coverage. Good progress here, but still needs more integration tests.
-4. **Sequences (`internal/engine/sequences`)**: 60.8% coverage. Essential for cutscenes and scripted events.
-5. **Composite Grounded State (`internal/game/entity/actors/states`)**: New sub-state machine (`GroundedState`, `DuckingState`, `DashState`). Each sub-state transition must be independently tested.
-6. **Physics Skills (`internal/engine/physics/skill`)**: `JumpSkill` jump-cut logic and `DashState` tween deceleration are new and untested.
+1. **Entity State Machine (`internal/engine/entity/actors`)**: 63.6% coverage. The `handleState` logic — including the new `StateContributor` hook (ADR-008) — is the most critical and complex part of the engine.
+2. **Level Management (`internal/game/scenes/phases`)**: 18.4% coverage. This is the foundation for all game levels; still the lowest coverage across the codebase.
+3. **Player & Character Logic (`internal/game/entity/actors/player`)**: 60.5% coverage. `WireStateContributors` and the dash/shoot contributors need dedicated branch coverage.
+4. **Sequences (`internal/engine/sequences`)**: 86.4% coverage. Essential for cutscenes and scripted events; per-command `block_sequence` paths now covered.
+5. **Composite Grounded State (`internal/game/entity/actors/states`)**: Sub-state machine (`GroundedState`, `DuckingState`, `DashState`). Each sub-state transition must be independently tested.
+6. **Physics Skills (`internal/engine/physics/skill`)**: 79.5% coverage. `JumpSkill` jump-cut, `DashSkill` tween deceleration, and `ShootingSkill` direction detection.
 7. **Scene Freeze (`internal/engine/scene`)**: `FreezeController` tick/reset logic needs full branch coverage.
 8. **Physics Tween (`internal/engine/physics/tween`)**: `InOutSineTween` interpolation values and `Done()` boundary.
+9. **Combat (`internal/engine/combat/...`)**: `weapon` 96.2%, `projectile` 89.9%, `inventory` 51.5%. Faction gating (`applyDamage` / `resolveDamageable`) and `EnemyShooting` gate chain are both new surface area.
 
 ## 🛠 Testing Strategy & Patterns
 
@@ -127,14 +128,17 @@ func (t *Transition) Draw(_ *ebiten.Image) {}  // Use blank in param list
 
 | Package | Current Coverage | Focus Area |
 | :--- | :--- | :--- |
-| `entity/actors` | 48.0% | `handleState` state machine, animation logic |
-| `game/scenes/phases` | 0.0% | `PhasesScene` life cycle, goal tracking |
-| `game/entity/actors/player` | 52.2% | Player input, physics integration, interactions |
-| `sequences` | 60.8% | Command execution and completion conditions |
-| `entity/items` | 52.3% | Item collection and state transitions |
-| `scene` | 73.0% | Scene transitions and tilemap initialization |
-| `data/i18n` | (new) | `I18nManager.Load()` and `T()` methods, error handling |
-| `combat` | (new) | Inventory, weapons, projectiles (US-028) |
+| `entity/actors` | 63.6% | `handleState` state machine, `StateContributor` hook (ADR-008), animation logic |
+| `game/scenes/phases` | 18.4% | `PhasesScene` life cycle, goal tracking |
+| `game/entity/actors/player` | 60.5% | `WireStateContributors`, dash/shoot contributors, input integration |
+| `sequences` | 86.4% | Command execution, `block_sequence` flag, one-time / interruptible logic |
+| `entity/items` | 51.7% | Item collection and state transitions |
+| `scene` | 73.2% | Scene transitions and tilemap initialization |
+| `data/i18n` | 100.0% | `I18nManager.Load()` and `T()` methods, error handling |
+| `combat/weapon` | 96.2% | `ProjectileWeapon`, per-state spawn offsets, `EnemyShooting` gate chain |
+| `combat/projectile` | 89.9% | Lifetime, faction-gated damage, impact / despawn VFX |
+| `combat/inventory` | 51.5% | Switch/add/ammo tracking |
+| `physics/skill` | 79.5% | `JumpSkill`, `DashSkill`, `ShootingSkill`, `FromConfig` factory |
 
 ## 🛠 Story Management Scripts
 

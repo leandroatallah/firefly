@@ -5,10 +5,11 @@ This module contains the core, reusable game engine components. It is designed t
 ## Core Components
 
 - `app/`: Manages the main engine loop, context, and initialization (`engine.go`, `context.go`).
-- `combat/`: Handles weapon management, inventory, and projectile lifecycles.
+- `combat/`: Handles weapon management, inventory, projectile lifecycles, and faction-gated damage.
   - `inventory/`: Manages weapon collections and ammo.
-  - `weapon/`: Logic for firing and cooldowns.
-  - `projectile/`: High-performance projectile management.
+  - `weapon/`: Logic for firing and cooldowns; includes `EnemyShooting` for automatic enemy fire and `ProjectileWeapon` with per-state spawn offsets and muzzle-flash VFX.
+  - `projectile/`: High-performance projectile management with lifetime, damage, and impact/despawn VFX hooks.
+  - `faction.go`: `FactionNeutral | FactionPlayer | FactionEnemy` — side identification used to prevent self-damage.
 - `contracts/`: Defines the Go interfaces (contracts) for key engine components like animations, bodies, configuration, context, navigation, sequences, tilemap layers, and visual effects (vfx). This promotes a decoupled architecture.
 - `data/`: Handles data loading, management, and configuration schemas (e.g., from JSON files).
   - `config/`: Engine-specific configuration structures.
@@ -21,7 +22,7 @@ This module contains the core, reusable game engine components. It is designed t
 - `input/`: Manages user input from keyboard, mouse, or gamepads.
   - `HorizontalAxis`: Last-pressed-wins directional input — when both left and right are held, the most recently pressed direction wins.
 - `mocks/`: Contains mock implementations of engine components for testing purposes, facilitating unit and integration tests for the game module.
-- `sequences/`: Manages scripted event sequences, commands, and cutscenes.
+- `sequences/`: Manages scripted event sequences, commands, and cutscenes. See [`sequences/README.md`](sequences/README.md).
   - `player.go`: Executes sequences of commands.
   - `commands_*.go`: Scriptable actions for actors, camera, music, and visual effects.
 - `utils/`: Contains various utility functions (e.g., fixed-point arithmetic `fp16/`, timing `timing/`, and `delay_trigger.go`).
@@ -30,13 +31,15 @@ This module contains the core, reusable game engine components. It is designed t
 
 - `entity/`: Provides the foundational structures for all in-game objects.
   - `actors/`: Base structures and logic for character-like entities.
+    - `StateContributor`: Optional hook polled by `Character.handleState` before default movement transitions. Lets adapters (e.g., dash, shooting) override the target state without subclassing `Character`. See [ADR-008](../../docs/adr/ADR-008-state-contributor-pattern.md).
   - `items/`: Base structures and logic for collectible or interactive items.
   - `animation_utils.go`: Helper functions for animation logic.
 - `physics/`: Implements the physics simulation.
   - `body/`: Defines physical body interfaces and implementations.
   - `movement/`: Provides movement models (e.g., platformer physics). Includes one-way platform drop-through logic.
-  - `skill/`: Manages physics-related skills or abilities.
-    - `JumpSkill`: Supports variable jump height via a configurable `JumpCutMultiplier` — releasing the jump button early reduces the apex.
+  - `skill/`: Manages physics-related skills or abilities. See [`physics/skill/README.md`](physics/skill/README.md).
+    - `JumpSkill` (variable jump height), `DashSkill` (tween-based deceleration), `HorizontalMovementSkill`, `ShootingSkill`.
+    - `factory.go` (`FromConfig`) — builds the skill set from a JSON `SkillsConfig`.
   - `space/`: Handles collision detection and spatial partitioning.
   - `tween/`: Interpolation utilities.
     - `InOutSineTween`: Smooth `InOutSine` tween used by the dash deceleration.
@@ -82,3 +85,6 @@ Key non-obvious design choices are documented in [`docs/adr/`](../../docs/adr/):
 - [ADR-003](../../docs/adr/ADR-003-goroutine-audio-looping.md) — Why audio looping uses goroutines instead of Ebitengine's built-in loop
 - [ADR-004](../../docs/adr/ADR-004-space-body-model-physics.md) — Why physics is split into Space / Body / MovementModel layers
 - [ADR-005](../../docs/adr/ADR-005-composite-grounded-sub-state.md) — Why the grounded state uses a sub-state machine instead of flat states
+- [ADR-006](../../docs/adr/ADR-006-engine-game-layer-separation.md) — Engine/Game two-layer architecture
+- [ADR-007](../../docs/adr/ADR-007-fp16-scale-factor.md) — FP16 scale factor is 16, not 65536
+- [ADR-008](../../docs/adr/ADR-008-state-contributor-pattern.md) — StateContributor hook for extensible state transitions
