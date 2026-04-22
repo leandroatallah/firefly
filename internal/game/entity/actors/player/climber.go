@@ -169,5 +169,5 @@ func (p *ClimberPlayer) spawnMeleeVFX(x16, y16 int) {
 	}
 	px := float64(fp16.From16(x16 + offsetX16))
 	py := float64(fp16.From16(y16))
-	p.meleeVFX.SpawnPuff("melee_slash", px, py, 6, 4)
+	p.meleeVFX.SpawnDirectionalPuff("melee_slash", px, py, p.FaceDirection() == animation.FaceDirectionRight, 1, 0.0)
 }
