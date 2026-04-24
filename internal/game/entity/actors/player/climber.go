@@ -79,8 +79,16 @@ func (p *ClimberPlayer) Update(space body.BodiesSpace) error {
 
 	if p.melee != nil {
 		p.melee.Update()
+
+		if (cmds.Dash || cmds.Jump) && p.melee.ComboWindowRemaining() > 0 {
+			p.melee.ResetCombo()
+		}
+
 		meleePressed := cmds.Melee && !p.meleeHeldPrev
 		if meleePressed && p.melee.CanFire() && !p.IsDucking() {
+			if p.melee.ComboWindowRemaining() > 0 {
+				p.melee.AdvanceCombo()
+			}
 			x16, y16 := p.GetPosition16()
 			p.melee.Fire(x16, y16, p.FaceDirection(), body.ShootDirectionStraight, 0)
 			p.spawnMeleeVFX(x16, y16)
@@ -124,7 +132,11 @@ func (p *ClimberPlayer) GetSpriteData() *schemas.SpriteData {
 	return p.spriteData
 }
 
-func (p *ClimberPlayer) Hurt(damage int) {
+func (p *ClimberPlayer) Hurt(_ int) {
+	if p.melee != nil {
+		p.melee.ResetCombo()
+	}
+
 	if p.State() == gamestates.Dying || p.State() == gamestates.Dead {
 		return
 	}
@@ -132,11 +144,11 @@ func (p *ClimberPlayer) Hurt(damage int) {
 	p.SetNewStateFatal(gamestates.Dying)
 }
 
-func (p *ClimberPlayer) OnTouch(other body.Collidable) {
+func (p *ClimberPlayer) OnTouch(_ body.Collidable) {
 	// Standard player touch behavior
 }
 
-func (p *ClimberPlayer) OnBlock(other body.Collidable) {
+func (p *ClimberPlayer) OnBlock(_ body.Collidable) {
 	// Required to implement body.Touchable to avoid recursion if we rely on embedded CollidableBody.OnBlock
 }
 

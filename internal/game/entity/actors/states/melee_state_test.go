@@ -80,40 +80,56 @@ func newPlayerOwner(xPx, yPx int, face animation.FacingDirectionEnum) *owningMoc
 }
 
 // ---------------------------------------------------------------------------
-// §4 RED-3 tests
+// §4 RED-3 helpers and tests
 // ---------------------------------------------------------------------------
 
+// newTestMeleeWeaponForState builds a single-step combo-capable weapon.
+// Matches the pre-US-041 defaults (damage=1, active=[3,5], cooldown=20,
+// hitbox 24x16 offset 12,0).
 func newTestMeleeWeaponForState(owner interface{}) *weapon.MeleeWeapon {
-	w := weapon.NewMeleeWeapon(
-		"player_melee",
-		1,            // damage
-		20,           // cooldownFrames
-		[2]int{3, 5}, // activeFrames
-		24*16, 16*16, // hitbox W/H fp16
-		12*16, 0, // offset fp16
-	)
+	steps := []weapon.ComboStep{{
+		Damage:          1,
+		ActiveFrames:    [2]int{3, 5},
+		HitboxW16:       24 * 16,
+		HitboxH16:       16 * 16,
+		HitboxOffsetX16: 12 * 16,
+		HitboxOffsetY16: 0,
+	}}
+	w := weapon.NewMeleeWeapon("player_melee", 20, 0 /*comboWindowFrames*/, steps)
+	w.SetOwner(owner)
+	return w
+}
+
+// newThreeStepStateMeleeWeapon builds a 3-step weapon for combo-step tests.
+func newThreeStepStateMeleeWeapon(owner interface{}) *weapon.MeleeWeapon {
+	steps := []weapon.ComboStep{
+		{Damage: 1, ActiveFrames: [2]int{3, 5}, HitboxW16: 24 * 16, HitboxH16: 16 * 16, HitboxOffsetX16: 12 * 16, HitboxOffsetY16: 0},
+		{Damage: 1, ActiveFrames: [2]int{3, 5}, HitboxW16: 28 * 16, HitboxH16: 16 * 16, HitboxOffsetX16: 14 * 16, HitboxOffsetY16: -4 * 16},
+		{Damage: 2, ActiveFrames: [2]int{3, 5}, HitboxW16: 32 * 16, HitboxH16: 20 * 16, HitboxOffsetX16: 16 * 16, HitboxOffsetY16: 0},
+	}
+	w := weapon.NewMeleeWeapon("player_melee", 0 /*cooldown*/, 15 /*window*/, steps)
 	w.SetOwner(owner)
 	return w
 }
 
 func TestMeleeAttackState_ReturnsToGrounded_WhenAnimationFinishes(t *testing.T) {
 	owner := newPlayerOwner(100, 100, animation.FaceDirectionRight)
-	_ = owner
 	sp := &mockSpace{}
 	w := newTestMeleeWeaponForState(owner)
+
+	// US-041: ClimberPlayer owns Fire. Tests must fire explicitly before OnStart.
+	w.Fire(owner.pos.Min.X*16, owner.pos.Min.Y*16, owner.faceDir, body.ShootDirectionStraight, 0)
 
 	const animFrames = 8
 	st := gamestates.NewMeleeAttackState(owner, sp, w, gamestates.StateGrounded)
 	st.SetAnimationFrames(animFrames)
 	st.OnStart(0)
 
-	// First animFrames-1 ticks should stay in StateMeleeAttack.
 	for i := 0; i < animFrames-1; i++ {
 		if got := st.Update(); got != gamestates.StateMeleeAttack {
 			t.Errorf("tick %d Update() = %v, want StateMeleeAttack", i, got)
 		}
 	}
-	// The Nth tick should transition back to returnTo (StateGrounded).
 	if got := st.Update(); got != gamestates.StateGrounded {
 		t.Errorf("final tick Update() = %v, want StateGrounded", got)
 	}
@@ -121,10 +137,11 @@ func TestMeleeAttackState_ReturnsToGrounded_WhenAnimationFinishes(t *testing.T) 
 
 func TestMeleeAttackState_AirMelee_ReturnsToFalling(t *testing.T) {
 	owner := newPlayerOwner(100, 100, animation.FaceDirectionRight)
-	_ = owner
 	owner.grounded = false
 	sp := &mockSpace{}
 	w := newTestMeleeWeaponForState(owner)
+
+	w.Fire(owner.pos.Min.X*16, owner.pos.Min.Y*16, owner.faceDir, body.ShootDirectionStraight, 0)
 
 	const animFrames = 6
 	st := gamestates.NewMeleeAttackState(owner, sp, w, actors.Falling)
@@ -140,15 +157,17 @@ func TestMeleeAttackState_AirMelee_ReturnsToFalling(t *testing.T) {
 	}
 }
 
+// US-041: OnStart no longer calls Fire — the climber owns that call.
+// The state's job is to drive the hitbox while the weapon swings.
 func TestMeleeAttackState_Update_AppliesHitboxDuringActiveWindow(t *testing.T) {
 	owner := newPlayerOwner(100, 100, animation.FaceDirectionRight)
-	_ = owner
-	// Enemy positioned inside the forward hitbox range
-	// (owner origin ~100 + offset 12, size 24x16 → enemy at 110).
 	enemy := newMeleeEnemy("enemy", image.Rect(110, 100, 118, 108), combat.FactionEnemy)
 
 	sp := &mockSpace{queryResult: []body.Collidable{enemy}}
 	w := newTestMeleeWeaponForState(owner)
+
+	// Fire explicitly before entering the state (per SPEC §1.4).
+	w.Fire(owner.pos.Min.X*16, owner.pos.Min.Y*16, owner.faceDir, body.ShootDirectionStraight, 0)
 
 	const animFrames = 10
 	st := gamestates.NewMeleeAttackState(owner, sp, w, gamestates.StateGrounded)
@@ -197,16 +216,123 @@ func TestMeleeTrigger_BlockedDuringCooldown(t *testing.T) {
 	owner := newPlayerOwner(100, 100, animation.FaceDirectionRight)
 	w := newTestMeleeWeaponForState(owner)
 
-	// Force weapon into cooldown.
 	w.SetCooldown(15)
 	if w.CanFire() {
 		t.Fatalf("precondition: weapon must not be able to fire during cooldown")
 	}
 
-	// TryMeleeFromFalling is the shared trigger helper used by the Falling
-	// wiring (per SPEC §1.4). While on cooldown it must not transition.
 	_, ok := gamestates.TryMeleeFromFalling(w, true /*meleePressed*/)
 	if ok {
 		t.Errorf("TryMeleeFromFalling returned ok=true while weapon on cooldown; want false")
+	}
+}
+
+// AC5 — The state captures the step index at OnStart so the animation layer
+// can pick MeleeAttack1 / MeleeAttack2 / MeleeAttack3.
+func TestMeleeAttackState_UsesCurrentComboStep(t *testing.T) {
+	owner := newPlayerOwner(100, 100, animation.FaceDirectionRight)
+	sp := &mockSpace{}
+	w := newThreeStepStateMeleeWeapon(owner)
+
+	// Step 0.
+	w.Fire(owner.pos.Min.X*16, owner.pos.Min.Y*16, owner.faceDir, body.ShootDirectionStraight, 0)
+	st0 := gamestates.NewMeleeAttackState(owner, sp, w, gamestates.StateGrounded)
+	st0.SetAnimationFrames(8)
+	st0.OnStart(0)
+	if got := st0.StepUsed(); got != 0 {
+		t.Errorf("step 0: StepUsed() = %d, want 0", got)
+	}
+
+	// Finish swing so combo window opens, then advance to step 1.
+	for i := 0; i <= 5+1; i++ {
+		w.Update()
+	}
+	if !w.AdvanceCombo() {
+		t.Fatalf("AdvanceCombo step 0→1 returned false; want true")
+	}
+	w.Fire(owner.pos.Min.X*16, owner.pos.Min.Y*16, owner.faceDir, body.ShootDirectionStraight, 0)
+	st1 := gamestates.NewMeleeAttackState(owner, sp, w, gamestates.StateGrounded)
+	st1.SetAnimationFrames(8)
+	st1.OnStart(0)
+	if got := st1.StepUsed(); got != 1 {
+		t.Errorf("step 1: StepUsed() = %d, want 1", got)
+	}
+
+	// Advance to step 2.
+	for i := 0; i <= 5+1; i++ {
+		w.Update()
+	}
+	if !w.AdvanceCombo() {
+		t.Fatalf("AdvanceCombo step 1→2 returned false; want true")
+	}
+	w.Fire(owner.pos.Min.X*16, owner.pos.Min.Y*16, owner.faceDir, body.ShootDirectionStraight, 0)
+	st2 := gamestates.NewMeleeAttackState(owner, sp, w, gamestates.StateGrounded)
+	st2.SetAnimationFrames(8)
+	st2.OnStart(0)
+	if got := st2.StepUsed(); got != 2 {
+		t.Errorf("step 2: StepUsed() = %d, want 2", got)
+	}
+}
+
+// AC3 bullet 3 — Pressing Dash or Jump while the combo window is open resets
+// the combo. Verified via the shared helper used by ClimberPlayer.Update to
+// keep the unit test independent of the full climber harness.
+func TestResetComboOnInterrupt_ResetsWhenDashOrJumpPressedDuringWindow(t *testing.T) {
+	owner := newPlayerOwner(100, 100, animation.FaceDirectionRight)
+
+	tests := []struct {
+		name        string
+		dashPressed bool
+		jumpPressed bool
+		wantReset   bool
+	}{
+		{name: "dash pressed during window resets combo", dashPressed: true, wantReset: true},
+		{name: "jump pressed during window resets combo", jumpPressed: true, wantReset: true},
+		{name: "neither pressed leaves combo intact", wantReset: false},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			w := newThreeStepStateMeleeWeapon(owner)
+
+			// Open the combo window: fire step 0, advance past active frames.
+			w.Fire(owner.pos.Min.X*16, owner.pos.Min.Y*16, owner.faceDir, body.ShootDirectionStraight, 0)
+			for i := 0; i <= 5+1; i++ {
+				w.Update()
+			}
+			// Advance to step 1 so we have something to reset from.
+			if !w.AdvanceCombo() {
+				t.Fatalf("precondition: AdvanceCombo failed; window not open?")
+			}
+			// Reopen the window by running step 1's swing to completion.
+			w.Fire(owner.pos.Min.X*16, owner.pos.Min.Y*16, owner.faceDir, body.ShootDirectionStraight, 0)
+			for i := 0; i <= 5+1; i++ {
+				w.Update()
+			}
+			if w.ComboWindowRemaining() == 0 {
+				t.Fatalf("precondition: combo window must be open")
+			}
+			if w.StepIndex() != 1 {
+				t.Fatalf("precondition: StepIndex = %d, want 1", w.StepIndex())
+			}
+
+			gamestates.ResetComboOnInterrupt(w, tc.dashPressed, tc.jumpPressed)
+
+			if tc.wantReset {
+				if w.StepIndex() != 0 {
+					t.Errorf("StepIndex() = %d, want 0 (reset)", w.StepIndex())
+				}
+				if w.ComboWindowRemaining() != 0 {
+					t.Errorf("ComboWindowRemaining() = %d, want 0 (reset)", w.ComboWindowRemaining())
+				}
+			} else {
+				if w.StepIndex() != 1 {
+					t.Errorf("StepIndex() = %d, want 1 (no reset)", w.StepIndex())
+				}
+				if w.ComboWindowRemaining() == 0 {
+					t.Errorf("ComboWindowRemaining() = 0, want > 0 (no reset)")
+				}
+			}
+		})
 	}
 }

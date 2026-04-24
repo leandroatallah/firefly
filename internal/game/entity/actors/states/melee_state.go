@@ -23,6 +23,9 @@ type meleeWeaponIface interface {
 	combat.Weapon
 	IsHitboxActive() bool
 	ApplyHitbox(space contractsbody.BodiesSpace)
+	StepIndex() int
+	ComboWindowRemaining() int
+	ResetCombo()
 }
 
 // meleeOwnerIface is the minimum owner interface needed by MeleeAttackState.
@@ -39,6 +42,7 @@ type MeleeAttackState struct {
 	returnTo   actors.ActorStateEnum
 	animFrames int
 	frame      int
+	stepUsed   int
 }
 
 // NewMeleeAttackState constructs a MeleeAttackState.
@@ -55,11 +59,14 @@ func NewMeleeAttackState(owner meleeOwnerIface, space contractsbody.BodiesSpace,
 // SetAnimationFrames sets the total number of animation frames for the swing.
 func (s *MeleeAttackState) SetAnimationFrames(n int) { s.animFrames = n }
 
-// OnStart fires the weapon and resets the frame counter.
+// StepUsed returns the combo step index that was active when OnStart was called.
+func (s *MeleeAttackState) StepUsed() int { return s.stepUsed }
+
+// OnStart captures the current combo step and resets the frame counter.
+// Fire is owned by the caller (ClimberPlayer.Update) and must be called before OnStart.
 func (s *MeleeAttackState) OnStart(_ int) {
 	s.frame = 0
-	x16, y16 := s.owner.GetPosition16()
-	s.weapon.Fire(x16, y16, s.owner.FaceDirection(), contractsbody.ShootDirectionStraight, 0)
+	s.stepUsed = s.weapon.StepIndex()
 }
 
 // OnFinish is a no-op (weapon cooldown is self-managed).
@@ -94,4 +101,14 @@ func TryMeleeFromFalling(w meleeWeaponIface, meleePressed bool) (actors.ActorSta
 		return 0, false
 	}
 	return StateMeleeAttack, true
+}
+
+// ResetComboOnInterrupt resets the combo chain when dash or jump is pressed during the combo window.
+func ResetComboOnInterrupt(w interface {
+	ComboWindowRemaining() int
+	ResetCombo()
+}, dashPressed, jumpPressed bool) {
+	if (dashPressed || jumpPressed) && w.ComboWindowRemaining() > 0 {
+		w.ResetCombo()
+	}
 }
