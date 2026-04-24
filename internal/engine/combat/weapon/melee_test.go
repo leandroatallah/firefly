@@ -114,24 +114,62 @@ func (s *fakeSpace) Query(rect image.Rectangle) []body.Collidable {
 }
 
 // ---------------------------------------------------------------------------
-// §4 RED-1 tests
+// Helpers for US-041 combo-aware weapon construction.
 // ---------------------------------------------------------------------------
 
-// newTestMeleeWeapon constructs a MeleeWeapon directly (bypasses the factory)
-// so that hitbox frame tests can run without JSON plumbing.
+// newTestMeleeWeapon constructs a single-step MeleeWeapon (US-040 parity).
 // damage=1, activeFrames=[3,5], cooldown=20, hitbox 24x16 offset (12,0).
 func newTestMeleeWeapon(owner interface{}) *weapon.MeleeWeapon {
-	w := weapon.NewMeleeWeapon(
-		"player_melee",
-		1,            // damage
-		20,           // cooldownFrames
-		[2]int{3, 5}, // activeFrames
-		24*16, 16*16, // hitbox W/H in fp16
-		12*16, 0, // hitbox offset in fp16
-	)
+	steps := []weapon.ComboStep{{
+		Damage:          1,
+		ActiveFrames:    [2]int{3, 5},
+		HitboxW16:       24 * 16,
+		HitboxH16:       16 * 16,
+		HitboxOffsetX16: 12 * 16,
+		HitboxOffsetY16: 0,
+	}}
+	w := weapon.NewMeleeWeapon("player_melee", 20, 0 /*comboWindowFrames*/, steps)
 	w.SetOwner(owner)
 	return w
 }
+
+// newThreeStepComboWeapon builds a 3-step weapon used by the combo tests.
+// Cooldown is 0 so step-to-step transitions aren't gated by cooldown.
+// Damage progression: 1, 1, 2 matches the AC6 example.
+// Hitbox width also varies per step so the per-step-hitbox test has a
+// distinguishing property to observe.
+// All steps share ActiveFrames [3,5] so runSwingToCompletion can use a fixed
+// advance count (lastTestStepActiveFrame = 5).
+func newThreeStepComboWeapon(owner interface{}) *weapon.MeleeWeapon {
+	steps := []weapon.ComboStep{
+		{Damage: 1, ActiveFrames: [2]int{3, 5}, HitboxW16: 24 * 16, HitboxH16: 16 * 16, HitboxOffsetX16: 12 * 16, HitboxOffsetY16: 0},
+		{Damage: 1, ActiveFrames: [2]int{3, 5}, HitboxW16: 28 * 16, HitboxH16: 16 * 16, HitboxOffsetX16: 14 * 16, HitboxOffsetY16: -4 * 16},
+		{Damage: 2, ActiveFrames: [2]int{3, 5}, HitboxW16: 32 * 16, HitboxH16: 20 * 16, HitboxOffsetX16: 16 * 16, HitboxOffsetY16: 0},
+	}
+	w := weapon.NewMeleeWeapon("player_melee", 0 /*cooldown*/, 15 /*comboWindowFrames*/, steps)
+	w.SetOwner(owner)
+	return w
+}
+
+// lastTestStepActiveFrame is the shared ActiveFrames[1] for all steps in
+// newThreeStepComboWeapon. runSwingToCompletion advances past this frame.
+const lastTestStepActiveFrame = 5
+
+// runSwingToCompletion fires and advances the weapon past the current step's
+// active window (ActiveFrames[1] == lastTestStepActiveFrame for all test steps).
+func runSwingToCompletion(w *weapon.MeleeWeapon, owner *meleeOwner) {
+	w.Fire(owner.x16, owner.y16, owner.face, body.ShootDirectionStraight, 0)
+	// Advance swingFrame from 0 to lastTestStepActiveFrame+1 (inclusive) so
+	// swinging goes false and Update() opens the combo window (or resets after
+	// the last step).
+	for i := 0; i <= lastTestStepActiveFrame+1; i++ {
+		w.Update()
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Single-step (US-040) parity tests — now driven by ComboStep[0].
+// ---------------------------------------------------------------------------
 
 func TestMeleeWeapon_Fire_HitboxActivation(t *testing.T) {
 	tests := []struct {
@@ -174,8 +212,6 @@ func TestMeleeWeapon_ApplyHitbox_FactionGating(t *testing.T) {
 	owner := newMeleeOwner(100, 100, combat.FactionPlayer, animation.FaceDirectionRight)
 	w := newTestMeleeWeapon(owner)
 
-	// Hitbox at frame 3 extends from owner origin + offset (12*16 fp16 = 12px) with
-	// size 24x16. Place overlapping ally/enemy at x≈110, and far enemy at x=400.
 	enemy := newMeleeTarget("enemy", 110, 100, 8, 8, combat.FactionEnemy)
 	ally := newMeleeTarget("ally", 110, 100, 8, 8, combat.FactionPlayer)
 	farEnemy := newMeleeTarget("far_enemy", 400, 100, 8, 8, combat.FactionEnemy)
@@ -186,7 +222,6 @@ func TestMeleeWeapon_ApplyHitbox_FactionGating(t *testing.T) {
 	space.AddBody(farEnemy)
 
 	w.Fire(owner.x16, owner.y16, owner.face, body.ShootDirectionStraight, 0)
-	// Advance to first active frame (swingFrame == 3).
 	for i := 0; i < 3; i++ {
 		w.Update()
 	}
@@ -215,7 +250,6 @@ func TestMeleeWeapon_ApplyHitbox_SingleHitPerSwing(t *testing.T) {
 	space.AddBody(enemy)
 
 	w.Fire(owner.x16, owner.y16, owner.face, body.ShootDirectionStraight, 0)
-	// Advance to frame 3 and apply hitbox across the full active window (frames 3..5).
 	for i := 0; i < 3; i++ {
 		w.Update()
 	}
@@ -263,9 +297,6 @@ func TestMeleeWeapon_Fire_MirrorsHitboxWhenFacingLeft(t *testing.T) {
 	owner := newMeleeOwner(100, 100, combat.FactionPlayer, animation.FaceDirectionLeft)
 	w := newTestMeleeWeapon(owner)
 
-	// Target on the LEFT of the owner. If offset is correctly mirrored, the
-	// query rect will include (88, 100); if NOT mirrored, a same-position target
-	// on the RIGHT (x=110) would be hit but the left target would not.
 	leftTarget := newMeleeTarget("left", 88, 100, 8, 8, combat.FactionEnemy)
 	rightTarget := newMeleeTarget("right", 118, 100, 8, 8, combat.FactionEnemy)
 
@@ -286,10 +317,228 @@ func TestMeleeWeapon_Fire_MirrorsHitboxWhenFacingLeft(t *testing.T) {
 		t.Errorf("right target TakeDamage: got %v, want no calls", rightTarget.damageCalls)
 	}
 
-	// Cross-check: the recorded query rect must be to the LEFT of the owner
-	// origin (centerX ≈ 100), not the right.
 	ownerCenterX := 100
 	if space.lastQuery.Max.X > ownerCenterX+4 {
 		t.Errorf("query rect %+v extends to the right of owner origin (x=%d); expected mirrored to the left", space.lastQuery, ownerCenterX)
+	}
+}
+
+// ---------------------------------------------------------------------------
+// §4 RED-1 — Combo chain behaviour
+// ---------------------------------------------------------------------------
+
+// AC1 — Pressing Z within combo_window_frames after a hit advances to the
+// next step; state machine advances step 0 → 1 → 2, and the last step wraps
+// back to 0 (AC4).
+func TestMeleeWeapon_Combo_AdvancesWhenPressedWithinWindow(t *testing.T) {
+	owner := newMeleeOwner(100, 100, combat.FactionPlayer, animation.FaceDirectionRight)
+	w := newThreeStepComboWeapon(owner)
+
+	if w.StepIndex() != 0 {
+		t.Fatalf("initial StepIndex() = %d, want 0", w.StepIndex())
+	}
+
+	// Step 1 swing.
+	runSwingToCompletion(w, owner)
+	if w.ComboWindowRemaining() <= 0 {
+		t.Fatalf("after step 1 completes, ComboWindowRemaining() = %d, want > 0", w.ComboWindowRemaining())
+	}
+	if w.StepIndex() != 0 {
+		t.Errorf("before AdvanceCombo, StepIndex() = %d, want 0 (advance happens on the press, not on swing end)", w.StepIndex())
+	}
+
+	// Press Z within the window → advance to step 2.
+	if !w.AdvanceCombo() {
+		t.Fatalf("AdvanceCombo() returned false within window; want true")
+	}
+	if w.StepIndex() != 1 {
+		t.Errorf("after AdvanceCombo, StepIndex() = %d, want 1", w.StepIndex())
+	}
+
+	// Step 2 swing.
+	runSwingToCompletion(w, owner)
+	if !w.AdvanceCombo() {
+		t.Fatalf("AdvanceCombo() to step 3 returned false; want true")
+	}
+	if w.StepIndex() != 2 {
+		t.Errorf("after second AdvanceCombo, StepIndex() = %d, want 2", w.StepIndex())
+	}
+
+	// Step 3 swing → AC4: chain resets automatically, no fourth swing possible.
+	runSwingToCompletion(w, owner)
+	if w.StepIndex() != 0 {
+		t.Errorf("after last step swing completes, StepIndex() = %d, want 0 (AC4 last-step wrap)", w.StepIndex())
+	}
+	if w.ComboWindowRemaining() != 0 {
+		t.Errorf("after last step, ComboWindowRemaining() = %d, want 0 (no window after wrap)", w.ComboWindowRemaining())
+	}
+}
+
+// AC3 bullet 1 — If the player does not press Z within combo_window_frames,
+// the chain resets to step 1 (index 0).
+func TestMeleeWeapon_Combo_ResetsOnWindowExpiry(t *testing.T) {
+	owner := newMeleeOwner(100, 100, combat.FactionPlayer, animation.FaceDirectionRight)
+	w := newThreeStepComboWeapon(owner)
+
+	runSwingToCompletion(w, owner)
+	if w.ComboWindowRemaining() <= 0 {
+		t.Fatalf("precondition: combo window must be open; got %d", w.ComboWindowRemaining())
+	}
+	// Advance past the window without any AdvanceCombo call.
+	for i := 0; i < 15; /*comboWindowFrames*/ i++ {
+		w.Update()
+	}
+
+	if w.StepIndex() != 0 {
+		t.Errorf("after window expiry, StepIndex() = %d, want 0", w.StepIndex())
+	}
+	if w.ComboWindowRemaining() != 0 {
+		t.Errorf("after window expiry, ComboWindowRemaining() = %d, want 0", w.ComboWindowRemaining())
+	}
+	if w.AdvanceCombo() {
+		t.Errorf("AdvanceCombo() returned true after window expired; want false")
+	}
+}
+
+// AC3 — Explicit reset API (used by ClimberPlayer.Hurt and by dash/jump interrupts).
+func TestMeleeWeapon_Combo_ResetsOnDemand(t *testing.T) {
+	owner := newMeleeOwner(100, 100, combat.FactionPlayer, animation.FaceDirectionRight)
+	w := newThreeStepComboWeapon(owner)
+
+	runSwingToCompletion(w, owner)
+	if !w.AdvanceCombo() {
+		t.Fatalf("precondition: AdvanceCombo should succeed while window open")
+	}
+	if w.StepIndex() != 1 {
+		t.Fatalf("precondition: StepIndex should be 1 before reset, got %d", w.StepIndex())
+	}
+
+	w.ResetCombo()
+
+	if w.StepIndex() != 0 {
+		t.Errorf("after ResetCombo, StepIndex() = %d, want 0", w.StepIndex())
+	}
+	if w.ComboWindowRemaining() != 0 {
+		t.Errorf("after ResetCombo, ComboWindowRemaining() = %d, want 0", w.ComboWindowRemaining())
+	}
+}
+
+// AC2 — Each combo step uses its own hitbox dimensions and damage value.
+func TestMeleeWeapon_Combo_PerStepDamageAndHitbox(t *testing.T) {
+	owner := newMeleeOwner(100, 100, combat.FactionPlayer, animation.FaceDirectionRight)
+	w := newThreeStepComboWeapon(owner)
+
+	// Enemy placed to overlap all three step hitboxes (the closest one —
+	// right in front of the owner — is reachable from each step's forward
+	// hitbox). A fresh enemy per step keeps single-hit-per-swing honest.
+	type stepExpect struct {
+		damage int
+	}
+	expects := []stepExpect{{1}, {1}, {2}}
+
+	for stepIdx, exp := range expects {
+		if w.StepIndex() != stepIdx {
+			t.Fatalf("step %d: precondition StepIndex() = %d, want %d", stepIdx, w.StepIndex(), stepIdx)
+		}
+
+		enemy := newMeleeTarget("enemy", 110, 100, 8, 8, combat.FactionEnemy)
+		space := &fakeSpace{}
+		space.AddBody(enemy)
+
+		w.Fire(owner.x16, owner.y16, owner.face, body.ShootDirectionStraight, 0)
+		// Advance to the first active frame of this step (ActiveFrames[0]=3 for all steps).
+		for i := 0; i < 3; i++ {
+			w.Update()
+		}
+		if !w.IsHitboxActive() {
+			t.Fatalf("step %d: expected hitbox active at frame 3", stepIdx)
+		}
+		w.ApplyHitbox(space)
+
+		if len(enemy.damageCalls) != 1 {
+			t.Errorf("step %d: TakeDamage called %d times, want 1", stepIdx, len(enemy.damageCalls))
+			continue
+		}
+		if enemy.damageCalls[0] != exp.damage {
+			t.Errorf("step %d: TakeDamage value = %d, want %d", stepIdx, enemy.damageCalls[0], exp.damage)
+		}
+
+		// Hitbox width grows per step (24 → 28 → 32). Verify the query rect width
+		// reflects the active step's dimensions.
+		wantWidth := []int{24, 28, 32}[stepIdx]
+		if space.lastQuery.Dx() != wantWidth {
+			t.Errorf("step %d: query rect width = %d, want %d (step-specific hitbox)", stepIdx, space.lastQuery.Dx(), wantWidth)
+		}
+
+		// Finish the swing and, for steps 0/1, advance to the next step.
+		for i := 3; i <= lastTestStepActiveFrame+1; i++ {
+			w.Update()
+		}
+		if stepIdx < 2 {
+			if !w.AdvanceCombo() {
+				t.Fatalf("step %d: AdvanceCombo() returned false; want true", stepIdx)
+			}
+		}
+	}
+}
+
+// AC4 — After the 3rd hit, the chain always resets without any external call.
+func TestMeleeWeapon_Combo_LastStepAlwaysResets(t *testing.T) {
+	owner := newMeleeOwner(100, 100, combat.FactionPlayer, animation.FaceDirectionRight)
+	w := newThreeStepComboWeapon(owner)
+
+	// Step 1
+	runSwingToCompletion(w, owner)
+	if !w.AdvanceCombo() {
+		t.Fatalf("step 1→2 AdvanceCombo failed")
+	}
+	// Step 2
+	runSwingToCompletion(w, owner)
+	if !w.AdvanceCombo() {
+		t.Fatalf("step 2→3 AdvanceCombo failed")
+	}
+	// Step 3
+	runSwingToCompletion(w, owner)
+
+	if w.StepIndex() != 0 {
+		t.Errorf("after final step swing, StepIndex() = %d, want 0 (auto-reset)", w.StepIndex())
+	}
+	if w.ComboWindowRemaining() != 0 {
+		t.Errorf("after final step swing, ComboWindowRemaining() = %d, want 0", w.ComboWindowRemaining())
+	}
+	// AdvanceCombo from a fresh (reset) state with no open window must fail.
+	if w.AdvanceCombo() {
+		t.Errorf("AdvanceCombo after auto-reset returned true; want false (no open window)")
+	}
+}
+
+// AdvanceCombo is a no-op when no window is open (press outside the window
+// should start step 0 on the next Fire, not jump ahead).
+func TestMeleeWeapon_Combo_AdvanceCombo_NoopWhenWindowClosed(t *testing.T) {
+	owner := newMeleeOwner(100, 100, combat.FactionPlayer, animation.FaceDirectionRight)
+	w := newThreeStepComboWeapon(owner)
+
+	if w.AdvanceCombo() {
+		t.Errorf("AdvanceCombo on fresh weapon returned true; want false (no window open)")
+	}
+	if w.StepIndex() != 0 {
+		t.Errorf("after no-op AdvanceCombo, StepIndex() = %d, want 0", w.StepIndex())
+	}
+}
+
+// Steps() getter exposes the configured combo steps for tests / introspection.
+func TestMeleeWeapon_Steps_ReturnsConfiguredSlice(t *testing.T) {
+	owner := newMeleeOwner(100, 100, combat.FactionPlayer, animation.FaceDirectionRight)
+	w := newThreeStepComboWeapon(owner)
+
+	got := w.Steps()
+	if len(got) != 3 {
+		t.Fatalf("Steps() len = %d, want 3", len(got))
+	}
+	if got[0].Damage != 1 || got[2].Damage != 2 {
+		t.Errorf("Steps() damage = [%d,%d,%d], want [1,1,2]", got[0].Damage, got[1].Damage, got[2].Damage)
+	}
+	if got[1].HitboxOffsetY16 != -4*16 {
+		t.Errorf("Steps()[1].HitboxOffsetY16 = %d, want %d", got[1].HitboxOffsetY16, -4*16)
 	}
 }

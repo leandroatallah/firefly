@@ -52,41 +52,53 @@ func parseProjectileWeapon(data []byte, manager combat.ProjectileManager) (comba
 
 func parseMeleeWeapon(data []byte) (*MeleeWeapon, error) {
 	var config struct {
-		ID             string `json:"id"`
-		Damage         int    `json:"damage"`
-		CooldownFrames int    `json:"cooldown_frames"`
-		ActiveFrames   [2]int `json:"active_frames"`
-		Hitbox         *struct {
-			Width   int `json:"width"`
-			Height  int `json:"height"`
-			OffsetX int `json:"offset_x"`
-			OffsetY int `json:"offset_y"`
-		} `json:"hitbox"`
+		ID                string `json:"id"`
+		CooldownFrames    int    `json:"cooldown_frames"`
+		ComboWindowFrames int    `json:"combo_window_frames"`
+		ComboSteps        []struct {
+			Damage       int    `json:"damage"`
+			ActiveFrames [2]int `json:"active_frames"`
+			Hitbox       *struct {
+				Width   int `json:"width"`
+				Height  int `json:"height"`
+				OffsetX int `json:"offset_x"`
+				OffsetY int `json:"offset_y"`
+			} `json:"hitbox"`
+		} `json:"combo_steps"`
 	}
 	if err := json.Unmarshal(data, &config); err != nil {
 		return nil, err
 	}
-	if config.Hitbox == nil {
-		return nil, fmt.Errorf("hitbox is required for melee weapons")
+	if len(config.ComboSteps) < 1 || len(config.ComboSteps) > 3 {
+		return nil, fmt.Errorf("combo_steps must contain 1..3 entries")
 	}
-	if config.ActiveFrames[0] < 0 || config.ActiveFrames[1] < config.ActiveFrames[0] {
-		return nil, fmt.Errorf("invalid active_frames")
-	}
-	if config.Hitbox.Width <= 0 || config.Hitbox.Height <= 0 {
-		return nil, fmt.Errorf("invalid hitbox dimensions")
+	if config.ComboWindowFrames < 0 {
+		return nil, fmt.Errorf("invalid combo_window_frames")
 	}
 	if config.CooldownFrames < 0 {
 		return nil, fmt.Errorf("invalid cooldown_frames")
 	}
-	w := NewMeleeWeapon(
-		config.ID,
-		config.Damage,
-		config.CooldownFrames,
-		config.ActiveFrames,
-		fp16.To16(config.Hitbox.Width),
-		fp16.To16(config.Hitbox.Height),
-		fp16.To16(config.Hitbox.OffsetX),
-		fp16.To16(config.Hitbox.OffsetY),
-	)
-	return w, nil
+
+	steps := make([]ComboStep, len(config.ComboSteps))
+	for i, cs := range config.ComboSteps {
+		if cs.Hitbox == nil {
+			return nil, fmt.Errorf("hitbox is required for melee combo step %d", i)
+		}
+		if cs.ActiveFrames[0] < 0 || cs.ActiveFrames[1] < cs.ActiveFrames[0] {
+			return nil, fmt.Errorf("invalid active_frames for combo step %d", i)
+		}
+		if cs.Hitbox.Width <= 0 || cs.Hitbox.Height <= 0 {
+			return nil, fmt.Errorf("invalid hitbox dimensions for combo step %d", i)
+		}
+		steps[i] = ComboStep{
+			Damage:          cs.Damage,
+			ActiveFrames:    cs.ActiveFrames,
+			HitboxW16:       fp16.To16(cs.Hitbox.Width),
+			HitboxH16:       fp16.To16(cs.Hitbox.Height),
+			HitboxOffsetX16: fp16.To16(cs.Hitbox.OffsetX),
+			HitboxOffsetY16: fp16.To16(cs.Hitbox.OffsetY),
+		}
+	}
+
+	return NewMeleeWeapon(config.ID, config.CooldownFrames, config.ComboWindowFrames, steps), nil
 }
