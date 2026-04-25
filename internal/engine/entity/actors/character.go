@@ -42,6 +42,11 @@ type Character struct {
 	skills            []skill.Skill      // active gameplay skills (jump, dash, …)
 	stateContributors []StateContributor // optional per-frame state overrides
 
+	// perActorInstances allows a pre-built ActorState instance to be returned for
+	// a specific enum when NewState is called, bypassing the global factory.
+	// Use SetStateInstance to register an instance.
+	perActorInstances map[ActorStateEnum]ActorState
+
 	// StateTransitionHandler, when non-nil, is called before the default handleState
 	// logic. Return true to suppress the default transitions.
 	StateTransitionHandler func(*Character) bool
@@ -142,12 +147,34 @@ func (c *Character) GetCharacter() *Character {
 	return c
 }
 
+// SetStateInstance registers a pre-built ActorState for a specific enum on this
+// character. Subsequent calls to NewState or SetNewState with the same enum will
+// return this instance instead of calling the global factory constructor.
+func (c *Character) SetStateInstance(enum ActorStateEnum, instance ActorState) {
+	if c.perActorInstances == nil {
+		c.perActorInstances = make(map[ActorStateEnum]ActorState)
+	}
+	c.perActorInstances[enum] = instance
+}
+
+// StateInstance returns the per-actor instance registered for the given enum,
+// or nil if none has been registered.
+func (c *Character) StateInstance(enum ActorStateEnum) ActorState {
+	if c.perActorInstances == nil {
+		return nil
+	}
+	return c.perActorInstances[enum]
+}
+
 func (c *Character) NewState(state ActorStateEnum) (ActorState, error) {
+	if inst, ok := c.perActorInstances[state]; ok {
+		return inst, nil
+	}
 	return NewState(c, state)
 }
 
 func (c *Character) SetNewState(state ActorStateEnum) error {
-	s, err := NewState(c, state)
+	s, err := c.NewState(state)
 	if err != nil {
 		return err
 	}
@@ -156,7 +183,7 @@ func (c *Character) SetNewState(state ActorStateEnum) error {
 }
 
 func (c *Character) SetNewStateFatal(state ActorStateEnum) {
-	s, err := NewState(c, state)
+	s, err := c.NewState(state)
 	if err != nil {
 		log.Fatalf("Failed to create new state %v: %v", s, err)
 	}
