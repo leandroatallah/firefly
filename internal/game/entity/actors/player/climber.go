@@ -24,6 +24,12 @@ func climberStateTransitionLogic(c *actors.Character) bool {
 		return true
 	}
 
+	for _, s := range gamestates.MeleeAttackStepStates(3) {
+		if state == s {
+			return !c.IsAnimationFinished()
+		}
+	}
+
 	return false
 }
 
@@ -35,6 +41,8 @@ type ClimberPlayer struct {
 	melee         *weapon.MeleeWeapon
 	meleeVFX      vfx.Manager
 	meleeHeldPrev bool
+	meleeBuffered bool
+	meleeAnimWait int
 
 	*gameplayermethods.PlayerDeathBehavior
 }
@@ -76,23 +84,43 @@ func NewClimberPlayer(ctx *app.AppContext) (platformer.PlatformerActorEntity, er
 
 func (p *ClimberPlayer) Update(space body.BodiesSpace) error {
 	cmds := input.CommandsReader()
+	isGrounded := !p.IsFalling() && !p.IsGoingUp()
 
 	if p.melee != nil {
 		p.melee.Update()
 
+		if p.meleeAnimWait > 0 {
+			p.meleeAnimWait--
+		}
+
 		if (cmds.Dash || cmds.Jump) && p.melee.ComboWindowRemaining() > 0 {
 			p.melee.ResetCombo()
+			p.meleeBuffered = false
+			p.meleeAnimWait = 0
 		}
 
 		meleePressed := cmds.Melee && !p.meleeHeldPrev
-		if meleePressed && p.melee.CanFire() && !p.IsDucking() {
-			if p.melee.ComboWindowRemaining() > 0 {
+		if meleePressed && isGrounded && (p.melee.IsSwinging() || p.meleeAnimWait > 0) {
+			p.meleeBuffered = true
+		}
+
+		canAct := p.melee.CanFire() && !p.melee.IsSwinging() && p.meleeAnimWait == 0 && !p.IsDucking()
+		wantFire := canAct && (meleePressed || (isGrounded && p.meleeBuffered && p.melee.ComboWindowRemaining() > 0))
+		if wantFire {
+			if isGrounded && p.melee.ComboWindowRemaining() > 0 {
 				p.melee.AdvanceCombo()
 			}
 			x16, y16 := p.GetPosition16()
 			p.melee.Fire(x16, y16, p.FaceDirection(), body.ShootDirectionStraight, 0)
 			p.spawnMeleeVFX(x16, y16)
+			p.meleeBuffered = false
+			p.meleeAnimWait = p.meleeStepAnimDuration(p.melee.StepIndex())
 		}
+
+		if !p.melee.IsSwinging() && p.melee.ComboWindowRemaining() == 0 && p.meleeAnimWait == 0 {
+			p.meleeBuffered = false
+		}
+
 		if p.melee.IsHitboxActive() {
 			p.melee.ApplyHitbox(space)
 		}
@@ -103,12 +131,14 @@ func (p *ClimberPlayer) Update(space body.BodiesSpace) error {
 	duckHeld := cmds.Down
 	p.SetDucking(duckHeld && !p.IsFalling() && !p.IsGoingUp())
 
-	// When ducking, prevent horizontal movement but allow facing direction change
-	if p.IsDucking() {
+	isMeleeActive := p.melee != nil && (p.melee.IsSwinging() || p.meleeAnimWait > 0) && !p.IsFalling() && !p.IsGoingUp()
+	isGroundedShooting := isGrounded && (p.State() == actors.IdleShooting || p.State() == actors.WalkingShooting)
+
+	// When ducking, mid-melee, or shooting on ground: lock horizontal movement but allow facing change
+	if p.IsDucking() || isMeleeActive || isGroundedShooting {
 		p.SetSpeed(0)
 		p.SetHorizontalInertia(0)
 
-		// Allow facing direction change while ducking
 		if cmds.Left {
 			p.SetFaceDirection(animation.FaceDirectionLeft)
 		} else if cmds.Right {
@@ -135,6 +165,8 @@ func (p *ClimberPlayer) GetSpriteData() *schemas.SpriteData {
 func (p *ClimberPlayer) Hurt(_ int) {
 	if p.melee != nil {
 		p.melee.ResetCombo()
+		p.meleeBuffered = false
+		p.meleeAnimWait = 0
 	}
 
 	if p.State() == gamestates.Dying || p.State() == gamestates.Dead {
@@ -168,7 +200,36 @@ func (p *ClimberPlayer) SetMelee(w *weapon.MeleeWeapon, vfxMgr vfx.Manager) {
 	p.meleeVFX = vfxMgr
 	if w != nil {
 		w.SetOwner(p)
+		stepStates := gamestates.MeleeAttackStepStates(len(w.Steps()))
+		p.AddStateContributor(&meleeContributor{w: w, stepStates: stepStates})
 	}
+}
+
+// meleeStepAnimDuration returns the total game-frames for the sprite animation
+// of the given combo step, derived from the sprite sheet width and frame rate.
+func (p *ClimberPlayer) meleeStepAnimDuration(stepIdx int) int {
+	if p.melee == nil {
+		return 0
+	}
+	stepStates := gamestates.MeleeAttackStepStates(len(p.melee.Steps()))
+	if stepIdx < 0 || stepIdx >= len(stepStates) {
+		return 0
+	}
+	char := p.GetCharacter()
+	sprite := char.GetSpriteByState(stepStates[stepIdx])
+	if sprite == nil || sprite.Image == nil {
+		return 0
+	}
+	rect := char.Position()
+	if rect.Dx() == 0 {
+		return 0
+	}
+	frameCount := sprite.Image.Bounds().Dx() / rect.Dx()
+	frameRate := char.FrameRate()
+	if frameRate == 0 {
+		frameRate = 1
+	}
+	return frameCount * frameRate
 }
 
 func (p *ClimberPlayer) spawnMeleeVFX(x16, y16 int) {

@@ -1,6 +1,8 @@
 package gamestates
 
 import (
+	"fmt"
+
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/animation"
 	contractsbody "github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/combat"
@@ -16,6 +18,8 @@ func init() {
 	StateMeleeAttack = actors.RegisterState("melee_attack", func(b actors.BaseState) actors.ActorState {
 		return &actors.IdleState{BaseState: b}
 	})
+	// Pre-register per-step states so the sprite builder can resolve them at startup.
+	MeleeAttackStepStates(3)
 }
 
 // meleeWeaponIface captures the MeleeWeapon surface needed by MeleeAttackState.
@@ -111,4 +115,22 @@ func ResetComboOnInterrupt(w interface {
 	if (dashPressed || jumpPressed) && w.ComboWindowRemaining() > 0 {
 		w.ResetCombo()
 	}
+}
+
+// MeleeAttackStepStates returns a slice of n state enums for per-step melee attack states,
+// registered under the name pattern "melee_attack_step_<i>". Repeated calls with the same
+// n return the same enum values (idempotent via GetStateEnum).
+func MeleeAttackStepStates(n int) []actors.ActorStateEnum {
+	out := make([]actors.ActorStateEnum, n)
+	for i := range out {
+		name := fmt.Sprintf("melee_attack_step_%d", i)
+		if s, ok := actors.GetStateEnum(name); ok {
+			out[i] = s
+		} else {
+			out[i] = actors.RegisterState(name, func(b actors.BaseState) actors.ActorState {
+				return &actors.IdleState{BaseState: b}
+			})
+		}
+	}
+	return out
 }

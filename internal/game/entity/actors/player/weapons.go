@@ -54,11 +54,13 @@ func NewClimberInventory(projectileManager combat.ProjectileManager, vfxManager 
 // NewPlayerMeleeWeapon creates the player's melee weapon with a 3-step combo chain.
 func NewPlayerMeleeWeapon() *weapon.MeleeWeapon {
 	steps := []weapon.ComboStep{
-		{Damage: 1, ActiveFrames: [2]int{4, 10}, HitboxW16: fp16.To16(24), HitboxH16: fp16.To16(16), HitboxOffsetX16: fp16.To16(12), HitboxOffsetY16: fp16.To16(0)},
-		{Damage: 1, ActiveFrames: [2]int{3, 8}, HitboxW16: fp16.To16(28), HitboxH16: fp16.To16(16), HitboxOffsetX16: fp16.To16(14), HitboxOffsetY16: fp16.To16(-4)},
-		{Damage: 2, ActiveFrames: [2]int{5, 12}, HitboxW16: fp16.To16(32), HitboxH16: fp16.To16(20), HitboxOffsetX16: fp16.To16(16), HitboxOffsetY16: fp16.To16(0)},
+		{Damage: 1, StartupFrames: 2, ActiveFrames: [2]int{4, 10}, HitboxW16: fp16.To16(24), HitboxH16: fp16.To16(16), HitboxOffsetX16: fp16.To16(12), HitboxOffsetY16: fp16.To16(0)},
+		{Damage: 1, StartupFrames: 2, ActiveFrames: [2]int{3, 8}, HitboxW16: fp16.To16(28), HitboxH16: fp16.To16(16), HitboxOffsetX16: fp16.To16(14), HitboxOffsetY16: fp16.To16(-4)},
+		{Damage: 2, StartupFrames: 2, ActiveFrames: [2]int{5, 12}, HitboxW16: fp16.To16(32), HitboxH16: fp16.To16(20), HitboxOffsetX16: fp16.To16(16), HitboxOffsetY16: fp16.To16(0)},
 	}
-	return weapon.NewMeleeWeapon("player_melee", 20, 15, steps)
+	w := weapon.NewMeleeWeapon("player_melee", 8, 30, steps)
+	w.SetPostComboCooldownFrames(45)
+	return w
 }
 
 // NewHeavyCannonWeapon creates the heavy_cannon weapon.
