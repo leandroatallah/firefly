@@ -32,6 +32,7 @@ func parseProjectileWeapon(data []byte, manager combat.ProjectileManager) (comba
 	var config struct {
 		ID               string `json:"id"`
 		CooldownFrames   int    `json:"cooldown_frames"`
+		StartupFrames    int    `json:"startup_frames"`
 		MuzzleEffectType string `json:"muzzle_effect_type"`
 		Projectile       *struct {
 			Type   string `json:"type"`
@@ -47,6 +48,9 @@ func parseProjectileWeapon(data []byte, manager combat.ProjectileManager) (comba
 	}
 	w := NewProjectileWeapon(config.ID, config.CooldownFrames, config.Projectile.Type, config.Projectile.Speed, manager, config.MuzzleEffectType, 0, 0)
 	w.SetDamage(config.Projectile.Damage)
+	if config.StartupFrames > 0 {
+		w.SetStartupFrames(config.StartupFrames)
+	}
 	return w, nil
 }
 
@@ -56,9 +60,10 @@ func parseMeleeWeapon(data []byte) (*MeleeWeapon, error) {
 		CooldownFrames    int    `json:"cooldown_frames"`
 		ComboWindowFrames int    `json:"combo_window_frames"`
 		ComboSteps        []struct {
-			Damage       int    `json:"damage"`
-			ActiveFrames [2]int `json:"active_frames"`
-			Hitbox       *struct {
+			Damage        int    `json:"damage"`
+			StartupFrames int    `json:"startup_frames"`
+			ActiveFrames  [2]int `json:"active_frames"`
+			Hitbox        *struct {
 				Width   int `json:"width"`
 				Height  int `json:"height"`
 				OffsetX int `json:"offset_x"`
@@ -92,6 +97,7 @@ func parseMeleeWeapon(data []byte) (*MeleeWeapon, error) {
 		}
 		steps[i] = ComboStep{
 			Damage:          cs.Damage,
+			StartupFrames:   cs.StartupFrames,
 			ActiveFrames:    cs.ActiveFrames,
 			HitboxW16:       fp16.To16(cs.Hitbox.Width),
 			HitboxH16:       fp16.To16(cs.Hitbox.Height),

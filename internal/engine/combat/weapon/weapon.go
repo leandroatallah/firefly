@@ -5,6 +5,7 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/combat"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/vfx"
+	"github.com/boilerplate/ebiten-template/internal/engine/utils"
 )
 
 // ProjectileWeapon is a weapon that spawns projectiles.
@@ -12,6 +13,8 @@ type ProjectileWeapon struct {
 	id               string
 	cooldownFrames   int
 	currentCooldown  int
+	startupFrames    int
+	startup          utils.DelayTrigger
 	projectileType   string
 	projectileSpeed  int
 	manager          combat.ProjectileManager
@@ -22,6 +25,12 @@ type ProjectileWeapon struct {
 	spawnOffsetY16   int
 	stateOffsets     map[int][2]int
 	damage           int
+
+	// pending fire params stored during startup
+	pendingX16, pendingY16 int
+	pendingFaceDir         animation.FacingDirectionEnum
+	pendingDirection       body.ShootDirection
+	pendingState           int
 }
 
 // NewProjectileWeapon creates a new projectile weapon.
@@ -61,13 +70,30 @@ func (w *ProjectileWeapon) SetVFXManager(manager vfx.Manager) {
 	w.vfxManager = manager
 }
 
+// SetStartupFrames sets the number of frames to wait before spawning the projectile.
+func (w *ProjectileWeapon) SetStartupFrames(frames int) { w.startupFrames = frames }
+
 // ID returns the weapon's unique identifier.
 func (w *ProjectileWeapon) ID() string {
 	return w.id
 }
 
 // Fire spawns a projectile if the weapon can fire.
+// If startup_frames > 0, the spawn is deferred until the countdown elapses.
 func (w *ProjectileWeapon) Fire(x16, y16 int, faceDir animation.FacingDirectionEnum, direction body.ShootDirection, state int) {
+	if w.startupFrames > 0 {
+		w.startup.Enable(w.startupFrames)
+		w.pendingX16 = x16
+		w.pendingY16 = y16
+		w.pendingFaceDir = faceDir
+		w.pendingDirection = direction
+		w.pendingState = state
+		return
+	}
+	w.doFire(x16, y16, faceDir, direction, state)
+}
+
+func (w *ProjectileWeapon) doFire(x16, y16 int, faceDir animation.FacingDirectionEnum, direction body.ShootDirection, state int) {
 	offsetX16 := w.spawnOffsetX16
 	offsetY16 := w.spawnOffsetY16
 
@@ -85,7 +111,6 @@ func (w *ProjectileWeapon) Fire(x16, y16 int, faceDir animation.FacingDirectionE
 	spawnX16 := x16 + offsetX16
 	spawnY16 := y16 + offsetY16
 
-	// Spawn muzzle flash VFX
 	if w.vfxManager != nil && w.muzzleEffectType != "" {
 		x := float64(spawnX16) / 16.0
 		y := float64(spawnY16) / 16.0
@@ -99,11 +124,20 @@ func (w *ProjectileWeapon) Fire(x16, y16 int, faceDir animation.FacingDirectionE
 
 // CanFire returns true if the weapon is ready to fire.
 func (w *ProjectileWeapon) CanFire() bool {
-	return w.currentCooldown == 0
+	return w.currentCooldown == 0 && !w.startup.IsEnabled()
 }
 
-// Update decrements the cooldown timer.
+// Update decrements the startup and cooldown timers.
 func (w *ProjectileWeapon) Update() {
+	w.startup.Update()
+	if w.startup.Trigger() {
+		w.startup.Reset()
+		w.doFire(w.pendingX16, w.pendingY16, w.pendingFaceDir, w.pendingDirection, w.pendingState)
+		return
+	}
+	if w.startup.IsEnabled() {
+		return
+	}
 	if w.currentCooldown > 0 {
 		w.currentCooldown--
 	}
