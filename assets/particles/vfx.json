@@ -44,7 +44,7 @@
     "image": "assets/images/melee-slash-24.png",
     "frame_width": 24,
     "frame_height": 24,
-    "frame_rate": 3,
+    "frame_rate": 6,
     "scale": 1
   }
 ]
