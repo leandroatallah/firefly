@@ -61,14 +61,16 @@ func (e *meleeEnemy) ApplyValidPosition(int, bool, body.BodiesSpace) (int, int, 
 	return e.pos.Min.X, e.pos.Min.Y, false
 }
 
-// owningMockBody wraps mockBody and adds a Faction() getter so the MeleeWeapon
-// can gate same-faction targets when used as an owner.
+// owningMockBody wraps mockBody and adds Faction() + IsDucking() so it
+// satisfies the meleeOwnerIface used by MeleeAttackState (after US-042).
 type owningMockBody struct {
 	*mockBody
 	faction combat.Faction
+	ducking bool
 }
 
 func (o *owningMockBody) Faction() combat.Faction { return o.faction }
+func (o *owningMockBody) IsDucking() bool         { return o.ducking }
 
 func newPlayerOwner(xPx, yPx int, face animation.FacingDirectionEnum) *owningMockBody { //nolint:unparam
 	b := &mockBody{
@@ -79,13 +81,29 @@ func newPlayerOwner(xPx, yPx int, face animation.FacingDirectionEnum) *owningMoc
 	return &owningMockBody{mockBody: b, faction: combat.FactionPlayer}
 }
 
+// vfxSpy records SpawnDirectionalPuff invocations. It satisfies the package-local
+// meleeVFXSpawner interface introduced by US-042 SPEC §3.2.
+type vfxSpy struct {
+	calls []vfxSpyCall
+}
+
+type vfxSpyCall struct {
+	typeKey   string
+	x, y      float64
+	faceRight bool
+	count     int
+	randRange float64
+}
+
+func (v *vfxSpy) SpawnDirectionalPuff(typeKey string, x, y float64, faceRight bool, count int, randRange float64) {
+	v.calls = append(v.calls, vfxSpyCall{typeKey, x, y, faceRight, count, randRange})
+}
+
 // ---------------------------------------------------------------------------
-// §4 RED-3 helpers and tests
+// Test helpers — weapon factories.
 // ---------------------------------------------------------------------------
 
 // newTestMeleeWeaponForState builds a single-step combo-capable weapon.
-// Matches the pre-US-041 defaults (damage=1, active=[3,5], cooldown=20,
-// hitbox 24x16 offset 12,0).
 func newTestMeleeWeaponForState(owner interface{}) *weapon.MeleeWeapon {
 	steps := []weapon.ComboStep{{
 		Damage:          1,
@@ -112,16 +130,255 @@ func newThreeStepStateMeleeWeapon(owner interface{}) *weapon.MeleeWeapon {
 	return w
 }
 
+// ---------------------------------------------------------------------------
+// US-042 RED-1: OnStart fires the weapon (no caller-side w.Fire).
+// ---------------------------------------------------------------------------
+
+func TestMeleeAttackState_OnStart_FiresWeapon(t *testing.T) {
+	owner := newPlayerOwner(100, 100, animation.FaceDirectionRight)
+	sp := &mockSpace{}
+	w := newTestMeleeWeaponForState(owner)
+
+	if w.IsSwinging() {
+		t.Fatalf("precondition: weapon must not be swinging before OnStart")
+	}
+
+	st := gamestates.NewMeleeAttackState(owner, sp, w, nil /*vfx*/)
+	st.SetAnimationFrames(8)
+	st.OnStart(0)
+
+	if !w.IsSwinging() {
+		t.Errorf("after OnStart: weapon.IsSwinging() = false, want true (state must own Fire)")
+	}
+}
+
+// ---------------------------------------------------------------------------
+// US-042 RED-2: OnStart spawns VFX with correct facing offset.
+// ---------------------------------------------------------------------------
+
+func TestMeleeAttackState_OnStart_SpawnsVFX(t *testing.T) {
+	tests := []struct {
+		name          string
+		face          animation.FacingDirectionEnum
+		wantFaceRight bool
+		wantOffsetPx  int
+	}{
+		{name: "facing right spawns VFX +12px", face: animation.FaceDirectionRight, wantFaceRight: true, wantOffsetPx: 12},
+		{name: "facing left spawns VFX -12px", face: animation.FaceDirectionLeft, wantFaceRight: false, wantOffsetPx: -12},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			owner := newPlayerOwner(100, 50, tc.face)
+			// owner GetPosition16 returns (0, 0) per mockBody default; use known x16/y16.
+			owner.pos = image.Rect(100, 50, 116, 74)
+			sp := &mockSpace{}
+			w := newTestMeleeWeaponForState(owner)
+			spy := &vfxSpy{}
+
+			st := gamestates.NewMeleeAttackState(owner, sp, w, spy)
+			st.SetAnimationFrames(8)
+			st.OnStart(0)
+
+			if len(spy.calls) != 1 {
+				t.Fatalf("SpawnDirectionalPuff calls = %d, want 1", len(spy.calls))
+			}
+			c := spy.calls[0]
+			if c.typeKey != "melee_slash" {
+				t.Errorf("typeKey = %q, want %q", c.typeKey, "melee_slash")
+			}
+			if c.faceRight != tc.wantFaceRight {
+				t.Errorf("faceRight = %v, want %v", c.faceRight, tc.wantFaceRight)
+			}
+
+			// Owner mockBody.GetPosition16 returns (0, 0), so px/py reflect only the offset.
+			// fp16.From16(0 + 12*16) = 12, fp16.From16(-12*16) = -12, fp16.From16(0) = 0.
+			wantX := float64(tc.wantOffsetPx)
+			wantY := 0.0
+			if c.x != wantX {
+				t.Errorf("x = %v, want %v", c.x, wantX)
+			}
+			if c.y != wantY {
+				t.Errorf("y = %v, want %v", c.y, wantY)
+			}
+		})
+	}
+}
+
+// Nil VFX must not panic.
+func TestMeleeAttackState_OnStart_NilVFX_NoPanic(t *testing.T) {
+	owner := newPlayerOwner(100, 100, animation.FaceDirectionRight)
+	sp := &mockSpace{}
+	w := newTestMeleeWeaponForState(owner)
+
+	st := gamestates.NewMeleeAttackState(owner, sp, w, nil)
+	st.SetAnimationFrames(8)
+
+	defer func() {
+		if r := recover(); r != nil {
+			t.Errorf("OnStart with nil vfx panicked: %v", r)
+		}
+	}()
+	st.OnStart(0)
+}
+
+// ---------------------------------------------------------------------------
+// US-042 RED-3: OnStart aborts when owner is ducking.
+// ---------------------------------------------------------------------------
+
+func TestMeleeAttackState_OnStart_DuckingAborts(t *testing.T) {
+	owner := newPlayerOwner(100, 100, animation.FaceDirectionRight)
+	owner.ducking = true
+	sp := &mockSpace{}
+	w := newTestMeleeWeaponForState(owner)
+	spy := &vfxSpy{}
+
+	st := gamestates.NewMeleeAttackState(owner, sp, w, spy)
+	st.SetAnimationFrames(8)
+	st.OnStart(0)
+
+	if w.IsSwinging() {
+		t.Errorf("ducking abort: weapon.IsSwinging() = true, want false (Fire must not be called)")
+	}
+	if len(spy.calls) != 0 {
+		t.Errorf("ducking abort: VFX spawn calls = %d, want 0", len(spy.calls))
+	}
+
+	// Next Update must resolve immediately to returnTo (StateGrounded for grounded owner).
+	got := st.Update()
+	if got != gamestates.StateGrounded {
+		t.Errorf("ducking abort: next Update() = %v, want StateGrounded (immediate resolve)", got)
+	}
+}
+
+// ---------------------------------------------------------------------------
+// US-042 RED-4: returnTo computed dynamically from grounded state.
+// ---------------------------------------------------------------------------
+
+func TestMeleeAttackState_DynamicReturnTo(t *testing.T) {
+	tests := []struct {
+		name     string
+		grounded bool
+		want     actors.ActorStateEnum
+	}{
+		{name: "grounded owner returns to StateGrounded", grounded: true, want: gamestates.StateGrounded},
+		{name: "airborne owner returns to actors.Falling", grounded: false, want: actors.Falling},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			owner := newPlayerOwner(100, 100, animation.FaceDirectionRight)
+			owner.grounded = tc.grounded
+			sp := &mockSpace{}
+			w := newTestMeleeWeaponForState(owner)
+
+			const animFrames = 6
+			st := gamestates.NewMeleeAttackState(owner, sp, w, nil /*vfx*/)
+			st.SetAnimationFrames(animFrames)
+			st.OnStart(0)
+
+			var got actors.ActorStateEnum
+			for i := 0; i < animFrames; i++ {
+				got = st.Update()
+			}
+			if got != tc.want {
+				t.Errorf("final Update() = %v, want %v", got, tc.want)
+			}
+		})
+	}
+}
+
+// ---------------------------------------------------------------------------
+// US-042 RED-6: Hitbox is applied during the active window (the state owns Fire).
+// ---------------------------------------------------------------------------
+
+func TestMeleeAttackState_Update_AppliesHitboxDuringActiveWindow(t *testing.T) {
+	owner := newPlayerOwner(100, 100, animation.FaceDirectionRight)
+	enemy := newMeleeEnemy("enemy", image.Rect(110, 100, 118, 108), combat.FactionEnemy)
+
+	sp := &mockSpace{queryResult: []body.Collidable{enemy}}
+	w := newTestMeleeWeaponForState(owner)
+
+	const animFrames = 10
+	st := gamestates.NewMeleeAttackState(owner, sp, w, nil /*vfx*/)
+	st.SetAnimationFrames(animFrames)
+	st.OnStart(0) // OnStart now owns Fire — no caller-side w.Fire.
+
+	for i := 0; i < animFrames; i++ {
+		st.Update()
+	}
+
+	if len(enemy.damageCalls) != 1 {
+		t.Errorf("TakeDamage called %d times over full swing, want exactly 1", len(enemy.damageCalls))
+	}
+}
+
+// ---------------------------------------------------------------------------
+// US-042 RED-7: Step capture order — OnStart captures StepIndex BEFORE Fire.
+// ---------------------------------------------------------------------------
+
+func TestMeleeAttackState_UsesCurrentComboStep(t *testing.T) {
+	owner := newPlayerOwner(100, 100, animation.FaceDirectionRight)
+	sp := &mockSpace{}
+	w := newThreeStepStateMeleeWeapon(owner)
+
+	// Step 0 — state OnStart fires.
+	st0 := gamestates.NewMeleeAttackState(owner, sp, w, nil)
+	st0.SetAnimationFrames(8)
+	st0.OnStart(0)
+	if got := st0.StepUsed(); got != 0 {
+		t.Errorf("step 0: StepUsed() = %d, want 0", got)
+	}
+
+	// Drive the swing to completion via state Update so hitbox+window logic settles,
+	// matching how production will run after the refactor.
+	for i := 0; i < 8; i++ {
+		st0.Update()
+	}
+	// Open the next window if not already (weapon.Update inside state advances frames).
+	for w.IsSwinging() {
+		w.Update()
+	}
+	if !w.AdvanceCombo() {
+		t.Fatalf("AdvanceCombo step 0→1 returned false; window must be open")
+	}
+
+	st1 := gamestates.NewMeleeAttackState(owner, sp, w, nil)
+	st1.SetAnimationFrames(8)
+	st1.OnStart(0)
+	if got := st1.StepUsed(); got != 1 {
+		t.Errorf("step 1: StepUsed() = %d, want 1", got)
+	}
+
+	for i := 0; i < 8; i++ {
+		st1.Update()
+	}
+	for w.IsSwinging() {
+		w.Update()
+	}
+	if !w.AdvanceCombo() {
+		t.Fatalf("AdvanceCombo step 1→2 returned false; window must be open")
+	}
+
+	st2 := gamestates.NewMeleeAttackState(owner, sp, w, nil)
+	st2.SetAnimationFrames(8)
+	st2.OnStart(0)
+	if got := st2.StepUsed(); got != 2 {
+		t.Errorf("step 2: StepUsed() = %d, want 2", got)
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Existing regression tests (signature updated to drop static returnTo).
+// ---------------------------------------------------------------------------
+
 func TestMeleeAttackState_ReturnsToGrounded_WhenAnimationFinishes(t *testing.T) {
 	owner := newPlayerOwner(100, 100, animation.FaceDirectionRight)
 	sp := &mockSpace{}
 	w := newTestMeleeWeaponForState(owner)
 
-	// US-041: ClimberPlayer owns Fire. Tests must fire explicitly before OnStart.
-	w.Fire(owner.pos.Min.X*16, owner.pos.Min.Y*16, owner.faceDir, body.ShootDirectionStraight, 0)
-
 	const animFrames = 8
-	st := gamestates.NewMeleeAttackState(owner, sp, w, gamestates.StateGrounded)
+	st := gamestates.NewMeleeAttackState(owner, sp, w, nil)
 	st.SetAnimationFrames(animFrames)
 	st.OnStart(0)
 
@@ -141,10 +398,8 @@ func TestMeleeAttackState_AirMelee_ReturnsToFalling(t *testing.T) {
 	sp := &mockSpace{}
 	w := newTestMeleeWeaponForState(owner)
 
-	w.Fire(owner.pos.Min.X*16, owner.pos.Min.Y*16, owner.faceDir, body.ShootDirectionStraight, 0)
-
 	const animFrames = 6
-	st := gamestates.NewMeleeAttackState(owner, sp, w, actors.Falling)
+	st := gamestates.NewMeleeAttackState(owner, sp, w, nil)
 	st.SetAnimationFrames(animFrames)
 	st.OnStart(0)
 
@@ -153,33 +408,7 @@ func TestMeleeAttackState_AirMelee_ReturnsToFalling(t *testing.T) {
 		got = st.Update()
 	}
 	if got != actors.Falling {
-		t.Errorf("air-melee final Update() = %v, want actors.Falling (not StateGrounded)", got)
-	}
-}
-
-// US-041: OnStart no longer calls Fire — the climber owns that call.
-// The state's job is to drive the hitbox while the weapon swings.
-func TestMeleeAttackState_Update_AppliesHitboxDuringActiveWindow(t *testing.T) {
-	owner := newPlayerOwner(100, 100, animation.FaceDirectionRight)
-	enemy := newMeleeEnemy("enemy", image.Rect(110, 100, 118, 108), combat.FactionEnemy)
-
-	sp := &mockSpace{queryResult: []body.Collidable{enemy}}
-	w := newTestMeleeWeaponForState(owner)
-
-	// Fire explicitly before entering the state (per SPEC §1.4).
-	w.Fire(owner.pos.Min.X*16, owner.pos.Min.Y*16, owner.faceDir, body.ShootDirectionStraight, 0)
-
-	const animFrames = 10
-	st := gamestates.NewMeleeAttackState(owner, sp, w, gamestates.StateGrounded)
-	st.SetAnimationFrames(animFrames)
-	st.OnStart(0)
-
-	for i := 0; i < animFrames; i++ {
-		st.Update()
-	}
-
-	if len(enemy.damageCalls) != 1 {
-		t.Errorf("TakeDamage called %d times over full swing, want exactly 1 (single-hit per swing)", len(enemy.damageCalls))
+		t.Errorf("air-melee final Update() = %v, want actors.Falling", got)
 	}
 }
 
@@ -227,56 +456,8 @@ func TestMeleeTrigger_BlockedDuringCooldown(t *testing.T) {
 	}
 }
 
-// AC5 — The state captures the step index at OnStart so the animation layer
-// can pick MeleeAttack1 / MeleeAttack2 / MeleeAttack3.
-func TestMeleeAttackState_UsesCurrentComboStep(t *testing.T) {
-	owner := newPlayerOwner(100, 100, animation.FaceDirectionRight)
-	sp := &mockSpace{}
-	w := newThreeStepStateMeleeWeapon(owner)
-
-	// Step 0.
-	w.Fire(owner.pos.Min.X*16, owner.pos.Min.Y*16, owner.faceDir, body.ShootDirectionStraight, 0)
-	st0 := gamestates.NewMeleeAttackState(owner, sp, w, gamestates.StateGrounded)
-	st0.SetAnimationFrames(8)
-	st0.OnStart(0)
-	if got := st0.StepUsed(); got != 0 {
-		t.Errorf("step 0: StepUsed() = %d, want 0", got)
-	}
-
-	// Finish swing so combo window opens, then advance to step 1.
-	for i := 0; i <= 5+1; i++ {
-		w.Update()
-	}
-	if !w.AdvanceCombo() {
-		t.Fatalf("AdvanceCombo step 0→1 returned false; want true")
-	}
-	w.Fire(owner.pos.Min.X*16, owner.pos.Min.Y*16, owner.faceDir, body.ShootDirectionStraight, 0)
-	st1 := gamestates.NewMeleeAttackState(owner, sp, w, gamestates.StateGrounded)
-	st1.SetAnimationFrames(8)
-	st1.OnStart(0)
-	if got := st1.StepUsed(); got != 1 {
-		t.Errorf("step 1: StepUsed() = %d, want 1", got)
-	}
-
-	// Advance to step 2.
-	for i := 0; i <= 5+1; i++ {
-		w.Update()
-	}
-	if !w.AdvanceCombo() {
-		t.Fatalf("AdvanceCombo step 1→2 returned false; want true")
-	}
-	w.Fire(owner.pos.Min.X*16, owner.pos.Min.Y*16, owner.faceDir, body.ShootDirectionStraight, 0)
-	st2 := gamestates.NewMeleeAttackState(owner, sp, w, gamestates.StateGrounded)
-	st2.SetAnimationFrames(8)
-	st2.OnStart(0)
-	if got := st2.StepUsed(); got != 2 {
-		t.Errorf("step 2: StepUsed() = %d, want 2", got)
-	}
-}
-
 // AC3 bullet 3 — Pressing Dash or Jump while the combo window is open resets
-// the combo. Verified via the shared helper used by ClimberPlayer.Update to
-// keep the unit test independent of the full climber harness.
+// the combo. Verified via the shared helper used by ClimberPlayer.Update.
 func TestResetComboOnInterrupt_ResetsWhenDashOrJumpPressedDuringWindow(t *testing.T) {
 	owner := newPlayerOwner(100, 100, animation.FaceDirectionRight)
 
@@ -300,11 +481,9 @@ func TestResetComboOnInterrupt_ResetsWhenDashOrJumpPressedDuringWindow(t *testin
 			for i := 0; i <= 5+1; i++ {
 				w.Update()
 			}
-			// Advance to step 1 so we have something to reset from.
 			if !w.AdvanceCombo() {
 				t.Fatalf("precondition: AdvanceCombo failed; window not open?")
 			}
-			// Reopen the window by running step 1's swing to completion.
 			w.Fire(owner.pos.Min.X*16, owner.pos.Min.Y*16, owner.faceDir, body.ShootDirectionStraight, 0)
 			for i := 0; i <= 5+1; i++ {
 				w.Update()

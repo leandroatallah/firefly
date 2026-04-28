@@ -9,6 +9,7 @@ This module contains the core, reusable game engine components. It is designed t
   - `inventory/`: Manages weapon collections and ammo.
   - `weapon/`: Logic for firing and cooldowns; includes `EnemyShooting` for automatic enemy fire and `ProjectileWeapon` with per-state spawn offsets and muzzle-flash VFX.
   - `projectile/`: High-performance projectile management with lifetime, damage, and impact/despawn VFX hooks.
+  - `melee/`: Per-actor melee swing state (`Controller` + `State`): input buffering, combo advancement, hitbox application, VFX, and dynamic return-state selection.
   - `faction.go`: `FactionNeutral | FactionPlayer | FactionEnemy` — side identification used to prevent self-damage.
 - `contracts/`: Defines the Go interfaces (contracts) for key engine components like animations, bodies, configuration, context, navigation, sequences, tilemap layers, and visual effects (vfx). This promotes a decoupled architecture.
 - `data/`: Handles data loading, management, and configuration schemas (e.g., from JSON files).
@@ -88,3 +89,4 @@ Key non-obvious design choices are documented in [`docs/adr/`](../../docs/adr/):
 - [ADR-006](../../docs/adr/ADR-006-engine-game-layer-separation.md) — Engine/Game two-layer architecture
 - [ADR-007](../../docs/adr/ADR-007-fp16-scale-factor.md) — FP16 scale factor is 16, not 65536
 - [ADR-008](../../docs/adr/ADR-008-state-contributor-pattern.md) — StateContributor hook for extensible state transitions
+- [ADR-009](../../docs/adr/ADR-009-per-actor-state-instance-override.md) — Per-actor state instance override for states requiring complex injection or shared identity across enums

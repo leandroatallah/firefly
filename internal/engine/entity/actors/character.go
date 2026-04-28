@@ -42,6 +42,12 @@ type Character struct {
 	skills            []skill.Skill      // active gameplay skills (jump, dash, …)
 	stateContributors []StateContributor // optional per-frame state overrides
 
+	// perActorInstances holds stateful ActorState instances that must be reused
+	// across frames (e.g. states that carry per-actor fields like a weapon ref or
+	// frame counter). NewState returns the registered instance instead of calling
+	// the global stateless factory. Register via SetStateInstance.
+	perActorInstances map[ActorStateEnum]ActorState
+
 	// StateTransitionHandler, when non-nil, is called before the default handleState
 	// logic. Return true to suppress the default transitions.
 	StateTransitionHandler func(*Character) bool
@@ -142,45 +148,79 @@ func (c *Character) GetCharacter() *Character {
 	return c
 }
 
+// SetStateInstance registers a pre-built ActorState for a specific enum on this
+// character. Subsequent calls to NewState or SetNewState with the same enum will
+// return this instance instead of calling the global factory constructor.
+func (c *Character) SetStateInstance(enum ActorStateEnum, instance ActorState) {
+	if c.perActorInstances == nil {
+		c.perActorInstances = make(map[ActorStateEnum]ActorState)
+	}
+	c.perActorInstances[enum] = instance
+}
+
+// StateInstance returns the per-actor instance registered for the given enum,
+// or nil if none has been registered.
+func (c *Character) StateInstance(enum ActorStateEnum) ActorState {
+	if c.perActorInstances == nil {
+		return nil
+	}
+	return c.perActorInstances[enum]
+}
+
 func (c *Character) NewState(state ActorStateEnum) (ActorState, error) {
+	if inst, ok := c.perActorInstances[state]; ok {
+		return inst, nil
+	}
 	return NewState(c, state)
 }
 
 func (c *Character) SetNewState(state ActorStateEnum) error {
-	s, err := NewState(c, state)
+	if c.state != nil && c.state.State() == state {
+		return nil
+	}
+	s, err := c.NewState(state)
 	if err != nil {
 		return err
 	}
-	c.SetState(s)
+	c.applyState(s)
 	return nil
 }
 
 func (c *Character) SetNewStateFatal(state ActorStateEnum) {
-	s, err := NewState(c, state)
+	if c.state != nil && c.state.State() == state {
+		return
+	}
+	s, err := c.NewState(state)
 	if err != nil {
 		log.Fatalf("Failed to create new state %v: %v", s, err)
 	}
-	c.SetState(s)
+	c.applyState(s)
 }
 
 // SetState set a new Character state and update current collision shapes.
 func (c *Character) SetState(state ActorState) {
 	if c.state == nil || c.state.State() != state.State() {
-		var oldState ActorStateEnum
-		if c.state != nil {
-			c.state.OnFinish()
-			oldState = c.state.State()
-		} else {
-			oldState = -1 // Unknown/First state
-		}
+		c.applyState(state)
+	}
+}
 
-		c.state = state
-		c.state.OnStart(c.count)
-		c.RefreshCollisions()
+// applyState performs the unconditional state transition: calls OnFinish on the
+// previous state, installs the new state, calls OnStart, and refreshes collisions.
+func (c *Character) applyState(state ActorState) {
+	var oldState ActorStateEnum
+	if c.state != nil {
+		c.state.OnFinish()
+		oldState = c.state.State()
+	} else {
+		oldState = -1 // Unknown/First state
+	}
 
-		if c.OnStateChange != nil {
-			c.OnStateChange(oldState, c.state.State())
-		}
+	c.state = state
+	c.state.OnStart(c.count)
+	c.RefreshCollisions()
+
+	if c.OnStateChange != nil {
+		c.OnStateChange(oldState, c.state.State())
 	}
 }
 
@@ -232,7 +272,6 @@ func (c *Character) Update(space body.BodiesSpace) error {
 	c.UpdateMovement(space)
 
 	c.handleState()
-
 	return nil
 }
 
@@ -447,6 +486,7 @@ func (c *Character) Image() *ebiten.Image {
 	// AnimatedSpriteImage only cares about rect dimensions for sub-image extraction.
 	frameRect := image.Rect(0, 0, frameWidth, frameHeight)
 	stateDurationCount := c.state.GetAnimationCount(c.count)
+
 	return c.AnimatedSpriteImage(sprite, frameRect, stateDurationCount, c.FrameRate())
 }
 
