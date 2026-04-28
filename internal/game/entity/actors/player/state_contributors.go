@@ -81,31 +81,3 @@ func WireStateContributors(char characterWithSkills, mov movementChecker) {
 		}
 	}
 }
-
-// meleeActiveIface is the surface of MeleeWeapon needed by meleeContributor.
-type meleeActiveIface interface {
-	IsSwinging() bool
-	IsInStartup() bool
-	StepIndex() int
-}
-
-type meleeContributor struct {
-	w          meleeActiveIface
-	stepStates []actors.ActorStateEnum
-}
-
-func (m *meleeContributor) ContributeState(_ actors.ActorStateEnum) (actors.ActorStateEnum, bool) {
-	if !m.w.IsSwinging() && !m.w.IsInStartup() {
-		return 0, false
-	}
-	step := m.w.StepIndex()
-	if step >= 0 && step < len(m.stepStates) {
-		return m.stepStates[step], true
-	}
-	return 0, false
-}
-
-// NewMeleeContributorForTest is exported for white-box tests only.
-func NewMeleeContributorForTest(w meleeActiveIface, stepStates []actors.ActorStateEnum) actors.StateContributor {
-	return &meleeContributor{w: w, stepStates: stepStates}
-}

@@ -2,6 +2,7 @@ package gameplayer
 
 import (
 	"github.com/boilerplate/ebiten-template/internal/engine/app"
+	meleeengine "github.com/boilerplate/ebiten-template/internal/engine/combat/melee"
 	"github.com/boilerplate/ebiten-template/internal/engine/combat/weapon"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/animation"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
@@ -21,14 +22,10 @@ type ClimberPlayer struct {
 	spriteData *schemas.SpriteData
 	inventory  interface{}
 
-	// melee is kept as a separate field (not in inventory) because MeleeWeapon
-	// exposes hitbox lifecycle methods (IsHitboxActive, ApplyHitbox) not present
-	// on the combat.Weapon interface.
-	melee         *weapon.MeleeWeapon
-	meleeState    *gamestates.MeleeAttackState // installed per-actor instance
-	meleeHeldPrev bool
-	meleeBuffered bool
-	meleeAnimWait int
+	// melee is kept as a separate field (not in inventory) because Controller
+	// bundles weapon lifecycle, hitbox activation, input buffering, and combo
+	// state — none of which are present on the combat.Weapon interface.
+	melee *meleeengine.Controller
 
 	*gameplayermethods.PlayerDeathBehavior
 }
@@ -48,9 +45,6 @@ func NewClimberPlayer(ctx *app.AppContext) (platformer.PlatformerActorEntity, er
 	// Ensure the original character pointer (referenced by physics bodies) also points to the player
 	character.SetOwner(player)
 
-	// Install state transition handler as a method closure so it has access to the player.
-	character.SetStateTransitionHandler(player.handleStateTransition)
-
 	if err = builder.ConfigureCharacter(player, spriteData, statData, stateMap, "player"); err != nil {
 		return nil, err
 	}
@@ -69,82 +63,24 @@ func NewClimberPlayer(ctx *app.AppContext) (platformer.PlatformerActorEntity, er
 	return player, nil
 }
 
-// handleStateTransition is the per-player StateTransitionHandler. It drives
-// custom states (MeleeAttack step animations, melee state Update) and blocks
-// default transitions when appropriate.
-func (p *ClimberPlayer) handleStateTransition(c *actors.Character) bool {
-	state := c.State()
-
-	if state == gamestates.Exiting || state == gamestates.Dying || state == gamestates.Dead {
-		return true
-	}
-
-	// Drive melee attack state update: weapon tick, hitbox, frame counter.
-	if state == gamestates.StateMeleeAttack {
-		if p.meleeState != nil {
-			next := p.meleeState.Update()
-			if next != gamestates.StateMeleeAttack {
-				c.SetNewStateFatal(next)
-				// Do not suppress default transitions after exiting MeleeAttackState:
-				// return false so stateContributors can re-route to a per-step state if needed.
-				return false
-			}
-			return true
-		}
-	}
-
-	for _, s := range gamestates.MeleeAttackStepStates(3) {
-		if state == s {
-			return !c.IsAnimationFinished()
-		}
-	}
-
-	return false
-}
-
 func (p *ClimberPlayer) Update(space body.BodiesSpace) error {
 	cmds := input.CommandsReader()
 	isGrounded := !p.IsFalling() && !p.IsGoingUp()
 
 	if p.melee != nil {
-		// Propagate the current space so MeleeAttackState.Update can call ApplyHitbox.
-		if p.meleeState != nil {
-			p.meleeState.SetSpace(space)
-		}
+		p.melee.SetSpace(space)
+		p.melee.Tick(p.GetCharacter())
 
-		if p.meleeAnimWait > 0 {
-			p.meleeAnimWait--
+		if p.melee.HandleInput(cmds.Melee, cmds.Dash, cmds.Jump, isGrounded, p.IsDucking()) {
+			p.melee.EnterAttackState(p.GetCharacter())
 		}
-
-		if (cmds.Dash || cmds.Jump) && p.melee.ComboWindowRemaining() > 0 {
-			p.melee.ResetCombo()
-			p.meleeBuffered = false
-			p.meleeAnimWait = 0
-		}
-
-		meleePressed := cmds.Melee && !p.meleeHeldPrev
-		if meleePressed && isGrounded && (p.melee.IsSwinging() || p.meleeAnimWait > 0) {
-			p.meleeBuffered = true
-		}
-
-		wantFire := p.melee.CanFire() && !p.melee.IsSwinging() && p.meleeAnimWait == 0 && !p.IsDucking() &&
-			(meleePressed || (isGrounded && p.meleeBuffered && p.melee.ComboWindowRemaining() > 0))
-		if wantFire {
-			p.tryEnterMeleeState(isGrounded)
-		}
-
-		if !p.melee.IsSwinging() && p.melee.ComboWindowRemaining() == 0 && p.meleeAnimWait == 0 {
-			p.meleeBuffered = false
-		}
-
-		p.meleeHeldPrev = cmds.Melee
 	}
 
 	// Check for ducking input
 	duckHeld := cmds.Down
 	p.SetDucking(duckHeld && !p.IsFalling() && !p.IsGoingUp())
 
-	isMeleeActive := p.melee != nil && (p.melee.IsSwinging() || p.meleeAnimWait > 0) && !p.IsFalling() && !p.IsGoingUp()
+	isMeleeActive := p.melee != nil && p.melee.IsBlockingMovement() && !p.IsFalling() && !p.IsGoingUp()
 	isGroundedShooting := isGrounded && (p.State() == actors.IdleShooting || p.State() == actors.WalkingShooting)
 
 	// When ducking, mid-melee, or shooting on ground: lock horizontal movement but allow facing change
@@ -167,23 +103,6 @@ func (p *ClimberPlayer) Update(space body.BodiesSpace) error {
 	return p.Character.Update(space)
 }
 
-// tryEnterMeleeState advances the combo (if applicable) and transitions the
-// character into StateMeleeAttack. The state's OnStart owns Fire + VFX.
-func (p *ClimberPlayer) tryEnterMeleeState(isGrounded bool) {
-	if isGrounded && p.melee.ComboWindowRemaining() > 0 {
-		p.melee.AdvanceCombo()
-	}
-	animFrames := p.meleeStepAnimDuration(p.melee.StepIndex())
-	p.meleeBuffered = false
-	p.meleeAnimWait = animFrames
-	if p.meleeState != nil {
-		p.meleeState.SetAnimationFrames(animFrames)
-	}
-	if err := p.SetNewState(gamestates.StateMeleeAttack); err != nil {
-		return
-	}
-}
-
 func (p *ClimberPlayer) GetCharacter() *actors.Character {
 	return p.Character
 }
@@ -194,9 +113,7 @@ func (p *ClimberPlayer) GetSpriteData() *schemas.SpriteData {
 
 func (p *ClimberPlayer) Hurt(_ int) {
 	if p.melee != nil {
-		p.melee.ResetCombo()
-		p.meleeBuffered = false
-		p.meleeAnimWait = 0
+		p.melee.OnInterrupt()
 	}
 
 	if p.State() == gamestates.Dying || p.State() == gamestates.Dead {
@@ -224,18 +141,21 @@ func (p *ClimberPlayer) Inventory() interface{} {
 
 // SetMelee wires the player's melee weapon and VFX manager. The owner is set
 // on the weapon so the faction gate in ApplyHitbox resolves against
-// Character.Faction(). The MeleeAttackState is installed as a per-actor state
-// instance on the character, making the state the sole owner of the swing lifecycle.
+// Character.Faction(). A MeleeController is installed on the character,
+// making it the sole owner of the swing lifecycle and state machine hooks.
 func (p *ClimberPlayer) SetMelee(w *weapon.MeleeWeapon, vfxMgr vfx.Manager) {
-	p.melee = w
-	if w != nil {
-		w.SetOwner(p)
-		stepStates := gamestates.MeleeAttackStepStates(len(w.Steps()))
-		p.AddStateContributor(&meleeContributor{w: w, stepStates: stepStates})
-
-		// Install the real MeleeAttackState for this actor.
-		p.meleeState = gamestates.InstallMeleeAttackState(p.GetCharacter(), p, w, vfxMgr)
+	if w == nil {
+		return
 	}
+	w.SetOwner(p)
+
+	char := p.GetCharacter()
+	stepStates := gamestates.MeleeAttackStepStates(len(w.Steps()))
+
+	st := meleeengine.InstallState(char, p, w, vfxMgr, gamestates.StateMeleeAttack, gamestates.StateGrounded, actors.Falling, stepStates)
+
+	p.melee = meleeengine.New(w, st, gamestates.StateMeleeAttack, stepStates, p.meleeStepAnimDuration)
+	p.melee.Install(char)
 }
 
 // meleeStepAnimDuration returns the total game-frames for the sprite animation
@@ -244,11 +164,11 @@ func (p *ClimberPlayer) meleeStepAnimDuration(stepIdx int) int {
 	if p.melee == nil {
 		return 0
 	}
-	stepStates := gamestates.MeleeAttackStepStates(len(p.melee.Steps()))
+	char := p.GetCharacter()
+	stepStates := gamestates.MeleeAttackStepStates(p.melee.StepCount())
 	if stepIdx < 0 || stepIdx >= len(stepStates) {
 		return 0
 	}
-	char := p.GetCharacter()
 	sprite := char.GetSpriteByState(stepStates[stepIdx])
 	if sprite == nil || sprite.Image == nil {
 		return 0
