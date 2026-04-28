@@ -23,6 +23,22 @@ The system is built around three core concepts defined in `internal/engine/contr
 - **[inventory](./inventory)**: Implementation of the weapon collection and ammo tracking.
 - **[weapon](./weapon)**: Common weapon implementations (like `ProjectileWeapon`) and a JSON-based weapon factory.
 - **[projectile](./projectile)**: A high-performance projectile manager that handles the lifecycle of active projectiles.
+- **[melee](./melee)**: `Controller` and `State` for actor-owned melee swings. Install once per actor; drives input buffering, combo advancement, hitbox application, and VFX.
+
+## Melee Combat
+
+The `melee/` subpackage provides two types:
+
+- **`melee.Controller`** — per-actor struct that owns the weapon, attack state, and input bookkeeping.
+  - Install via `Controller.Install(char)`: registers itself as both a `StateContributor` (returns the per-step combo enum while swinging) and the `StateTransitionHandler` (drives `State.Update` and exits to the return state when the animation finishes).
+  - Call `Controller.Tick(char)` each frame to drain cooldown/combo-window frames when the actor is not in a melee state.
+  - Call `Controller.HandleInput(...)` to process melee button state; returns `true` if an attack was entered.
+  - Call `Controller.EnterAttackState(char)` immediately after `HandleInput` returns `true`.
+
+- **`melee.State`** — the `actors.ActorState` node active during a swing.
+  - `OnStart`: fires the weapon, spawns slash VFX, sets `returnTo` dynamically (grounded vs. falling). If the owner is ducking, aborts with no fire/VFX.
+  - `Update`: advances the weapon, applies the hitbox when active, increments the frame counter, returns the active step enum or the return state when animation finishes.
+  - Construct via `InstallState(char, ...)` which registers the same `State` instance for both `meleeAttackEnum` and each step-state enum on the character (see [ADR-009](../../../docs/adr/ADR-009-per-actor-state-instance-override.md)).
 
 ## Core Interfaces
 

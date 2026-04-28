@@ -14,3 +14,5 @@ States are registered into a package-level map via `RegisterState(name, construc
 - The registry is global package-level state (intentional, documented with `//nolint:gochecknoglobals`).
 - State enum values are assigned at runtime in registration order, so they must never be persisted or compared across process restarts.
 - Tests must register states before exercising state transitions; the registry is shared across tests in the same process, so registration order can affect test isolation.
+
+**Note**: For states that need complex constructor arguments unavailable to a registry factory (e.g., a pre-wired weapon reference shared across multiple enums), see [ADR-009](ADR-009-per-actor-state-instance-override.md) — per-actor state instance override.
