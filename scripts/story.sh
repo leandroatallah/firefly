@@ -16,6 +16,7 @@ case "$cmd" in
   new)
     dir="$WORK/backlog/$slug"
     mkdir -p "$dir"
+    touch "$WORK/backlog/.gitkeep"
     cat > "$dir/USER_STORY.md" <<EOF
 # $slug
 
@@ -48,13 +49,17 @@ EOF
     ;;
 
   start)
+    mkdir -p "$WORK/active"
     mv "$WORK/backlog/$slug" "$WORK/active/$slug"
+    touch "$WORK/backlog/.gitkeep"
     sed -i '' 's/📋 Backlog/🔄 Active/' "$WORK/active/$slug/PROGRESS.md"
     echo "🔄 Moved to active: $slug"
     ;;
 
   done)
+    mkdir -p "$WORK/done"
     mv "$WORK/active/$slug" "$WORK/done/$slug"
+    touch "$WORK/active/.gitkeep"
     sed -i '' 's/🔄 Active/✅ Done/' "$WORK/done/$slug/PROGRESS.md"
     echo "✅ Moved to done: $slug"
     ;;
