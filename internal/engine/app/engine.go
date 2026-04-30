@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
+	"github.com/boilerplate/ebiten-template/internal/engine/debug"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
@@ -18,6 +19,7 @@ type Game struct {
 }
 
 func NewGame(ctx *AppContext) *Game {
+	debug.Init("assets/data/debug.json")
 	return &Game{
 		AppContext: ctx,
 	}
