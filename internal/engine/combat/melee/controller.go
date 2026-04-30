@@ -198,6 +198,10 @@ func (c *Controller) StepCount() int {
 	return len(c.weapon.Steps())
 }
 
+// Weapon returns the underlying MeleeWeapon. Used by the Phase Scene to query
+// the active hitbox rect for debug rendering.
+func (c *Controller) Weapon() *weapon.MeleeWeapon { return c.weapon }
+
 // OnInterrupt resets the combo chain. Call when the player takes damage or an
 // action (dash, jump, etc.) interrupts the melee.
 func (c *Controller) OnInterrupt() {

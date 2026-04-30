@@ -164,6 +164,18 @@ func (m *Manager) DrawWithOffset(screen *ebiten.Image, camX, camY float64) {
 	}
 }
 
+// DrawCollisionBoxesWithOffset renders each active projectile's collision box
+// using the given camera-space draw helper. The helper is invoked once per
+// active projectile body.
+func (m *Manager) DrawCollisionBoxesWithOffset(draw func(b body.Collidable)) {
+	if draw == nil {
+		return
+	}
+	for _, p := range m.projectiles {
+		draw(p.body)
+	}
+}
+
 // Clear removes all projectiles and their bodies from the physics space.
 func (m *Manager) Clear() {
 	for _, p := range m.projectiles {

@@ -42,6 +42,11 @@ func (c *Controller) DrawCollisionBox(screen *ebiten.Image, b body.Collidable) {
 	c.base.DrawCollisionBox(screen, b)
 }
 
+// DrawHitboxRect delegates to the base camera controller.
+func (c *Controller) DrawHitboxRect(screen *ebiten.Image, rect image.Rectangle) {
+	c.base.DrawHitboxRect(screen, rect)
+}
+
 // SetFollowTarget sets the follow target.
 func (c *Controller) SetFollowTarget(b body.Body) {
 	c.base.SetFollowTarget(b)
