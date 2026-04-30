@@ -227,6 +227,31 @@ func (c *Controller) DrawCollisionBox(screen *ebiten.Image, b body.Collidable) {
 	}
 }
 
+// DrawHitboxRect renders an orange debug rectangle in world space.
+// Used by the Phase Scene to visualize an active melee hitbox under the
+// --collision-box flag. Caller is responsible for gating on the flag.
+func (c *Controller) DrawHitboxRect(screen *ebiten.Image, rect image.Rectangle) {
+	if rect.Dx() <= 0 || rect.Dy() <= 0 {
+		return
+	}
+
+	// Draw outer rect (dark orange)
+	opts := &ebiten.DrawImageOptions{}
+	opts.GeoM.Scale(float64(rect.Dx()), float64(rect.Dy()))
+	opts.GeoM.Translate(float64(rect.Min.X), float64(rect.Min.Y))
+	opts.ColorScale.Scale(0.66, 0.33, 0, 1)
+	c.Draw(collisionBoxImage, opts, screen)
+
+	// Draw inner rect (orange), only if rect is large enough
+	if rect.Dx() > 2 && rect.Dy() > 2 {
+		opts = &ebiten.DrawImageOptions{}
+		opts.GeoM.Scale(float64(rect.Dx()-2), float64(rect.Dy()-2))
+		opts.GeoM.Translate(float64(rect.Min.X+1), float64(rect.Min.Y+1))
+		opts.ColorScale.Scale(1, 0.5, 0, 1)
+		c.Draw(collisionBoxImage, opts, screen)
+	}
+}
+
 // Useful for debugging
 func (c *Controller) Kamera() *kamera.Camera {
 	return c.cam

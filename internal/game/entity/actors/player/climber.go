@@ -111,6 +111,8 @@ func (p *ClimberPlayer) GetSpriteData() *schemas.SpriteData {
 	return p.spriteData
 }
 
+func (p *ClimberPlayer) MeleeController() *meleeengine.Controller { return p.melee }
+
 func (p *ClimberPlayer) Hurt(_ int) {
 	if p.melee != nil {
 		p.melee.OnInterrupt()

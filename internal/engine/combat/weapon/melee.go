@@ -184,7 +184,7 @@ func (w *MeleeWeapon) ApplyHitbox(space body.BodiesSpace) {
 		return
 	}
 
-	rect := w.hitboxRect()
+	rect := w.HitboxRect()
 	hits := space.Query(rect)
 
 	for _, b := range hits {
@@ -213,8 +213,8 @@ func (w *MeleeWeapon) ApplyHitbox(space body.BodiesSpace) {
 	}
 }
 
-// hitboxRect computes the query rectangle in pixel space for the current step.
-func (w *MeleeWeapon) hitboxRect() image.Rectangle {
+// HitboxRect computes the query rectangle in pixel space for the current step.
+func (w *MeleeWeapon) HitboxRect() image.Rectangle {
 	step := w.steps[w.stepIndex]
 	halfW16 := step.HitboxW16 / 2
 
@@ -230,4 +230,13 @@ func (w *MeleeWeapon) hitboxRect() image.Rectangle {
 	y0 := (w.originY16 + step.HitboxOffsetY16) / 16
 	y1 := y0 + step.HitboxH16/16
 	return image.Rect(x0, y0, x1, y1)
+}
+
+// ActiveHitboxRect returns (rect, true) only while IsHitboxActive() is true,
+// otherwise (zero, false). This is the surface intended for debug rendering.
+func (w *MeleeWeapon) ActiveHitboxRect() (image.Rectangle, bool) {
+	if !w.IsHitboxActive() {
+		return image.Rectangle{}, false
+	}
+	return w.HitboxRect(), true
 }

@@ -32,6 +32,7 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/utils/timing"
 	gameenemies "github.com/boilerplate/ebiten-template/internal/game/entity/actors/enemies"
 	gamenpcs "github.com/boilerplate/ebiten-template/internal/game/entity/actors/npcs"
+	gameplayer "github.com/boilerplate/ebiten-template/internal/game/entity/actors/player"
 	gamestates "github.com/boilerplate/ebiten-template/internal/game/entity/actors/states"
 	gameitems "github.com/boilerplate/ebiten-template/internal/game/entity/items"
 	gameentitytypes "github.com/boilerplate/ebiten-template/internal/game/entity/types"
@@ -500,6 +501,26 @@ func (s *PhasesScene) Draw(screen *ebiten.Image) {
 		camX -= float64(config.Get().ScreenWidth) / 2
 		camY -= float64(config.Get().ScreenHeight) / 2
 		s.AppContext().ProjectileManager.DrawWithOffset(screen, camX, camY)
+	}
+
+	if config.Get().CollisionBox {
+		// AC-1: projectile collision boxes (green/non-obstructive style)
+		if pm := s.AppContext().ProjectileManager; pm != nil {
+			pm.DrawCollisionBoxesWithOffset(func(b body.Collidable) {
+				s.Camera().DrawCollisionBox(screen, b)
+			})
+		}
+
+		// AC-2/AC-3: active melee hitbox (orange), frame-accurate
+		if s.hasPlayer && s.player != nil {
+			if cp, ok := s.player.(*gameplayer.ClimberPlayer); ok {
+				if mc := cp.MeleeController(); mc != nil {
+					if rect, active := mc.Weapon().ActiveHitboxRect(); active {
+						s.Camera().DrawHitboxRect(screen, rect)
+					}
+				}
+			}
+		}
 	}
 
 	if s.ShowDrawScreenFlash > 0 {
