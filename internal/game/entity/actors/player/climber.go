@@ -14,6 +14,7 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/input"
 	gameplayermethods "github.com/boilerplate/ebiten-template/internal/game/entity/actors/methods"
 	gamestates "github.com/boilerplate/ebiten-template/internal/game/entity/actors/states"
+	kitstates "github.com/boilerplate/ebiten-template/internal/kit/states"
 )
 
 type ClimberPlayer struct {
@@ -152,11 +153,11 @@ func (p *ClimberPlayer) SetMelee(w *weapon.MeleeWeapon, vfxMgr vfx.Manager) {
 	w.SetOwner(p)
 
 	char := p.GetCharacter()
-	stepStates := gamestates.MeleeAttackStepStates(len(w.Steps()))
+	stepStates := kitstates.MeleeAttackStepStates(len(w.Steps()))
 
-	st := meleeengine.InstallState(char, p, w, vfxMgr, gamestates.StateMeleeAttack, gamestates.StateGrounded, actors.Falling, stepStates)
+	st := meleeengine.InstallState(char, p, w, vfxMgr, kitstates.StateMeleeAttack, kitstates.StateGrounded, actors.Falling, stepStates)
 
-	p.melee = meleeengine.New(w, st, gamestates.StateMeleeAttack, stepStates, p.meleeStepAnimDuration)
+	p.melee = meleeengine.New(w, st, kitstates.StateMeleeAttack, stepStates, p.meleeStepAnimDuration)
 	p.melee.Install(char)
 }
 
@@ -167,7 +168,7 @@ func (p *ClimberPlayer) meleeStepAnimDuration(stepIdx int) int {
 		return 0
 	}
 	char := p.GetCharacter()
-	stepStates := gamestates.MeleeAttackStepStates(p.melee.StepCount())
+	stepStates := kitstates.MeleeAttackStepStates(p.melee.StepCount())
 	if stepIdx < 0 || stepIdx >= len(stepStates) {
 		return 0
 	}

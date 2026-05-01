@@ -1,4 +1,4 @@
-package gamestates_test
+package kitstates_test
 
 import (
 	"image"
@@ -9,7 +9,7 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/combat"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
-	gamestates "github.com/boilerplate/ebiten-template/internal/game/entity/actors/states"
+	kitstates "github.com/boilerplate/ebiten-template/internal/kit/states"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -143,7 +143,7 @@ func TestMeleeAttackState_OnStart_FiresWeapon(t *testing.T) {
 		t.Fatalf("precondition: weapon must not be swinging before OnStart")
 	}
 
-	st := gamestates.NewMeleeAttackState(owner, sp, w, nil /*vfx*/)
+	st := kitstates.NewMeleeAttackState(owner, sp, w, nil /*vfx*/)
 	st.SetAnimationFrames(8)
 	st.OnStart(0)
 
@@ -176,7 +176,7 @@ func TestMeleeAttackState_OnStart_SpawnsVFX(t *testing.T) {
 			w := newTestMeleeWeaponForState(owner)
 			spy := &vfxSpy{}
 
-			st := gamestates.NewMeleeAttackState(owner, sp, w, spy)
+			st := kitstates.NewMeleeAttackState(owner, sp, w, spy)
 			st.SetAnimationFrames(8)
 			st.OnStart(0)
 
@@ -211,7 +211,7 @@ func TestMeleeAttackState_OnStart_NilVFX_NoPanic(t *testing.T) {
 	sp := &mockSpace{}
 	w := newTestMeleeWeaponForState(owner)
 
-	st := gamestates.NewMeleeAttackState(owner, sp, w, nil)
+	st := kitstates.NewMeleeAttackState(owner, sp, w, nil)
 	st.SetAnimationFrames(8)
 
 	defer func() {
@@ -233,7 +233,7 @@ func TestMeleeAttackState_OnStart_DuckingAborts(t *testing.T) {
 	w := newTestMeleeWeaponForState(owner)
 	spy := &vfxSpy{}
 
-	st := gamestates.NewMeleeAttackState(owner, sp, w, spy)
+	st := kitstates.NewMeleeAttackState(owner, sp, w, spy)
 	st.SetAnimationFrames(8)
 	st.OnStart(0)
 
@@ -246,7 +246,7 @@ func TestMeleeAttackState_OnStart_DuckingAborts(t *testing.T) {
 
 	// Next Update must resolve immediately to returnTo (StateGrounded for grounded owner).
 	got := st.Update()
-	if got != gamestates.StateGrounded {
+	if got != kitstates.StateGrounded {
 		t.Errorf("ducking abort: next Update() = %v, want StateGrounded (immediate resolve)", got)
 	}
 }
@@ -261,7 +261,7 @@ func TestMeleeAttackState_DynamicReturnTo(t *testing.T) {
 		grounded bool
 		want     actors.ActorStateEnum
 	}{
-		{name: "grounded owner returns to StateGrounded", grounded: true, want: gamestates.StateGrounded},
+		{name: "grounded owner returns to StateGrounded", grounded: true, want: kitstates.StateGrounded},
 		{name: "airborne owner returns to actors.Falling", grounded: false, want: actors.Falling},
 	}
 
@@ -273,7 +273,7 @@ func TestMeleeAttackState_DynamicReturnTo(t *testing.T) {
 			w := newTestMeleeWeaponForState(owner)
 
 			const animFrames = 6
-			st := gamestates.NewMeleeAttackState(owner, sp, w, nil /*vfx*/)
+			st := kitstates.NewMeleeAttackState(owner, sp, w, nil /*vfx*/)
 			st.SetAnimationFrames(animFrames)
 			st.OnStart(0)
 
@@ -300,7 +300,7 @@ func TestMeleeAttackState_Update_AppliesHitboxDuringActiveWindow(t *testing.T) {
 	w := newTestMeleeWeaponForState(owner)
 
 	const animFrames = 10
-	st := gamestates.NewMeleeAttackState(owner, sp, w, nil /*vfx*/)
+	st := kitstates.NewMeleeAttackState(owner, sp, w, nil /*vfx*/)
 	st.SetAnimationFrames(animFrames)
 	st.OnStart(0) // OnStart now owns Fire — no caller-side w.Fire.
 
@@ -323,7 +323,7 @@ func TestMeleeAttackState_UsesCurrentComboStep(t *testing.T) {
 	w := newThreeStepStateMeleeWeapon(owner)
 
 	// Step 0 — state OnStart fires.
-	st0 := gamestates.NewMeleeAttackState(owner, sp, w, nil)
+	st0 := kitstates.NewMeleeAttackState(owner, sp, w, nil)
 	st0.SetAnimationFrames(8)
 	st0.OnStart(0)
 	if got := st0.StepUsed(); got != 0 {
@@ -343,7 +343,7 @@ func TestMeleeAttackState_UsesCurrentComboStep(t *testing.T) {
 		t.Fatalf("AdvanceCombo step 0→1 returned false; window must be open")
 	}
 
-	st1 := gamestates.NewMeleeAttackState(owner, sp, w, nil)
+	st1 := kitstates.NewMeleeAttackState(owner, sp, w, nil)
 	st1.SetAnimationFrames(8)
 	st1.OnStart(0)
 	if got := st1.StepUsed(); got != 1 {
@@ -360,7 +360,7 @@ func TestMeleeAttackState_UsesCurrentComboStep(t *testing.T) {
 		t.Fatalf("AdvanceCombo step 1→2 returned false; window must be open")
 	}
 
-	st2 := gamestates.NewMeleeAttackState(owner, sp, w, nil)
+	st2 := kitstates.NewMeleeAttackState(owner, sp, w, nil)
 	st2.SetAnimationFrames(8)
 	st2.OnStart(0)
 	if got := st2.StepUsed(); got != 2 {
@@ -378,16 +378,16 @@ func TestMeleeAttackState_ReturnsToGrounded_WhenAnimationFinishes(t *testing.T) 
 	w := newTestMeleeWeaponForState(owner)
 
 	const animFrames = 8
-	st := gamestates.NewMeleeAttackState(owner, sp, w, nil)
+	st := kitstates.NewMeleeAttackState(owner, sp, w, nil)
 	st.SetAnimationFrames(animFrames)
 	st.OnStart(0)
 
 	for i := 0; i < animFrames-1; i++ {
-		if got := st.Update(); got != gamestates.StateMeleeAttack {
+		if got := st.Update(); got != kitstates.StateMeleeAttack {
 			t.Errorf("tick %d Update() = %v, want StateMeleeAttack", i, got)
 		}
 	}
-	if got := st.Update(); got != gamestates.StateGrounded {
+	if got := st.Update(); got != kitstates.StateGrounded {
 		t.Errorf("final tick Update() = %v, want StateGrounded", got)
 	}
 }
@@ -399,7 +399,7 @@ func TestMeleeAttackState_AirMelee_ReturnsToFalling(t *testing.T) {
 	w := newTestMeleeWeaponForState(owner)
 
 	const animFrames = 6
-	st := gamestates.NewMeleeAttackState(owner, sp, w, nil)
+	st := kitstates.NewMeleeAttackState(owner, sp, w, nil)
 	st.SetAnimationFrames(animFrames)
 	st.OnStart(0)
 
@@ -421,7 +421,7 @@ func TestGroundedState_MeleePressed_TransitionsToMeleeAttack(t *testing.T) {
 
 	next := g.Update()
 
-	if next != gamestates.StateMeleeAttack {
+	if next != kitstates.StateMeleeAttack {
 		t.Errorf("melee pressed: Update() = %v, want StateMeleeAttack", next)
 	}
 }
@@ -436,7 +436,7 @@ func TestGroundedState_DashPressed_TakesPrecedenceOverMelee(t *testing.T) {
 
 	next := g.Update()
 
-	if next != gamestates.StateDashing {
+	if next != kitstates.StateDashing {
 		t.Errorf("dash+melee pressed: Update() = %v, want StateDashing (dash precedence)", next)
 	}
 }
@@ -450,7 +450,7 @@ func TestMeleeTrigger_BlockedDuringCooldown(t *testing.T) {
 		t.Fatalf("precondition: weapon must not be able to fire during cooldown")
 	}
 
-	_, ok := gamestates.TryMeleeFromFalling(w, true /*meleePressed*/)
+	_, ok := kitstates.TryMeleeFromFalling(w, true /*meleePressed*/)
 	if ok {
 		t.Errorf("TryMeleeFromFalling returned ok=true while weapon on cooldown; want false")
 	}
@@ -495,7 +495,7 @@ func TestResetComboOnInterrupt_ResetsWhenDashOrJumpPressedDuringWindow(t *testin
 				t.Fatalf("precondition: StepIndex = %d, want 1", w.StepIndex())
 			}
 
-			gamestates.ResetComboOnInterrupt(w, tc.dashPressed, tc.jumpPressed)
+			kitstates.ResetComboOnInterrupt(w, tc.dashPressed, tc.jumpPressed)
 
 			if tc.wantReset {
 				if w.StepIndex() != 0 {

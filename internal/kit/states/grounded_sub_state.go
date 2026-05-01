@@ -1,4 +1,4 @@
-package gamestates
+package kitstates
 
 // GroundedSubStateEnum identifies the active sub-state inside GroundedState.
 type GroundedSubStateEnum int

@@ -1,11 +1,11 @@
-package gamestates_test
+package kitstates_test
 
 import (
 	"fmt"
 	"testing"
 
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
-	gamestates "github.com/boilerplate/ebiten-template/internal/game/entity/actors/states"
+	kitstates "github.com/boilerplate/ebiten-template/internal/kit/states"
 )
 
 // TestMeleeAttackStepStates_LengthAndNonZero verifies that the helper returns
@@ -23,7 +23,7 @@ func TestMeleeAttackStepStates_LengthAndNonZero(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			got := gamestates.MeleeAttackStepStates(tc.n)
+			got := kitstates.MeleeAttackStepStates(tc.n)
 			if len(got) != tc.n {
 				t.Fatalf("MeleeAttackStepStates(%d) len = %d, want %d", tc.n, len(got), tc.n)
 			}
@@ -40,8 +40,8 @@ func TestMeleeAttackStepStates_LengthAndNonZero(t *testing.T) {
 // repeatedly with the same N returns the same enum values — the underlying
 // state registry must not allocate new enums for already-registered names.
 func TestMeleeAttackStepStates_Idempotent(t *testing.T) {
-	first := gamestates.MeleeAttackStepStates(3)
-	second := gamestates.MeleeAttackStepStates(3)
+	first := kitstates.MeleeAttackStepStates(3)
+	second := kitstates.MeleeAttackStepStates(3)
 
 	if len(first) != len(second) {
 		t.Fatalf("len mismatch: first=%d, second=%d", len(first), len(second))
@@ -58,7 +58,7 @@ func TestMeleeAttackStepStates_Idempotent(t *testing.T) {
 // GetStateEnum resolves to the same enum returned by the helper.
 func TestMeleeAttackStepStates_RegistersNamedPattern(t *testing.T) {
 	const n = 3
-	got := gamestates.MeleeAttackStepStates(n)
+	got := kitstates.MeleeAttackStepStates(n)
 
 	for i := 0; i < n; i++ {
 		name := fmt.Sprintf("melee_attack_step_%d", i)
@@ -77,7 +77,7 @@ func TestMeleeAttackStepStates_RegistersNamedPattern(t *testing.T) {
 // indices map to distinct enum values (so the animation layer can dispatch
 // on step without collisions).
 func TestMeleeAttackStepStates_DistinctPerStep(t *testing.T) {
-	got := gamestates.MeleeAttackStepStates(3)
+	got := kitstates.MeleeAttackStepStates(3)
 	seen := make(map[actors.ActorStateEnum]int)
 	for i, enum := range got {
 		if prev, ok := seen[enum]; ok {

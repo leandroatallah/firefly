@@ -1,4 +1,4 @@
-package gamestates_test
+package kitstates_test
 
 import (
 	"image"
@@ -8,7 +8,7 @@ import (
 	contractsbody "github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/tilemaplayer"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
-	gamestates "github.com/boilerplate/ebiten-template/internal/game/entity/actors/states"
+	kitstates "github.com/boilerplate/ebiten-template/internal/kit/states"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -102,8 +102,8 @@ func (m *mockSpace) SetTilemapDimensionsProvider(_ tilemaplayer.TilemapDimension
 func (m *mockSpace) GetTilemapDimensionsProvider() tilemaplayer.TilemapDimensionsProvider  { return nil }
 func (m *mockSpace) Find(_ string) contractsbody.Collidable                                { return nil }
 
-func defaultCfg() gamestates.DashConfig {
-	return gamestates.DashConfig{
+func defaultCfg() kitstates.DashConfig {
+	return kitstates.DashConfig{
 		Speed:          160,
 		DurationFrames: 18,
 		BlockDistance:  32,
@@ -131,7 +131,7 @@ func TestDashStateUpdate(t *testing.T) {
 			setupBody:   newGroundedBody,
 			setupSpace:  func() *mockSpace { return &mockSpace{} },
 			ticksBefore: defaultCfg().DurationFrames / 2,
-			wantState:   gamestates.StateDashing,
+			wantState:   kitstates.StateDashing,
 		},
 		{
 			name:        "tween complete and grounded returns StateIdle",
@@ -168,7 +168,7 @@ func TestDashStateUpdate(t *testing.T) {
 			sp := tc.setupSpace()
 			cfg := defaultCfg()
 
-			ds := gamestates.NewDashState(b, sp, cfg)
+			ds := kitstates.NewDashState(b, sp, cfg)
 			ds.OnStart(0)
 
 			var got actors.ActorStateEnum
@@ -187,7 +187,7 @@ func TestDashStateUpdate(t *testing.T) {
 		sp := &mockSpace{}
 		cfg := defaultCfg()
 
-		ds := gamestates.NewDashState(b, sp, cfg)
+		ds := kitstates.NewDashState(b, sp, cfg)
 		ds.OnStart(0)
 
 		// Advance a few frames so tween is in progress
@@ -199,7 +199,7 @@ func TestDashStateUpdate(t *testing.T) {
 		ds.OnStart(0)
 
 		got := ds.Update()
-		if got != gamestates.StateDashing {
+		if got != kitstates.StateDashing {
 			t.Errorf("expected StateDashing after ignored second OnStart, got %v", got)
 		}
 	})

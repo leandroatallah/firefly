@@ -1,4 +1,4 @@
-package gamestates
+package kitstates
 
 import (
 	"fmt"

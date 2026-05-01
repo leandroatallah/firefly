@@ -3,7 +3,7 @@ package gameplayer
 import (
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
 	engineskill "github.com/boilerplate/ebiten-template/internal/engine/physics/skill"
-	gamestates "github.com/boilerplate/ebiten-template/internal/game/entity/actors/states"
+	kitstates "github.com/boilerplate/ebiten-template/internal/kit/states"
 )
 
 // movementChecker is the subset of body methods the shootingContributor needs.
@@ -33,7 +33,7 @@ type dashContributor struct{ s activeChecker }
 
 func (d *dashContributor) ContributeState(_ actors.ActorStateEnum) (actors.ActorStateEnum, bool) {
 	if d.s.IsActive() {
-		return gamestates.StateDashing, true
+		return kitstates.StateDashing, true
 	}
 	return 0, false
 }

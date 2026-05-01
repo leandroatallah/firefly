@@ -1,4 +1,4 @@
-package gamestates
+package kitstates
 
 import (
 	contractsbody "github.com/boilerplate/ebiten-template/internal/engine/contracts/body"

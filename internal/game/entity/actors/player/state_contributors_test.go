@@ -5,7 +5,7 @@ import (
 
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
 	gameplayer "github.com/boilerplate/ebiten-template/internal/game/entity/actors/player"
-	gamestates "github.com/boilerplate/ebiten-template/internal/game/entity/actors/states"
+	kitstates "github.com/boilerplate/ebiten-template/internal/kit/states"
 )
 
 // stubMovement implements the movement-query interface used by shootingContributor.
@@ -61,7 +61,7 @@ func TestDashContributor_StateMapping(t *testing.T) {
 		expectedOK    bool
 	}{
 		{"inactive — defer", false, 0, false},
-		{"active — StateDashing", true, gamestates.StateDashing, true},
+		{"active — StateDashing", true, kitstates.StateDashing, true},
 	}
 
 	for _, tt := range tests {

@@ -1,8 +1,6 @@
-package gamestates
+package kitstates
 
 import (
-	kitstates "github.com/boilerplate/ebiten-template/internal/kit/states"
-
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
 )
 
@@ -98,7 +96,7 @@ func newSubState(key GroundedSubStateEnum) groundedSubState {
 	case SubStateAimLock:
 		return &aimLockSubState{}
 	default:
-		return &kitstates.IdleSubState[GroundedSubStateEnum, GroundedInput]{
+		return &IdleSubState[GroundedSubStateEnum, GroundedInput]{
 			Idle:    SubStateIdle,
 			Walking: SubStateWalking,
 			Ducking: SubStateDucking,

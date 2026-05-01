@@ -10,7 +10,7 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
 	"github.com/boilerplate/ebiten-template/internal/engine/event"
 	"github.com/boilerplate/ebiten-template/internal/engine/physics/space"
-	_ "github.com/boilerplate/ebiten-template/internal/game/entity/actors/states"
+	_ "github.com/boilerplate/ebiten-template/internal/kit/states"
 )
 
 func getModuleRoot() string {

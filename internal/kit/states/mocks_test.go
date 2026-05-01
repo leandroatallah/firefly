@@ -1,4 +1,4 @@
-package gamestates_test
+package kitstates_test
 
 import (
 	"image"

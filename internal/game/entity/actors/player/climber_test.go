@@ -12,7 +12,7 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/event"
 	"github.com/boilerplate/ebiten-template/internal/engine/input"
 	"github.com/boilerplate/ebiten-template/internal/engine/physics/space"
-	gamestates "github.com/boilerplate/ebiten-template/internal/game/entity/actors/states"
+	kitstates "github.com/boilerplate/ebiten-template/internal/kit/states"
 )
 
 // AC3 bullet 2 — Taking damage mid-combo resets the chain to step 1.
@@ -126,8 +126,8 @@ func TestClimberPlayer_Update_MeleePressTransitionsToMeleeAttackState(t *testing
 	// The state machine must reflect the melee attack — either StateMeleeAttack
 	// or one of the per-step states registered for it.
 	st := climber.State()
-	stepStates := gamestates.MeleeAttackStepStates(len(w.Steps()))
-	isMeleeState := st == gamestates.StateMeleeAttack
+	stepStates := kitstates.MeleeAttackStepStates(len(w.Steps()))
+	isMeleeState := st == kitstates.StateMeleeAttack
 	for _, s := range stepStates {
 		if st == s {
 			isMeleeState = true
