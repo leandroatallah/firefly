@@ -4,18 +4,18 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/app"
 	enginecombat "github.com/boilerplate/ebiten-template/internal/engine/combat"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
-	"github.com/boilerplate/ebiten-template/internal/engine/contracts/combat"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/builder"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/movement"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/platformer"
 	gameplayer "github.com/boilerplate/ebiten-template/internal/game/entity/actors/player"
 	gamestates "github.com/boilerplate/ebiten-template/internal/game/entity/actors/states"
+	kitactors "github.com/boilerplate/ebiten-template/internal/kit/actors"
 )
 
 type BatEnemy struct {
 	*platformer.PlatformerCharacter
-	shooter combat.EnemyShooter
+	*kitactors.ShooterCharacter
 }
 
 // NewBatEnemy creates a new bat enemy.
@@ -42,7 +42,7 @@ func NewBatEnemy(ctx *app.AppContext, x, y int, id string) (*BatEnemy, error) {
 	if err != nil {
 		return nil, err
 	}
-	enemy.shooter = shooter
+	enemy.ShooterCharacter = kitactors.NewShooterCharacter(shooter)
 
 	enemy.GetCharacter().SetFaction(enginecombat.FactionEnemy)
 	enemy.SetGravityEnabled(false)
@@ -53,20 +53,14 @@ func NewBatEnemy(ctx *app.AppContext, x, y int, id string) (*BatEnemy, error) {
 
 func (e *BatEnemy) SetTarget(target body.MovableCollidable) {
 	e.Character.MovementState().SetTarget(target)
-	if e.shooter != nil {
-		e.shooter.SetTarget(target)
+	if e.Shooter() != nil {
+		e.Shooter().SetTarget(target)
 	}
-}
-
-func (e *BatEnemy) Shooter() combat.EnemyShooter {
-	return e.shooter
 }
 
 // Character Methods
 func (e *BatEnemy) Update(space body.BodiesSpace) error {
-	if e.shooter != nil {
-		e.shooter.Update()
-	}
+	e.UpdateShooter()
 	return e.Character.Update(space)
 }
 

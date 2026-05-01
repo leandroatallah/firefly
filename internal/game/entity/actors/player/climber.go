@@ -12,8 +12,8 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/builder"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/platformer"
 	"github.com/boilerplate/ebiten-template/internal/engine/input"
-	gameplayermethods "github.com/boilerplate/ebiten-template/internal/game/entity/actors/methods"
 	gamestates "github.com/boilerplate/ebiten-template/internal/game/entity/actors/states"
+	kitactors "github.com/boilerplate/ebiten-template/internal/kit/actors"
 	kitstates "github.com/boilerplate/ebiten-template/internal/kit/states"
 )
 
@@ -23,12 +23,8 @@ type ClimberPlayer struct {
 	spriteData *schemas.SpriteData
 	inventory  interface{}
 
-	// melee is kept as a separate field (not in inventory) because Controller
-	// bundles weapon lifecycle, hitbox activation, input buffering, and combo
-	// state — none of which are present on the combat.Weapon interface.
-	melee *meleeengine.Controller
-
-	*gameplayermethods.PlayerDeathBehavior
+	*kitactors.MeleeCharacter
+	*kitactors.PlayerDeathBehavior
 }
 
 // NewClimberPlayer creates a new climber player.
@@ -40,6 +36,7 @@ func NewClimberPlayer(ctx *app.AppContext) (platformer.PlatformerActorEntity, er
 
 	player := &ClimberPlayer{
 		PlatformerCharacter: character,
+		MeleeCharacter:      kitactors.NewMeleeCharacter(),
 	}
 	// Set the owner on the embedded character so LastOwner() works correctly
 	player.SetOwner(player)
@@ -56,7 +53,7 @@ func NewClimberPlayer(ctx *app.AppContext) (platformer.PlatformerActorEntity, er
 	}
 
 	character.RefreshCollisions()
-	player.PlayerDeathBehavior = gameplayermethods.NewPlayerDeathBehavior(player)
+	player.PlayerDeathBehavior = kitactors.NewPlayerDeathBehavior(player)
 
 	// Store spriteData for later skill configuration
 	player.spriteData = &spriteData
@@ -68,12 +65,13 @@ func (p *ClimberPlayer) Update(space body.BodiesSpace) error {
 	cmds := input.CommandsReader()
 	isGrounded := !p.IsFalling() && !p.IsGoingUp()
 
-	if p.melee != nil {
-		p.melee.SetSpace(space)
-		p.melee.Tick(p.GetCharacter())
+	melee := p.MeleeController()
+	if melee != nil {
+		melee.SetSpace(space)
+		melee.Tick(p.GetCharacter())
 
-		if p.melee.HandleInput(cmds.Melee, cmds.Dash, cmds.Jump, isGrounded, p.IsDucking()) {
-			p.melee.EnterAttackState(p.GetCharacter())
+		if melee.HandleInput(cmds.Melee, cmds.Dash, cmds.Jump, isGrounded, p.IsDucking()) {
+			melee.EnterAttackState(p.GetCharacter())
 		}
 	}
 
@@ -81,7 +79,7 @@ func (p *ClimberPlayer) Update(space body.BodiesSpace) error {
 	duckHeld := cmds.Down
 	p.SetDucking(duckHeld && !p.IsFalling() && !p.IsGoingUp())
 
-	isMeleeActive := p.melee != nil && p.melee.IsBlockingMovement() && !p.IsFalling() && !p.IsGoingUp()
+	isMeleeActive := melee != nil && melee.IsBlockingMovement() && !p.IsFalling() && !p.IsGoingUp()
 	isGroundedShooting := isGrounded && (p.State() == actors.IdleShooting || p.State() == actors.WalkingShooting)
 
 	// When ducking, mid-melee, or shooting on ground: lock horizontal movement but allow facing change
@@ -112,11 +110,10 @@ func (p *ClimberPlayer) GetSpriteData() *schemas.SpriteData {
 	return p.spriteData
 }
 
-func (p *ClimberPlayer) MeleeController() *meleeengine.Controller { return p.melee }
-
 func (p *ClimberPlayer) Hurt(_ int) {
-	if p.melee != nil {
-		p.melee.OnInterrupt()
+	melee := p.MeleeController()
+	if melee != nil {
+		melee.OnInterrupt()
 	}
 
 	if p.State() == gamestates.Dying || p.State() == gamestates.Dead {
@@ -157,18 +154,20 @@ func (p *ClimberPlayer) SetMelee(w *weapon.MeleeWeapon, vfxMgr vfx.Manager) {
 
 	st := meleeengine.InstallState(char, p, w, vfxMgr, kitstates.StateMeleeAttack, kitstates.StateGrounded, actors.Falling, stepStates)
 
-	p.melee = meleeengine.New(w, st, kitstates.StateMeleeAttack, stepStates, p.meleeStepAnimDuration)
-	p.melee.Install(char)
+	controller := meleeengine.New(w, st, kitstates.StateMeleeAttack, stepStates, p.meleeStepAnimDuration)
+	p.SetMeleeController(controller)
+	controller.Install(char)
 }
 
 // meleeStepAnimDuration returns the total game-frames for the sprite animation
 // of the given combo step, derived from the sprite sheet width and frame rate.
 func (p *ClimberPlayer) meleeStepAnimDuration(stepIdx int) int {
-	if p.melee == nil {
+	melee := p.MeleeController()
+	if melee == nil {
 		return 0
 	}
 	char := p.GetCharacter()
-	stepStates := kitstates.MeleeAttackStepStates(p.melee.StepCount())
+	stepStates := kitstates.MeleeAttackStepStates(melee.StepCount())
 	if stepIdx < 0 || stepIdx >= len(stepStates) {
 		return 0
 	}
