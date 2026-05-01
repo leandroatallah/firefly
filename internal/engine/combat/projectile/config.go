@@ -12,4 +12,5 @@ type ProjectileConfig struct {
 	ImpactEffect   string               `json:"impact_effect,omitempty"`   // VFX type for collision impacts
 	DespawnEffect  string               `json:"despawn_effect,omitempty"`  // VFX type for lifetime expiration
 	LifetimeFrames int                  `json:"lifetime_frames,omitempty"` // 0 = infinite (backward compat)
+	Interceptable  bool                 `json:"interceptable,omitempty"`   // true = can be hit by other projectiles
 }

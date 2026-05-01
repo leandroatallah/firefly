@@ -4,21 +4,21 @@
 
 Projectiles Must Not Collide With Other Projectiles
 
-## As a...
+## As a
 
 Player engaged in combat
 
-## I want...
+## I want
 
 Bullets I fire to pass through enemy bullets without being destroyed
 
-## So that...
+## So that
 
 Combat feels physically accurate and gameplay is not unfairly disrupted by projectile-on-projectile interactions.
 
 ## Background
 
-When a player's projectile (a bullet Body in the physics Space) travels toward an enemy, it may cross paths with an enemy projectile traveling in the opposite direction. Currently, the collision system treats any two projectile Bodies as valid collision pairs, causing both to be destroyed on contact. This is incorrect — projectiles are not Actors and should only interact with Actor Bodies (player or enemy Bodies), never with other projectile Bodies.
+When a player's projectile (a bullet Body in the physics Space) travels toward an enemy, it may cross paths with an enemy projectile traveling in the opposite direction. Currently, the collision system treats any two projectile Bodies as valid collision pairs, causing both to be destroyed on contact. This is incorrect — projectiles are not Actors and should only interact with Actor Bodies (player or enemy Bodies), never with other projectile Bodies. Furthermore, when a player's projectile hit an enemy projectile, both characters die, what is totally unexpected.
 
 ## Acceptance Criteria
 

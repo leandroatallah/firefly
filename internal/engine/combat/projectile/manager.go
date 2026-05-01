@@ -87,9 +87,15 @@ func (m *Manager) Spawn(cfg interface{}, x16, y16, vx16, vy16 int, owner interfa
 		}
 	}
 
+	// Wrap the collidable body so the Projectile trait is discoverable on the body itself.
+	wrappedBody := &projectileBody{
+		Collidable:    collidableBody,
+		interceptable: config.Interceptable,
+	}
+
 	p := &projectile{
 		movable:         movableBody,
-		body:            collidableBody,
+		body:            wrappedBody,
 		space:           m.space,
 		speedX16:        vx16,
 		speedY16:        vy16,
@@ -100,13 +106,14 @@ func (m *Manager) Spawn(cfg interface{}, x16, y16, vx16, vy16 int, owner interfa
 		currentLifetime: lifetime,
 		damage:          config.Damage,
 		faction:         faction,
+		interceptable:   config.Interceptable,
 	}
 
 	// Register collision callbacks
-	collidableBody.SetTouchable(p)
+	wrappedBody.SetTouchable(p)
 
 	m.projectiles = append(m.projectiles, p)
-	m.space.AddBody(collidableBody)
+	m.space.AddBody(wrappedBody)
 }
 
 // SpawnProjectile implements the ProjectileManager interface.

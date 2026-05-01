@@ -34,6 +34,32 @@ func isPassthrough(other contractsbody.Collidable) bool {
 	return false
 }
 
+// isProjectile checks whether other (or its owner) implements body.Projectile.
+// Returns (true, interceptable) when it does, (false, false) otherwise.
+func isProjectile(other contractsbody.Collidable) (bool, bool) {
+	if other == nil {
+		return false, false
+	}
+	if proj, ok := other.(contractsbody.Projectile); ok {
+		return true, proj.Interceptable()
+	}
+	if owner := other.Owner(); owner != nil {
+		if proj, ok := owner.(contractsbody.Projectile); ok {
+			return true, proj.Interceptable()
+		}
+	}
+	return false, false
+}
+
+// projectileBody wraps a contractsbody.Collidable and adds Interceptable so the
+// trait is discoverable directly on the body registered in the physics space.
+type projectileBody struct {
+	contractsbody.Collidable
+	interceptable bool
+}
+
+func (pb *projectileBody) Interceptable() bool { return pb.interceptable }
+
 // projectile is the internal state of a spawned projectile.
 type projectile struct {
 	movable         contractsbody.Movable
@@ -48,7 +74,10 @@ type projectile struct {
 	currentLifetime int // frames remaining; only meaningful when lifetimeFrames > 0
 	damage          int
 	faction         enginecombat.Faction
+	interceptable   bool
 }
+
+func (p *projectile) Interceptable() bool { return p.interceptable }
 
 func (p *projectile) Update() {
 	x, y := p.body.GetPosition16()
@@ -88,6 +117,9 @@ func (p *projectile) OnTouch(other contractsbody.Collidable) {
 	if isPassthrough(other) {
 		return
 	}
+	if isProj, interceptable := isProjectile(other); isProj && !interceptable {
+		return
+	}
 	p.applyDamage(other)
 	p.spawnVFX(p.impactEffect)
 	p.space.QueueForRemoval(p.body)
@@ -98,6 +130,9 @@ func (p *projectile) OnBlock(other contractsbody.Collidable) {
 		return
 	}
 	if isPassthrough(other) {
+		return
+	}
+	if isProj, interceptable := isProjectile(other); isProj && !interceptable {
 		return
 	}
 	p.applyDamage(other)
