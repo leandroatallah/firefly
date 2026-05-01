@@ -1,6 +1,10 @@
 package gamestates
 
-import "github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
+import (
+	kitstates "github.com/boilerplate/ebiten-template/internal/kit/states"
+
+	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
+)
 
 // State enum: part of engine public API
 //
@@ -53,7 +57,7 @@ func (g *GroundedState) Update() actors.ActorStateEnum {
 		return StateMeleeAttack
 	}
 
-	next := g.activeSub.transitionTo(input)
+	next := g.activeSub.TransitionTo(input)
 	if next != g.activeKey {
 		g.activeSub.OnFinish()
 		g.setSub(next, g.count)
@@ -94,6 +98,11 @@ func newSubState(key GroundedSubStateEnum) groundedSubState {
 	case SubStateAimLock:
 		return &aimLockSubState{}
 	default:
-		return &idleSubState{}
+		return &kitstates.IdleSubState[GroundedSubStateEnum, GroundedInput]{
+			Idle:    SubStateIdle,
+			Walking: SubStateWalking,
+			Ducking: SubStateDucking,
+			AimLock: SubStateAimLock,
+		}
 	}
 }

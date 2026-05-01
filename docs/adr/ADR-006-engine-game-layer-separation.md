@@ -1,7 +1,8 @@
 # ADR-006 — Engine/Game Two-Layer Architecture
 
 ## Status
-Accepted
+Superseded by 046
+> **Note:** Superseded by story `046-kit-layer-validation-step`, which validates a three-layer architecture (`engine` ← `kit` ← `game`) by relocating `IdleSubState` to `internal/kit/states/`. A full ADR rewrite is deferred until follow-up stories 047–052 populate the `kit` layer; see `.agents/work/active/046-kit-layer-validation-step/SPEC.md` for the validation rationale.
 
 ## Context
 The codebase separates reusable engine code from game-specific implementation. This raises the question: where should concrete implementations (states, skills, scenes) live? Three options exist:

@@ -6,7 +6,9 @@ Every agent in this pipeline MUST read this file before producing any output. Th
 
 - **Engine**: Ebitengine (Go)
 - **Language**: Go 1.25+
+- **Architecture**: three-layer — `engine`, `kit`, `game`; dependency rules: engine must not import kit or game; kit may import engine, must not import game; game may import both engine and kit
 - **Core module**: `internal/engine/`
+- **Kit module**: `internal/kit/` — genre-reusable concrete implementations; may import engine, must not import game
 - **Game module**: `internal/game/`
 
 ## Ubiquitous Language (DDD)
@@ -36,6 +38,7 @@ Use these terms consistently across all stories, specs, and code:
 | Input | `internal/engine/input/` |
 | i18n | `internal/engine/data/i18n/` |
 | Game Logic | `internal/game/` |
+| Kit | `internal/kit/` |
 
 ## Non-Negotiable Standards
 
