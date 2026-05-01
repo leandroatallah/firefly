@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"image/color"
 
-	enginecombat "github.com/boilerplate/ebiten-template/internal/engine/combat"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	contractsvfx "github.com/boilerplate/ebiten-template/internal/engine/contracts/vfx"
 	bodyphysics "github.com/boilerplate/ebiten-template/internal/engine/physics/body"
+	enginecombat "github.com/boilerplate/ebiten-template/internal/kit/combat"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 

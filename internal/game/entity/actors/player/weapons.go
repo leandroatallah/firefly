@@ -3,12 +3,12 @@ package gameplayer
 import (
 	"log"
 
-	"github.com/boilerplate/ebiten-template/internal/engine/combat/inventory"
-	"github.com/boilerplate/ebiten-template/internal/engine/combat/weapon"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/combat"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/vfx"
 	actors "github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
 	"github.com/boilerplate/ebiten-template/internal/engine/utils/fp16"
+	"github.com/boilerplate/ebiten-template/internal/kit/combat/inventory"
+	"github.com/boilerplate/ebiten-template/internal/kit/combat/weapon"
 )
 
 // StateOffsetEntry holds pixel-space spawn offset values for a single actor state.

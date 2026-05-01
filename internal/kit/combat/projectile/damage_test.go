@@ -3,8 +3,8 @@ package projectile
 import (
 	"testing"
 
-	enginecombat "github.com/boilerplate/ebiten-template/internal/engine/combat"
 	contractsbody "github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
+	enginecombat "github.com/boilerplate/ebiten-template/internal/kit/combat"
 )
 
 // TestProjectile_AppliesDamageOnHit covers AC2, AC3, AC7, AC8 and AC10 by

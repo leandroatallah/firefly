@@ -1,7 +1,7 @@
 // internal/engine/combat/projectile/config.go
 package projectile
 
-import enginecombat "github.com/boilerplate/ebiten-template/internal/engine/combat"
+import enginecombat "github.com/boilerplate/ebiten-template/internal/kit/combat"
 
 // ProjectileConfig defines the basic properties for spawning a projectile.
 type ProjectileConfig struct {

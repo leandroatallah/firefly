@@ -5,13 +5,13 @@ import (
 	"testing"
 
 	"github.com/boilerplate/ebiten-template/internal/engine/app"
-	"github.com/boilerplate/ebiten-template/internal/engine/combat/weapon"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/animation"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
 	"github.com/boilerplate/ebiten-template/internal/engine/event"
 	"github.com/boilerplate/ebiten-template/internal/engine/input"
 	"github.com/boilerplate/ebiten-template/internal/engine/physics/space"
+	"github.com/boilerplate/ebiten-template/internal/kit/combat/weapon"
 	kitstates "github.com/boilerplate/ebiten-template/internal/kit/states"
 )
 

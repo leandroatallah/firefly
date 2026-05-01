@@ -7,8 +7,8 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/assets/font"
 	"github.com/boilerplate/ebiten-template/internal/engine/assets/imagemanager"
 	"github.com/boilerplate/ebiten-template/internal/engine/audio"
-	combatprojectile "github.com/boilerplate/ebiten-template/internal/engine/combat/projectile"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
+	contractscombat "github.com/boilerplate/ebiten-template/internal/engine/contracts/combat"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/navigation"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/vfx"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
@@ -37,7 +37,7 @@ type AppContext struct {
 	Assets            fs.FS
 	Config            *config.AppConfig
 	Space             body.BodiesSpace
-	ProjectileManager *combatprojectile.Manager
+	ProjectileManager contractscombat.ProjectileManager
 	VFX               vfx.Manager
 	Font              *font.FontText
 

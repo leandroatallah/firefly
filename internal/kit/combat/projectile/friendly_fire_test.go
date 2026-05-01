@@ -4,8 +4,8 @@ import (
 	"image"
 	"testing"
 
-	enginecombat "github.com/boilerplate/ebiten-template/internal/engine/combat"
 	body "github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
+	enginecombat "github.com/boilerplate/ebiten-template/internal/kit/combat"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 

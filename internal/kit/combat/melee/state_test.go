@@ -4,12 +4,12 @@ import (
 	"image"
 	"testing"
 
-	"github.com/boilerplate/ebiten-template/internal/engine/combat/melee"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/animation"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/tilemaplayer"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
 	"github.com/boilerplate/ebiten-template/internal/engine/mocks"
+	"github.com/boilerplate/ebiten-template/internal/kit/combat/melee"
 )
 
 type mockOwner struct {

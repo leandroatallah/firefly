@@ -1,6 +1,6 @@
 package kitactors
 
-import meleeengine "github.com/boilerplate/ebiten-template/internal/engine/combat/melee"
+import meleeengine "github.com/boilerplate/ebiten-template/internal/kit/combat/melee"
 
 // MeleeCharacter is a reusable trait that holds a melee Controller and provides accessor methods.
 type MeleeCharacter struct {

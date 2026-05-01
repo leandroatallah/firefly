@@ -3,10 +3,10 @@ package weapon_test
 import (
 	"testing"
 
-	"github.com/boilerplate/ebiten-template/internal/engine/combat/weapon"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/animation"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	"github.com/boilerplate/ebiten-template/internal/engine/mocks"
+	"github.com/boilerplate/ebiten-template/internal/kit/combat/weapon"
 )
 
 func TestProjectileWeapon_Fire_SpawnsProjectileWithCorrectVelocity(t *testing.T) {

@@ -6,7 +6,6 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/app"
 	"github.com/boilerplate/ebiten-template/internal/engine/assets/font"
 	"github.com/boilerplate/ebiten-template/internal/engine/audio"
-	"github.com/boilerplate/ebiten-template/internal/engine/combat/projectile"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/i18n"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
@@ -19,6 +18,7 @@ import (
 	gamescene "github.com/boilerplate/ebiten-template/internal/game/scenes"
 	scenestypes "github.com/boilerplate/ebiten-template/internal/game/scenes/types"
 	gamespeech "github.com/boilerplate/ebiten-template/internal/game/ui/speech"
+	"github.com/boilerplate/ebiten-template/internal/kit/combat/projectile"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 

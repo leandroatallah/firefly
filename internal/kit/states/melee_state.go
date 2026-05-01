@@ -3,11 +3,11 @@ package kitstates
 import (
 	"fmt"
 
-	meleeengine "github.com/boilerplate/ebiten-template/internal/engine/combat/melee"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/animation"
 	contractsbody "github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/combat"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
+	meleeengine "github.com/boilerplate/ebiten-template/internal/kit/combat/melee"
 )
 
 // State enum for melee attack.

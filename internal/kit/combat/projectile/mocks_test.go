@@ -4,12 +4,12 @@ import (
 	"image"
 
 	"github.com/boilerplate/ebiten-template/internal/engine/assets/font"
-	"github.com/boilerplate/ebiten-template/internal/engine/combat"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	contractscombat "github.com/boilerplate/ebiten-template/internal/engine/contracts/combat"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/tilemaplayer"
 	"github.com/boilerplate/ebiten-template/internal/engine/render/camera"
 	"github.com/boilerplate/ebiten-template/internal/engine/render/particles"
+	"github.com/boilerplate/ebiten-template/internal/kit/combat"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 

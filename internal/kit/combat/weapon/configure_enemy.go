@@ -1,20 +1,19 @@
-package builder
+package weapon
 
 import (
 	"fmt"
 
-	"github.com/boilerplate/ebiten-template/internal/engine/combat/weapon"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/combat"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/schemas"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
 )
 
-// ConfigureEnemyWeapon reads the weapon block from cfg and wires an EnemyShooter
+// ConfigureEnemy reads the weapon block from cfg and wires an EnemyShooter
 // onto the character's embedded body.
 // Returns (nil, nil) if cfg is nil.
 // Returns (nil, error) if manager is nil when cfg is non-nil.
-func ConfigureEnemyWeapon(
+func ConfigureEnemy(
 	character actors.ActorEntity,
 	cfg *schemas.EnemyWeaponConfig,
 	manager combat.ProjectileManager,
@@ -64,7 +63,7 @@ func ConfigureEnemyWeapon(
 
 	// Build weapon; id = character.ID() + "_weapon"
 	weaponID := character.ID() + "_weapon"
-	w := weapon.NewProjectileWeapon(
+	w := NewProjectileWeapon(
 		weaponID,
 		cfg.Cooldown,
 		cfg.ProjectileType,
@@ -79,6 +78,6 @@ func ConfigureEnemyWeapon(
 	ch := character.GetCharacter()
 	w.SetOwner(ch)
 
-	shooter := weapon.NewEnemyShooting(ch, w, cfg.Range, mode, dir, stateEnum, stateGate)
+	shooter := NewEnemyShooting(ch, w, cfg.Range, mode, dir, stateEnum, stateGate)
 	return shooter, nil
 }

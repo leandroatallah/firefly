@@ -4,10 +4,10 @@ import (
 	"image"
 	"testing"
 
-	enginecombat "github.com/boilerplate/ebiten-template/internal/engine/combat"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/animation"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	bodyphysics "github.com/boilerplate/ebiten-template/internal/engine/physics/body"
+	kitcombat "github.com/boilerplate/ebiten-template/internal/kit/combat"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )
@@ -113,7 +113,7 @@ func TestWolfEnemy_FactionAndShooter(t *testing.T) {
 		t.Fatal("NewWolfEnemy returned nil")
 	}
 
-	if got := wolf.GetCharacter().Faction(); got != enginecombat.FactionEnemy {
+	if got := wolf.GetCharacter().Faction(); got != kitcombat.FactionEnemy {
 		t.Errorf("Faction() = %v, want FactionEnemy", got)
 	}
 	if wolf.Shooter() == nil {

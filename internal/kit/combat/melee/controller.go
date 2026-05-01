@@ -1,9 +1,9 @@
 package melee
 
 import (
-	"github.com/boilerplate/ebiten-template/internal/engine/combat/weapon"
 	contractsbody "github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
+	"github.com/boilerplate/ebiten-template/internal/kit/combat/weapon"
 )
 
 // animDurationFn computes how many game-frames the animation for the given

@@ -3,7 +3,7 @@ package kitactors
 import (
 	"testing"
 
-	meleeengine "github.com/boilerplate/ebiten-template/internal/engine/combat/melee"
+	meleeengine "github.com/boilerplate/ebiten-template/internal/kit/combat/melee"
 )
 
 func TestMeleeCharacter_MeleeController_NilBeforeSet(t *testing.T) {

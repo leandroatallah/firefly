@@ -2,8 +2,6 @@ package gameplayer
 
 import (
 	"github.com/boilerplate/ebiten-template/internal/engine/app"
-	meleeengine "github.com/boilerplate/ebiten-template/internal/engine/combat/melee"
-	"github.com/boilerplate/ebiten-template/internal/engine/combat/weapon"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/animation"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/vfx"
@@ -14,6 +12,8 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/input"
 	gamestates "github.com/boilerplate/ebiten-template/internal/game/entity/actors/states"
 	kitactors "github.com/boilerplate/ebiten-template/internal/kit/actors"
+	meleeengine "github.com/boilerplate/ebiten-template/internal/kit/combat/melee"
+	"github.com/boilerplate/ebiten-template/internal/kit/combat/weapon"
 	kitstates "github.com/boilerplate/ebiten-template/internal/kit/states"
 )
 

@@ -2,10 +2,10 @@
 package projectile
 
 import (
-	enginecombat "github.com/boilerplate/ebiten-template/internal/engine/combat"
 	contractsbody "github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	contractscombat "github.com/boilerplate/ebiten-template/internal/engine/contracts/combat"
 	contractsvfx "github.com/boilerplate/ebiten-template/internal/engine/contracts/vfx"
+	enginecombat "github.com/boilerplate/ebiten-template/internal/kit/combat"
 )
 
 // factioned is a file-local interface for entities that expose their faction.

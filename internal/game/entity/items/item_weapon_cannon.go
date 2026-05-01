@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/boilerplate/ebiten-template/internal/engine/app"
-	"github.com/boilerplate/ebiten-template/internal/engine/combat/inventory"
 	gameplayer "github.com/boilerplate/ebiten-template/internal/game/entity/actors/player"
+	"github.com/boilerplate/ebiten-template/internal/kit/combat/inventory"
 )
 
 // WeaponCannonItem is a collectible item that grants the heavy_cannon weapon.

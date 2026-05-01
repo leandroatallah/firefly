@@ -8,12 +8,23 @@ import (
 	actors "github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
 	"github.com/boilerplate/ebiten-template/internal/engine/mocks"
 	gameplayer "github.com/boilerplate/ebiten-template/internal/game/entity/actors/player"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 type mockProjectileManager struct{}
 
 func (m *mockProjectileManager) SpawnProjectile(projectileType string, x16, y16, vx16, vy16, damage int, owner interface{}) {
 }
+
+func (m *mockProjectileManager) Update() {}
+
+func (m *mockProjectileManager) Draw(screen *ebiten.Image) {}
+
+func (m *mockProjectileManager) DrawWithOffset(screen *ebiten.Image, camX, camY float64) {}
+
+func (m *mockProjectileManager) DrawCollisionBoxesWithOffset(draw func(b body.Collidable)) {}
+
+func (m *mockProjectileManager) Clear() {}
 
 func TestNewClimberInventory(t *testing.T) {
 	spawnPuffCalled := false

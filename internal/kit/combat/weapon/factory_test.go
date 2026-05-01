@@ -4,11 +4,11 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/boilerplate/ebiten-template/internal/engine/combat/weapon"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/animation"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/combat"
 	"github.com/boilerplate/ebiten-template/internal/engine/utils/fp16"
+	"github.com/boilerplate/ebiten-template/internal/kit/combat/weapon"
 )
 
 func TestWeaponFactory_ValidJSON_ReturnsWeapon(t *testing.T) {

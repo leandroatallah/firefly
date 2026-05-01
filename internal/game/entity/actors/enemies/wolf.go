@@ -2,7 +2,6 @@ package gameenemies
 
 import (
 	"github.com/boilerplate/ebiten-template/internal/engine/app"
-	enginecombat "github.com/boilerplate/ebiten-template/internal/engine/combat"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/builder"
@@ -11,6 +10,8 @@ import (
 	gameplayer "github.com/boilerplate/ebiten-template/internal/game/entity/actors/player"
 	gamestates "github.com/boilerplate/ebiten-template/internal/game/entity/actors/states"
 	kitactors "github.com/boilerplate/ebiten-template/internal/kit/actors"
+	kitcombat "github.com/boilerplate/ebiten-template/internal/kit/combat"
+	kitcombatweapon "github.com/boilerplate/ebiten-template/internal/kit/combat/weapon"
 )
 
 type WolfEnemy struct {
@@ -38,13 +39,13 @@ func NewWolfEnemy(ctx *app.AppContext, x, y int, id string) (*WolfEnemy, error) 
 		return nil, err
 	}
 
-	shooter, err := builder.ConfigureEnemyWeapon(enemy, spriteData.Weapon, ctx.ProjectileManager)
+	shooter, err := kitcombatweapon.ConfigureEnemy(enemy, spriteData.Weapon, ctx.ProjectileManager)
 	if err != nil {
 		return nil, err
 	}
 	enemy.ShooterCharacter = kitactors.NewShooterCharacter(shooter)
 
-	enemy.GetCharacter().SetFaction(enginecombat.FactionEnemy)
+	enemy.GetCharacter().SetFaction(kitcombat.FactionEnemy)
 	enemy.SetMovementState(
 		movement.SideToSide,
 		nil,

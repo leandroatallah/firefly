@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	enginecombat "github.com/boilerplate/ebiten-template/internal/engine/combat"
+	enginecombat "github.com/boilerplate/ebiten-template/internal/kit/combat"
 )
 
 // TestProjectileConfig_FactionField covers AC4: ProjectileConfig has a new

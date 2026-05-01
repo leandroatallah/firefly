@@ -7,14 +7,14 @@ import (
 	"testing"
 
 	"github.com/boilerplate/ebiten-template/internal/engine/app"
-	enginecombat "github.com/boilerplate/ebiten-template/internal/engine/combat"
-	"github.com/boilerplate/ebiten-template/internal/engine/combat/projectile"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
 	"github.com/boilerplate/ebiten-template/internal/engine/event"
 	"github.com/boilerplate/ebiten-template/internal/engine/physics/space"
 	_ "github.com/boilerplate/ebiten-template/internal/game/entity/actors/states"
+	kitcombat "github.com/boilerplate/ebiten-template/internal/kit/combat"
+	kitcombatprojectile "github.com/boilerplate/ebiten-template/internal/kit/combat/projectile"
 )
 
 func getModuleRoot() string {
@@ -53,7 +53,7 @@ func newEnemyTestContext() *app.AppContext {
 		ActorManager:      actors.NewManager(),
 		Space:             sp,
 		EventManager:      event.NewManager(),
-		ProjectileManager: projectile.NewManager(sp),
+		ProjectileManager: kitcombatprojectile.NewManager(sp),
 	}
 }
 
@@ -81,7 +81,7 @@ func TestBatEnemy_FactionAndShooter(t *testing.T) {
 		t.Fatal("NewBatEnemy returned nil")
 	}
 
-	if got := bat.GetCharacter().Faction(); got != enginecombat.FactionEnemy {
+	if got := bat.GetCharacter().Faction(); got != kitcombat.FactionEnemy {
 		t.Errorf("Faction() = %v, want FactionEnemy", got)
 	}
 	if bat.Shooter() == nil {

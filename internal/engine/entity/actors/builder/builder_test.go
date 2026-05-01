@@ -612,6 +612,16 @@ type mockProjectileManager struct{}
 func (m *mockProjectileManager) SpawnProjectile(projectileType string, x16, y16, vx16, vy16, damage int, owner interface{}) {
 }
 
+func (m *mockProjectileManager) Update() {}
+
+func (m *mockProjectileManager) Draw(screen *ebiten.Image) {}
+
+func (m *mockProjectileManager) DrawWithOffset(screen *ebiten.Image, camX, camY float64) {}
+
+func (m *mockProjectileManager) DrawCollisionBoxesWithOffset(draw func(b body.Collidable)) {}
+
+func (m *mockProjectileManager) Clear() {}
+
 // mockMovementBlocker implements physicsmovement.PlayerMovementBlocker
 type mockMovementBlocker struct{}
 

@@ -3,7 +3,6 @@ package actors_test
 import (
 	"testing"
 
-	enginecombat "github.com/boilerplate/ebiten-template/internal/engine/combat"
 	contractscombat "github.com/boilerplate/ebiten-template/internal/engine/contracts/combat"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
 	bodyphysics "github.com/boilerplate/ebiten-template/internal/engine/physics/body"
@@ -89,23 +88,23 @@ func TestCharacter_TakeDamageDelegatesToHurt(t *testing.T) {
 func TestCharacter_FactionAccessors(t *testing.T) {
 	tests := []struct {
 		name string
-		set  *enginecombat.Faction // nil means "do not call SetFaction"
-		want enginecombat.Faction
+		set  *contractscombat.Faction // nil means "do not call SetFaction"
+		want contractscombat.Faction
 	}{
 		{
 			name: "default is FactionNeutral",
 			set:  nil,
-			want: enginecombat.FactionNeutral,
+			want: contractscombat.FactionNeutral,
 		},
 		{
 			name: "SetFaction(Player) round-trips",
-			set:  ptrFaction(enginecombat.FactionPlayer),
-			want: enginecombat.FactionPlayer,
+			set:  ptrFaction(contractscombat.FactionPlayer),
+			want: contractscombat.FactionPlayer,
 		},
 		{
 			name: "SetFaction(Enemy) round-trips",
-			set:  ptrFaction(enginecombat.FactionEnemy),
-			want: enginecombat.FactionEnemy,
+			set:  ptrFaction(contractscombat.FactionEnemy),
+			want: contractscombat.FactionEnemy,
 		},
 	}
 
@@ -122,4 +121,4 @@ func TestCharacter_FactionAccessors(t *testing.T) {
 	}
 }
 
-func ptrFaction(f enginecombat.Faction) *enginecombat.Faction { return &f }
+func ptrFaction(f contractscombat.Faction) *contractscombat.Faction { return &f }

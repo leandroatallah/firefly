@@ -4,9 +4,9 @@ import (
 	"image"
 	"log"
 
-	enginecombat "github.com/boilerplate/ebiten-template/internal/engine/combat"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/animation"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
+	contractscombat "github.com/boilerplate/ebiten-template/internal/engine/contracts/combat"
 	"github.com/boilerplate/ebiten-template/internal/engine/debug"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/movement"
 	bodyphysics "github.com/boilerplate/ebiten-template/internal/engine/physics/body"
@@ -38,7 +38,7 @@ type Character struct {
 	invulnerabilityTimer int                           // frames remaining of post-hurt invulnerability
 	imageOptions         *ebiten.DrawImageOptions
 
-	faction enginecombat.Faction // faction for damage resolution; default FactionNeutral
+	faction contractscombat.Faction // faction for damage resolution; default FactionNeutral
 
 	skills            []skill.Skill      // active gameplay skills (jump, dash, …)
 	stateContributors []StateContributor // optional per-frame state overrides
@@ -456,12 +456,12 @@ func (c *Character) TakeDamage(amount int) {
 }
 
 // Faction returns the character's current faction.
-func (c *Character) Faction() enginecombat.Faction {
+func (c *Character) Faction() contractscombat.Faction {
 	return c.faction
 }
 
 // SetFaction sets the character's faction.
-func (c *Character) SetFaction(f enginecombat.Faction) {
+func (c *Character) SetFaction(f contractscombat.Faction) {
 	c.faction = f
 }
 
