@@ -45,3 +45,13 @@ func GetStateEnum(name string) (ActorStateEnum, bool) {
 	val, ok := stateEnums[name]
 	return val, ok
 }
+
+// String returns the registered name of the state, or its numeric value if unregistered.
+func (e ActorStateEnum) String() string {
+	for name, val := range stateEnums {
+		if val == e {
+			return name
+		}
+	}
+	return fmt.Sprintf("%d", e)
+}

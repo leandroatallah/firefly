@@ -4,7 +4,9 @@
 // through handleState, delegating per-state behaviour to ActorState implementations.
 package actors
 
-import "github.com/boilerplate/ebiten-template/internal/engine/entity"
+import (
+	"github.com/boilerplate/ebiten-template/internal/engine/entity"
+)
 
 // ActorState is the interface every concrete state must satisfy.
 type ActorState interface {

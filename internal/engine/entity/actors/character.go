@@ -7,6 +7,7 @@ import (
 	enginecombat "github.com/boilerplate/ebiten-template/internal/engine/combat"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/animation"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
+	"github.com/boilerplate/ebiten-template/internal/engine/debug"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/movement"
 	bodyphysics "github.com/boilerplate/ebiten-template/internal/engine/physics/body"
 	physicsmovement "github.com/boilerplate/ebiten-template/internal/engine/physics/movement"
@@ -427,6 +428,8 @@ func (c *Character) handleState() {
 	case state != Idle && c.IsIdle():
 		setNewState(Idle)
 	}
+
+	debug.Watch("player_state", c.ID(), c.state.State())
 }
 
 func (c *Character) Hurt(damage int) {
