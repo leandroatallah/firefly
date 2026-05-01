@@ -1,5 +1,12 @@
 {
   "permissions": {
-    "allow": ["Bash(gofmt *)", "Bash(go test *)"]
+    "allow": [
+      "Bash(gofmt *)",
+      "Bash(go test *)",
+      "Bash(go build *)",
+      "Bash(golangci-lint run *)",
+      "Bash(go tool cover *)",
+      "Bash(go run *)"
+    ]
   }
 }
