@@ -4,7 +4,7 @@ This document provides specialized instructions for AI agents working on this pr
 
 ## 🎯 Goal
 
-Achieve **80%+ test coverage** across the codebase, prioritizing the engine's entity management and the game's level infrastructure.
+Achieve **80%+ test coverage** across the codebase, prioritizing the engine's entity management and the game's level infrastructure. The codebase follows a three-layer architecture (`engine`, `kit`, `game`): game may import engine and kit; kit may import engine; engine must not import kit or game.
 
 ## 🔝 Priorities
 
@@ -139,6 +139,7 @@ func (t *Transition) Draw(_ *ebiten.Image) {}  // Use blank in param list
 | `combat/projectile` | 89.9% | Lifetime, faction-gated damage, impact / despawn VFX |
 | `combat/inventory` | 51.5% | Switch/add/ammo tracking |
 | `physics/skill` | 79.5% | `JumpSkill`, `DashSkill`, `ShootingSkill`, `FromConfig` factory |
+| `kit/states` | 100.0% | `IdleSubState[E,I]` transition branches; maintain as kit grows |
 
 ## 🛠 Story Management Scripts
 

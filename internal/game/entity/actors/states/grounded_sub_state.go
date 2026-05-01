@@ -14,5 +14,5 @@ const (
 type groundedSubState interface {
 	OnStart(currentCount int)
 	OnFinish()
-	transitionTo(input GroundedInput) GroundedSubStateEnum
+	TransitionTo(input GroundedInput) GroundedSubStateEnum
 }
