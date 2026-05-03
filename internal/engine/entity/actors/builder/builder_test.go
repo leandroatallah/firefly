@@ -6,11 +6,9 @@ import (
 
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/animation"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
-	"github.com/boilerplate/ebiten-template/internal/engine/contracts/combat"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/schemas"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/movement"
-	"github.com/boilerplate/ebiten-template/internal/engine/event"
 	bodyphysics "github.com/boilerplate/ebiten-template/internal/engine/physics/body"
 	physicsmovement "github.com/boilerplate/ebiten-template/internal/engine/physics/movement"
 	"github.com/boilerplate/ebiten-template/internal/engine/render/sprites"
@@ -525,46 +523,7 @@ func TestApplySkills(t *testing.T) {
 // stubSkill is a minimal Skill for testing ApplySkills.
 type stubSkill struct{ skill.SkillBase }
 
-// mockInventory implements combat.Inventory
-type mockInventory struct{}
-
-func (m *mockInventory) AddWeapon(weapon combat.Weapon)          {}
-func (m *mockInventory) ActiveWeapon() combat.Weapon             { return nil }
-func (m *mockInventory) SwitchNext()                             {}
-func (m *mockInventory) SwitchPrev()                             {}
-func (m *mockInventory) SwitchTo(index int)                      {}
-func (m *mockInventory) HasAmmo(weaponID string) bool            { return true }
-func (m *mockInventory) ConsumeAmmo(weaponID string, amount int) {}
-func (m *mockInventory) SetAmmo(weaponID string, amount int)     {}
-func (m *mockInventory) Update()                                 {}
-
-// mockEventManager implements event.Manager interface
-type mockEventManager struct{}
-
-func (m *mockEventManager) Publish(e event.Event) {}
-
-// mockProjectileManager implements combat.ProjectileManager
-type mockProjectileManager struct{}
-
-func (m *mockProjectileManager) SpawnProjectile(projectileType string, x16, y16, vx16, vy16, damage int, owner interface{}) {
-}
-
-func (m *mockProjectileManager) Update() {}
-
-func (m *mockProjectileManager) Draw(screen *ebiten.Image) {}
-
-func (m *mockProjectileManager) DrawWithOffset(screen *ebiten.Image, camX, camY float64) {}
-
-func (m *mockProjectileManager) DrawCollisionBoxesWithOffset(draw func(b body.Collidable)) {}
-
-func (m *mockProjectileManager) Clear() {}
-
 // mockMovementBlocker implements physicsmovement.PlayerMovementBlocker
 type mockMovementBlocker struct{}
 
 func (m *mockMovementBlocker) IsMovementBlocked() bool { return false }
-
-// Helper function
-func boolPtr(b bool) *bool {
-	return &b
-}
