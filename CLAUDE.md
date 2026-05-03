@@ -1,4 +1,6 @@
-@.agents/constitution.md
+# Standards
+
+See `.agents/constitution.md` for non-negotiable project standards (language, architecture, ubiquitous language, test rules).
 
 ---
 

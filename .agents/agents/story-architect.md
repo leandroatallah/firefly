@@ -6,6 +6,7 @@ capabilities:
   - read_files
   - write_files
   - execute_commands
+---
 
 ## Purpose
 
