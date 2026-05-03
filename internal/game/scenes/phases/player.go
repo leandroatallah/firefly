@@ -5,13 +5,26 @@ import (
 
 	"github.com/boilerplate/ebiten-template/internal/engine/app"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/vfx"
+	"github.com/boilerplate/ebiten-template/internal/engine/data/schemas"
+	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/builder"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/events"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/platformer"
 	gameplayer "github.com/boilerplate/ebiten-template/internal/game/entity/actors/player"
 	gameentitytypes "github.com/boilerplate/ebiten-template/internal/game/entity/types"
+	"github.com/boilerplate/ebiten-template/internal/kit/combat/weapon"
 	kitskills "github.com/boilerplate/ebiten-template/internal/kit/skills"
 )
+
+// interface to satisfies platformer melee players
+type platformerMeleeActor interface {
+	body.Movable
+	GetCharacter() *actors.Character
+	GetSpriteData() *schemas.SpriteData
+	SetMelee(w *weapon.MeleeWeapon, vfxMgr vfx.Manager)
+	SetInventory(inv interface{})
+}
 
 func createPlayer(ctx *app.AppContext, playerType gameentitytypes.PlayerType) (platformer.PlatformerActorEntity, error) {
 	var f func(*app.AppContext) (platformer.PlatformerActorEntity, error)
@@ -19,6 +32,8 @@ func createPlayer(ctx *app.AppContext, playerType gameentitytypes.PlayerType) (p
 	switch playerType {
 	case gameentitytypes.ClimberPlayerType:
 		f = gameplayer.NewClimberPlayer
+	case gameentitytypes.CodyPlayerType:
+		f = gameplayer.NewCodyPlayer
 	}
 
 	p, err := f(ctx)
@@ -26,12 +41,12 @@ func createPlayer(ctx *app.AppContext, playerType gameentitytypes.PlayerType) (p
 		return nil, err
 	}
 
-	climber, ok := p.(*gameplayer.ClimberPlayer)
+	actor, ok := p.(platformerMeleeActor)
 	if !ok {
 		return p, nil
 	}
 
-	spriteData := climber.GetSpriteData()
+	spriteData := actor.GetSpriteData()
 	if spriteData == nil {
 		return p, nil
 	}
@@ -54,15 +69,15 @@ func createPlayer(ctx *app.AppContext, playerType gameentitytypes.PlayerType) (p
 		EventManager: ctx.EventManager,
 	}
 
-	climber.SetInventory(deps.Inventory)
-	climber.SetMelee(gameplayer.NewPlayerMeleeWeapon(), ctx.VFX)
+	actor.SetInventory(deps.Inventory)
+	actor.SetMelee(gameplayer.NewPlayerMeleeWeapon(), ctx.VFX)
 
 	skills := kitskills.FromConfig(spriteData.Skills, deps)
 	if err := builder.ApplySkills(p, skills); err != nil {
 		return nil, err
 	}
 
-	gameplayer.WireStateContributors(climber.GetCharacter(), climber)
+	gameplayer.WireStateContributors(actor.GetCharacter(), actor)
 
 	return p, nil
 }
