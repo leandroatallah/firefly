@@ -376,6 +376,13 @@ func (c *Character) handleState() {
 		return
 	}
 
+	// Get grounded state if available from the platform movement model.
+	// Default to true for other models (like top-down) to maintain existing behavior.
+	onGround := true
+	if pm, ok := c.movementModel.(*physicsmovement.PlatformMovementModel); ok {
+		onGround = pm.OnGround()
+	}
+
 	setNewState := func(s ActorStateEnum) {
 		state, err := c.NewState(s)
 		if err != nil {
@@ -403,17 +410,21 @@ func (c *Character) handleState() {
 		}
 	case state == Landing:
 		isAnimationOver := c.state.IsAnimationFinished()
-		if c.IsWalking() {
+		if c.IsWalking() && onGround {
 			setNewState(Walking)
 		} else if isAnimationOver {
 			setNewState(Idle)
 		}
 	case state == Jumping:
+		if c.IsFalling() {
+			setNewState(Falling)
+			return
+		}
 		isAnimationOver := c.state.IsAnimationFinished()
-		if isAnimationOver {
+		if isAnimationOver && onGround {
 			setNewState(Idle)
 		}
-	case state == Falling && !c.IsFalling():
+	case state == Falling && !c.IsFalling() && onGround:
 		setNewState(Landing)
 	case c.IsGoingUp():
 		setNewState(Jumping)
@@ -423,9 +434,9 @@ func (c *Character) handleState() {
 		setNewState(Idle)
 	case state != Ducking && c.IsDucking():
 		setNewState(Ducking)
-	case state != Walking && c.IsWalking():
+	case state != Walking && c.IsWalking() && onGround:
 		setNewState(Walking)
-	case state != Idle && c.IsIdle():
+	case state != Idle && c.IsIdle() && onGround:
 		setNewState(Idle)
 	}
 

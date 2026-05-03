@@ -1,9 +1,11 @@
 package actors_test
 
 import (
+	"image"
 	"testing"
 
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/tilemaplayer"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
 	bodyphysics "github.com/boilerplate/ebiten-template/internal/engine/physics/body"
@@ -402,5 +404,111 @@ func TestCharacter_handleState_ContributorSkippedDuringHurted(t *testing.T) {
 	c.Update(nil)
 	if contrib.called {
 		t.Error("contributor must not be called while Hurted animation plays")
+	}
+}
+
+type stubSpace struct {
+	body.BodiesSpace
+}
+
+func (s *stubSpace) GetTilemapDimensionsProvider() tilemaplayer.TilemapDimensionsProvider {
+	return nil
+}
+func (s *stubSpace) Query(_ image.Rectangle) []body.Collidable {
+	return nil
+}
+func (s *stubSpace) ResolveCollisions(_ body.Collidable) (bool, bool) {
+	return false, false
+}
+
+func TestCharacter_handleState_JumpFlicker(t *testing.T) {
+	// Setup mock sprite map
+	img := ebiten.NewImage(1, 1)
+	sMap := sprites.SpriteMap{
+		actors.Idle:    &sprites.Sprite{Image: img},
+		actors.Jumping: &sprites.Sprite{Image: img},
+		actors.Falling: &sprites.Sprite{Image: img},
+	}
+	rect := bodyphysics.NewRect(0, 0, 16, 16)
+	c := actors.NewCharacter(sMap, rect)
+	c.SetMaxSpeed(100)
+	c.SetMaxHealth(100)
+	c.SetHealth(100)
+
+	// Setup movement model and ensure it's airborne
+	model := physicsmovement.NewPlatformMovementModel(nil)
+	model.SetOnGround(false)
+	c.SetMovementModel(model)
+
+	// Set a negative vertical velocity (going up)
+	c.SetVelocity(0, -100)
+
+	// Set initial state to Jumping
+	state, _ := c.NewState(actors.Jumping)
+	c.SetState(state)
+
+	// Update the character. Since IsAnimationFinished will be true (1x1 image),
+	// but onGround is false, it should stay in Jumping state.
+	c.Update(&stubSpace{})
+
+	if c.State() != actors.Jumping {
+		t.Errorf("expected state to stay Jumping while vy < 0 and airborne, but got %v", c.State())
+	}
+}
+
+func TestCharacter_handleState_AirPeakStaysJumping(t *testing.T) {
+	// Setup default config for tests
+	config.Set(&config.AppConfig{
+		ScreenWidth:  256,
+		ScreenHeight: 240,
+		Physics: config.PhysicsConfig{
+			SpeedMultiplier: 1.0,
+			DownwardGravity: 5,
+			UpwardGravity:   4,
+			MaxFallSpeed:    100,
+		},
+	})
+
+	// Setup mock sprite map
+	img := ebiten.NewImage(1, 1)
+	sMap := sprites.SpriteMap{
+		actors.Idle:    &sprites.Sprite{Image: img},
+		actors.Jumping: &sprites.Sprite{Image: img},
+		actors.Falling: &sprites.Sprite{Image: img},
+	}
+	rect := bodyphysics.NewRect(0, 0, 16, 16)
+	c := actors.NewCharacter(sMap, rect)
+	c.SetMaxSpeed(100)
+	c.SetMaxHealth(100)
+	c.SetHealth(100)
+
+	// Setup movement model and ensure it's airborne
+	model := physicsmovement.NewPlatformMovementModel(nil)
+	model.SetOnGround(false)
+	c.SetMovementModel(model)
+
+	// Set a velocity that will become 0 after gravity (peak)
+	// vy is -4, UpwardGravity is 4, so after UpdateMovement it will be 0.
+	c.SetVelocity(0, -4)
+
+	// Set initial state to Jumping
+	state, _ := c.NewState(actors.Jumping)
+	c.SetState(state)
+
+	// Update. After UpdateMovement, vy will be 0.
+	// 0 < DownwardGravity(5), so it should stay Jumping.
+	c.Update(&stubSpace{})
+
+	if c.State() != actors.Jumping {
+		_, curVy := c.Velocity()
+		t.Errorf("expected state to stay Jumping at air peak (vy=%d), but got %v", curVy, c.State())
+	}
+
+	// Now set vy to DownwardGravity
+	c.SetVelocity(0, 5)
+	c.Update(&stubSpace{})
+
+	if c.State() != actors.Falling {
+		t.Errorf("expected state to transition to Falling when vy >= threshold, but got %v", c.State())
 	}
 }

@@ -1,0 +1,100 @@
+{
+  "sprites": {
+    "body_rect": {
+      "x": 0,
+      "y": 0,
+      "width": 32,
+      "height": 32
+    },
+    "assets": {
+      "idle": {
+        "path": "assets/images/cody-idle.png",
+        "loop": true,
+        "collision_rect": [
+          {
+            "x": 6,
+            "y": 2,
+            "width": 18,
+            "height": 30
+          }
+        ]
+      },
+      "walk": {
+        "path": "assets/images/cody-walk.png",
+        "loop": true,
+        "collision_rect": [
+          {
+            "x": 6,
+            "y": 2,
+            "width": 18,
+            "height": 30
+          }
+        ]
+      },
+      "jump": {
+        "path": "assets/images/cody-jump.png",
+        "loop": false,
+        "collision_rect": [
+          {
+            "x": 6,
+            "y": 2,
+            "width": 18,
+            "height": 30
+          }
+        ]
+      },
+      "fall": {
+        "path": "assets/images/cody-fall.png",
+        "loop": false,
+        "collision_rect": [
+          {
+            "x": 6,
+            "y": 2,
+            "width": 18,
+            "height": 30
+          }
+        ]
+      },
+      "land": {
+        "path": "assets/images/cody-idle.png",
+        "loop": false,
+        "collision_rect": [
+          {
+            "x": 6,
+            "y": 2,
+            "width": 18,
+            "height": 30
+          }
+        ]
+      },
+      "hurt": {
+        "path": "assets/images/cody-hurt.png",
+        "loop": false,
+        "collision_rect": [
+          {
+            "x": 6,
+            "y": 2,
+            "width": 18,
+            "height": 30
+          }
+        ]
+      }
+    },
+    "facing_direction": 0,
+    "frame_rate": 6,
+    "skills": {
+      "movement": {
+        "enabled": true
+      },
+      "jump": {
+        "enabled": true,
+        "jump_cut_multiplier": 0.4
+      }
+    }
+  },
+  "stats": {
+    "health": 4,
+    "speed": 4,
+    "max_speed": 4
+  }
+}
