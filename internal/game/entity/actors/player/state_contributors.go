@@ -2,7 +2,8 @@ package gameplayer
 
 import (
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
-	engineskill "github.com/boilerplate/ebiten-template/internal/engine/physics/skill"
+	"github.com/boilerplate/ebiten-template/internal/engine/skill"
+	kitskills "github.com/boilerplate/ebiten-template/internal/kit/skills"
 	kitstates "github.com/boilerplate/ebiten-template/internal/kit/states"
 )
 
@@ -15,7 +16,7 @@ type movementChecker interface {
 
 // characterWithSkills is the subset of character methods needed to wire state contributors.
 type characterWithSkills interface {
-	Skills() []engineskill.Skill
+	Skills() []skill.Skill
 	AddStateContributor(sc actors.StateContributor)
 }
 
@@ -74,9 +75,9 @@ func NewDashContributorForTest(active bool) actors.StateContributor {
 func WireStateContributors(char characterWithSkills, mov movementChecker) {
 	for _, s := range char.Skills() {
 		switch sk := s.(type) {
-		case *engineskill.DashSkill:
+		case *kitskills.DashSkill:
 			char.AddStateContributor(&dashContributor{s: sk})
-		case *engineskill.ShootingSkill:
+		case *kitskills.ShootingSkill:
 			char.AddStateContributor(&shootingContributor{s: sk, chr: mov})
 		}
 	}

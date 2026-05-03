@@ -1,4 +1,4 @@
-package skill
+package kitskills
 
 import (
 	"time"
@@ -7,6 +7,7 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	"github.com/boilerplate/ebiten-template/internal/engine/input"
 	physicsmovement "github.com/boilerplate/ebiten-template/internal/engine/physics/movement"
+	"github.com/boilerplate/ebiten-template/internal/engine/skill"
 	"github.com/boilerplate/ebiten-template/internal/engine/utils/fp16"
 	"github.com/boilerplate/ebiten-template/internal/engine/utils/timing"
 	"github.com/hajimehoshi/ebiten/v2"
@@ -14,7 +15,7 @@ import (
 
 // DashSkill implements a dash and air dash ability.
 type DashSkill struct {
-	SkillBase
+	skill.SkillBase
 
 	canAirDash    bool
 	airDashUsed   bool
@@ -24,17 +25,16 @@ type DashSkill struct {
 
 // NewDashSkill creates a new DashSkill with default values.
 func NewDashSkill() *DashSkill {
-	return &DashSkill{
-		SkillBase: SkillBase{
-			state:    StateReady,
-			duration: timing.FromDuration(200 * time.Millisecond), // 8 frames (short burst)
-			cooldown: timing.FromDuration(750 * time.Millisecond), // 45 frames
-			speed:    fp16.To16(6),
-		},
+	d := &DashSkill{
 		canAirDash:    true,
 		airDashUsed:   false,
 		activationKey: ebiten.KeyShift,
 	}
+	d.SetState(skill.StateReady)
+	d.SetDuration(timing.FromDuration(200 * time.Millisecond))
+	d.SetCooldown(timing.FromDuration(750 * time.Millisecond))
+	d.SetSpeed(fp16.To16(6))
+	return d
 }
 
 // ActivationKey returns the activation key for the dash skill.
@@ -43,11 +43,11 @@ func (d *DashSkill) ActivationKey() ebiten.Key {
 }
 
 // HandleInput checks for the dash activation key.
-func (d *DashSkill) HandleInput(body body.MovableCollidable, model *physicsmovement.PlatformMovementModel, space body.BodiesSpace) {
+func (d *DashSkill) HandleInput(b body.MovableCollidable, model *physicsmovement.PlatformMovementModel, space body.BodiesSpace) {
 	cmds := input.CommandsReader()
 	dashPressed := cmds.Dash
 	if dashPressed && !d.dashPressed {
-		d.tryActivate(body, model, space)
+		d.tryActivate(b, model, space)
 	}
 	d.dashPressed = dashPressed
 }
@@ -61,12 +61,12 @@ func (d *DashSkill) Update(b body.MovableCollidable, model *physicsmovement.Plat
 		d.airDashUsed = false
 	}
 
-	switch d.state {
-	case StateActive:
-		d.timer--
-		if d.timer <= 0 {
-			d.state = StateCooldown
-			d.timer = d.cooldown
+	switch d.State() {
+	case skill.StateActive:
+		d.SetTimer(d.Timer() - 1)
+		if d.Timer() <= 0 {
+			d.SetState(skill.StateCooldown)
+			d.SetTimer(d.Cooldown())
 			model.SetDashActive(false, 0)
 			model.SetGravityEnabled(true)
 		} else {
@@ -75,7 +75,7 @@ func (d *DashSkill) Update(b body.MovableCollidable, model *physicsmovement.Plat
 			if b.FaceDirection() == animation.FaceDirectionLeft {
 				dirX = -1
 			}
-			model.SetDashActive(true, d.speed*dirX)
+			model.SetDashActive(true, d.Speed()*dirX)
 			// Override gravity during air dash to maintain height (Cuphead-style)
 			if !model.OnGround() {
 				model.SetGravityEnabled(false)
@@ -83,16 +83,16 @@ func (d *DashSkill) Update(b body.MovableCollidable, model *physicsmovement.Plat
 				b.SetVelocity(vx, 0)
 			}
 		}
-	case StateCooldown:
-		d.timer--
-		if d.timer <= 0 {
-			d.state = StateReady
+	case skill.StateCooldown:
+		d.SetTimer(d.Timer() - 1)
+		if d.Timer() <= 0 {
+			d.SetState(skill.StateReady)
 		}
 	}
 }
 
 func (d *DashSkill) tryActivate(_ body.MovableCollidable, model *physicsmovement.PlatformMovementModel, _ body.BodiesSpace) {
-	if d.state != StateReady {
+	if d.State() != skill.StateReady {
 		return
 	}
 
@@ -104,7 +104,6 @@ func (d *DashSkill) tryActivate(_ body.MovableCollidable, model *physicsmovement
 		d.airDashUsed = true
 	}
 
-	d.state = StateActive
-	d.timer = d.duration
-	// Optional: trigger a sound or visual effect here
+	d.SetState(skill.StateActive)
+	d.SetTimer(d.Duration())
 }

@@ -8,9 +8,9 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/builder"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/events"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/platformer"
-	engineskill "github.com/boilerplate/ebiten-template/internal/engine/physics/skill"
 	gameplayer "github.com/boilerplate/ebiten-template/internal/game/entity/actors/player"
 	gameentitytypes "github.com/boilerplate/ebiten-template/internal/game/entity/types"
+	kitskills "github.com/boilerplate/ebiten-template/internal/kit/skills"
 )
 
 func createPlayer(ctx *app.AppContext, playerType gameentitytypes.PlayerType) (platformer.PlatformerActorEntity, error) {
@@ -36,7 +36,7 @@ func createPlayer(ctx *app.AppContext, playerType gameentitytypes.PlayerType) (p
 		return p, nil
 	}
 
-	deps := engineskill.SkillDeps{
+	deps := kitskills.SkillDeps{
 		Inventory:         gameplayer.NewClimberInventory(ctx.ProjectileManager, ctx.VFX),
 		ProjectileManager: ctx.ProjectileManager,
 		OnJump: func(b interface{}) {
@@ -57,7 +57,8 @@ func createPlayer(ctx *app.AppContext, playerType gameentitytypes.PlayerType) (p
 	climber.SetInventory(deps.Inventory)
 	climber.SetMelee(gameplayer.NewPlayerMeleeWeapon(), ctx.VFX)
 
-	if err := builder.ApplySkills(p, *spriteData, deps); err != nil {
+	skills := kitskills.FromConfig(spriteData.Skills, deps)
+	if err := builder.ApplySkills(p, skills); err != nil {
 		return nil, err
 	}
 

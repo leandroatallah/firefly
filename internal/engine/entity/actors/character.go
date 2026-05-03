@@ -11,9 +11,9 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/movement"
 	bodyphysics "github.com/boilerplate/ebiten-template/internal/engine/physics/body"
 	physicsmovement "github.com/boilerplate/ebiten-template/internal/engine/physics/movement"
-	"github.com/boilerplate/ebiten-template/internal/engine/physics/skill"
 	"github.com/boilerplate/ebiten-template/internal/engine/physics/space"
 	"github.com/boilerplate/ebiten-template/internal/engine/render/sprites"
+	"github.com/boilerplate/ebiten-template/internal/engine/skill"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 

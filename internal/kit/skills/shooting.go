@@ -1,4 +1,4 @@
-package skill
+package kitskills
 
 import (
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/animation"
@@ -6,11 +6,13 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/combat"
 	"github.com/boilerplate/ebiten-template/internal/engine/input"
 	physicsmovement "github.com/boilerplate/ebiten-template/internal/engine/physics/movement"
+	"github.com/boilerplate/ebiten-template/internal/engine/skill"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
+// ShootingSkill implements a shooting ability.
 type ShootingSkill struct {
-	SkillBase
+	skill.SkillBase
 	inv            combat.Inventory
 	shootHeld      bool
 	weaponNextHeld bool
@@ -20,20 +22,20 @@ type ShootingSkill struct {
 	directionSet   bool
 }
 
+// NewShootingSkill creates a new ShootingSkill with the given inventory.
 func NewShootingSkill(inv combat.Inventory) *ShootingSkill {
-	return &ShootingSkill{
-		SkillBase: SkillBase{
-			state: StateReady,
-		},
-		inv: inv,
-	}
+	s := &ShootingSkill{inv: inv}
+	s.SetState(skill.StateReady)
+	return s
 }
 
+// SetStateTransitionHandler sets the handler for state transitions triggered by shooting.
 func (s *ShootingSkill) SetStateTransitionHandler(handler body.StateTransitionHandler) {
 	s.handler = handler
 }
 
-func (s *ShootingSkill) HandleInputWithDirection(b body.MovableCollidable, model *physicsmovement.PlatformMovementModel, space body.BodiesSpace, up, down, left, right bool) {
+// HandleInputWithDirection processes shooting with explicit direction flags.
+func (s *ShootingSkill) HandleInputWithDirection(b body.MovableCollidable, model *physicsmovement.PlatformMovementModel, _ body.BodiesSpace, up, down, left, right bool) {
 	direction := s.detectShootDirection(b, model, up, down, left, right)
 
 	s.lastDirection = direction
@@ -68,6 +70,7 @@ func (s *ShootingSkill) HandleInputWithDirection(b body.MovableCollidable, model
 	weapon.Fire(x16, y16, b.FaceDirection(), direction, state)
 }
 
+// HandleInput processes shooting input from the command reader.
 func (s *ShootingSkill) HandleInput(b body.MovableCollidable, model *physicsmovement.PlatformMovementModel, space body.BodiesSpace) {
 	cmds := input.CommandsReader()
 
@@ -88,10 +91,12 @@ func (s *ShootingSkill) HandleInput(b body.MovableCollidable, model *physicsmove
 	s.HandleInputWithDirection(b, model, space, cmds.Up, cmds.Down, cmds.Left, cmds.Right)
 }
 
+// IsActive returns true when the shoot button is held.
 func (s *ShootingSkill) IsActive() bool {
 	return s.shootHeld
 }
 
+// Update processes inventory cooldowns and tracks shoot-held state.
 func (s *ShootingSkill) Update(b body.MovableCollidable, model *physicsmovement.PlatformMovementModel) {
 	// Update inventory weapons (cooldowns)
 	s.inv.Update()
@@ -104,6 +109,7 @@ func (s *ShootingSkill) Update(b body.MovableCollidable, model *physicsmovement.
 	}
 }
 
+// ActivationKey returns the key that activates shooting.
 func (s *ShootingSkill) ActivationKey() ebiten.Key {
 	return ebiten.KeyX
 }

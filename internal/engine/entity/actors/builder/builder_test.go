@@ -13,8 +13,8 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/event"
 	bodyphysics "github.com/boilerplate/ebiten-template/internal/engine/physics/body"
 	physicsmovement "github.com/boilerplate/ebiten-template/internal/engine/physics/movement"
-	"github.com/boilerplate/ebiten-template/internal/engine/physics/skill"
 	"github.com/boilerplate/ebiten-template/internal/engine/render/sprites"
+	"github.com/boilerplate/ebiten-template/internal/engine/skill"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -490,103 +490,40 @@ func TestApplyPlatformerPhysics(t *testing.T) {
 }
 
 func TestApplySkills(t *testing.T) {
-	t.Run("all skills enabled with inventory", func(t *testing.T) {
+	t.Run("adds skills to character", func(t *testing.T) {
 		actor := newMockActorWithCollision()
 		character := actors.NewCharacter(sprites.SpriteMap{}, bodyphysics.NewRect(0, 0, 16, 16))
 		actor.SetCharacter(character)
 
-		spriteData := schemas.SpriteData{
-			Skills: &schemas.SkillsConfig{
-				Movement: &schemas.MovementConfig{
-					Enabled: boolPtr(true),
-				},
-				Jump: &schemas.JumpConfig{
-					Enabled:           boolPtr(true),
-					JumpCutMultiplier: 0.5,
-				},
-				Dash: &schemas.DashConfig{
-					Enabled:    boolPtr(true),
-					DurationMs: 200,
-					CooldownMs: 1000,
-					Speed:      10,
-					CanAirDash: boolPtr(true),
-				},
-				Shooting: &schemas.ShootingConfig{
-					Enabled: boolPtr(true),
-				},
-			},
-		}
-
-		deps := skill.SkillDeps{
-			Inventory:         &mockInventory{},
-			ProjectileManager: &mockProjectileManager{},
-			OnJump:            func(b interface{}) {},
-			EventManager:      &mockEventManager{},
-		}
-
-		err := ApplySkills(actor, spriteData, deps)
+		stub := &stubSkill{}
+		err := ApplySkills(actor, []skill.Skill{stub})
 		if err != nil {
 			t.Fatalf("ApplySkills returned error: %v", err)
+		}
+
+		if len(character.Skills()) != 1 {
+			t.Errorf("expected 1 skill, got %d", len(character.Skills()))
 		}
 	})
 
-	t.Run("nil skills config", func(t *testing.T) {
+	t.Run("empty slice is a no-op", func(t *testing.T) {
 		actor := newMockActorWithCollision()
 		character := actors.NewCharacter(sprites.SpriteMap{}, bodyphysics.NewRect(0, 0, 16, 16))
 		actor.SetCharacter(character)
 
-		spriteData := schemas.SpriteData{
-			Skills: nil,
-		}
-
-		deps := skill.SkillDeps{
-			Inventory:         &mockInventory{},
-			ProjectileManager: &mockProjectileManager{},
-			OnJump:            func(b interface{}) {},
-			EventManager:      &mockEventManager{},
-		}
-
-		err := ApplySkills(actor, spriteData, deps)
+		err := ApplySkills(actor, []skill.Skill{})
 		if err != nil {
 			t.Fatalf("ApplySkills returned error: %v", err)
 		}
-	})
 
-	t.Run("shooting skill omitted when inventory is nil", func(t *testing.T) {
-		actor := newMockActorWithCollision()
-		character := actors.NewCharacter(sprites.SpriteMap{}, bodyphysics.NewRect(0, 0, 16, 16))
-		actor.SetCharacter(character)
-
-		spriteData := schemas.SpriteData{
-			Skills: &schemas.SkillsConfig{
-				Movement: &schemas.MovementConfig{
-					Enabled: boolPtr(true),
-				},
-				Jump: &schemas.JumpConfig{
-					Enabled: boolPtr(true),
-				},
-				Dash: &schemas.DashConfig{
-					Enabled: boolPtr(true),
-				},
-				Shooting: &schemas.ShootingConfig{
-					Enabled: boolPtr(true),
-				},
-			},
-		}
-
-		deps := skill.SkillDeps{
-			Inventory:         nil,
-			ProjectileManager: &mockProjectileManager{},
-			OnJump:            func(b interface{}) {},
-			EventManager:      &mockEventManager{},
-		}
-
-		err := ApplySkills(actor, spriteData, deps)
-		if err != nil {
-			t.Fatalf("ApplySkills returned error: %v", err)
+		if len(character.Skills()) != 0 {
+			t.Errorf("expected 0 skills, got %d", len(character.Skills()))
 		}
 	})
 }
+
+// stubSkill is a minimal Skill for testing ApplySkills.
+type stubSkill struct{ skill.SkillBase }
 
 // mockInventory implements combat.Inventory
 type mockInventory struct{}

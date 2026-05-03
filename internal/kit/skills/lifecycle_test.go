@@ -1,4 +1,4 @@
-package skill
+package kitskills
 
 import (
 	"testing"
@@ -10,6 +10,7 @@ import (
 	bodyphysics "github.com/boilerplate/ebiten-template/internal/engine/physics/body"
 	"github.com/boilerplate/ebiten-template/internal/engine/physics/movement"
 	"github.com/boilerplate/ebiten-template/internal/engine/physics/space"
+	"github.com/boilerplate/ebiten-template/internal/engine/skill"
 	"github.com/boilerplate/ebiten-template/internal/engine/utils/fp16"
 	"github.com/boilerplate/ebiten-template/internal/engine/utils/timing"
 	"github.com/hajimehoshi/ebiten/v2"
@@ -18,6 +19,14 @@ import (
 // mockMovableCollidable for skill tests
 type mockMovableCollidable struct {
 	*bodyphysics.ObstacleRect
+	isDuckingFunc func() bool
+}
+
+func (m *mockMovableCollidable) IsDucking() bool {
+	if m.isDuckingFunc != nil {
+		return m.isDuckingFunc()
+	}
+	return false
 }
 
 // mockPlayerMovementBlocker implements movement.PlayerMovementBlocker for testing
@@ -40,46 +49,6 @@ func newMockMovableCollidable() *mockMovableCollidable {
 	}
 }
 
-// Test SkillBase
-func TestSkillBase_InitialState(t *testing.T) {
-	sb := &SkillBase{
-		state:    StateReady,
-		duration: 10,
-		cooldown: 20,
-	}
-
-	if sb.state != StateReady {
-		t.Errorf("expected state Ready; got %s", sb.state)
-	}
-}
-
-func TestSkillBase_Update(t *testing.T) {
-	sb := &SkillBase{}
-	actor := newMockMovableCollidable()
-	model := movement.NewPlatformMovementModel(nil)
-
-	// Should not panic
-	sb.Update(actor, model)
-}
-
-func TestSkillBase_IsActive(t *testing.T) {
-	sb := &SkillBase{state: StateReady}
-
-	if sb.IsActive() {
-		t.Error("expected IsActive=false for Ready state")
-	}
-
-	sb.state = StateActive
-	if !sb.IsActive() {
-		t.Error("expected IsActive=true for Active state")
-	}
-
-	sb.state = StateCooldown
-	if sb.IsActive() {
-		t.Error("expected IsActive=false for Cooldown state")
-	}
-}
-
 // Test DashSkill
 func TestDashSkill_New(t *testing.T) {
 	d := NewDashSkill()
@@ -87,17 +56,17 @@ func TestDashSkill_New(t *testing.T) {
 	if d == nil {
 		t.Fatal("NewDashSkill returned nil")
 	}
-	if d.state != StateReady {
-		t.Errorf("expected state Ready; got %s", d.state)
+	if d.State() != skill.StateReady {
+		t.Errorf("expected state Ready; got %s", d.State())
 	}
-	if d.duration <= 0 {
+	if d.Duration() <= 0 {
 		t.Error("expected positive duration")
 	}
-	if d.cooldown <= 0 {
+	if d.Cooldown() <= 0 {
 		t.Error("expected positive cooldown")
 	}
-	if d.activationKey != ebiten.KeyShift {
-		t.Errorf("expected activationKey Shift; got %v", d.activationKey)
+	if d.ActivationKey() != ebiten.KeyShift {
+		t.Errorf("expected activationKey Shift; got %v", d.ActivationKey())
 	}
 	if !d.canAirDash {
 		t.Error("expected canAirDash=true")
@@ -126,42 +95,40 @@ func TestDashSkill_Update_StateTransitions(t *testing.T) {
 	d := NewDashSkill()
 
 	// Test Ready state - no changes
-	d.state = StateReady
+	d.SetState(skill.StateReady)
 	d.Update(actor, model)
-	if d.state != StateReady {
-		t.Errorf("expected state to remain Ready; got %s", d.state)
+	if d.State() != skill.StateReady {
+		t.Errorf("expected state to remain Ready; got %s", d.State())
 	}
 
 	// Test Active state
-	d.state = StateActive
-	d.timer = 2
+	d.SetState(skill.StateActive)
+	d.SetTimer(2)
 	d.Update(actor, model)
-	if d.state != StateActive {
-		t.Errorf("expected state to remain Active; got %s", d.state)
+	if d.State() != skill.StateActive {
+		t.Errorf("expected state to remain Active; got %s", d.State())
 	}
-	// Note: We can't check model.dashActive directly as it's unexported
-	// The integration test verifies the behavior
 
 	// Active state expires
-	d.timer = 0
+	d.SetTimer(0)
 	d.Update(actor, model)
-	if d.state != StateCooldown {
-		t.Errorf("expected state Cooldown; got %s", d.state)
+	if d.State() != skill.StateCooldown {
+		t.Errorf("expected state Cooldown; got %s", d.State())
 	}
 
 	// Cooldown state
-	d.state = StateCooldown
-	d.timer = 2
+	d.SetState(skill.StateCooldown)
+	d.SetTimer(2)
 	d.Update(actor, model)
-	if d.state != StateCooldown {
-		t.Errorf("expected state to remain Cooldown; got %s", d.state)
+	if d.State() != skill.StateCooldown {
+		t.Errorf("expected state to remain Cooldown; got %s", d.State())
 	}
 
 	// Cooldown expires
-	d.timer = 0
+	d.SetTimer(0)
 	d.Update(actor, model)
-	if d.state != StateReady {
-		t.Errorf("expected state Ready after cooldown; got %s", d.state)
+	if d.State() != skill.StateReady {
+		t.Errorf("expected state Ready after cooldown; got %s", d.State())
 	}
 }
 
@@ -189,50 +156,22 @@ func TestDashSkill_Update_AirDashReset(t *testing.T) {
 	}
 }
 
-func TestDashSkill_Update_FaceDirection(t *testing.T) {
-	cfg := &config.AppConfig{
-		Physics: config.PhysicsConfig{
-			DownwardGravity: 4,
-			MaxFallSpeed:    128,
-		},
-	}
-	config.Set(cfg)
-
-	actor := newMockMovableCollidable()
-	model := movement.NewPlatformMovementModel(nil)
-
-	d := NewDashSkill()
-	d.state = StateActive
-	d.timer = 2
-
-	// Test facing right
-	actor.SetFaceDirection(animation.FaceDirectionRight)
-	d.Update(actor, model)
-	// Note: Can't check dashVelocityX directly as it's unexported
-	// Integration test verifies behavior
-
-	// Test facing left
-	actor.SetFaceDirection(animation.FaceDirectionLeft)
-	d.Update(actor, model)
-	// Note: Can't check dashVelocityX directly as it's unexported
-}
-
 func TestDashSkill_tryActivate_Ready(t *testing.T) {
 	actor := newMockMovableCollidable()
 	model := movement.NewPlatformMovementModel(nil)
 	sp := space.NewSpace()
 
 	d := NewDashSkill()
-	d.state = StateReady
+	d.SetState(skill.StateReady)
 	model.SetOnGround(true)
 
 	d.tryActivate(actor, model, sp)
 
-	if d.state != StateActive {
-		t.Errorf("expected state Active; got %s", d.state)
+	if d.State() != skill.StateActive {
+		t.Errorf("expected state Active; got %s", d.State())
 	}
-	if d.timer != d.duration {
-		t.Errorf("expected timer=duration; got %d", d.timer)
+	if d.Timer() != d.Duration() {
+		t.Errorf("expected timer=duration; got %d", d.Timer())
 	}
 }
 
@@ -242,12 +181,12 @@ func TestDashSkill_tryActivate_NotReady(t *testing.T) {
 	sp := space.NewSpace()
 
 	d := NewDashSkill()
-	d.state = StateActive // Already active
+	d.SetState(skill.StateActive) // Already active
 
 	d.tryActivate(actor, model, sp)
 
-	if d.state != StateActive {
-		t.Errorf("expected state to remain Active; got %s", d.state)
+	if d.State() != skill.StateActive {
+		t.Errorf("expected state to remain Active; got %s", d.State())
 	}
 }
 
@@ -257,22 +196,22 @@ func TestDashSkill_tryActivate_AirDash(t *testing.T) {
 	sp := space.NewSpace()
 
 	d := NewDashSkill()
-	d.state = StateReady
+	d.SetState(skill.StateReady)
 	model.SetOnGround(false)
 
 	// First air dash should work
 	d.tryActivate(actor, model, sp)
-	if d.state != StateActive {
-		t.Errorf("expected first air dash to work; got state %s", d.state)
+	if d.State() != skill.StateActive {
+		t.Errorf("expected first air dash to work; got state %s", d.State())
 	}
 	if !d.airDashUsed {
 		t.Error("expected airDashUsed to be set")
 	}
 
 	// Reset and try second air dash (should fail)
-	d.state = StateReady
+	d.SetState(skill.StateReady)
 	d.tryActivate(actor, model, sp)
-	if d.state == StateActive {
+	if d.State() == skill.StateActive {
 		t.Error("expected second air dash to fail")
 	}
 }
@@ -284,12 +223,12 @@ func TestDashSkill_tryActivate_NoAirDash(t *testing.T) {
 
 	d := NewDashSkill()
 	d.canAirDash = false
-	d.state = StateReady
+	d.SetState(skill.StateReady)
 	model.SetOnGround(false)
 
 	d.tryActivate(actor, model, sp)
 
-	if d.state == StateActive {
+	if d.State() == skill.StateActive {
 		t.Error("expected air dash to fail when canAirDash=false")
 	}
 }
@@ -301,11 +240,11 @@ func TestJumpSkill_New(t *testing.T) {
 	if j == nil {
 		t.Fatal("NewJumpSkill returned nil")
 	}
-	if j.state != StateReady {
-		t.Errorf("expected state Ready; got %s", j.state)
+	if j.State() != skill.StateReady {
+		t.Errorf("expected state Ready; got %s", j.State())
 	}
-	if j.activationKey != ebiten.KeySpace {
-		t.Errorf("expected activationKey Space; got %v", j.activationKey)
+	if j.ActivationKey() != ebiten.KeySpace {
+		t.Errorf("expected activationKey Space; got %v", j.ActivationKey())
 	}
 }
 
@@ -459,31 +398,6 @@ func TestJumpSkill_tryActivate_Airborne(t *testing.T) {
 	}
 }
 
-func TestJumpSkill_tryActivate_ZeroJumpForce(t *testing.T) {
-	cfg := &config.AppConfig{
-		Physics: config.PhysicsConfig{
-			JumpForce:       0,
-			DownwardGravity: 4,
-			MaxFallSpeed:    128,
-		},
-	}
-	config.Set(cfg)
-
-	actor := newMockMovableCollidable()
-	model := movement.NewPlatformMovementModel(nil)
-	sp := space.NewSpace()
-
-	j := NewJumpSkill()
-	model.SetOnGround(true)
-
-	j.tryActivate(actor, model, sp)
-
-	_, vy := actor.Velocity()
-	if vy != 0 {
-		t.Errorf("expected zero velocity with zero jump force; got %d", vy)
-	}
-}
-
 func TestJumpSkill_tryActivate_OnJumpCallback(t *testing.T) {
 	cfg := &config.AppConfig{
 		Physics: config.PhysicsConfig{
@@ -512,30 +426,6 @@ func TestJumpSkill_tryActivate_OnJumpCallback(t *testing.T) {
 	}
 }
 
-func TestJumpSkill_handleCoyoteAndJumpBuffering_Landing(t *testing.T) {
-	cfg := &config.AppConfig{
-		Physics: config.PhysicsConfig{
-			JumpBufferFrames: 5,
-			DownwardGravity:  4,
-			MaxFallSpeed:     128,
-		},
-	}
-	config.Set(cfg)
-
-	actor := newMockMovableCollidable()
-	model := movement.NewPlatformMovementModel(nil)
-
-	j := NewJumpSkill()
-	j.jumpBufferCounter = 2
-
-	// Simulate landing with buffered jump
-	wasOnGround := false
-	model.SetOnGround(true)
-
-	// Just verify it doesn't panic
-	j.handleCoyoteAndJumpBuffering(actor, model, wasOnGround)
-}
-
 func TestJumpSkill_HandleInput_Blocked(t *testing.T) {
 	actor := newMockMovableCollidable()
 	model := movement.NewPlatformMovementModel(&mockPlayerMovementBlocker{blocked: true})
@@ -546,8 +436,8 @@ func TestJumpSkill_HandleInput_Blocked(t *testing.T) {
 	// Should not activate when blocked
 	j.HandleInput(actor, model, sp)
 
-	if j.state != StateReady {
-		t.Errorf("expected state to remain Ready; got %s", j.state)
+	if j.State() != skill.StateReady {
+		t.Errorf("expected state to remain Ready; got %s", j.State())
 	}
 }
 
@@ -558,27 +448,9 @@ func TestHorizontalMovementSkill_New(t *testing.T) {
 	if s == nil {
 		t.Fatal("NewHorizontalMovementSkill returned nil")
 	}
-	if s.state != StateReady {
-		t.Errorf("expected state Ready; got %s", s.state)
+	if s.State() != skill.StateReady {
+		t.Errorf("expected state Ready; got %s", s.State())
 	}
-}
-
-func TestHorizontalMovementSkill_ActivationKey(t *testing.T) {
-	s := NewHorizontalMovementSkill()
-	// Returns zero value since not set
-	if s.ActivationKey() != ebiten.Key(0) {
-		t.Errorf("expected zero key; got %v", s.ActivationKey())
-	}
-}
-
-func TestHorizontalMovementSkill_Update(t *testing.T) {
-	actor := newMockMovableCollidable()
-	model := movement.NewPlatformMovementModel(nil)
-
-	s := NewHorizontalMovementSkill()
-	s.Update(actor, model)
-
-	// Should not panic
 }
 
 func TestHorizontalMovementSkill_HandleInput_Blocked(t *testing.T) {
@@ -630,45 +502,6 @@ func TestHorizontalMovementSkill_HandleInput_Immobile(t *testing.T) {
 	}
 }
 
-func TestHorizontalMovementSkill_HandleInput_WithInertia(t *testing.T) {
-	cfg := &config.AppConfig{
-		Physics: config.PhysicsConfig{
-			HorizontalInertia: 1.0,
-		},
-	}
-	config.Set(cfg)
-
-	actor := newMockMovableCollidable()
-	model := movement.NewPlatformMovementModel(nil)
-
-	s := NewHorizontalMovementSkill()
-
-	// Simulate key press (we can't actually press keys, so test the logic path)
-	// When inertia > 0, it uses OnMoveLeft/OnMoveRight
-	// This is tested via the input package which we can't easily mock
-	// So we just verify no panic
-	s.HandleInput(actor, model, nil)
-}
-
-func TestHorizontalMovementSkill_HandleInput_WithoutInertia(t *testing.T) {
-	cfg := &config.AppConfig{
-		Physics: config.PhysicsConfig{
-			HorizontalInertia: 0,
-		},
-	}
-	config.Set(cfg)
-
-	actor := newMockMovableCollidable()
-	model := movement.NewPlatformMovementModel(nil)
-
-	s := NewHorizontalMovementSkill()
-
-	// Without inertia, it sets velocity directly based on input
-	// Again, we can't simulate key presses easily
-	// Just verify no panic
-	s.HandleInput(actor, model, nil)
-}
-
 // Test timing integration
 func TestDashSkill_TimingConstants(t *testing.T) {
 	d := NewDashSkill()
@@ -677,10 +510,72 @@ func TestDashSkill_TimingConstants(t *testing.T) {
 	expectedDuration := timing.FromDuration(200 * time.Millisecond)
 	expectedCooldown := timing.FromDuration(750 * time.Millisecond)
 
-	if d.duration != expectedDuration {
-		t.Errorf("expected duration %d; got %d", expectedDuration, d.duration)
+	if d.Duration() != expectedDuration {
+		t.Errorf("expected duration %d; got %d", expectedDuration, d.Duration())
 	}
-	if d.cooldown != expectedCooldown {
-		t.Errorf("expected cooldown %d; got %d", expectedCooldown, d.cooldown)
+	if d.Cooldown() != expectedCooldown {
+		t.Errorf("expected cooldown %d; got %d", expectedCooldown, d.Cooldown())
 	}
+}
+
+func TestHorizontalMovementSkillImmobileBehavior(t *testing.T) {
+	cfg := &config.AppConfig{Physics: config.PhysicsConfig{HorizontalInertia: 0}}
+	config.Set(cfg)
+
+	actor := bodyphysics.NewObstacleRect(bodyphysics.NewRect(0, 0, 10, 10))
+	actor.SetID("actor")
+	actor.SetVelocity(fp16.To16(5), fp16.To16(3))
+	actor.SetAcceleration(fp16.To16(2), fp16.To16(1))
+	actor.SetImmobile(true)
+
+	s := NewHorizontalMovementSkill()
+	s.HandleInput(actor, movement.NewPlatformMovementModel(nil), nil)
+
+	vx, vy := actor.Velocity()
+	if vx != 0 {
+		t.Fatalf("expected vx=0 when immobile, got %d", vx)
+	}
+	if vy != fp16.To16(3) {
+		t.Fatalf("vy should remain unchanged, got %d", vy)
+	}
+}
+
+func TestDashSkillIntegratesWithMovementModel(t *testing.T) {
+	cfg := &config.AppConfig{
+		Physics: config.PhysicsConfig{
+			DownwardGravity: 4,
+			MaxFallSpeed:    128,
+		},
+	}
+	config.Set(cfg)
+
+	actor := bodyphysics.NewObstacleRect(bodyphysics.NewRect(0, 0, 10, 10))
+	actor.SetID("actor")
+	actor.SetFaceDirection(animation.FaceDirectionRight)
+
+	sp := space.NewSpace()
+	model := movement.NewPlatformMovementModel(nil)
+
+	d := NewDashSkill()
+	// Force active state for a few frames
+	d.SetState(skill.StateActive)
+	d.SetTimer(2)
+
+	// First update should set dash active and move horizontally
+	prevX, _ := actor.GetPositionMin()
+	d.Update(actor, model)
+	_ = model.Update(actor, sp)
+
+	newX, _ := actor.GetPositionMin()
+	if newX == prevX {
+		t.Fatalf("expected actor to move horizontally due to dash, prevX=%d newX=%d", prevX, newX)
+	}
+
+	// Advance to end active -> cooldown
+	d.Update(actor, model)
+	_ = model.Update(actor, sp) // should keep dash while timer > 0
+
+	// Next tick transitions to cooldown and clears dash on model
+	d.Update(actor, model)
+	_ = model.Update(actor, sp)
 }

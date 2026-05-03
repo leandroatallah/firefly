@@ -1,4 +1,4 @@
-package skill
+package kitskills
 
 import (
 	"time"
@@ -7,6 +7,7 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/combat"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/schemas"
 	"github.com/boilerplate/ebiten-template/internal/engine/event"
+	"github.com/boilerplate/ebiten-template/internal/engine/skill"
 	"github.com/boilerplate/ebiten-template/internal/engine/utils/fp16"
 	"github.com/boilerplate/ebiten-template/internal/engine/utils/timing"
 )
@@ -23,12 +24,12 @@ type SkillDeps struct {
 // Returns an empty slice if cfg is nil.
 // Skips skills with nil sub-config or Enabled == false.
 // Skips shooting skill if Inventory is nil.
-func FromConfig(cfg *schemas.SkillsConfig, deps SkillDeps) []Skill {
+func FromConfig(cfg *schemas.SkillsConfig, deps SkillDeps) []skill.Skill {
 	if cfg == nil {
-		return []Skill{}
+		return []skill.Skill{}
 	}
 
-	var skills []Skill
+	var skills []skill.Skill
 
 	// Movement skill
 	if cfg.Movement != nil && isEnabled(cfg.Movement.Enabled) {
@@ -53,13 +54,13 @@ func FromConfig(cfg *schemas.SkillsConfig, deps SkillDeps) []Skill {
 	if cfg.Dash != nil && isEnabled(cfg.Dash.Enabled) {
 		dashSkill := NewDashSkill()
 		if cfg.Dash.DurationMs > 0 {
-			dashSkill.duration = timing.FromDuration(time.Duration(cfg.Dash.DurationMs) * time.Millisecond)
+			dashSkill.SetDuration(timing.FromDuration(time.Duration(cfg.Dash.DurationMs) * time.Millisecond))
 		}
 		if cfg.Dash.CooldownMs > 0 {
-			dashSkill.cooldown = timing.FromDuration(time.Duration(cfg.Dash.CooldownMs) * time.Millisecond)
+			dashSkill.SetCooldown(timing.FromDuration(time.Duration(cfg.Dash.CooldownMs) * time.Millisecond))
 		}
 		if cfg.Dash.Speed > 0 {
-			dashSkill.speed = fp16.To16(cfg.Dash.Speed)
+			dashSkill.SetSpeed(fp16.To16(cfg.Dash.Speed))
 		}
 		if cfg.Dash.CanAirDash != nil {
 			dashSkill.canAirDash = *cfg.Dash.CanAirDash

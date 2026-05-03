@@ -1,4 +1,4 @@
-package skill_test
+package kitskills
 
 import (
 	"testing"
@@ -8,7 +8,6 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/combat"
 	"github.com/boilerplate/ebiten-template/internal/engine/mocks"
 	"github.com/boilerplate/ebiten-template/internal/engine/physics/movement"
-	"github.com/boilerplate/ebiten-template/internal/engine/physics/skill"
 )
 
 func TestShootingSkill_ShootStraight(t *testing.T) {
@@ -30,12 +29,11 @@ func TestShootingSkill_ShootStraight(t *testing.T) {
 		ActiveWeaponFunc: func() combat.Weapon { return mockWeapon },
 	}
 
-	s := skill.NewShootingSkill(mockInventory)
+	s := NewShootingSkill(mockInventory)
 	s.SetStateTransitionHandler(handler)
 
 	mockBody := &mockMovableCollidable{
-		getPosition16Func: func() (int, int) { return 0, 0 },
-		faceDirectionFunc: func() animation.FacingDirectionEnum { return animation.FaceDirectionRight },
+		ObstacleRect: newMockMovableCollidable().ObstacleRect,
 	}
 
 	s.HandleInputWithDirection(mockBody, nil, nil, false, false, false, false)
@@ -64,12 +62,11 @@ func TestShootingSkill_ShootUp(t *testing.T) {
 		ActiveWeaponFunc: func() combat.Weapon { return mockWeapon },
 	}
 
-	s := skill.NewShootingSkill(mockInventory)
+	s := NewShootingSkill(mockInventory)
 	s.SetStateTransitionHandler(handler)
 
 	mockBody := &mockMovableCollidable{
-		getPosition16Func: func() (int, int) { return 0, 0 },
-		faceDirectionFunc: func() animation.FacingDirectionEnum { return animation.FaceDirectionRight },
+		ObstacleRect: newMockMovableCollidable().ObstacleRect,
 	}
 
 	s.HandleInputWithDirection(mockBody, nil, nil, true, false, false, false)
@@ -98,12 +95,11 @@ func TestShootingSkill_ShootDownAirborne(t *testing.T) {
 		ActiveWeaponFunc: func() combat.Weapon { return mockWeapon },
 	}
 
-	s := skill.NewShootingSkill(mockInventory)
+	s := NewShootingSkill(mockInventory)
 	s.SetStateTransitionHandler(handler)
 
 	mockBody := &mockMovableCollidable{
-		getPosition16Func: func() (int, int) { return 0, 0 },
-		faceDirectionFunc: func() animation.FacingDirectionEnum { return animation.FaceDirectionRight },
+		ObstacleRect: newMockMovableCollidable().ObstacleRect,
 	}
 
 	model := &movement.PlatformMovementModel{}
@@ -135,12 +131,11 @@ func TestShootingSkill_ShootDownGrounded_Ignored(t *testing.T) {
 		ActiveWeaponFunc: func() combat.Weapon { return mockWeapon },
 	}
 
-	s := skill.NewShootingSkill(mockInventory)
+	s := NewShootingSkill(mockInventory)
 	s.SetStateTransitionHandler(handler)
 
 	mockBody := &mockMovableCollidable{
-		getPosition16Func: func() (int, int) { return 0, 0 },
-		faceDirectionFunc: func() animation.FacingDirectionEnum { return animation.FaceDirectionRight },
+		ObstacleRect: newMockMovableCollidable().ObstacleRect,
 	}
 
 	model := &movement.PlatformMovementModel{}
@@ -172,12 +167,11 @@ func TestShootingSkill_DiagonalUpForward(t *testing.T) {
 		ActiveWeaponFunc: func() combat.Weapon { return mockWeapon },
 	}
 
-	s := skill.NewShootingSkill(mockInventory)
+	s := NewShootingSkill(mockInventory)
 	s.SetStateTransitionHandler(handler)
 
 	mockBody := &mockMovableCollidable{
-		getPosition16Func: func() (int, int) { return 0, 0 },
-		faceDirectionFunc: func() animation.FacingDirectionEnum { return animation.FaceDirectionRight },
+		ObstacleRect: newMockMovableCollidable().ObstacleRect,
 	}
 
 	s.HandleInputWithDirection(mockBody, nil, nil, true, false, true, false)
@@ -207,12 +201,11 @@ func TestShootingSkill_DirectionChangeMidShooting(t *testing.T) {
 		ActiveWeaponFunc: func() combat.Weapon { return mockWeapon },
 	}
 
-	s := skill.NewShootingSkill(mockInventory)
+	s := NewShootingSkill(mockInventory)
 	s.SetStateTransitionHandler(handler)
 
 	mockBody := &mockMovableCollidable{
-		getPosition16Func: func() (int, int) { return 0, 0 },
-		faceDirectionFunc: func() animation.FacingDirectionEnum { return animation.FaceDirectionRight },
+		ObstacleRect: newMockMovableCollidable().ObstacleRect,
 	}
 
 	s.HandleInputWithDirection(mockBody, nil, nil, false, false, false, false)
@@ -246,12 +239,11 @@ func TestShootingSkill_ReleaseDirectionalInput(t *testing.T) {
 		ActiveWeaponFunc: func() combat.Weapon { return mockWeapon },
 	}
 
-	s := skill.NewShootingSkill(mockInventory)
+	s := NewShootingSkill(mockInventory)
 	s.SetStateTransitionHandler(handler)
 
 	mockBody := &mockMovableCollidable{
-		getPosition16Func: func() (int, int) { return 0, 0 },
-		faceDirectionFunc: func() animation.FacingDirectionEnum { return animation.FaceDirectionRight },
+		ObstacleRect: newMockMovableCollidable().ObstacleRect,
 	}
 
 	s.HandleInputWithDirection(mockBody, nil, nil, true, false, false, false)
@@ -286,13 +278,12 @@ func TestShootingSkill_DuckingShooting(t *testing.T) {
 		ActiveWeaponFunc: func() combat.Weapon { return mockWeapon },
 	}
 
-	s := skill.NewShootingSkill(mockInventory)
+	s := NewShootingSkill(mockInventory)
 	s.SetStateTransitionHandler(handler)
 
 	mockBody := &mockMovableCollidable{
-		getPosition16Func: func() (int, int) { return 0, 0 },
-		faceDirectionFunc: func() animation.FacingDirectionEnum { return animation.FaceDirectionRight },
-		isDuckingFunc:     func() bool { return true },
+		ObstacleRect:  newMockMovableCollidable().ObstacleRect,
+		isDuckingFunc: func() bool { return true },
 	}
 
 	model := &movement.PlatformMovementModel{}

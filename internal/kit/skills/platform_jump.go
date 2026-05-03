@@ -1,4 +1,4 @@
-package skill
+package kitskills
 
 import (
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
@@ -6,11 +6,13 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/input"
 	physicsmovement "github.com/boilerplate/ebiten-template/internal/engine/physics/movement"
 	spacephysics "github.com/boilerplate/ebiten-template/internal/engine/physics/space"
+	"github.com/boilerplate/ebiten-template/internal/engine/skill"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
+// JumpSkill implements a platformer jump with coyote time and jump buffering.
 type JumpSkill struct {
-	SkillBase
+	skill.SkillBase
 	activationKey ebiten.Key
 
 	coyoteTimeCounter int
@@ -20,17 +22,18 @@ type JumpSkill struct {
 	jumpCutPending    bool
 	jumpPressed       bool
 
+	// OnJump is called when the actor jumps.
 	OnJump func(body body.MovableCollidable)
 }
 
+// NewJumpSkill creates a new JumpSkill with default values.
 func NewJumpSkill() *JumpSkill {
-	return &JumpSkill{
-		SkillBase: SkillBase{
-			state: StateReady,
-		},
+	s := &JumpSkill{
 		activationKey:     ebiten.KeySpace,
 		jumpCutMultiplier: 1.0,
 	}
+	s.SetState(skill.StateReady)
+	return s
 }
 
 // SetJumpCutMultiplier sets the velocity multiplier applied on early jump release.
@@ -44,26 +47,28 @@ func (s *JumpSkill) SetJumpCutMultiplier(m float64) {
 	s.jumpCutMultiplier = m
 }
 
+// ActivationKey returns the key that triggers the jump.
 func (s *JumpSkill) ActivationKey() ebiten.Key {
 	return s.activationKey
 }
 
 // HandleInput checks for the jump activation key.
-func (s *JumpSkill) HandleInput(body body.MovableCollidable, model *physicsmovement.PlatformMovementModel, space body.BodiesSpace) {
+func (s *JumpSkill) HandleInput(b body.MovableCollidable, model *physicsmovement.PlatformMovementModel, space body.BodiesSpace) {
 	if model != nil && model.IsInputBlocked() {
 		return
 	}
 	cmds := input.CommandsReader()
 	jumpPressed := cmds.Jump
 	if jumpPressed && !s.jumpPressed {
-		s.tryActivate(body, model, space)
+		s.tryActivate(b, model, space)
 	}
 	if !jumpPressed && s.jumpPressed && s.jumpCutPending {
-		s.applyJumpCut(body)
+		s.applyJumpCut(b)
 	}
 	s.jumpPressed = jumpPressed
 }
 
+// Update advances jump state (coyote time, jump buffering).
 func (s *JumpSkill) Update(b body.MovableCollidable, model *physicsmovement.PlatformMovementModel) {
 	s.SkillBase.Update(b, model)
 
@@ -74,33 +79,32 @@ func (s *JumpSkill) Update(b body.MovableCollidable, model *physicsmovement.Plat
 	s.handleCoyoteAndJumpBuffering(b, model, model.OnGround())
 }
 
-func (s *JumpSkill) tryActivate(body body.MovableCollidable, model *physicsmovement.PlatformMovementModel, space body.BodiesSpace) {
+func (s *JumpSkill) tryActivate(b body.MovableCollidable, model *physicsmovement.PlatformMovementModel, space body.BodiesSpace) {
 	cfg := config.Get()
 	if model.OnGround() || s.coyoteTimeCounter > 0 {
-		force := int(float64(cfg.Physics.JumpForce) * body.JumpForceMultiplier())
+		force := int(float64(cfg.Physics.JumpForce) * b.JumpForceMultiplier())
 		if force <= 0 {
 			return
 		}
 
-		body.TryJump(force)
+		b.TryJump(force)
 		s.jumpCutPending = true
 
 		if s.OnJump != nil {
-			s.OnJump(body)
+			s.OnJump(b)
 		}
 
 		// Check against map boundaries if the actor has a physics space.
 		for _, other := range space.Bodies() {
-			if other == nil || other.ID() == body.ID() {
+			if other == nil || other.ID() == b.ID() {
 				continue
 			}
 
-			if !spacephysics.HasCollision(body, other) {
+			if !spacephysics.HasCollision(b, other) {
 				continue
 			}
 
 			if other.IsObstructive() {
-				// blocking = true
 				break
 			}
 		}
@@ -113,8 +117,8 @@ func (s *JumpSkill) tryActivate(body body.MovableCollidable, model *physicsmovem
 	}
 }
 
-// Coyote Time & Jump Buffering
-func (s *JumpSkill) handleCoyoteAndJumpBuffering(body body.MovableCollidable, model *physicsmovement.PlatformMovementModel, wasOnGround bool) {
+// handleCoyoteAndJumpBuffering manages coyote time and jump buffering logic.
+func (s *JumpSkill) handleCoyoteAndJumpBuffering(b body.MovableCollidable, model *physicsmovement.PlatformMovementModel, wasOnGround bool) {
 	cfg := config.Get()
 
 	if model.OnGround() {
@@ -130,15 +134,15 @@ func (s *JumpSkill) handleCoyoteAndJumpBuffering(body body.MovableCollidable, mo
 	}
 
 	if !wasOnGround && model.OnGround() && s.jumpBufferCounter > 0 {
-		force := int(float64(cfg.Physics.JumpForce) * body.JumpForceMultiplier())
+		force := int(float64(cfg.Physics.JumpForce) * b.JumpForceMultiplier())
 		if force <= 0 {
 			return
 		}
 
-		body.TryJump(force)
+		b.TryJump(force)
 		s.jumpCutPending = true
 		if s.OnJump != nil {
-			s.OnJump(body)
+			s.OnJump(b)
 		}
 		model.SetOnGround(false)
 		s.jumpBufferCounter = 0
