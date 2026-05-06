@@ -5,10 +5,12 @@ import (
 	"testing"
 
 	"github.com/boilerplate/ebiten-template/internal/engine/app"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/dialogue"
 	"github.com/boilerplate/ebiten-template/internal/engine/event"
+	"github.com/boilerplate/ebiten-template/internal/engine/mocks"
 	"github.com/boilerplate/ebiten-template/internal/engine/physics/space"
 	"github.com/boilerplate/ebiten-template/internal/engine/scene"
-	"github.com/boilerplate/ebiten-template/internal/engine/ui/speech"
+	enginespeech "github.com/boilerplate/ebiten-template/internal/engine/ui/speech"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -40,8 +42,14 @@ func (s *stubSpeech) SetSkipFlash(_ int)             {}
 func (s *stubSpeech) IsAccumulative() bool           { return s.accumulativeVal }
 func (s *stubSpeech) SetAccumulative(v bool)         { s.accumulativeVal = v }
 
-func newTestDialogueManager() *speech.Manager {
-	return speech.NewManager(&stubSpeech{id: speech.BubbleSpeechID})
+func newTestDialogueManager() dialogue.Manager {
+	stub := &stubSpeech{id: dialogue.BubbleSpeechID}
+	m := &mocks.MockDialogueManager{
+		ActiveSpeech:    stub,
+		IsSpeakingValue: true,
+	}
+	m.GetActiveSpeechFunc = func() enginespeech.Speech { return stub }
+	return m
 }
 
 func setupTestAppContext() *app.AppContext {

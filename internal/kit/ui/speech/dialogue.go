@@ -4,14 +4,25 @@ import (
 	"strings"
 
 	"github.com/boilerplate/ebiten-template/internal/engine/audio"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/dialogue"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
 	"github.com/boilerplate/ebiten-template/internal/engine/input"
+	enginespeech "github.com/boilerplate/ebiten-template/internal/engine/ui/speech"
 	"github.com/hajimehoshi/ebiten/v2"
+)
+
+// Compile-time assertion that Manager satisfies the engine-facing contract.
+var _ dialogue.Manager = (*Manager)(nil)
+
+// ID constant aliases so callers that import kit/ui/speech keep working.
+const (
+	BubbleSpeechID = dialogue.BubbleSpeechID
+	StorySpeechID  = dialogue.StorySpeechID
 )
 
 // Manager handles the display of dialogue and speech bubbles.
 type Manager struct {
-	speeches        map[string]Speech
+	speeches        map[string]enginespeech.Speech
 	activeSpeech    string
 	isSpeaking      bool
 	currentText     string
@@ -37,15 +48,10 @@ type typingSoundPolicy interface {
 	TypingSoundEnabled() bool
 }
 
-const (
-	BubbleSpeechID = "bubble"
-	StorySpeechID  = "story"
-)
-
 // NewManager creates a new dialogue manager.
-func NewManager(s ...Speech) *Manager {
+func NewManager(s ...enginespeech.Speech) *Manager {
 	m := &Manager{
-		speeches: make(map[string]Speech),
+		speeches: make(map[string]enginespeech.Speech),
 		config:   config.Get(),
 	}
 	for _, s := range s {
@@ -54,7 +60,7 @@ func NewManager(s ...Speech) *Manager {
 	return m
 }
 
-func (m *Manager) AddSpeech(s Speech) {
+func (m *Manager) AddSpeech(s enginespeech.Speech) {
 	m.speeches[s.ID()] = s
 }
 
@@ -64,7 +70,7 @@ func (m *Manager) SetSpeech(id string) {
 	}
 }
 
-func (m *Manager) GetActiveSpeech() Speech {
+func (m *Manager) GetActiveSpeech() enginespeech.Speech {
 	return m.speeches[m.activeSpeech]
 }
 
@@ -277,7 +283,7 @@ func (m *Manager) stopSpeechAudio(clearQueue bool) {
 	m.speechAudioPlayingKey = ""
 }
 
-func (m *Manager) updateTypingSound(s Speech) {
+func (m *Manager) updateTypingSound(s enginespeech.Speech) {
 	cfg := m.config
 	if cfg == nil || !cfg.EnableTypingSounds || m.audioManager == nil || len(m.typingSounds) == 0 {
 		return

@@ -14,11 +14,12 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/render/particles/vfx"
 	"github.com/boilerplate/ebiten-template/internal/engine/scene"
 	"github.com/boilerplate/ebiten-template/internal/engine/scene/phases"
-	"github.com/boilerplate/ebiten-template/internal/engine/ui/speech"
+	enginespeech "github.com/boilerplate/ebiten-template/internal/engine/ui/speech"
 	gamescene "github.com/boilerplate/ebiten-template/internal/game/scenes"
 	scenestypes "github.com/boilerplate/ebiten-template/internal/game/scenes/types"
 	gamespeech "github.com/boilerplate/ebiten-template/internal/game/ui/speech"
 	"github.com/boilerplate/ebiten-template/internal/kit/combat/projectile"
+	kitspeech "github.com/boilerplate/ebiten-template/internal/kit/ui/speech"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -50,13 +51,13 @@ func Setup(assets fs.FS) error {
 		return err
 	}
 
-	speechFontMain := speech.NewSpeechFont(fontMain, 8, 14)
-	speechFontSmall := speech.NewSpeechFont(fontSmall, 8, 12)
+	speechFontMain := enginespeech.NewSpeechFont(fontMain, 8, 14)
+	speechFontSmall := enginespeech.NewSpeechFont(fontSmall, 8, 12)
 
 	speechBubble := gamespeech.NewSpeechBubble(assets, speechFontMain, i18nManager)
 	speechStory := gamespeech.NewStorySpeech(speechFontSmall, i18nManager)
-	dialogueManager := speech.NewManager(speechBubble, speechStory)
-	dialogueManager.SetActiveSpeech(speech.BubbleSpeechID)
+	dialogueManager := kitspeech.NewManager(speechBubble, speechStory)
+	dialogueManager.SetActiveSpeech(kitspeech.BubbleSpeechID)
 	dialogueManager.SetAudioManager(audioManager)
 	dialogueManager.SetTypingSounds(collectSpeechBleeps(assets))
 	dialogueManager.SetDefaultSpeechAudio(collectSpeechBleeps(assets))

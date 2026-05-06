@@ -6,6 +6,7 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/i18n"
 	"github.com/boilerplate/ebiten-template/internal/engine/ui/speech"
+	kitspeech "github.com/boilerplate/ebiten-template/internal/kit/ui/speech"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -23,7 +24,7 @@ func NewStorySpeech(fontSource *speech.SpeechFont, i18nManager *i18n.I18nManager
 	}
 	s.SetAccumulative(true)
 	s.indicator = indicatorImg
-	s.SetID(speech.StorySpeechID)
+	s.SetID(kitspeech.StorySpeechID)
 	s.SetColor(color.White) // Default to white for storytelling
 	return s
 }

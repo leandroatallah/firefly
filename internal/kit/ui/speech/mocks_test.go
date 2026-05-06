@@ -6,6 +6,10 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
+// mockSpeech is a hand-rolled fake satisfying internal/engine/ui/speech.Speech.
+// It lives in this package to support white-box tests for Manager without
+// exposing test helpers in production code or duplicating ebiten image
+// boundaries elsewhere.
 type mockSpeech struct {
 	id                string
 	visible           bool

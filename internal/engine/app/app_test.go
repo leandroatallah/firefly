@@ -7,7 +7,6 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
 	"github.com/boilerplate/ebiten-template/internal/engine/mocks"
 	"github.com/boilerplate/ebiten-template/internal/engine/scene/phases"
-	"github.com/boilerplate/ebiten-template/internal/engine/ui/speech"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -19,7 +18,7 @@ func TestGameUpdateAndDrawIntegration(t *testing.T) {
 
 	ctx := &AppContext{
 		Config:          cfg,
-		DialogueManager: speech.NewManager(),
+		DialogueManager: &mocks.MockDialogueManager{},
 	}
 
 	sm := &mocks.MockSceneManager{}

@@ -2,8 +2,8 @@ package sequences
 
 import (
 	"github.com/boilerplate/ebiten-template/internal/engine/app"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/dialogue"
 	"github.com/boilerplate/ebiten-template/internal/engine/event"
-	"github.com/boilerplate/ebiten-template/internal/engine/ui/speech"
 )
 
 // EventCommand publishes an event to the global event manager.
@@ -38,7 +38,7 @@ type DialogueCommand struct {
 	SpeechAudio      []string
 	EnableSpeechSkip *bool
 	Accumulative     *bool
-	dialogueManager  *speech.Manager
+	dialogueManager  dialogue.Manager
 }
 
 func (c *DialogueCommand) Init(appContext any) {
@@ -46,7 +46,7 @@ func (c *DialogueCommand) Init(appContext any) {
 	c.dialogueManager = ctx.DialogueManager
 	speechID := c.SpeechID
 	if speechID == "" {
-		speechID = speech.BubbleSpeechID
+		speechID = dialogue.BubbleSpeechID
 	}
 	c.dialogueManager.SetActiveSpeech(speechID)
 

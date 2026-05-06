@@ -9,6 +9,7 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/i18n"
 	"github.com/boilerplate/ebiten-template/internal/engine/ui/speech"
+	kitspeech "github.com/boilerplate/ebiten-template/internal/kit/ui/speech"
 	"github.com/ebitenui/ebitenui/image"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -42,7 +43,7 @@ func NewSpeechBubble(fsys fs.FS, fontSource *speech.SpeechFont, i18nManager *i18
 		baseSpeech: newBaseSpeech(fontSource, i18nManager),
 		nineSlice:  ns,
 	}
-	s.SetID(speech.BubbleSpeechID)
+	s.SetID(kitspeech.BubbleSpeechID)
 	s.indicator = indicatorImg
 	return s
 }

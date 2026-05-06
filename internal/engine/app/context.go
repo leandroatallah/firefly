@@ -9,6 +9,7 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/audio"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	contractscombat "github.com/boilerplate/ebiten-template/internal/engine/contracts/combat"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/dialogue"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/navigation"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/vfx"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
@@ -17,7 +18,6 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
 	"github.com/boilerplate/ebiten-template/internal/engine/event"
 	"github.com/boilerplate/ebiten-template/internal/engine/scene/phases"
-	"github.com/boilerplate/ebiten-template/internal/engine/ui/speech"
 )
 
 // AppContext holds all major systems and services that are shared across the
@@ -28,7 +28,7 @@ type AppContext struct {
 	AudioManager      audio.Manager
 	ImageManager      *imagemanager.ImageManager
 	DataManager       *datamanager.Manager
-	DialogueManager   *speech.Manager
+	DialogueManager   dialogue.Manager
 	EventManager      *event.Manager
 	ActorManager      *actors.Manager
 	SceneManager      navigation.SceneManager
