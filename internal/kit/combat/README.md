@@ -1,6 +1,6 @@
 # Combat System
 
-The `internal/engine/combat` package provides a modular and extensible combat system for the engine. It is designed to handle weapon management, firing logic, and projectile lifecycles in a way that decouples the game logic from the underlying physics and rendering.
+The `internal/kit/combat` package provides a modular and extensible combat system for the kit layer. It is designed to handle weapon management, firing logic, and projectile lifecycles in a way that decouples the game logic from the underlying physics and rendering.
 
 ## Architecture Overview
 

@@ -2,15 +2,11 @@
 
 This module contains the core, reusable game engine components. It is designed to be game-agnostic and provides the fundamental building blocks for creating a 2D game.
 
+> **Three-layer architecture:** `engine` (abstractions + core systems) ← `kit` (genre-reusable concrete implementations: combat, skills, actor archetypes, UI) ← `game` (project-specific code). See [ADR-006](../../docs/adr/ADR-006-engine-game-layer-separation.md).
+
 ## Core Components
 
 - `app/`: Manages the main engine loop, context, and initialization (`engine.go`, `context.go`).
-- `combat/`: Handles weapon management, inventory, projectile lifecycles, and faction-gated damage.
-  - `inventory/`: Manages weapon collections and ammo.
-  - `weapon/`: Logic for firing and cooldowns; includes `EnemyShooting` for automatic enemy fire and `ProjectileWeapon` with per-state spawn offsets and muzzle-flash VFX.
-  - `projectile/`: High-performance projectile management with lifetime, damage, and impact/despawn VFX hooks.
-  - `melee/`: Per-actor melee swing state (`Controller` + `State`): input buffering, combo advancement, hitbox application, VFX, and dynamic return-state selection.
-  - `faction.go`: `FactionNeutral | FactionPlayer | FactionEnemy` — side identification used to prevent self-damage.
 - `contracts/`: Defines the Go interfaces (contracts) for key engine components like animations, bodies, configuration, context, navigation, sequences, tilemap layers, and visual effects (vfx). This promotes a decoupled architecture.
 - `data/`: Handles data loading, management, and configuration schemas (e.g., from JSON files).
   - `config/`: Engine-specific configuration structures.
@@ -38,9 +34,6 @@ This module contains the core, reusable game engine components. It is designed t
 - `physics/`: Implements the physics simulation.
   - `body/`: Defines physical body interfaces and implementations.
   - `movement/`: Provides movement models (e.g., platformer physics). Includes one-way platform drop-through logic.
-  - `skill/`: Manages physics-related skills or abilities. See [`physics/skill/README.md`](physics/skill/README.md).
-    - `JumpSkill` (variable jump height), `DashSkill` (tween-based deceleration), `HorizontalMovementSkill`, `ShootingSkill`.
-    - `factory.go` (`FromConfig`) — builds the skill set from a JSON `SkillsConfig`.
   - `space/`: Handles collision detection and spatial partitioning.
   - `tween/`: Interpolation utilities.
     - `InOutSineTween`: Smooth `InOutSine` tween used by the dash deceleration.
@@ -75,7 +68,7 @@ This module contains the core, reusable game engine components. It is designed t
 - `ui/`: Provides building blocks for user interface elements.
   - `hud/`: Base components for Heads-Up Displays.
   - `menu/`: Components for creating interactive menus.
-  - `speech/`: Components for speech bubbles and dialogue systems.
+  - `speech/`: Font and text rendering helpers. The `speech.Manager` dialogue implementation lives in `internal/kit/ui/speech/`.
 
 ## Architecture Decision Records
 
@@ -86,7 +79,7 @@ Key non-obvious design choices are documented in [`docs/adr/`](../../docs/adr/):
 - [ADR-003](../../docs/adr/ADR-003-goroutine-audio-looping.md) — Why audio looping uses goroutines instead of Ebitengine's built-in loop
 - [ADR-004](../../docs/adr/ADR-004-space-body-model-physics.md) — Why physics is split into Space / Body / MovementModel layers
 - [ADR-005](../../docs/adr/ADR-005-composite-grounded-sub-state.md) — Why the grounded state uses a sub-state machine instead of flat states
-- [ADR-006](../../docs/adr/ADR-006-engine-game-layer-separation.md) — Engine/Game two-layer architecture
+- [ADR-006](../../docs/adr/ADR-006-engine-game-layer-separation.md) — Three-layer architecture: engine / kit / game
 - [ADR-007](../../docs/adr/ADR-007-fp16-scale-factor.md) — FP16 scale factor is 16, not 65536
 - [ADR-008](../../docs/adr/ADR-008-state-contributor-pattern.md) — StateContributor hook for extensible state transitions
 - [ADR-009](../../docs/adr/ADR-009-per-actor-state-instance-override.md) — Per-actor state instance override for states requiring complex injection or shared identity across enums

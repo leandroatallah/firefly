@@ -13,7 +13,6 @@ This module contains the game-specific implementation built on top of `internal/
   - `actors/`: Player, NPCs, and enemies.
     - `enemies/`: Enemy implementations (`bat`, `wolf`).
     - `events/`: Actor-specific event handling.
-    - `methods/`: Reusable actor behaviors (e.g., death).
     - `npcs/`: NPC implementations. The `ClimberPlayer` is reused as an NPC type.
     - `player/`: Player character (`ClimberPlayer`).
     - `states/`: Custom actor state machine states (`Dying`, `Dead`, `Exiting`), plus the composite grounded sub-state machine:

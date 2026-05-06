@@ -23,7 +23,7 @@ This package contains **only interface definitions** — no implementation logic
 - `config/`: Engine-side configuration structures.
 - `context/`: App/scene context hand-off interfaces.
 - `navigation/`: Scene-navigation hooks (`NavigateTo`, `NavigateBack`).
-- `projectile/`: `Manager` interface (spawn/update/draw/clear) — kept separate from `combat` to avoid a circular import between `combat` and `projectile`.
+- `projectile/`: `Manager` interface (spawn/update/draw/clear) — kept separate from `combat` to avoid a circular import between `combat` and `projectile`. Implementation and tests live in `internal/kit/combat/projectile/`.
 - `scene/`: Scene-level contracts.
   - `Freezable` — `FreezeFrame(durationFrames int)` and `IsFrozen() bool`, the injectable interface for the hit-stop freeze effect.
 - `sequences/`: `Sequence` and `Command` interfaces used by the scripted event player.

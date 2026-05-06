@@ -1,25 +1,37 @@
-# ADR-006 — Engine/Game Two-Layer Architecture
+# ADR-006 — Three-Layer Architecture: Engine / Kit / Game
 
 ## Status
-Superseded by 046
-> **Note:** Superseded by story `046-kit-layer-validation-step`, which validates a three-layer architecture (`engine` ← `kit` ← `game`) by relocating `IdleSubState` to `internal/kit/states/`. A full ADR rewrite is deferred until follow-up stories 047–052 populate the `kit` layer; see `.agents/work/active/046-kit-layer-validation-step/SPEC.md` for the validation rationale.
+Accepted (amended from two-layer; kit layer validated by stories 046–052)
 
 ## Context
-The codebase separates reusable engine code from game-specific implementation. This raises the question: where should concrete implementations (states, skills, scenes) live? Three options exist:
+The codebase separates reusable engine code from game-specific implementation. The original decision (two-layer: `engine` + `game`) placed both abstractions and genre-reusable concrete implementations in `engine`. As the concrete implementations grew (skills, combat, actor archetypes, UI dialogue), this created a tension: `engine` was accumulating code that wasn't truly engine-level but was reusable across games in the same genre.
 
-1. **Two-layer:** Engine contains both abstractions and common concrete implementations; game contains project-specific code.
-2. **Strict two-layer:** Engine contains only abstractions; all concrete code lives in game.
-3. **Three-layer:** Engine (abstractions) + Library (reusable concrete) + Game (project-specific).
+Story `046-kit-layer-validation-step` introduced a `kit` layer as a proof of concept, and stories 047–052 completed the migration.
 
 ## Decision
-Use a **two-layer architecture** with pragmatic placement rules:
+Use a **three-layer architecture**:
 
-- **`internal/engine/`**: Abstractions (contracts, core systems) + common concrete implementations used in 80%+ of games in the genre (e.g., `IdleState`, `WalkingState`, `JumpingState`, `JumpSkill` for platformers).
-- **`internal/game/`**: Project-specific concrete implementations (e.g., `ClimbingState`, `SwimmingState`, custom skills, all level scenes).
+- **`internal/engine/`**: Abstractions (contracts/interfaces) + minimal core systems (`app`, `entity`, `physics`, `scene`, `sequences`, `render`, `audio`, `input`, `data`). Nothing here should depend on genre-specific concepts.
+- **`internal/kit/`**: Genre-reusable concrete implementations that depend on `engine` contracts but are not game-specific. Includes:
+  - `combat/` — weapon inventory, projectile lifecycle, melee controller, faction system.
+  - `skills/` — `JumpSkill`, `DashSkill`, `HorizontalMovementSkill`, `ShootingSkill`, and a JSON `FromConfig` factory.
+  - `actors/` — reusable actor trait compositions (`MeleeCharacter`, `ShooterCharacter`, `DeathBehavior`).
+  - `states/` — genre-reusable state machine states.
+  - `ui/speech/` — `speech.Manager` dialogue implementation.
+- **`internal/game/`**: Project-specific concrete implementations (player, enemies, scenes, custom states, level-specific logic).
+
+## Placement Rules
+
+| Question | Layer |
+|---|---|
+| Is this an abstraction (interface/contract)? | `engine` |
+| Is this a core system needed by all game types? | `engine` |
+| Would 80%+ of games in this genre use this as-is? | `kit` |
+| Is this specific to *this* game's design? | `game` |
 
 ## Consequences
-- Clear separation without unnecessary folder overhead.
-- Engine stays reusable for similar game genres without bloat.
-- Developers extend the engine by adding game-specific states/skills/scenes to `internal/game/` and registering them with the engine's systems.
-- If multiple games share the same concrete implementations in the future, refactor to a three-layer architecture (engine/library/game).
-- Risk: Engine may accumulate "maybe reusable" code. Mitigation: Apply the 80% rule strictly—if a state isn't genre-defining, it belongs in game.
+- Engine stays minimal and genre-agnostic.
+- Kit provides a reusable genre library without polluting engine.
+- Game layer stays thin: it wires kit components to project-specific art, levels, and rules.
+- Dependency direction is strict: `game` → `kit` → `engine`. No reverse dependencies.
+- Risk: Kit may accumulate "maybe reusable" code. Apply the 80% rule strictly — if a component is only likely used in this one game, it belongs in `game`.
