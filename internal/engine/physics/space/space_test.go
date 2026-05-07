@@ -204,3 +204,8 @@ func TestSpaceResolveCollisionsAndQueryIntegration(t *testing.T) {
 		t.Fatalf("expected no blocking collision when other body is not obstructive")
 	}
 }
+
+func (m *testCollidable) Altitude() int           { return 0 }
+func (m *testCollidable) SetAltitude(alt int)     {}
+func (m *testCollidable) Altitude16() int         { return 0 }
+func (m *testCollidable) SetAltitude16(alt16 int) {}

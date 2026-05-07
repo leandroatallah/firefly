@@ -95,6 +95,11 @@ type Movable interface {
 	SetHorizontalInertia(inertia float64)
 	// HorizontalInertia returns the current horizontal inertia factor.
 	HorizontalInertia() float64
+
+	VAltitude16() int
+	SetVAltitude16(v16 int)
+	AccelerationAltitude() int
+	SetAccelerationAltitude(acc int)
 }
 
 // Collidable represents a body that participates in collision detection.
@@ -203,6 +208,10 @@ type Body interface {
 	GetPositionMin() (x, y int)
 	// GetShape returns the Shape describing this body's dimensions.
 	GetShape() Shape
+	Altitude() int
+	SetAltitude(alt int)
+	Altitude16() int
+	SetAltitude16(alt16 int)
 }
 
 // BodiesSpace manages a collection of collidable bodies and resolves collisions between them.

@@ -15,8 +15,10 @@ type MovableBody struct {
 
 	vx16                int
 	vy16                int
+	vAltitude16         int
 	accelerationX       int
 	accelerationY       int
+	accAltitude         int
 	speed               int
 	maxSpeed            int
 	jumpForceMultiplier float64
@@ -224,3 +226,8 @@ func (b *MovableBody) SetHorizontalInertia(inertia float64) {
 func (b *MovableBody) HorizontalInertia() float64 {
 	return b.horizontalInertia
 }
+
+func (b *MovableBody) VAltitude16() int              { return b.vAltitude16 }
+func (b *MovableBody) SetVAltitude16(v16 int)        { b.vAltitude16 = v16 }
+func (b *MovableBody) AccelerationAltitude() int     { return b.accAltitude }
+func (b *MovableBody) SetAccelerationAltitude(a int) { b.accAltitude = a }

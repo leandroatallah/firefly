@@ -277,3 +277,18 @@ var (
 	_ contractscombat.Damageable   = (*fakeDamageableBody)(nil)
 	_ contractscombat.Destructible = (*fakeDestructible)(nil)
 )
+
+func (m *mockCollidable) Altitude() int           { return 0 }
+func (m *mockCollidable) SetAltitude(alt int)     {}
+func (m *mockCollidable) Altitude16() int         { return 0 }
+func (m *mockCollidable) SetAltitude16(alt16 int) {}
+
+func (m *fakeDamageableBody) Altitude() int           { return 0 }
+func (m *fakeDamageableBody) SetAltitude(alt int)     {}
+func (m *fakeDamageableBody) Altitude16() int         { return 0 }
+func (m *fakeDamageableBody) SetAltitude16(alt16 int) {}
+
+func (m *mockPassthroughBody) Altitude() int           { return 0 }
+func (m *mockPassthroughBody) SetAltitude(alt int)     {}
+func (m *mockPassthroughBody) Altitude16() int         { return 0 }
+func (m *mockPassthroughBody) SetAltitude16(alt16 int) {}

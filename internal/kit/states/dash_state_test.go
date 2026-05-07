@@ -204,3 +204,13 @@ func TestDashStateUpdate(t *testing.T) {
 		}
 	})
 }
+
+func (m *mockBody) Altitude() int           { return 0 }
+func (m *mockBody) SetAltitude(alt int)     {}
+func (m *mockBody) Altitude16() int         { return 0 }
+func (m *mockBody) SetAltitude16(alt16 int) {}
+
+func (m *mockBody) VAltitude16() int              { return 0 }
+func (m *mockBody) SetVAltitude16(v16 int)        {}
+func (m *mockBody) AccelerationAltitude() int     { return 0 }
+func (m *mockBody) SetAccelerationAltitude(a int) {}

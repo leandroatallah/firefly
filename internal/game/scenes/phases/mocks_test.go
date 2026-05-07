@@ -115,3 +115,9 @@ func (c *mockCollidable) ApplyValidPosition(_ int, _ bool, _ body.BodiesSpace) (
 }
 func (c *mockCollidable) OnTouch(body.Collidable) {}
 func (c *mockCollidable) OnBlock(body.Collidable) {}
+
+// Body altitude stubs
+func (c *mockCollidable) Altitude() int           { return 0 }
+func (c *mockCollidable) SetAltitude(alt int)     {}
+func (c *mockCollidable) Altitude16() int         { return 0 }
+func (c *mockCollidable) SetAltitude16(alt16 int) {}

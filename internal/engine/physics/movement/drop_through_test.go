@@ -177,3 +177,8 @@ func TestDropThrough_PassThroughExpires(t *testing.T) {
 		t.Error("expected IsPassThrough=false after 2 ticks (expired)")
 	}
 }
+
+func (m *mockOneWayPlatform) Altitude() int           { return 0 }
+func (m *mockOneWayPlatform) SetAltitude(alt int)     {}
+func (m *mockOneWayPlatform) Altitude16() int         { return 0 }
+func (m *mockOneWayPlatform) SetAltitude16(alt16 int) {}

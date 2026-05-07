@@ -515,3 +515,18 @@ func TestResetComboOnInterrupt_ResetsWhenDashOrJumpPressedDuringWindow(t *testin
 		})
 	}
 }
+
+func (m *owningMockBody) Altitude() int           { return 0 }
+func (m *owningMockBody) SetAltitude(alt int)     {}
+func (m *owningMockBody) Altitude16() int         { return 0 }
+func (m *owningMockBody) SetAltitude16(alt16 int) {}
+
+func (m *owningMockBody) VAltitude16() int              { return 0 }
+func (m *owningMockBody) SetVAltitude16(v16 int)        {}
+func (m *owningMockBody) AccelerationAltitude() int     { return 0 }
+func (m *owningMockBody) SetAccelerationAltitude(a int) {}
+
+func (m *meleeEnemy) Altitude() int           { return 0 }
+func (m *meleeEnemy) SetAltitude(alt int)     {}
+func (m *meleeEnemy) Altitude16() int         { return 0 }
+func (m *meleeEnemy) SetAltitude16(alt16 int) {}

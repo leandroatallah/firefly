@@ -199,3 +199,13 @@ func TestWolfEnemy_OnSightSkips_WhenNoTarget(t *testing.T) {
 		t.Errorf("expected 0 projectiles without a target, got %d", len(bullets))
 	}
 }
+
+func (m *fakePlayerTarget) Altitude() int           { return 0 }
+func (m *fakePlayerTarget) SetAltitude(alt int)     {}
+func (m *fakePlayerTarget) Altitude16() int         { return 0 }
+func (m *fakePlayerTarget) SetAltitude16(alt16 int) {}
+
+func (m *fakePlayerTarget) VAltitude16() int              { return 0 }
+func (m *fakePlayerTarget) SetVAltitude16(v16 int)        {}
+func (m *fakePlayerTarget) AccelerationAltitude() int     { return 0 }
+func (m *fakePlayerTarget) SetAccelerationAltitude(a int) {}

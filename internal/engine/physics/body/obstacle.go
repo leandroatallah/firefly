@@ -119,3 +119,8 @@ func (o *ObstacleRect) UpdateImageOptions() {
 	x, y := o.GetPositionMin()
 	o.imageOptions.GeoM.Translate(float64(x), float64(y))
 }
+
+func (o *ObstacleRect) Altitude() int       { return o.MovableBody.Altitude() }
+func (o *ObstacleRect) Altitude16() int     { return o.MovableBody.Altitude16() }
+func (o *ObstacleRect) SetAltitude(a int)   { o.MovableBody.SetAltitude(a) }
+func (o *ObstacleRect) SetAltitude16(a int) { o.MovableBody.SetAltitude16(a) }

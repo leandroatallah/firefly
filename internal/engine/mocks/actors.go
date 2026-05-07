@@ -57,6 +57,12 @@ func (m *MockActor) GetCharacter() *actors.Character {
 	return &actors.Character{}
 }
 
+// Body altitude stubs
+func (m *MockActor) Altitude() int           { return 0 }
+func (m *MockActor) SetAltitude(alt int)     {}
+func (m *MockActor) Altitude16() int         { return 0 }
+func (m *MockActor) SetAltitude16(alt16 int) {}
+
 // Other interface methods (stubs)
 func (m *MockActor) Image() *ebiten.Image                                 { return nil }
 func (m *MockActor) ImageOptions() *ebiten.DrawImageOptions               { return nil }
@@ -107,18 +113,25 @@ func (m *MockActor) SetTouchable(t body.Touchable)                       {}
 func (m *MockActor) ApplyValidPosition(d int, ax bool, sp body.BodiesSpace) (int, int, bool) {
 	return m.Pos.Min.X, m.Pos.Min.Y, false
 }
-func (m *MockActor) MoveX(d int)                                      { m.MoveRightForce = d }
-func (m *MockActor) MoveY(d int)                                      { m.MoveRightForce = d }
-func (m *MockActor) OnMoveUpLeft(d int)                               { m.MoveLeftForce = d }
-func (m *MockActor) OnMoveDownLeft(d int)                             { m.MoveLeftForce = d }
-func (m *MockActor) OnMoveUpRight(d int)                              { m.MoveRightForce = d }
-func (m *MockActor) OnMoveDownRight(d int)                            { m.MoveRightForce = d }
-func (m *MockActor) OnMoveUp(d int)                                   { m.MoveRightForce = d } // Simplified
-func (m *MockActor) OnMoveDown(d int)                                 { m.MoveRightForce = d } // Simplified
-func (m *MockActor) Velocity() (int, int)                             { return 0, 0 }
-func (m *MockActor) SetVelocity(vx, vy int)                           {}
-func (m *MockActor) Acceleration() (ax, ay int)                       { return 0, 0 }
-func (m *MockActor) SetAcceleration(ax, ay int)                       {}
+func (m *MockActor) MoveX(d int)                { m.MoveRightForce = d }
+func (m *MockActor) MoveY(d int)                { m.MoveRightForce = d }
+func (m *MockActor) OnMoveUpLeft(d int)         { m.MoveLeftForce = d }
+func (m *MockActor) OnMoveDownLeft(d int)       { m.MoveLeftForce = d }
+func (m *MockActor) OnMoveUpRight(d int)        { m.MoveRightForce = d }
+func (m *MockActor) OnMoveDownRight(d int)      { m.MoveRightForce = d }
+func (m *MockActor) OnMoveUp(d int)             { m.MoveRightForce = d } // Simplified
+func (m *MockActor) OnMoveDown(d int)           { m.MoveRightForce = d } // Simplified
+func (m *MockActor) Velocity() (int, int)       { return 0, 0 }
+func (m *MockActor) SetVelocity(vx, vy int)     {}
+func (m *MockActor) Acceleration() (ax, ay int) { return 0, 0 }
+func (m *MockActor) SetAcceleration(ax, ay int) {}
+
+// Movable altitude stubs
+func (m *MockActor) VAltitude16() int              { return 0 }
+func (m *MockActor) SetVAltitude16(v16 int)        {}
+func (m *MockActor) AccelerationAltitude() int     { return 0 }
+func (m *MockActor) SetAccelerationAltitude(a int) {}
+
 func (m *MockActor) Immobile() bool                                   { return false }
 func (m *MockActor) SetImmobile(i bool)                               {}
 func (m *MockActor) SetFreeze(f bool)                                 {}
