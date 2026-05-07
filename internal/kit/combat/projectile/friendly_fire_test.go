@@ -254,3 +254,8 @@ func TestProjectile_OnTouch_InterceptableShooterStillIgnoresDefaultBullet(t *tes
 		t.Errorf("QueueForRemoval count = %d, want 0 (interceptable shooter must survive)", got)
 	}
 }
+
+func (m *mockProjectileBody) Altitude() int           { return 0 }
+func (m *mockProjectileBody) SetAltitude(alt int)     {}
+func (m *mockProjectileBody) Altitude16() int         { return 0 }
+func (m *mockProjectileBody) SetAltitude16(alt16 int) {}

@@ -60,6 +60,12 @@ func (m *mockPlatformerActor) Owner() interface{}         { return nil }
 func (m *mockPlatformerActor) SetOwner(_ interface{})     {}
 func (m *mockPlatformerActor) LastOwner() interface{}     { return nil }
 
+// Body altitude stubs
+func (m *mockPlatformerActor) Altitude() int           { return 0 }
+func (m *mockPlatformerActor) SetAltitude(alt int)     {}
+func (m *mockPlatformerActor) Altitude16() int         { return 0 }
+func (m *mockPlatformerActor) SetAltitude16(alt16 int) {}
+
 // body.Drawable
 func (m *mockPlatformerActor) Image() *ebiten.Image                   { return nil }
 func (m *mockPlatformerActor) ImageOptions() *ebiten.DrawImageOptions { return nil }
@@ -118,6 +124,12 @@ func (m *mockPlatformerActor) SetJumpForceMultiplier(_ float64)                 
 func (m *mockPlatformerActor) JumpForceMultiplier() float64                     { return 1 }
 func (m *mockPlatformerActor) SetHorizontalInertia(_ float64)                   {}
 func (m *mockPlatformerActor) HorizontalInertia() float64                       { return 1 }
+
+// Movable altitude stubs
+func (m *mockPlatformerActor) VAltitude16() int              { return 0 }
+func (m *mockPlatformerActor) SetVAltitude16(v16 int)        {}
+func (m *mockPlatformerActor) AccelerationAltitude() int     { return 0 }
+func (m *mockPlatformerActor) SetAccelerationAltitude(a int) {}
 
 // actors.Controllable
 func (m *mockPlatformerActor) BlockMovement()          {}

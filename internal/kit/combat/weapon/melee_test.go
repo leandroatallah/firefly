@@ -542,3 +542,8 @@ func TestMeleeWeapon_Steps_ReturnsConfiguredSlice(t *testing.T) {
 		t.Errorf("Steps()[1].HitboxOffsetY16 = %d, want %d", got[1].HitboxOffsetY16, -4*16)
 	}
 }
+
+func (m *meleeTarget) Altitude() int           { return 0 }
+func (m *meleeTarget) SetAltitude(alt int)     {}
+func (m *meleeTarget) Altitude16() int         { return 0 }
+func (m *meleeTarget) SetAltitude16(alt16 int) {}

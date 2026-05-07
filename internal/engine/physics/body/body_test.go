@@ -1,10 +1,15 @@
 package body
 
 import (
+	"image"
 	"testing"
 
+	bodycontract "github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	"github.com/boilerplate/ebiten-template/internal/engine/utils/fp16"
 )
+
+// Compile-time assertion: physics Body satisfies the body.Body contract.
+var _ bodycontract.Body = (*Body)(nil)
 
 func TestNewBody(t *testing.T) {
 	shape := NewRect(0, 0, 10, 10)
@@ -202,4 +207,123 @@ func TestBody_SetPosition_InvalidShape(t *testing.T) {
 func TestBody_SetPosition16_InvalidShape(t *testing.T) {
 	// log.Fatal path
 	t.Skip("SetPosition16 calls log.Fatal for non-Rect shape")
+}
+
+// --- Altitude axis (Story 053) ---
+
+func TestBody_AltitudeAccessors(t *testing.T) {
+	tests := []struct {
+		name string
+		alt  int
+	}{
+		{"zero", 0},
+		{"positive", 50},
+		{"negative", -25},
+		{"one", 1},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b := NewBody(NewRect(0, 0, 10, 10))
+
+			b.SetAltitude(tt.alt)
+			if got := b.Altitude(); got != tt.alt {
+				t.Errorf("Altitude() after SetAltitude(%d) = %d; want %d", tt.alt, got, tt.alt)
+			}
+			if got, want := b.Altitude16(), fp16.To16(tt.alt); got != want {
+				t.Errorf("Altitude16() after SetAltitude(%d) = %d; want %d", tt.alt, got, want)
+			}
+
+			// Now exercise the fp16 accessor round-trip too.
+			b2 := NewBody(NewRect(0, 0, 10, 10))
+			alt16 := fp16.To16(tt.alt)
+			b2.SetAltitude16(alt16)
+			if got := b2.Altitude16(); got != alt16 {
+				t.Errorf("Altitude16() after SetAltitude16(%d) = %d; want %d", alt16, got, alt16)
+			}
+			if got := b2.Altitude(); got != tt.alt {
+				t.Errorf("Altitude() after SetAltitude16(%d) = %d; want %d", alt16, got, tt.alt)
+			}
+		})
+	}
+}
+
+func TestBody_Altitude16_StoredDirectly(t *testing.T) {
+	b := NewBody(NewRect(0, 0, 10, 10))
+
+	b.SetAltitude16(123456)
+	if got := b.Altitude16(); got != 123456 {
+		t.Errorf("Altitude16() = %d; want 123456 (stored directly without fp16 conversion)", got)
+	}
+}
+
+func TestBody_SetAltitude_UsesFp16(t *testing.T) {
+	b := NewBody(NewRect(0, 0, 10, 10))
+
+	b.SetAltitude(50)
+	if got, want := b.Altitude16(), fp16.To16(50); got != want {
+		t.Errorf("Altitude16() = %d; want %d (fp16.To16(50))", got, want)
+	}
+	if got := b.Altitude(); got != 50 {
+		t.Errorf("Altitude() = %d; want 50", got)
+	}
+}
+
+func TestBody_Position_AltitudeMapsToScreenY(t *testing.T) {
+	tests := []struct {
+		name     string
+		groundY  int
+		altitude int
+		wantMinY int
+	}{
+		{"jump_above_ground", 200, 50, 150},
+		{"grounded_default", 100, 0, 100},
+		{"jump_to_zero_y", 100, 100, 0},
+		{"jump_above_viewport", 50, 75, -25},
+		{"negative_altitude_below_ground", 200, -10, 210},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			shape := NewRect(0, 0, 16, 16)
+			b := NewBody(shape)
+			b.SetPosition(0, tt.groundY)
+			b.SetAltitude(tt.altitude)
+
+			pos := b.Position()
+			if pos.Min.Y != tt.wantMinY {
+				t.Errorf("Position().Min.Y = %d; want %d (groundY=%d - altitude=%d)",
+					pos.Min.Y, tt.wantMinY, tt.groundY, tt.altitude)
+			}
+		})
+	}
+}
+
+func TestBody_Position_ZeroAltitude_IsBitIdentical(t *testing.T) {
+	const (
+		x = 10
+		y = 200
+		w = 16
+		h = 24
+	)
+	shape := NewRect(x, y, w, h)
+	b := NewBody(shape)
+	b.SetPosition(x, y)
+
+	want := image.Rect(x, y, x+w, y+h)
+
+	if got := b.Position(); got != want {
+		t.Errorf("Position() with default altitude = %v; want %v", got, want)
+	}
+
+	// Explicitly setting altitude to zero must not change the result.
+	b.SetAltitude(0)
+	if got := b.Position(); got != want {
+		t.Errorf("Position() after SetAltitude(0) = %v; want %v", got, want)
+	}
+
+	b.SetAltitude16(0)
+	if got := b.Position(); got != want {
+		t.Errorf("Position() after SetAltitude16(0) = %v; want %v", got, want)
+	}
 }

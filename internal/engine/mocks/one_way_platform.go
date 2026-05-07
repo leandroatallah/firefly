@@ -69,6 +69,12 @@ func (m *MockOneWayPlatform) Owner() interface{}         { return nil }
 func (m *MockOneWayPlatform) SetOwner(interface{})       {}
 func (m *MockOneWayPlatform) LastOwner() interface{}     { return nil }
 
+// Body altitude stubs
+func (m *MockOneWayPlatform) Altitude() int           { return 0 }
+func (m *MockOneWayPlatform) SetAltitude(alt int)     {}
+func (m *MockOneWayPlatform) Altitude16() int         { return 0 }
+func (m *MockOneWayPlatform) SetAltitude16(alt16 int) {}
+
 // body.Collidable stubs
 func (m *MockOneWayPlatform) GetTouchable() body.Touchable                        { return m }
 func (m *MockOneWayPlatform) DrawCollisionBox(_ *ebiten.Image, _ image.Rectangle) {}

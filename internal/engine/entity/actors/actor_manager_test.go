@@ -174,3 +174,13 @@ func TestActorManager(t *testing.T) {
 		t.Error("manager should be empty after Clear")
 	}
 }
+
+func (m *mockActor) Altitude() int           { return 0 }
+func (m *mockActor) SetAltitude(alt int)     {}
+func (m *mockActor) Altitude16() int         { return 0 }
+func (m *mockActor) SetAltitude16(alt16 int) {}
+
+func (m *mockActor) VAltitude16() int              { return 0 }
+func (m *mockActor) SetVAltitude16(v16 int)        {}
+func (m *mockActor) AccelerationAltitude() int     { return 0 }
+func (m *mockActor) SetAccelerationAltitude(a int) {}

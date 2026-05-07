@@ -20,6 +20,7 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/items"
 	bodyphysics "github.com/boilerplate/ebiten-template/internal/engine/physics/body"
 	enginecamera "github.com/boilerplate/ebiten-template/internal/engine/render/camera"
+	"github.com/boilerplate/ebiten-template/internal/engine/render/draworder"
 	"github.com/boilerplate/ebiten-template/internal/engine/render/screenutil"
 	enginevfx "github.com/boilerplate/ebiten-template/internal/engine/render/vfx"
 	"github.com/boilerplate/ebiten-template/internal/engine/scene"
@@ -469,7 +470,7 @@ func (s *PhasesScene) Draw(screen *ebiten.Image) {
 
 	// Draw bodies based on camera
 	space := s.PhysicsSpace()
-	for _, b := range space.Bodies() {
+	for _, b := range draworder.SortByGroundY(space.Bodies()) {
 		switch sb := b.(type) {
 		case platformer.PlatformerActorEntity:
 			opts := sb.ImageOptions()

@@ -158,3 +158,8 @@ func (b *BaseItem) IsAnimationFinished() bool {
 	}
 	return b.state.IsAnimationFinished()
 }
+
+func (b *BaseItem) Altitude() int       { return b.MovableBody.Altitude() }
+func (b *BaseItem) Altitude16() int     { return b.MovableBody.Altitude16() }
+func (b *BaseItem) SetAltitude(a int)   { b.MovableBody.SetAltitude(a) }
+func (b *BaseItem) SetAltitude16(a int) { b.MovableBody.SetAltitude16(a) }

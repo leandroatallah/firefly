@@ -559,3 +559,8 @@ func (c *Character) RemoveSkill(s skill.Skill) {
 func (c *Character) ClearSkills() {
 	c.skills = nil
 }
+
+func (c *Character) Altitude() int       { return c.MovableBody.Altitude() }
+func (c *Character) Altitude16() int     { return c.MovableBody.Altitude16() }
+func (c *Character) SetAltitude(a int)   { c.MovableBody.SetAltitude(a) }
+func (c *Character) SetAltitude16(a int) { c.MovableBody.SetAltitude16(a) }

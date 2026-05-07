@@ -527,3 +527,23 @@ type stubSkill struct{ skill.SkillBase }
 type mockMovementBlocker struct{}
 
 func (m *mockMovementBlocker) IsMovementBlocked() bool { return false }
+
+func (m *mockActorWithCollision) Altitude() int           { return 0 }
+func (m *mockActorWithCollision) SetAltitude(alt int)     {}
+func (m *mockActorWithCollision) Altitude16() int         { return 0 }
+func (m *mockActorWithCollision) SetAltitude16(alt16 int) {}
+
+func (m *mockActorWithCollision) VAltitude16() int              { return 0 }
+func (m *mockActorWithCollision) SetVAltitude16(v16 int)        {}
+func (m *mockActorWithCollision) AccelerationAltitude() int     { return 0 }
+func (m *mockActorWithCollision) SetAccelerationAltitude(a int) {}
+
+func (m *minimalActor) Altitude() int           { return 0 }
+func (m *minimalActor) SetAltitude(alt int)     {}
+func (m *minimalActor) Altitude16() int         { return 0 }
+func (m *minimalActor) SetAltitude16(alt16 int) {}
+
+func (m *minimalActor) VAltitude16() int              { return 0 }
+func (m *minimalActor) SetVAltitude16(v16 int)        {}
+func (m *minimalActor) AccelerationAltitude() int     { return 0 }
+func (m *minimalActor) SetAccelerationAltitude(a int) {}

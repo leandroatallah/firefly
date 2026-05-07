@@ -45,6 +45,12 @@ func (m *mockActor) Owner() interface{}         { return nil }
 func (m *mockActor) SetOwner(o interface{})     {}
 func (m *mockActor) LastOwner() interface{}     { return nil }
 
+// Body altitude stubs
+func (m *mockActor) Altitude() int           { return 0 }
+func (m *mockActor) SetAltitude(alt int)     {}
+func (m *mockActor) Altitude16() int         { return 0 }
+func (m *mockActor) SetAltitude16(alt16 int) {}
+
 func (m *mockActor) MoveX(d int)           { m.moveRightForce = d }
 func (m *mockActor) MoveY(d int)           { m.moveDownForce = d }
 func (m *mockActor) OnMoveLeft(d int)      { m.moveLeftForce = d }
@@ -80,6 +86,12 @@ func (m *mockActor) SetJumpForceMultiplier(mu float64)                {}
 func (m *mockActor) JumpForceMultiplier() float64                     { return 1.0 }
 func (m *mockActor) SetHorizontalInertia(i float64)                   {}
 func (m *mockActor) HorizontalInertia() float64                       { return 1.0 }
+
+// Movable altitude stubs
+func (m *mockActor) VAltitude16() int              { return 0 }
+func (m *mockActor) SetVAltitude16(v16 int)        {}
+func (m *mockActor) AccelerationAltitude() int     { return 0 }
+func (m *mockActor) SetAccelerationAltitude(a int) {}
 
 // Collidable methods
 func (m *mockActor) OnTouch(other body.Collidable)                                   {}
@@ -159,12 +171,19 @@ func (m *mockCollidable) SetSize(w, h int) {
 	m.rect.Max.X = m.rect.Min.X + w
 	m.rect.Max.Y = m.rect.Min.Y + h
 }
-func (m *mockCollidable) Scale() float64                                      { return 1.0 }
-func (m *mockCollidable) SetScale(s float64)                                  {}
-func (m *mockCollidable) SetPosition16(x16, y16 int)                          { m.pos16X = x16; m.pos16Y = y16 }
-func (m *mockCollidable) GetPosition16() (int, int)                           { return m.pos16X, m.pos16Y }
-func (m *mockCollidable) GetPositionMin() (int, int)                          { return m.rect.Min.X, m.rect.Min.Y }
-func (m *mockCollidable) GetShape() body.Shape                                { return nil }
+func (m *mockCollidable) Scale() float64             { return 1.0 }
+func (m *mockCollidable) SetScale(s float64)         {}
+func (m *mockCollidable) SetPosition16(x16, y16 int) { m.pos16X = x16; m.pos16Y = y16 }
+func (m *mockCollidable) GetPosition16() (int, int)  { return m.pos16X, m.pos16Y }
+func (m *mockCollidable) GetPositionMin() (int, int) { return m.rect.Min.X, m.rect.Min.Y }
+func (m *mockCollidable) GetShape() body.Shape       { return nil }
+
+// Body altitude stubs
+func (m *mockCollidable) Altitude() int           { return 0 }
+func (m *mockCollidable) SetAltitude(alt int)     {}
+func (m *mockCollidable) Altitude16() int         { return 0 }
+func (m *mockCollidable) SetAltitude16(alt16 int) {}
+
 func (m *mockCollidable) IsObstructive() bool                                 { return m.obstructive }
 func (m *mockCollidable) SetIsObstructive(v bool)                             { m.obstructive = v }
 func (m *mockCollidable) OnTouch(_ body.Collidable)                           {}
@@ -234,6 +253,12 @@ func (m *mockMovableCollidable) SetJumpForceMultiplier(_ float64)               
 func (m *mockMovableCollidable) JumpForceMultiplier() float64                     { return 1.0 }
 func (m *mockMovableCollidable) SetHorizontalInertia(_ float64)                   {}
 func (m *mockMovableCollidable) HorizontalInertia() float64                       { return 1.0 }
+
+// Movable altitude stubs
+func (m *mockMovableCollidable) VAltitude16() int              { return 0 }
+func (m *mockMovableCollidable) SetVAltitude16(v16 int)        {}
+func (m *mockMovableCollidable) AccelerationAltitude() int     { return 0 }
+func (m *mockMovableCollidable) SetAccelerationAltitude(a int) {}
 
 // newMockSpaceWithGround creates a mock space that returns ground at specified positions
 func newMockSpaceWithGround(groundPositions []image.Point) *mockBodiesSpace {

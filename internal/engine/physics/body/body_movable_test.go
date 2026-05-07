@@ -5,9 +5,13 @@ import (
 	"testing"
 
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/animation"
+	bodycontract "github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
 	"github.com/boilerplate/ebiten-template/internal/engine/utils/fp16"
 )
+
+// Compile-time assertion: physics MovableBody satisfies the body.Movable contract.
+var _ bodycontract.Movable = (*MovableBody)(nil)
 
 type accVect struct {
 	accelerationX int
@@ -285,5 +289,47 @@ func TestMovableBody_CheckMovementDirectionX(t *testing.T) {
 	b.CheckMovementDirectionX()
 	if b.FaceDirection() != animation.FaceDirectionRight {
 		t.Error("expected FaceDirectionRight to be preserved")
+	}
+}
+
+// --- Altitude axis dynamics (Story 053) ---
+
+func TestMovableBody_AltitudeDynamics(t *testing.T) {
+	tests := []struct {
+		name string
+		v16  int
+		acc  int
+	}{
+		{"zero", 0, 0},
+		{"positive_small", fp16.To16(3), 7},
+		{"negative", -fp16.To16(4), -12},
+		{"large", 1 << 20, 1 << 18},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b := NewMovableBody(NewBody(NewRect(0, 0, 10, 10)))
+
+			b.SetVAltitude16(tt.v16)
+			if got := b.VAltitude16(); got != tt.v16 {
+				t.Errorf("VAltitude16() = %d; want %d", got, tt.v16)
+			}
+
+			b.SetAccelerationAltitude(tt.acc)
+			if got := b.AccelerationAltitude(); got != tt.acc {
+				t.Errorf("AccelerationAltitude() = %d; want %d", got, tt.acc)
+			}
+		})
+	}
+}
+
+func TestMovableBody_AltitudeDefaultZero(t *testing.T) {
+	b := NewMovableBody(NewBody(NewRect(0, 0, 10, 10)))
+
+	if got := b.VAltitude16(); got != 0 {
+		t.Errorf("VAltitude16() default = %d; want 0", got)
+	}
+	if got := b.AccelerationAltitude(); got != 0 {
+		t.Errorf("AccelerationAltitude() default = %d; want 0", got)
 	}
 }
