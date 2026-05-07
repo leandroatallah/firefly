@@ -7,6 +7,7 @@ The `kit` layer provides genre-reusable concrete implementations for platformer/
 ## Packages
 
 - `actors/`: Composable character trait structs (`MeleeCharacter`, `ShooterCharacter`, `DeathBehavior`). Embed independently — a brawler character can use both `MeleeCharacter` and `ShooterCharacter`.
+  - `platformer/`: `PlatformerCharacter` concrete actor, `PlatformerActorEntity` interface, and `PreparePlatformer` factory (loads JSON, builds state map, initialises the character).
 - `combat/`: Weapon inventory, projectile lifecycle, melee controller, and faction-gated damage. See [`combat/README.md`](combat/README.md).
   - `inventory/`: Weapon collections and ammo tracking.
   - `weapon/`: `ProjectileWeapon`, `EnemyShooting`, and a JSON weapon factory.

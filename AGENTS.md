@@ -139,6 +139,7 @@ func (t *Transition) Draw(_ *ebiten.Image) {}  // Use blank in param list
 | `combat/projectile` | 89.9% | Lifetime, faction-gated damage, impact / despawn VFX |
 | `combat/inventory` | 51.5% | Switch/add/ammo tracking |
 | `physics/skill` | 79.5% | `JumpSkill`, `DashSkill`, `ShootingSkill`, `FromConfig` factory |
+| `kit/actors/platformer` | 35.7% | `PlatformerCharacter` state callbacks, movement blockers, coin tracking |
 | `kit/states` | 100.0% | `IdleSubState[E,I]` transition branches; maintain as kit grows |
 
 ## 🛠 Story Management Scripts

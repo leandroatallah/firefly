@@ -6,10 +6,10 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/builder"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/movement"
-	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/platformer"
 	gameplayer "github.com/boilerplate/ebiten-template/internal/game/entity/actors/player"
 	gamestates "github.com/boilerplate/ebiten-template/internal/game/entity/actors/states"
 	kitactors "github.com/boilerplate/ebiten-template/internal/kit/actors"
+	"github.com/boilerplate/ebiten-template/internal/kit/actors/platformer"
 	kitcombat "github.com/boilerplate/ebiten-template/internal/kit/combat"
 	kitcombatweapon "github.com/boilerplate/ebiten-template/internal/kit/combat/weapon"
 )
@@ -21,7 +21,7 @@ type WolfEnemy struct {
 
 // NewWolfEnemy creates a new wolf enemy.
 func NewWolfEnemy(ctx *app.AppContext, x, y int, id string) (*WolfEnemy, error) {
-	character, spriteData, statData, stateMap, err := builder.PreparePlatformer(ctx, "assets/entities/enemies/wolf.json")
+	character, spriteData, statData, stateMap, err := platformer.PreparePlatformer(ctx, "assets/entities/enemies/wolf.json")
 	if err != nil {
 		return nil, err
 	}

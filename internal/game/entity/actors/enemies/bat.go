@@ -6,10 +6,10 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/builder"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/movement"
-	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/platformer"
 	gameplayer "github.com/boilerplate/ebiten-template/internal/game/entity/actors/player"
 	gamestates "github.com/boilerplate/ebiten-template/internal/game/entity/actors/states"
 	kitactors "github.com/boilerplate/ebiten-template/internal/kit/actors"
+	"github.com/boilerplate/ebiten-template/internal/kit/actors/platformer"
 	kitcombat "github.com/boilerplate/ebiten-template/internal/kit/combat"
 	kitcombatweapon "github.com/boilerplate/ebiten-template/internal/kit/combat/weapon"
 )
@@ -21,7 +21,7 @@ type BatEnemy struct {
 
 // NewBatEnemy creates a new bat enemy.
 func NewBatEnemy(ctx *app.AppContext, x, y int, id string) (*BatEnemy, error) {
-	character, spriteData, statData, stateMap, err := builder.PreparePlatformer(ctx, "assets/entities/enemies/bat.json")
+	character, spriteData, statData, stateMap, err := platformer.PreparePlatformer(ctx, "assets/entities/enemies/bat.json")
 	if err != nil {
 		return nil, err
 	}

@@ -16,7 +16,6 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/enemies"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/npcs"
-	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/platformer"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/items"
 	bodyphysics "github.com/boilerplate/ebiten-template/internal/engine/physics/body"
 	enginecamera "github.com/boilerplate/ebiten-template/internal/engine/render/camera"
@@ -39,6 +38,7 @@ import (
 	gameentitytypes "github.com/boilerplate/ebiten-template/internal/game/entity/types"
 	gamecamera "github.com/boilerplate/ebiten-template/internal/game/render/camera"
 	scenestypes "github.com/boilerplate/ebiten-template/internal/game/scenes/types"
+	"github.com/boilerplate/ebiten-template/internal/kit/actors/platformer"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/vector"
 )

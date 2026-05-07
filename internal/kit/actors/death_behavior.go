@@ -1,6 +1,6 @@
 package kitactors
 
-import "github.com/boilerplate/ebiten-template/internal/engine/entity/actors/platformer"
+import "github.com/boilerplate/ebiten-template/internal/kit/actors/platformer"
 
 // PlayerDeathBehavior defines the behavior when a player dies.
 type PlayerDeathBehavior struct {

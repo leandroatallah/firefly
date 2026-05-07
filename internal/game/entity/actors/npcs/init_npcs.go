@@ -5,8 +5,8 @@ import (
 
 	"github.com/boilerplate/ebiten-template/internal/engine/app"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/npcs"
-	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/platformer"
 	gameplayer "github.com/boilerplate/ebiten-template/internal/game/entity/actors/player"
+	"github.com/boilerplate/ebiten-template/internal/kit/actors/platformer"
 )
 
 const (

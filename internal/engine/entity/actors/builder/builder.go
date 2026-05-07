@@ -3,13 +3,10 @@ package builder
 import (
 	"fmt"
 
-	"github.com/boilerplate/ebiten-template/internal/engine/app"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/animation"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
-	"github.com/boilerplate/ebiten-template/internal/engine/data/jsonutil"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/schemas"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
-	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/platformer"
 	bodyphysics "github.com/boilerplate/ebiten-template/internal/engine/physics/body"
 	physicsmovement "github.com/boilerplate/ebiten-template/internal/engine/physics/movement"
 	"github.com/boilerplate/ebiten-template/internal/engine/skill"
@@ -18,31 +15,6 @@ import (
 type collisionRectSetter interface {
 	AddCollisionRect(state actors.ActorStateEnum, rect body.Collidable)
 	RefreshCollisions()
-}
-
-// PreparePlatformer loads sprite and stat data, builds the state map, and initializes a PlatformerCharacter.
-func PreparePlatformer(
-	ctx *app.AppContext,
-	jsonPath string,
-) (*platformer.PlatformerCharacter, schemas.SpriteData, actors.StatData, map[string]animation.SpriteState, error) {
-	spriteData, statData, err := jsonutil.ParseSpriteAndStats[actors.StatData](ctx.Assets, jsonPath)
-	if err != nil {
-		return nil, schemas.SpriteData{}, actors.StatData{}, nil, err
-	}
-
-	stateMap, err := BuildStateMap(spriteData)
-	if err != nil {
-		return nil, schemas.SpriteData{}, actors.StatData{}, nil, err
-	}
-
-	rect := BodyRectFromSpriteData(spriteData)
-	character, err := platformer.NewPlatformerCharacter(ctx.Assets, stateMap, spriteData, rect)
-	if err != nil {
-		return nil, schemas.SpriteData{}, actors.StatData{}, nil, fmt.Errorf("failed to create platformer character: %w", err)
-	}
-	character.SetAppContext(ctx)
-
-	return character, spriteData, statData, stateMap, nil
 }
 
 // ApplyPlatformerPhysics sets up the movement model and touchable interface for a platformer actor.

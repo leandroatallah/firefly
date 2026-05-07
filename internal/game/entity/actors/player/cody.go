@@ -8,10 +8,10 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/data/schemas"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/builder"
-	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/platformer"
 	"github.com/boilerplate/ebiten-template/internal/engine/input"
 	gamestates "github.com/boilerplate/ebiten-template/internal/game/entity/actors/states"
 	kitactors "github.com/boilerplate/ebiten-template/internal/kit/actors"
+	"github.com/boilerplate/ebiten-template/internal/kit/actors/platformer"
 	meleeengine "github.com/boilerplate/ebiten-template/internal/kit/combat/melee"
 	"github.com/boilerplate/ebiten-template/internal/kit/combat/weapon"
 	kitstates "github.com/boilerplate/ebiten-template/internal/kit/states"
@@ -28,7 +28,7 @@ type CodyPlayer struct {
 }
 
 func NewCodyPlayer(ctx *app.AppContext) (platformer.PlatformerActorEntity, error) {
-	character, spriteData, statData, stateMap, err := builder.PreparePlatformer(ctx, "assets/entities/player/cody.json")
+	character, spriteData, statData, stateMap, err := platformer.PreparePlatformer(ctx, "assets/entities/player/cody.json")
 	if err != nil {
 		return nil, err
 	}

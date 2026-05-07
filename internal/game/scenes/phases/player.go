@@ -10,9 +10,9 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/builder"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/events"
-	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/platformer"
 	gameplayer "github.com/boilerplate/ebiten-template/internal/game/entity/actors/player"
 	gameentitytypes "github.com/boilerplate/ebiten-template/internal/game/entity/types"
+	"github.com/boilerplate/ebiten-template/internal/kit/actors/platformer"
 	"github.com/boilerplate/ebiten-template/internal/kit/combat/weapon"
 	kitskills "github.com/boilerplate/ebiten-template/internal/kit/skills"
 )
