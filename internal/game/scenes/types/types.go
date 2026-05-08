@@ -4,6 +4,7 @@ import "github.com/boilerplate/ebiten-template/internal/engine/contracts/navigat
 
 const (
 	SceneMenu navigation.SceneType = iota
-	ScenePhases
+	ScenePlatformerPhase
+	SceneBeatemupPhase
 	ScenePhaseReboot
 )

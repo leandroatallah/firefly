@@ -16,6 +16,7 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/scene/phases"
 	enginespeech "github.com/boilerplate/ebiten-template/internal/engine/ui/speech"
 	gamescene "github.com/boilerplate/ebiten-template/internal/game/scenes"
+	gamescenephases "github.com/boilerplate/ebiten-template/internal/game/scenes/phases"
 	scenestypes "github.com/boilerplate/ebiten-template/internal/game/scenes/types"
 	gamespeech "github.com/boilerplate/ebiten-template/internal/game/ui/speech"
 	"github.com/boilerplate/ebiten-template/internal/kit/combat/projectile"
@@ -109,7 +110,8 @@ func Setup(assets fs.FS) error {
 	// Set initial game scene
 	initialScene := scenestypes.SceneMenu
 	if cfg.SkipIntro {
-		initialScene = scenestypes.ScenePhases
+		phase, _ := phaseManager.GetCurrentPhase()
+		initialScene = gamescenephases.SceneTypeForGenre(phase.Genre)
 	}
 	game.AppContext.SceneManager.NavigateTo(initialScene, nil, false)
 

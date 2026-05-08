@@ -20,10 +20,10 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-// platformerPlayer is the minimal interface the scene requires from a platformer player.
-// It is a subset of platformer.PlatformerActorEntity that the mock and production
+// Player is the minimal interface the scene requires from a platformer player.
+// It is a subset of platformer.PlatformerActorEntity that mock and production
 // types both satisfy.
-type platformerPlayer interface {
+type Player interface {
 	body.Collidable
 	body.Drawable
 
@@ -48,12 +48,16 @@ type PlatformerPhaseScene struct {
 	screenHeight float64
 
 	// Player — holds the minimal interface; production code uses platformer.PlatformerActorEntity.
-	player     platformerPlayer
+	player     Player
 	dyingState actors.ActorStateEnum
 	deadState  actors.ActorStateEnum
 
 	// Death sequence
 	deathActive bool
+
+	// OnDeathStarted is called after the death sequence activates. Game layers
+	// set this to spawn VFX and enable navigation triggers.
+	OnDeathStarted func()
 
 	// Screen flipper callbacks. Set up by OnStart when hasFlipper=true.
 	onFlipStart  func()
@@ -69,6 +73,17 @@ type PlatformerPhaseScene struct {
 	// VFX vignette (may be nil)
 	vfx        *enginevfx.Vignette
 	flashCount int
+}
+
+// New creates a PlatformerPhaseScene for production use. dyingState and deadState
+// are the genre-specific actor state values used to trigger/detect death.
+func New(
+	cam *enginecamera.Controller,
+	space body.BodiesSpace,
+	sw, sh float64,
+	dyingState, deadState actors.ActorStateEnum,
+) *PlatformerPhaseScene {
+	return newScene(cam, space, sw, sh, dyingState, deadState)
 }
 
 // newScene creates a new PlatformerPhaseScene with the given camera and space.
@@ -108,7 +123,7 @@ func (s *PlatformerPhaseScene) OnStart() {
 }
 
 // wireFlipperCallbacks sets up the screen-flipper immobility callbacks for p.
-func (s *PlatformerPhaseScene) wireFlipperCallbacks(p platformerPlayer) {
+func (s *PlatformerPhaseScene) wireFlipperCallbacks(p Player) {
 	s.onFlipStart = func() { p.SetImmobile(true) }
 	s.onFlipFinish = func() { p.SetImmobile(false) }
 }
@@ -142,10 +157,31 @@ func (s *PlatformerPhaseScene) Update() error {
 	return nil
 }
 
-// Draw renders the scene.
-func (s *PlatformerPhaseScene) Draw(screen *ebiten.Image) {
-	screen.Fill(color.RGBA{0, 0, 0, 0xff})
+// SetPlayer wires a player into the scene. Calling this with a non-nil value
+// sets hasPlayer=true; calling with nil clears the player.
+func (s *PlatformerPhaseScene) SetPlayer(p Player) {
+	s.player = p
+	s.hasPlayer = p != nil
+	if s.hasFlipper && p != nil {
+		s.wireFlipperCallbacks(p)
+	}
+}
 
+// DeathActive reports whether the death sequence has been triggered.
+func (s *PlatformerPhaseScene) DeathActive() bool { return s.deathActive }
+
+// StartDeathSequence triggers the death sequence programmatically (e.g., from
+// a state check in the game layer).
+func (s *PlatformerPhaseScene) StartDeathSequence() { s.startDeathSequence() }
+
+// CheckPlayerFallDeath runs the fall-death check for the current frame.
+// Game layers call this instead of maintaining their own duplicate logic.
+func (s *PlatformerPhaseScene) CheckPlayerFallDeath() { s.checkPlayerFallDeath() }
+
+// DrawActors renders the actor bodies (without filling the background). Game
+// layers call this after drawing the tilemap so actors sort correctly with
+// game-specific bodies (items, etc.) that share the same sorted pass.
+func (s *PlatformerPhaseScene) DrawActors(screen *ebiten.Image) {
 	if s.space != nil {
 		for _, b := range draworder.SortByGroundY(s.space.Bodies()) {
 			switch sb := b.(type) {
@@ -163,15 +199,19 @@ func (s *PlatformerPhaseScene) Draw(screen *ebiten.Image) {
 			}
 		}
 	}
-
 	if s.flashCount > 0 {
 		screenutil.DrawScreenFlash(screen)
 		s.flashCount--
 	}
-
 	if s.debugDrawHook != nil {
 		s.debugDrawHook(screen)
 	}
+}
+
+// Draw renders the scene (background fill + actors).
+func (s *PlatformerPhaseScene) Draw(screen *ebiten.Image) {
+	screen.Fill(color.RGBA{0, 0, 0, 0xff})
+	s.DrawActors(screen)
 }
 
 // SetDebugDrawHook sets a function invoked at the end of every Draw call.
@@ -219,6 +259,9 @@ func (s *PlatformerPhaseScene) startDeathSequence() {
 		ch.SetNewStateFatal(s.dyingState)
 	}
 	s.player.SetImmobile(true)
+	if s.OnDeathStarted != nil {
+		s.OnDeathStarted()
+	}
 }
 
 // --- test-support API -------------------------------------------------------
@@ -262,14 +305,9 @@ func NewForTest(opts TestOptions) *PlatformerPhaseScene {
 	return s
 }
 
-// SetPlayerForTest injects a mock player for testing. If hasFlipper is set and
-// the player is non-nil, it also wires the flip callbacks so tests can invoke them.
-func (s *PlatformerPhaseScene) SetPlayerForTest(p platformerPlayer) {
-	s.player = p
-	s.hasPlayer = p != nil
-	if s.hasFlipper && p != nil {
-		s.wireFlipperCallbacks(p)
-	}
+// SetPlayerForTest injects a mock player for testing. Delegates to SetPlayer.
+func (s *PlatformerPhaseScene) SetPlayerForTest(p Player) {
+	s.SetPlayer(p)
 }
 
 // SetSetNewStateFatalRecorder overrides the SetNewStateFatal call path so tests

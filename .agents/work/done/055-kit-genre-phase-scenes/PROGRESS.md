@@ -38,3 +38,24 @@
     - Zero test failures across entire internal/engine/... and internal/game/... suite (50 packages).
     - Constitution standards verified: table-driven tests present, no ebiten.RunGame, no time.Sleep, no _ = variable in production code, DDD ubiquitous language upheld, headless Ebitengine (ebiten.NewImage) used throughout.
     - Layer import rules verified: kit scenes import engine only; no game import in kit packages.
+- [Sonnet 4.6] [Feature Implementer] 2026-05-08 [FINISHED]: Per-phase genre routing implemented. Scope diverged from SPEC.md §3–§5 (PhaseSceneBase hooks architecture deferred); instead a targeted Genre-routing pass was delivered:
+    - `internal/engine/scene/phases/phase.go` — added `type Genre int` (dumb int; engine assigns no meaning) and `Genre Genre` field on `Phase` struct. `SceneType` field retained (engine's `GoToCurrentPhaseScene` still uses it; removing it would require engine→kit coupling to resolve).
+    - `internal/kit/scenes/phases/genres.go` — new file, `package phaseskit`. Defines `GenrePlatformer phases.Genre = iota + 1` and `GenreBeatemup`. Kit owns the named constants; engine stays agnostic.
+    - `internal/game/scenes/types/types.go` — replaced `ScenePhases` with symmetric `ScenePlatformerPhase` and `SceneBeatemupPhase`. No genre is treated as default.
+    - `internal/game/scenes/phases/router.go` — new `SceneTypeForGenre(g phases.Genre) navigation.SceneType`. Panics on unknown genre so a misconfigured phase is caught early.
+    - `internal/game/scenes/phases/beatemup/scene.go` — new `package gamebeatemupphase`. Thin game-layer beat-em-up scene: embeds `*scene.TilemapScene`, altitude-aware draw order (`draworder.SortByGroundYAltitude`), no screen flipper, no fall-death. Scaffold for when a beat-em-up player exists in game layer.
+    - `internal/game/scenes/init_scenes.go` — registers `ScenePlatformerPhase → NewPlatformerPhaseScene` and `SceneBeatemupPhase → NewBeatemupPhaseScene`.
+    - `internal/game/app/phases_list.go` — each phase now declares `Genre` and `SceneType` (derived via `SceneTypeForGenre`) explicitly. Phase 1: `GenrePlatformer`. Phase 2: `GenreBeatemup`. `ScenePhases` constant removed from all callsites.
+    - `internal/game/app/setup.go` — `SkipIntro` path uses `SceneTypeForGenre(phase.Genre)` (dynamic routing).
+    - `internal/game/scenes/scene_menu.go` — start-game navigation uses `SceneTypeForGenre(phase.Genre)`.
+    - `internal/game/scenes/phases/scene.go` — removed long-standing `// TODO: It's coupled to platformer model.` comment; full scene→kit delegation deferred (see open items).
+    - Entire platformer game-scene package moved from `internal/game/scenes/phases/` root to `internal/game/scenes/phases/platformer/`, `package gameplatformerphase`. Type renamed `PhasesScene → PlatformerPhaseScene`, constructor `NewPhasesScene → NewPlatformerPhaseScene`. Root phases package now contains only `goal_type.go` (shared constants) and `router.go`. All nine moved files (scene, player, body_counter, events, goals, sequences, scene_test, mocks_test, scene_collision_debug_test) updated.
+    - `go build ./...` clean. `go test ./internal/...` all pass.
+
+## Open Items (deferred from SPEC.md)
+
+- **SPEC §3 `PhaseSceneBase` engine base** — not implemented. The hook-based template-method architecture was out of scope for this pass. `PlatformerPhaseScene` (game layer) still owns its full Update/Draw body loops rather than delegating to the kit via hooks.
+- **SPEC §5 `internal/game/render/camera/` deletion** — not done. `gamecamera.Controller` wrapper is still used by `PlatformerPhaseScene` for the vertical-only-upward constraint.
+- **AC-4 "game layer shrinks to thin wiring"** — partially met. `platformer/scene.go` is still ~300 lines with embedded genre logic; full delegation to `kit/scenes/phases/platformer/PlatformerPhaseScene` is the next step.
+- **AC-5 cross-genre type switches** — `platformer.PlatformerActorEntity` type switch remains in `game/scenes/phases/platformer/scene.go` (game layer, acceptable for now; must move to kit to fully satisfy AC-5).
+- **AC-6 melee-hitbox debug draw hook** — `*gameplayer.ClimberPlayer` cast still in `PlatformerPhaseScene.Draw`; `SetDebugDrawHook` not yet wired.

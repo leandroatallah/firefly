@@ -17,10 +17,10 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-// beatEmUpPlayer is the minimal interface the scene requires from a beat-em-up player.
-// It is a subset of beatemupkit.BeatEmUpActorEntity that the mock and production
+// Player is the minimal interface the scene requires from a beat-em-up player.
+// It is a subset of beatemupkit.BeatEmUpActorEntity that mock and production
 // types both satisfy.
-type beatEmUpPlayer interface {
+type Player interface {
 	body.Collidable
 	body.Drawable
 
@@ -29,6 +29,8 @@ type beatEmUpPlayer interface {
 	Altitude16() int
 
 	State() actors.ActorStateEnum
+	SetImmobile(bool)
+	GetCharacter() *actors.Character
 	Update(body.BodiesSpace) error
 }
 
@@ -53,9 +55,13 @@ type BeatemupPhaseScene struct {
 	screenHeight float64
 
 	// Player — holds the minimal interface; production code uses BeatEmUpActorEntity.
-	player beatEmUpPlayer
+	player Player
 
-	// Death state tracking (beat-em-up has no fall-death, but we expose for symmetry).
+	// OnDeathStarted is called after the death sequence activates. Game layers
+	// set this to spawn VFX and enable navigation triggers.
+	OnDeathStarted func()
+
+	// Death state tracking.
 	deathActive bool
 
 	// Hook for overriding SetNewStateFatal calls (used in tests for assertion).
@@ -63,6 +69,15 @@ type BeatemupPhaseScene struct {
 
 	// actorDrawHandler overrides the draw loop per actor (used in tests to record draw order).
 	actorDrawHandler func(screen *ebiten.Image, b body.Collidable) bool
+}
+
+// New creates a BeatemupPhaseScene for production use.
+func New(
+	cam *enginecamera.Controller,
+	space body.BodiesSpace,
+	sw, sh float64,
+) *BeatemupPhaseScene {
+	return newScene(cam, space, sw, sh)
 }
 
 // newScene creates a new BeatemupPhaseScene with the given camera and space.
@@ -121,14 +136,46 @@ func (s *BeatemupPhaseScene) Update() error {
 	return nil
 }
 
-// Draw renders the scene using altitude-aware draw ordering.
-func (s *BeatemupPhaseScene) Draw(screen *ebiten.Image) {
-	screen.Fill(color.RGBA{0, 0, 0, 0xff})
+// SetPlayer wires a player into the scene. Calling with non-nil sets
+// hasPlayer=true; calling with nil clears the player.
+func (s *BeatemupPhaseScene) SetPlayer(p Player) {
+	s.player = p
+	s.hasPlayer = p != nil
+}
 
+// DeathActive reports whether the death sequence has been triggered.
+func (s *BeatemupPhaseScene) DeathActive() bool { return s.deathActive }
+
+// StartDeathSequence triggers the death sequence programmatically (e.g., from
+// a player-state check in the game layer).
+func (s *BeatemupPhaseScene) StartDeathSequence() { s.startDeathSequence() }
+
+// startDeathSequence activates the death state on the player.
+func (s *BeatemupPhaseScene) startDeathSequence() {
+	if s.deathActive {
+		return
+	}
+	s.deathActive = true
+	if s.player == nil {
+		return
+	}
+	if s.setNewStateFatalHook != nil {
+		s.setNewStateFatalHook(actors.Dying)
+	} else if ch := s.player.GetCharacter(); ch != nil {
+		ch.SetNewStateFatal(actors.Dying)
+	}
+	s.player.SetImmobile(true)
+	if s.OnDeathStarted != nil {
+		s.OnDeathStarted()
+	}
+}
+
+// DrawActors renders the actor bodies using altitude-aware ordering without
+// filling the background. Game layers call this after drawing the tilemap.
+func (s *BeatemupPhaseScene) DrawActors(screen *ebiten.Image) {
 	if s.space == nil {
 		return
 	}
-
 	for _, b := range draworder.SortByGroundYAltitude(s.space.Bodies()) {
 		if s.actorDrawHandler != nil {
 			s.actorDrawHandler(screen, b)
@@ -148,6 +195,12 @@ func (s *BeatemupPhaseScene) Draw(screen *ebiten.Image) {
 			}
 		}
 	}
+}
+
+// Draw renders the scene (background fill + actors with altitude-aware ordering).
+func (s *BeatemupPhaseScene) Draw(screen *ebiten.Image) {
+	screen.Fill(color.RGBA{0, 0, 0, 0xff})
+	s.DrawActors(screen)
 }
 
 // --- test-support API -------------------------------------------------------
@@ -207,10 +260,9 @@ func (s *BeatemupPhaseScene) SpaceContainsBodyForTest(b body.Collidable) bool {
 	return false
 }
 
-// SetPlayerForTest injects a mock player for testing.
-func (s *BeatemupPhaseScene) SetPlayerForTest(p beatEmUpPlayer) {
-	s.player = p
-	s.hasPlayer = p != nil
+// SetPlayerForTest injects a mock player for testing. Delegates to SetPlayer.
+func (s *BeatemupPhaseScene) SetPlayerForTest(p Player) {
+	s.SetPlayer(p)
 }
 
 // SetSetNewStateFatalRecorder overrides the SetNewStateFatal call path so tests
@@ -220,9 +272,7 @@ func (s *BeatemupPhaseScene) SetSetNewStateFatalRecorder(f func(actors.ActorStat
 }
 
 // DeathActiveForTest returns whether the death sequence is active.
-func (s *BeatemupPhaseScene) DeathActiveForTest() bool {
-	return s.deathActive
-}
+func (s *BeatemupPhaseScene) DeathActiveForTest() bool { return s.DeathActive() }
 
 // EngineCameraForTest returns the underlying engine camera controller.
 func (s *BeatemupPhaseScene) EngineCameraForTest() *enginecamera.Controller {

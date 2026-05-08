@@ -1,7 +1,7 @@
-// Package gamescenephases implements the main platformer phase scene.
+// Package gameplatformerphase implements the game-layer platformer phase scene.
 // It wires together the tilemap, actor manager, physics space, camera, VFX,
-// sequences, and goal system into a playable level scene.
-package gamescenephases
+// sequences, and goal system into a playable platformer level.
+package gameplatformerphase
 
 import (
 	"image/color"
@@ -37,17 +37,18 @@ import (
 	gameitems "github.com/boilerplate/ebiten-template/internal/game/entity/items"
 	gameentitytypes "github.com/boilerplate/ebiten-template/internal/game/entity/types"
 	gamecamera "github.com/boilerplate/ebiten-template/internal/game/render/camera"
+	gamescenephases "github.com/boilerplate/ebiten-template/internal/game/scenes/phases"
 	scenestypes "github.com/boilerplate/ebiten-template/internal/game/scenes/types"
 	"github.com/boilerplate/ebiten-template/internal/kit/actors/platformer"
+	platformerphasescene "github.com/boilerplate/ebiten-template/internal/kit/scenes/phases/platformer"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
-type PhasesScene struct {
+type PlatformerPhaseScene struct {
 	*scene.TilemapScene
 
-	count int
-	// TODO: It's coupled to platformer model.
+	count       int
 	player      platformer.PlatformerActorEntity
 	mainText    *font.FontText
 	bodyCounter *BodyCounter
@@ -75,29 +76,40 @@ type PhasesScene struct {
 
 	vignette *enginevfx.Vignette
 
-	death deathSequence
+	// kitScene owns fall-death detection and death-sequence activation.
+	kitScene *platformerphasescene.PlatformerPhaseScene
 }
 
-func NewPhasesScene(ctx *app.AppContext) *PhasesScene {
+func NewPlatformerPhaseScene(ctx *app.AppContext) *PlatformerPhaseScene {
 	tilemapScene := scene.NewTilemapScene(ctx)
 
-	scene := &PhasesScene{
+	cfg := config.Get()
+	kitScene := platformerphasescene.New(
+		tilemapScene.Camera(),
+		ctx.Space,
+		float64(cfg.ScreenWidth),
+		float64(cfg.ScreenHeight),
+		gamestates.Dying,
+		actors.Dead,
+	)
+
+	s := &PlatformerPhaseScene{
 		TilemapScene: tilemapScene,
 		mainText:     ctx.Font,
 		bodyCounter:  &BodyCounter{},
 		vignette:     enginevfx.NewVignette(),
+		kitScene:     kitScene,
 	}
-	scene.SetAppContext(ctx)
+	s.SetAppContext(ctx)
 
-	subscribeEvents(ctx, scene)
+	subscribeEvents(ctx, s)
 
-	return scene
+	return s
 }
 
-func (s *PhasesScene) OnStart() {
+func (s *PlatformerPhaseScene) OnStart() {
 	s.TilemapScene.OnStart()
 	s.count = 0
-	s.death.active = false
 
 	ctx := s.AppContext()
 
@@ -114,6 +126,21 @@ func (s *PhasesScene) OnStart() {
 		ctx.ActorManager.Register(s.player)
 		ctx.ActorManager.RegisterPrimary(s.player)
 		s.PhysicsSpace().AddBody(s.player)
+
+		// Wire player into kit scene and set the game-specific death callback.
+		s.kitScene.SetPlayer(s.player)
+		s.kitScene.OnDeathStarted = func() {
+			if s.AppContext().VFX != nil {
+				deathX, deathY := s.player.GetPositionMin()
+				deathW, deathH := s.player.GetShape().Width(), s.player.GetShape().Height()
+				s.AppContext().VFX.SpawnDeathExplosion(
+					float64(deathX)+float64(deathW)/2,
+					float64(deathY)+float64(deathH)/2,
+					50,
+				)
+			}
+			s.deathTrigger.Enable(timing.FromDuration(time.Second))
+		}
 
 		// Optionally block input for the current player of this phase
 		if phase, err := ctx.PhaseManager.GetCurrentPhase(); err == nil && phase.BlockPlayerMovement {
@@ -218,31 +245,31 @@ func (s *PhasesScene) OnStart() {
 	phase, err := ctx.PhaseManager.GetCurrentPhase()
 	if err == nil && phase.SequencePath != "" {
 		s.sequencePlayer = sequences.NewSequencePlayer(ctx)
-		s.allowPause = phase.GoalType != SequenceGoalType
+		s.allowPause = phase.GoalType != gamescenephases.SequenceGoalType
 		s.sequencePlayer.PlaySequence(phase.SequencePath)
 	}
 
 	s.initGoal()
 }
 
-func (s *PhasesScene) initGoal() {
+func (s *PlatformerPhaseScene) initGoal() {
 	phase, _ := s.AppContext().PhaseManager.GetCurrentPhase()
 	switch phase.GoalType {
-	case ReactEndpointType:
+	case gamescenephases.ReactEndpointType:
 		s.goal = &ReachEndpointGoal{scene: s}
-	case SequenceGoalType:
+	case gamescenephases.SequenceGoalType:
 		s.goal = &phases.SequenceGoal{
 			Player:         s.sequencePlayer,
 			OnCompleteFunc: s.defaultCompletion,
 		}
-	case NoGoalType:
+	case gamescenephases.NoGoalType:
 		s.goal = &phases.NoGoal{}
 	default:
 		s.goal = &phases.NoGoal{}
 	}
 }
 
-func (s *PhasesScene) freezeAllActors() {
+func (s *PlatformerPhaseScene) freezeAllActors() {
 	if s.TilemapScene == nil {
 		return
 	}
@@ -256,69 +283,13 @@ func (s *PhasesScene) freezeAllActors() {
 	})
 }
 
-func (s *PhasesScene) defaultCompletion() {
+func (s *PlatformerPhaseScene) defaultCompletion() {
 	s.completionTrigger.Enable(timing.FromDuration(time.Second))
-}
-
-// checkPlayerFallDeath checks if the player fell out of camera view and triggers death.
-func (s *PhasesScene) checkPlayerFallDeath() {
-	if s.gameCamera == nil || s.player == nil {
-		return
-	}
-
-	// Don't trigger death during active death sequence
-	if s.death.active {
-		return
-	}
-
-	// Get camera center and player position
-	_, camY := s.gameCamera.Base().GetActualCenter()
-	_, playerY := s.player.GetPositionMin()
-
-	// Calculate bottom of camera viewport
-	// Camera center Y is the center of screen, so bottom is center + half screen height
-	cameraBottom := camY + s.gameCamera.Height()/2
-
-	// Check if player's top is below camera bottom (player fell out of view)
-	playerTop := float64(playerY)
-	if playerTop > cameraBottom {
-		s.startDeathSequence()
-	}
-}
-
-// startDeathSequence triggers the death VFX and navigates to PhaseRebootScene,
-// which fades to black and NavigateBack to restart the phase via OnStart.
-func (s *PhasesScene) startDeathSequence() {
-	if s.death.active {
-		return
-	}
-
-	s.death.active = true
-
-	if s.player == nil {
-		return
-	}
-
-	// Spawn explosion VFX at player position
-	if s.AppContext().VFX != nil {
-		deathX, deathY := s.player.GetPositionMin()
-		deathW, deathH := s.player.GetShape().Width(), s.player.GetShape().Height()
-		s.AppContext().VFX.SpawnDeathExplosion(
-			float64(deathX)+float64(deathW)/2,
-			float64(deathY)+float64(deathH)/2,
-			50,
-		)
-	}
-
-	s.player.GetCharacter().SetNewStateFatal(gamestates.Dying)
-	s.player.SetImmobile(true)
-
-	s.deathTrigger.Enable(timing.FromDuration(time.Second))
 }
 
 // Camera returns the game-layer camera controller with vertical-only-upward constraint.
 // Falls back to base camera if gameCamera is not set (e.g., when hasPlayer is false).
-func (s *PhasesScene) Camera() *gamecamera.Controller {
+func (s *PlatformerPhaseScene) Camera() *gamecamera.Controller {
 	if s.gameCamera != nil {
 		return s.gameCamera
 	}
@@ -327,14 +298,14 @@ func (s *PhasesScene) Camera() *gamecamera.Controller {
 }
 
 // BaseCamera returns the underlying engine camera controller (bypasses game-layer constraint).
-func (s *PhasesScene) BaseCamera() *enginecamera.Controller {
+func (s *PlatformerPhaseScene) BaseCamera() *enginecamera.Controller {
 	if s.gameCamera != nil {
 		return s.gameCamera.Base()
 	}
 	return s.TilemapScene.Camera()
 }
 
-func (s *PhasesScene) Update() error {
+func (s *PlatformerPhaseScene) Update() error {
 	if s.pauseScreen != nil && s.canPause() {
 		s.pauseScreen.Update()
 		if s.pauseScreen.IsPaused() {
@@ -357,14 +328,14 @@ func (s *PhasesScene) Update() error {
 		}
 	}
 
-	// Check if player fell out of camera view
-	if s.hasPlayer {
-		s.checkPlayerFallDeath()
+	// Check if player fell out of camera view (delegated to kit scene)
+	if s.hasPlayer && s.kitScene != nil {
+		s.kitScene.CheckPlayerFallDeath()
 	}
 
 	// Check if player died (from any cause) and death sequence hasn't started
-	if s.hasPlayer && !s.death.active && (s.player.State() == gamestates.Dying || s.player.State() == gamestates.Dead) {
-		s.startDeathSequence()
+	if s.hasPlayer && s.kitScene != nil && !s.kitScene.DeathActive() && (s.player.State() == gamestates.Dying || s.player.State() == gamestates.Dead) {
+		s.kitScene.StartDeathSequence()
 	}
 
 	// Update navigation triggers
@@ -409,7 +380,7 @@ func (s *PhasesScene) Update() error {
 	space := s.PhysicsSpace()
 	for _, i := range space.Bodies() {
 		switch b := i.(type) {
-		// ActorEntity case should came first. It can be confused with body.Obstacle
+		// ActorEntity case should come first. It can be confused with body.Obstacle
 		case platformer.PlatformerActorEntity:
 			if b.State() == actors.Dead {
 				if s.AppContext().VFX != nil {
@@ -459,7 +430,7 @@ func (s *PhasesScene) Update() error {
 	return nil
 }
 
-func (s *PhasesScene) Draw(screen *ebiten.Image) {
+func (s *PlatformerPhaseScene) Draw(screen *ebiten.Image) {
 	screen.Fill(color.RGBA{0, 0, 0, 0xff}) // force black
 
 	// Get tilemap image and draw based on camera
@@ -544,7 +515,7 @@ func (s *PhasesScene) Draw(screen *ebiten.Image) {
 	}
 }
 
-func (s *PhasesScene) OnFinish() {
+func (s *PlatformerPhaseScene) OnFinish() {
 	s.TilemapScene.OnFinish()
 	if s.AppContext().ProjectileManager != nil {
 		s.AppContext().ProjectileManager.Clear()
@@ -560,7 +531,7 @@ func (s *PhasesScene) OnFinish() {
 
 // EnableVignetteDarkness enables the world darkness overlay with the given radius in screen pixels.
 // The effect follows the player and is applied after world rendering (so UI remains visible).
-func (s *PhasesScene) EnableVignetteDarkness(radiusPx float64) {
+func (s *PlatformerPhaseScene) EnableVignetteDarkness(radiusPx float64) {
 	if s.vignette == nil {
 		s.vignette = enginevfx.NewVignette()
 	}
@@ -568,7 +539,7 @@ func (s *PhasesScene) EnableVignetteDarkness(radiusPx float64) {
 }
 
 // DisableVignetteDarkness disables the world darkness overlay.
-func (s *PhasesScene) DisableVignetteDarkness() {
+func (s *PlatformerPhaseScene) DisableVignetteDarkness() {
 	if s.vignette == nil {
 		return
 	}
@@ -576,23 +547,25 @@ func (s *PhasesScene) DisableVignetteDarkness() {
 }
 
 // TriggerScreenFlash triggers a white screen flash effect for feedback.
-func (s *PhasesScene) TriggerScreenFlash() {
+func (s *PlatformerPhaseScene) TriggerScreenFlash() {
 	s.ShowDrawScreenFlash = 2
 }
 
-func (s *PhasesScene) endpointTrigger(eventType string) {
+func (s *PlatformerPhaseScene) endpointTrigger(eventType string) {
 	if !s.hasPlayer {
 		return
 	}
 
 	// Prevent multiple triggers (e.g., from continuous spike collision)
-	if s.death.active {
+	if s.kitScene != nil && s.kitScene.DeathActive() {
 		return
 	}
 
 	switch eventType {
 	case "SPIKE":
-		s.startDeathSequence()
+		if s.kitScene != nil {
+			s.kitScene.StartDeathSequence()
+		}
 		return
 	case "CUTSCENE":
 		// TODO: Implement this
@@ -601,7 +574,7 @@ func (s *PhasesScene) endpointTrigger(eventType string) {
 	s.reachedEndpoint = true
 }
 
-func (s *PhasesScene) initTilemap() {
+func (s *PlatformerPhaseScene) initTilemap() {
 	// Set items position from tilemap
 	f := items.NewItemFactory(gameitems.InitItemMap(s.AppContext()))
 	scene.InitItems(s.TilemapScene, f)
@@ -619,11 +592,11 @@ func (s *PhasesScene) initTilemap() {
 	}
 }
 
-func (s *PhasesScene) canPause() bool {
+func (s *PlatformerPhaseScene) canPause() bool {
 	return s.allowPause && !s.sequencePlayer.IsPlaying()
 }
 
-func (s *PhasesScene) refreshPauseMenuLabels() {
+func (s *PlatformerPhaseScene) refreshPauseMenuLabels() {
 	i18n := s.AppContext().I18n
 
 	if s.pauseMenu != nil {
@@ -632,7 +605,7 @@ func (s *PhasesScene) refreshPauseMenuLabels() {
 	}
 }
 
-func (s *PhasesScene) drawPause(screen *ebiten.Image) {
+func (s *PlatformerPhaseScene) drawPause(screen *ebiten.Image) {
 	if !s.canPause() || s.pauseScreen == nil || !s.pauseScreen.IsPaused() {
 		return
 	}

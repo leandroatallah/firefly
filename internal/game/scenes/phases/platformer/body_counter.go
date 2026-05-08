@@ -1,4 +1,4 @@
-package gamescenephases
+package gameplatformerphase
 
 import (
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
