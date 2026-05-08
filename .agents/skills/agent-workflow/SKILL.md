@@ -22,11 +22,13 @@ Each story lives in a self-contained folder that moves through the pipeline:
 │   └── PROGRESS.md     ← pipeline status tracker
 ├── active/[ID]-[slug]/
 │   ├── USER_STORY.md
-│   ├── SPEC.md         ← written by Spec Engineer
+│   ├── SPEC.md         ← written by Spec Engineer (agent-optimized)
+│   ├── NOTES.md        ← written by Spec Engineer (human-readable context)
 │   └── PROGRESS.md
 └── done/[ID]-[slug]/
     ├── USER_STORY.md
     ├── SPEC.md
+    ├── NOTES.md
     └── PROGRESS.md
 ```
 
@@ -72,7 +74,21 @@ Translates the feature request into a User Story with Acceptance Criteria using 
 **2. Spec Engineer**
 Transforms the story into a Technical Specification: interface contracts, state machine transitions, pre/post-conditions.
 - Moves folder from `backlog/` to `active/` using `bash scripts/story.sh start <id-slug>`.
-- Writes `SPEC.md`, updates `PROGRESS.md`.
+- Writes `SPEC.md` (agent-optimized, token-efficient) and `NOTES.md` (human context), updates `PROGRESS.md`.
+
+### SPEC.md vs NOTES.md
+
+| File | Audience | Content |
+|---|---|---|
+| `SPEC.md` | Agents | Signatures, pseudocode, test triples, post-conditions. No prose rationale. |
+| `NOTES.md` | Humans | Investigation findings, risks, out-of-scope, design rationale. |
+
+**SPEC.md token rules:**
+- Pseudocode over prose for logic.
+- Test scenarios as `pre / act / post` triples (not paragraphs).
+- AC tags on section headers, not in a separate table.
+- Omit: risks, out-of-scope, investigation narrative, AC traceability table.
+- Target: ≤200 lines (medium story), ≤400 lines (large refactor).
 
 **3. Mock Generator**
 Inspects `internal/engine/contracts/` and `internal/engine/mocks/`, generates or updates mocks required by the spec.

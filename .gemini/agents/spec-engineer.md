@@ -34,13 +34,52 @@ Acts as the "Architect". Transforms User Stories into detailed Technical Specifi
 
 ## Outputs
 
-- `.agents/work/active/[ID]-[slug]/SPEC.md` containing:
-  - Branch name (from the story).
-  - Technical requirements (interface changes, state machine states).
-  - Pre-conditions and post-conditions.
-  - Integration points within the Bounded Context.
-  - Red Phase scenario (failing test description).
+- `.agents/work/active/[ID]-[slug]/SPEC.md` — agent-optimized technical spec (see format rules below).
+- `.agents/work/active/[ID]-[slug]/NOTES.md` — human-only context: investigation narrative, risks, out-of-scope, rationale.
 - Updated `PROGRESS.md` with "Spec Engineer" ✅.
+
+## SPEC.md Format Rules (Token Optimization)
+
+SPEC.md is consumed by agents (TDD Specialist, Feature Implementer). Optimize for token efficiency:
+
+**Include:**
+- File paths and package names (exact).
+- Typed signatures and struct fields (copy-pasteable).
+- Pseudocode for non-trivial logic (not prose):
+  ```
+  actorBodyHandler:
+    if b is PlatformerActorEntity:
+      if b.State() == Dead: emit VFX, space.Remove(b)
+      else: b.Update(space)
+    → handled=true
+  ```
+- Pre-conditions and post-conditions as **checkable one-liners**.
+- Red Phase test scenarios as compact triples:
+  ```
+  T-P1: checkPlayerFallDeath fires when below camera
+    pre:  player.TopY=250, camera.Bottom=200, deathActive=false
+    act:  checkPlayerFallDeath()
+    post: deathActive==true, SetNewStateFatal(Dying) called, SetImmobile(true) called
+  ```
+- Mock/contract inventory (one line per item).
+- AC tags inline on section headers: `## 3. Engine Layer [AC-1, AC-5]`.
+
+**Omit from SPEC.md (move to NOTES.md):**
+- Investigation narrative ("we found that line 145 does X...").
+- Risk tables.
+- Out-of-scope sections.
+- Rationale paragraphs ("this is genre-agnostic because...").
+- AC traceability table (ACs are already on section headers).
+
+**Target:** SPEC.md under **200 lines** for a medium story, **400 lines** for a large refactor.
+
+## NOTES.md Format
+
+Human-readable companion. No format constraints. Include:
+- Pre-spec investigation findings and their rationale.
+- Risks and mitigations.
+- Out-of-scope decisions and why.
+- Any non-obvious design choices that don't fit in a signature.
 
 ## Integration
 
