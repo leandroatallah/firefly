@@ -16,5 +16,13 @@ func GetPhases() []phases.Phase {
 			SceneType:    scenestypes.ScenePhases,
 			SequencePath: "assets/sequences/sample_phase.json",
 		},
+		{
+			ID:           2,
+			Name:         "Sample Phase",
+			TilemapPath:  "assets/tilemap/beatemup-000.tmj",
+			GoalType:     gamescenephases.ReactEndpointType,
+			SceneType:    scenestypes.ScenePhases,
+			SequencePath: "assets/sequences/sample_phase.json",
+		},
 	}
 }

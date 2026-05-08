@@ -133,6 +133,12 @@ func (c *Controller) SetFollowTarget(b body.Body) {
 	c.Kamera().SetCenter(targetX, targetY)
 }
 
+// SetVerticalOnlyUpward enables or disables the vertical-only-upward camera constraint.
+// When enabled, the camera will not move downward (increasing Y) when following a target.
+func (c *Controller) SetVerticalOnlyUpward(v bool) {
+	c.VerticalOnlyUpward = v
+}
+
 func (c *Controller) Update() {
 	var targetX, targetY float64
 	if c.isFollowing && c.followTarget != nil {

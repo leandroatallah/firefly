@@ -19,8 +19,8 @@ type fakeCollidable struct {
 	w, h int
 }
 
-func newFakeCollidable(id string, x16, y16 int) *fakeCollidable {
-	return &fakeCollidable{id: id, x16: x16, y16: y16, w: 16, h: 16}
+func newFakeCollidable(id string, y16 int) *fakeCollidable {
+	return &fakeCollidable{id: id, x16: 0, y16: y16, w: 16, h: 16}
 }
 
 // body.Body methods.
@@ -81,9 +81,9 @@ func (f *fakeCollidableAlt) Altitude16() int     { return f.alt16 }
 func (f *fakeCollidableAlt) SetAltitude(a int)   { f.alt16 = a * 16 }
 func (f *fakeCollidableAlt) SetAltitude16(a int) { f.alt16 = a }
 
-func newFakeWithAltitude(id string, x16, y16, alt16 int) *fakeCollidableAlt {
+func newFakeWithAltitude(id string, y16, alt16 int) *fakeCollidableAlt {
 	return &fakeCollidableAlt{
-		fakeCollidable: newFakeCollidable(id, x16, y16),
+		fakeCollidable: newFakeCollidable(id, y16),
 		alt16:          alt16,
 	}
 }
@@ -110,9 +110,9 @@ func equalIDs(a, b []string) bool {
 
 func TestSortByGroundY_AscendingOrder(t *testing.T) {
 	in := []body.Collidable{
-		newFakeCollidable("a", 0, 300),
-		newFakeCollidable("b", 0, 100),
-		newFakeCollidable("c", 0, 200),
+		newFakeCollidable("a", 300),
+		newFakeCollidable("b", 100),
+		newFakeCollidable("c", 200),
 	}
 
 	out := draworder.SortByGroundY(in)
@@ -126,9 +126,9 @@ func TestSortByGroundY_AscendingOrder(t *testing.T) {
 
 func TestSortByGroundY_StableForEqualY(t *testing.T) {
 	in := []body.Collidable{
-		newFakeCollidable("idA", 0, 100),
-		newFakeCollidable("idB", 0, 100),
-		newFakeCollidable("idC", 0, 50),
+		newFakeCollidable("idA", 100),
+		newFakeCollidable("idB", 100),
+		newFakeCollidable("idC", 50),
 	}
 
 	out := draworder.SortByGroundY(in)
@@ -143,8 +143,8 @@ func TestSortByGroundY_StableForEqualY(t *testing.T) {
 func TestSortByGroundY_AltitudeIgnored(t *testing.T) {
 	// Same ground y16=200; different altitudes. Input order must be preserved.
 	in := []body.Collidable{
-		newFakeWithAltitude("first", 0, 200, 0),
-		newFakeWithAltitude("second", 0, 200, 100*16),
+		newFakeWithAltitude("first", 200, 0),
+		newFakeWithAltitude("second", 200, 100*16),
 	}
 
 	out := draworder.SortByGroundY(in)
@@ -157,9 +157,9 @@ func TestSortByGroundY_AltitudeIgnored(t *testing.T) {
 }
 
 func TestSortByGroundY_DoesNotMutateInput(t *testing.T) {
-	a := newFakeCollidable("a", 0, 300)
-	b := newFakeCollidable("b", 0, 100)
-	c := newFakeCollidable("c", 0, 200)
+	a := newFakeCollidable("a", 300)
+	b := newFakeCollidable("b", 100)
+	c := newFakeCollidable("c", 200)
 	in := []body.Collidable{a, b, c}
 
 	snapshot := make([]body.Collidable, len(in))
@@ -186,7 +186,7 @@ func TestSortByGroundY_EmptyAndSingle(t *testing.T) {
 	})
 
 	t.Run("single", func(t *testing.T) {
-		only := newFakeCollidable("only", 0, 42)
+		only := newFakeCollidable("only", 42)
 		in := []body.Collidable{only}
 
 		out := draworder.SortByGroundY(in)
@@ -194,4 +194,68 @@ func TestSortByGroundY_EmptyAndSingle(t *testing.T) {
 			t.Fatalf("expected single-element identity; got %v", ids(out))
 		}
 	})
+}
+
+// T-D1: SortByGroundYAltitude sorts by effective ground depth (y16 - altitude16).
+// This Red-Phase test will fail to compile until draworder.SortByGroundYAltitude
+// is introduced — that is the missing-behaviour signal.
+func TestSortByGroundYAltitude(t *testing.T) {
+	cases := []struct {
+		name string
+		in   []body.Collidable
+		want []string
+	}{
+		{
+			name: "all non-altitudable falls back to SortByGroundY",
+			in: []body.Collidable{
+				newFakeCollidable("a", 300),
+				newFakeCollidable("b", 100),
+				newFakeCollidable("c", 200),
+			},
+			want: []string{"b", "c", "a"},
+		},
+		{
+			name: "mixed altitudable and non-altitudable: non-altitudable treated as alt=0",
+			in: []body.Collidable{
+				// Effective depth = y16 - alt16.
+				newFakeCollidable("ground100", 100),         // 100 - 0 = 100
+				newFakeWithAltitude("airHigh", 5*16, 8*16),  // 80 - 128 = -48
+				newFakeWithAltitude("groundlowAlt0", 50, 0), // 50 - 0 = 50
+				newFakeWithAltitude("airC", 20*16, 5*16),    // 320 - 80 = 240
+			},
+			want: []string{"airHigh", "groundlowAlt0", "ground100", "airC"},
+		},
+		{
+			name: "stable order for equal effective depth",
+			in: []body.Collidable{
+				// All produce effective depth = 100.
+				newFakeCollidable("first", 100),
+				newFakeWithAltitude("second", 100, 0),
+				newFakeWithAltitude("third", 116, 16), // 116 - 16 = 100
+			},
+			want: []string{"first", "second", "third"},
+		},
+		{
+			name: "spec example — B before A before C",
+			// A: y16=10, alt=0    -> 10
+			// B: y16=5,  alt=8    -> -3
+			// C: y16=20, alt=5    -> 15
+			in: []body.Collidable{
+				newFakeWithAltitude("A", 10, 0),
+				newFakeWithAltitude("B", 5, 8),
+				newFakeWithAltitude("C", 20, 5),
+			},
+			want: []string{"B", "A", "C"},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			out := draworder.SortByGroundYAltitude(tc.in)
+			got := ids(out)
+			if !equalIDs(got, tc.want) {
+				t.Fatalf("SortByGroundYAltitude: got %v; want %v", got, tc.want)
+			}
+		})
+	}
 }

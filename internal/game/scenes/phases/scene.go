@@ -46,7 +46,8 @@ import (
 type PhasesScene struct {
 	*scene.TilemapScene
 
-	count       int
+	count int
+	// TODO: It's coupled to platformer model.
 	player      platformer.PlatformerActorEntity
 	mainText    *font.FontText
 	bodyCounter *BodyCounter
