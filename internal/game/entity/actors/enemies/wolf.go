@@ -7,7 +7,6 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/builder"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/movement"
 	gameplayer "github.com/boilerplate/ebiten-template/internal/game/entity/actors/player"
-	gamestates "github.com/boilerplate/ebiten-template/internal/game/entity/actors/states"
 	kitactors "github.com/boilerplate/ebiten-template/internal/kit/actors"
 	"github.com/boilerplate/ebiten-template/internal/kit/actors/platformer"
 	kitcombat "github.com/boilerplate/ebiten-template/internal/kit/combat"
@@ -83,7 +82,7 @@ func (e *WolfEnemy) OnTouch(other body.Collidable) {
 	owner := other.LastOwner()
 	switch owner.(type) {
 	case *gameplayer.ClimberPlayer:
-		if owner.(platformer.PlatformerActorEntity).State() == gamestates.Dying {
+		if owner.(platformer.PlatformerActorEntity).State() == actors.Dying {
 			return
 		}
 

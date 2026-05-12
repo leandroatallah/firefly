@@ -33,7 +33,6 @@ import (
 	gameenemies "github.com/boilerplate/ebiten-template/internal/game/entity/actors/enemies"
 	gamenpcs "github.com/boilerplate/ebiten-template/internal/game/entity/actors/npcs"
 	gameplayer "github.com/boilerplate/ebiten-template/internal/game/entity/actors/player"
-	gamestates "github.com/boilerplate/ebiten-template/internal/game/entity/actors/states"
 	gameitems "github.com/boilerplate/ebiten-template/internal/game/entity/items"
 	gameentitytypes "github.com/boilerplate/ebiten-template/internal/game/entity/types"
 	gamecamera "github.com/boilerplate/ebiten-template/internal/game/render/camera"
@@ -89,7 +88,7 @@ func NewPlatformerPhaseScene(ctx *app.AppContext) *PlatformerPhaseScene {
 		ctx.Space,
 		float64(cfg.ScreenWidth),
 		float64(cfg.ScreenHeight),
-		gamestates.Dying,
+		actors.Dying,
 		actors.Dead,
 	)
 
@@ -334,7 +333,7 @@ func (s *PlatformerPhaseScene) Update() error {
 	}
 
 	// Check if player died (from any cause) and death sequence hasn't started
-	if s.hasPlayer && s.kitScene != nil && !s.kitScene.DeathActive() && (s.player.State() == gamestates.Dying || s.player.State() == gamestates.Dead) {
+	if s.hasPlayer && s.kitScene != nil && !s.kitScene.DeathActive() && (s.player.State() == actors.Dying || s.player.State() == actors.Dead) {
 		s.kitScene.StartDeathSequence()
 	}
 

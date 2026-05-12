@@ -15,7 +15,6 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/scene/transition"
 	"github.com/boilerplate/ebiten-template/internal/engine/utils"
 	"github.com/boilerplate/ebiten-template/internal/engine/utils/timing"
-	gamestates "github.com/boilerplate/ebiten-template/internal/game/entity/actors/states"
 	scenestypes "github.com/boilerplate/ebiten-template/internal/game/scenes/types"
 	beatemupkit "github.com/boilerplate/ebiten-template/internal/kit/actors/beatemup"
 	beatemupphasescene "github.com/boilerplate/ebiten-template/internal/kit/scenes/phases/beatemup"
@@ -103,7 +102,7 @@ func (s *BeatemupPhaseScene) Update() error {
 
 	// Detect player death triggered by combat (Hurt → Dying/Dead state).
 	if s.hasPlayer && s.player != nil && !s.kitScene.DeathActive() &&
-		(s.player.State() == gamestates.Dying || s.player.State() == actors.Dead) {
+		(s.player.State() == actors.Dying || s.player.State() == actors.Dead) {
 		s.kitScene.StartDeathSequence()
 	}
 
