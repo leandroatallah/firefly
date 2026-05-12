@@ -1,4 +1,4 @@
-package gamescenephases
+package gameplatformerphase
 
 import (
 	"image"
@@ -25,7 +25,7 @@ func (o *debugMeleeOwner) Faction() combat.Faction                      { return
 func (o *debugMeleeOwner) FaceDirection() animation.FacingDirectionEnum { return o.face }
 
 // runDebugDrawBlock mirrors the production §3.6 debug block from
-// PhasesScene.Draw under config.Get().CollisionBox. It is the exact integration
+// PlatformerPhaseScene.Draw under config.Get().CollisionBox. It is the exact integration
 // the Phase Scene will perform once the production code lands; running it
 // here lets the Red Phase pixel-sample without needing a fully wired scene.
 func runDebugDrawBlock(
@@ -95,10 +95,10 @@ func driveToActiveFrame(w *weapon.MeleeWeapon, owner *debugMeleeOwner) {
 	}
 }
 
-// TestPhasesScene_Draw_CollisionBoxFlag covers AC-1..AC-4: the debug block
+// TestPlatformerPhaseScene_Draw_CollisionBoxFlag covers AC-1..AC-4: the debug block
 // only draws when the flag is on, projectile boxes are rendered (green),
 // and the melee hitbox box is rendered (orange) only when active.
-func TestPhasesScene_Draw_CollisionBoxFlag(t *testing.T) {
+func TestPlatformerPhaseScene_Draw_CollisionBoxFlag(t *testing.T) {
 	originalConfig := config.Get()
 	t.Cleanup(func() {
 		config.Set(originalConfig)
@@ -227,12 +227,12 @@ func TestPhasesScene_Draw_CollisionBoxFlag(t *testing.T) {
 	}
 }
 
-// TestPhasesScene_Draw_CollisionBoxFlag_LogicInvariance covers AC-5: running
+// TestPlatformerPhaseScene_Draw_CollisionBoxFlag_LogicInvariance covers AC-5: running
 // the same simulation with the flag on vs. off produces byte-identical
 // post-frame state for MeleeWeapon (swingFrame via IsHitboxActive transitions
 // + cooldown via CanFire) and projectile body positions. The debug draw block
 // must be a pure read; it must not mutate any game state.
-func TestPhasesScene_Draw_CollisionBoxFlag_LogicInvariance(t *testing.T) {
+func TestPlatformerPhaseScene_Draw_CollisionBoxFlag_LogicInvariance(t *testing.T) {
 	originalConfig := config.Get()
 	t.Cleanup(func() {
 		config.Set(originalConfig)

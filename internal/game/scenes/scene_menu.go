@@ -16,7 +16,7 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/ui/menu"
 	"github.com/boilerplate/ebiten-template/internal/engine/utils"
 	"github.com/boilerplate/ebiten-template/internal/engine/utils/timing"
-	scenestypes "github.com/boilerplate/ebiten-template/internal/game/scenes/types"
+	gamescenephases "github.com/boilerplate/ebiten-template/internal/game/scenes/phases"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
 )
@@ -151,8 +151,9 @@ func (s *MenuScene) Update() error {
 
 	s.navigationTrigger.Update()
 	if s.navigationTrigger.Trigger() {
+		phase, _ := s.AppContext().PhaseManager.GetCurrentPhase()
 		s.AppContext().SceneManager.NavigateTo(
-			scenestypes.ScenePhases, transition.NewFader(0, config.Get().FadeVisibleDuration), true,
+			gamescenephases.SceneTypeForGenre(phase.Genre), transition.NewFader(0, config.Get().FadeVisibleDuration), true,
 		)
 	}
 

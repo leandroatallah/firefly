@@ -1,4 +1,4 @@
-package gamescenephases
+package gameplatformerphase
 
 import (
 	"time"
@@ -6,7 +6,7 @@ import (
 
 // ReachEndpointGoal completes the phase when the player reaches the level endpoint.
 type ReachEndpointGoal struct {
-	scene *PhasesScene
+	scene *PlatformerPhaseScene
 }
 
 func (g *ReachEndpointGoal) IsCompleted() bool {

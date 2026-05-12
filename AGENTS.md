@@ -79,7 +79,7 @@ tests := []struct {
 
 ## 📋 Feature Implementation Workflow
 
-See **[`.agents/WORKFLOW.md`](.agents/WORKFLOW.md)** for the complete Spec-Driven Development (SDD) pipeline: Story Architect → Spec Engineer → Mock Generator → TDD Specialist → Feature Implementer → Gatekeeper.
+See **[`.agents/WORKFLOW.md`](.agents/WORKFLOW.md)** for the complete Spec-Driven Development (SDD) pipeline: Story Architect → Spec Engineer → Mock Generator → TDD Specialist → Feature Implementer → Gatekeeper. The Spec Engineer produces two files: `SPEC.md` (agent-optimized, token-efficient) and `NOTES.md` (human context: risks, rationale, investigation findings).
 
 ## 📋 Standard Workflow for Coverage Tasks
 

@@ -1,4 +1,4 @@
-package gamescenephases
+package gamebeatemupphase
 
 import (
 	"image"

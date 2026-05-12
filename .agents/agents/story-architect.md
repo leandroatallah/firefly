@@ -36,9 +36,20 @@ Acts as the "Product Owner". Translates feature requests into behavioral User St
   - Branch name.
   - Story description ("As a [role], I want [action], so that [benefit]").
   - Bounded Context.
-  - Acceptance Criteria.
-  - Behavioral edge cases.
+  - Acceptance Criteria (numbered, one line each).
+  - Behavioral edge cases (bullet list, no prose).
 - `.agents/work/backlog/[ID]-[slug]/PROGRESS.md` with initial pipeline status and a `## Log` entry: `Story Architect [date]: USER_STORY.md created.`
+
+## Token Optimization Rules
+
+USER_STORY.md must be **agent-consumable first**:
+
+- **No investigation narrative.** State decisions, not how you reached them.
+- **ACs are one-liners.** `AC-1: PhaseSceneBase embeds TilemapScene and owns pause/sequence/goal state.`
+- **Edge cases are bullets.** No paragraph explanations.
+- **No "Out of Scope" section.** Omit what is not being done.
+- **No risk tables.** Risks belong in `NOTES.md` (human-only).
+- Keep the story under **80 lines**.
 
 ## Integration
 

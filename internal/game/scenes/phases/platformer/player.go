@@ -1,4 +1,4 @@
-package gamescenephases
+package gameplatformerphase
 
 import (
 	"image"

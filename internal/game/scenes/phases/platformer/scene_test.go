@@ -1,4 +1,4 @@
-package gamescenephases
+package gameplatformerphase
 
 import (
 	"testing"
@@ -21,7 +21,7 @@ func TestReachEndpointGoal_Completion(t *testing.T) {
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			s := &PhasesScene{reachedEndpoint: tc.reachedEndpoint}
+			s := &PlatformerPhaseScene{reachedEndpoint: tc.reachedEndpoint}
 			goal := &ReachEndpointGoal{scene: s}
 			if got := goal.IsCompleted(); got != tc.wantCompleted {
 				t.Errorf("IsCompleted() = %v, want %v", got, tc.wantCompleted)
@@ -32,7 +32,7 @@ func TestReachEndpointGoal_Completion(t *testing.T) {
 
 func TestReachEndpointGoal_OnCompletion_NilAudioManager(t *testing.T) {
 	// Production code must guard against nil AudioManager — this test exposes the missing guard.
-	s := &PhasesScene{reachedEndpoint: true}
+	s := &PlatformerPhaseScene{reachedEndpoint: true}
 	goal := &ReachEndpointGoal{scene: s}
 	// Must not panic when AudioManager is nil.
 	goal.OnCompletion()
@@ -92,16 +92,8 @@ func TestBodyCounter_CountsWolfBodies(t *testing.T) {
 	}
 }
 
-func TestCheckPlayerFallDeath_TriggersWhenBelowCamera(t *testing.T) {
-	s := &PhasesScene{death: deathSequence{active: false}}
-	s.checkPlayerFallDeath()
-	if s.death.active {
-		t.Error("death triggered with nil gameCamera")
-	}
-}
-
 func TestDefaultCompletion_EnablesTrigger(t *testing.T) {
-	s := &PhasesScene{}
+	s := &PlatformerPhaseScene{}
 	s.defaultCompletion()
 	if !s.completionTrigger.IsEnabled() {
 		t.Error("completionTrigger not enabled")
@@ -109,7 +101,7 @@ func TestDefaultCompletion_EnablesTrigger(t *testing.T) {
 }
 
 func TestCamera_ReturnsGameCamera(t *testing.T) {
-	s := &PhasesScene{TilemapScene: &scene.TilemapScene{}}
+	s := &PlatformerPhaseScene{TilemapScene: &scene.TilemapScene{}}
 	cam := s.Camera()
 	if cam == nil {
 		t.Error("Camera() returned nil")
@@ -118,7 +110,7 @@ func TestCamera_ReturnsGameCamera(t *testing.T) {
 
 func TestBaseCamera_ReturnsUnderlyingCamera(t *testing.T) {
 	ctx := &app.AppContext{Space: &mockBodiesSpace{}}
-	s := &PhasesScene{TilemapScene: scene.NewTilemapScene(ctx)}
+	s := &PlatformerPhaseScene{TilemapScene: scene.NewTilemapScene(ctx)}
 	cam := s.BaseCamera()
 	if cam == nil {
 		t.Error("BaseCamera() returned nil")
@@ -126,7 +118,7 @@ func TestBaseCamera_ReturnsUnderlyingCamera(t *testing.T) {
 }
 
 func TestEndpointTrigger_SetsReachedEndpoint(t *testing.T) {
-	s := &PhasesScene{
+	s := &PlatformerPhaseScene{
 		TilemapScene: &scene.TilemapScene{},
 		hasPlayer:    true,
 	}
@@ -139,23 +131,10 @@ func TestEndpointTrigger_SetsReachedEndpoint(t *testing.T) {
 }
 
 func TestTriggerScreenFlash_SetsFlashCounter(t *testing.T) {
-	s := &PhasesScene{}
+	s := &PlatformerPhaseScene{}
 	s.TriggerScreenFlash()
 	if s.ShowDrawScreenFlash == 0 {
 		t.Error("ShowDrawScreenFlash not set")
-	}
-}
-
-func TestStartDeathSequence_ActivatesDeathState(t *testing.T) {
-	s := &PhasesScene{
-		TilemapScene: &scene.TilemapScene{},
-		death:        deathSequence{active: false},
-	}
-	ctx := &app.AppContext{Space: &mockBodiesSpace{}}
-	s.SetAppContext(ctx)
-	s.startDeathSequence()
-	if !s.death.active {
-		t.Error("death.active not set to true")
 	}
 }
 
@@ -172,7 +151,7 @@ func TestCanPause_RequiresAllowPauseAndNoSequence(t *testing.T) {
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			s := &PhasesScene{
+			s := &PlatformerPhaseScene{
 				allowPause:     tc.allowPause,
 				sequencePlayer: &mockSequencePlayer{playing: tc.playing},
 			}
@@ -183,13 +162,13 @@ func TestCanPause_RequiresAllowPauseAndNoSequence(t *testing.T) {
 	}
 }
 
-func newUpdateHarness(goal phases.Goal, sm *mockSceneManager) *PhasesScene {
+func newUpdateHarness(goal phases.Goal, sm *mockSceneManager) *PlatformerPhaseScene {
 	space := &mockBodiesSpace{}
 	ctx := &app.AppContext{
 		Space:        space,
 		SceneManager: sm,
 	}
-	s := &PhasesScene{
+	s := &PlatformerPhaseScene{
 		TilemapScene: scene.NewTilemapScene(ctx),
 		goal:         goal,
 		hasPlayer:    false,
@@ -224,7 +203,7 @@ func TestUpdate_SequencePlayerUpdated(t *testing.T) {
 	sp := &trackingSequencePlayer{}
 	space := &mockBodiesSpace{}
 	ctx := &app.AppContext{Space: space, SceneManager: &mockSceneManager{}}
-	s := &PhasesScene{
+	s := &PlatformerPhaseScene{
 		TilemapScene:   scene.NewTilemapScene(ctx),
 		sequencePlayer: sp,
 		hasPlayer:      false,
@@ -261,7 +240,7 @@ func (p *trackingSequencePlayer) Update() { p.updateCalled = true }
 
 func TestOnFinish_NoPlayer_DoesNotPanic(t *testing.T) {
 	ctx := &app.AppContext{Space: &mockBodiesSpace{}}
-	s := &PhasesScene{
+	s := &PlatformerPhaseScene{
 		TilemapScene: scene.NewTilemapScene(ctx),
 		hasPlayer:    false,
 	}
@@ -270,7 +249,7 @@ func TestOnFinish_NoPlayer_DoesNotPanic(t *testing.T) {
 }
 
 func TestDisableVignetteDarkness_NilVignette_DoesNotPanic(t *testing.T) {
-	s := &PhasesScene{vignette: nil}
+	s := &PlatformerPhaseScene{vignette: nil}
 	s.DisableVignetteDarkness() // must not panic
 }
 

@@ -17,11 +17,13 @@ Each story moves through the pipeline as a self-contained folder:
 │   └── PROGRESS.md     ← pipeline status tracker
 ├── active/[ID]-[slug]/
 │   ├── USER_STORY.md
-│   ├── SPEC.md         ← written by Spec Engineer
+│   ├── SPEC.md         ← written by Spec Engineer (agent-optimized)
+│   ├── NOTES.md        ← written by Spec Engineer (human context)
 │   └── PROGRESS.md
 └── done/[ID]-[slug]/
     ├── USER_STORY.md
     ├── SPEC.md
+    ├── NOTES.md
     └── PROGRESS.md
 ```
 
@@ -66,7 +68,14 @@ Translates the feature request into a User Story with Acceptance Criteria using 
 ### 2. Spec Engineer (`@spec-engineer`)
 Transforms the story into a Technical Specification: interface contracts, state machine transitions, pre/post-conditions.
 - Moves folder from `backlog/` to `active/` using `bash scripts/story.sh start <id-slug>`.
-- Writes `SPEC.md`, updates `PROGRESS.md`.
+- Writes `SPEC.md` (agent-optimized, token-efficient) and `NOTES.md` (human context: risks, rationale, investigation findings), updates `PROGRESS.md`.
+
+**SPEC.md vs NOTES.md:**
+
+| File | Audience | Content |
+|---|---|---|
+| `SPEC.md` | Agents | Signatures, pseudocode, `pre/act/post` test triples, post-conditions. No prose rationale. |
+| `NOTES.md` | Humans | Investigation findings, risks, out-of-scope, design rationale. |
 
 ### 3. Mock Generator (`@mock-generator`)
 Inspects `internal/engine/contracts/` and `internal/engine/mocks/`, generates or updates mocks required by the spec.

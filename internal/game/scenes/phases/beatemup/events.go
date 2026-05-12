@@ -1,4 +1,4 @@
-package gamescenephases
+package gamebeatemupphase
 
 import (
 	"github.com/boilerplate/ebiten-template/internal/engine/app"
@@ -8,7 +8,7 @@ import (
 
 // subscribeEvents registers scene-level event handlers (jump puffs, landing puffs, etc.)
 // on the app context's EventManager for the duration of the phase.
-func subscribeEvents(ctx *app.AppContext, _ *PhasesScene) {
+func subscribeEvents(ctx *app.AppContext, _ *BeatemupPhaseScene) {
 
 	em := ctx.EventManager
 

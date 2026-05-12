@@ -9,7 +9,6 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/builder"
 	"github.com/boilerplate/ebiten-template/internal/engine/input"
-	gamestates "github.com/boilerplate/ebiten-template/internal/game/entity/actors/states"
 	kitactors "github.com/boilerplate/ebiten-template/internal/kit/actors"
 	"github.com/boilerplate/ebiten-template/internal/kit/actors/platformer"
 	meleeengine "github.com/boilerplate/ebiten-template/internal/kit/combat/melee"
@@ -116,11 +115,11 @@ func (p *ClimberPlayer) Hurt(_ int) {
 		melee.OnInterrupt()
 	}
 
-	if p.State() == gamestates.Dying || p.State() == gamestates.Dead {
+	if p.State() == actors.Dying || p.State() == actors.Dead {
 		return
 	}
 
-	p.SetNewStateFatal(gamestates.Dying)
+	p.SetNewStateFatal(actors.Dying)
 }
 
 func (p *ClimberPlayer) OnTouch(_ body.Collidable) {

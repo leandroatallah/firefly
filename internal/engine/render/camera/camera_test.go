@@ -381,3 +381,60 @@ func TestControllerAddTrauma(t *testing.T) {
 	// Smoke test, should not panic
 	ctrl.AddTrauma(0.5)
 }
+
+// T-C1: Controller.SetVerticalOnlyUpward toggles the constraint and the field is
+// observable. With the flag on, Update() must not advance camera Y for a target
+// that moves downward (Y increasing); with the flag off it must advance.
+//
+// Red Phase: this test will fail to compile until SetVerticalOnlyUpward is
+// introduced on Controller.
+func TestController_SetVerticalOnlyUpward(t *testing.T) {
+	originalConfig := config.Get()
+	t.Cleanup(func() {
+		config.Set(originalConfig)
+	})
+	config.Set(&config.AppConfig{ScreenWidth: 320, ScreenHeight: 240})
+
+	cases := []struct {
+		name          string
+		flag          bool
+		wantYAdvanced bool
+	}{
+		{"flag off: target moving down advances camera Y", false, true},
+		{"flag on: target moving down does NOT advance camera Y", true, false},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			ctrl := NewController(0, 0)
+			ctrl.DisableSmoothing()
+
+			rect := bodyphysics.NewRect(0, 0, 16, 16)
+			target := bodyphysics.NewCollidableBodyFromRect(rect)
+			target.SetPosition(100, 100)
+			ctrl.SetFollowTarget(target)
+			ctrl.SetFollowing(true)
+
+			ctrl.SetVerticalOnlyUpward(tc.flag)
+			if ctrl.VerticalOnlyUpward != tc.flag {
+				t.Fatalf("VerticalOnlyUpward field = %v after SetVerticalOnlyUpward(%v); want %v",
+					ctrl.VerticalOnlyUpward, tc.flag, tc.flag)
+			}
+
+			// Establish baseline center.
+			ctrl.Update()
+			_, baselineY := ctrl.GetActualCenter()
+
+			// Move target downward (positive Y direction) and update.
+			target.SetPosition(100, 300)
+			ctrl.Update()
+			_, afterY := ctrl.GetActualCenter()
+
+			advanced := afterY > baselineY
+			if advanced != tc.wantYAdvanced {
+				t.Fatalf("camera Y advanced=%v (baseline=%f after=%f); want advanced=%v",
+					advanced, baselineY, afterY, tc.wantYAdvanced)
+			}
+		})
+	}
+}
