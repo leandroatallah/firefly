@@ -27,7 +27,9 @@ Each story moves through the pipeline as a self-contained folder:
     └── PROGRESS.md
 ```
 
-`PROGRESS.md` is the single source of truth for pipeline state. Every agent updates it before finishing.
+`PROGRESS.md` is the single source of truth for **per-story pipeline state**. Every agent updates it before finishing.
+
+For **cross-story sequencing** (what to work on next, dependencies between stories), see [`.agents/work/ROADMAP.md`](work/ROADMAP.md). Story IDs do not imply execution order.
 
 ## PROGRESS.md Format
 

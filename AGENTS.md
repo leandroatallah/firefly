@@ -144,6 +144,8 @@ func (t *Transition) Draw(_ *ebiten.Image) {}  // Use blank in param list
 
 ## 🛠 Story Management Scripts
 
+For **what to work on next** and cross-story dependencies, read [`.agents/work/ROADMAP.md`](.agents/work/ROADMAP.md). Story IDs do not imply execution order.
+
 Use these scripts to manage story lifecycle. Do **not** move folders manually.
 
 | Script | Purpose |
