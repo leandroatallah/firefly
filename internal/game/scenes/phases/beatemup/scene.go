@@ -1,5 +1,6 @@
 // Package gamebeatemupphase implements the game-layer beat-em-up phase scene.
-// It wires the tilemap and delegates actor update/draw to the kit beatemup scene.
+// It wires together the tilemap, actor manager, physics space, camera, VFX,
+// sequences, and goal system into a playable beat-em-up level.
 package gamebeatemupphase
 
 import (
@@ -8,53 +9,95 @@ import (
 	"time"
 
 	"github.com/boilerplate/ebiten-template/internal/engine/app"
-	"github.com/boilerplate/ebiten-template/internal/engine/contracts/navigation"
+	"github.com/boilerplate/ebiten-template/internal/engine/assets/font"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
+	sequencestypes "github.com/boilerplate/ebiten-template/internal/engine/contracts/sequences"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
+	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/enemies"
+	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/npcs"
+	"github.com/boilerplate/ebiten-template/internal/engine/entity/items"
+	bodyphysics "github.com/boilerplate/ebiten-template/internal/engine/physics/body"
+	"github.com/boilerplate/ebiten-template/internal/engine/render/draworder"
+	"github.com/boilerplate/ebiten-template/internal/engine/render/screenutil"
 	"github.com/boilerplate/ebiten-template/internal/engine/scene"
+	"github.com/boilerplate/ebiten-template/internal/engine/scene/pause"
+	"github.com/boilerplate/ebiten-template/internal/engine/scene/phases"
 	"github.com/boilerplate/ebiten-template/internal/engine/scene/transition"
+	"github.com/boilerplate/ebiten-template/internal/engine/sequences"
+	"github.com/boilerplate/ebiten-template/internal/engine/ui/menu"
 	"github.com/boilerplate/ebiten-template/internal/engine/utils"
 	"github.com/boilerplate/ebiten-template/internal/engine/utils/timing"
+	gameenemies "github.com/boilerplate/ebiten-template/internal/game/entity/actors/enemies"
+	gamenpcs "github.com/boilerplate/ebiten-template/internal/game/entity/actors/npcs"
+	gameitems "github.com/boilerplate/ebiten-template/internal/game/entity/items"
+	gamescenephases "github.com/boilerplate/ebiten-template/internal/game/scenes/phases"
 	scenestypes "github.com/boilerplate/ebiten-template/internal/game/scenes/types"
 	beatemupkit "github.com/boilerplate/ebiten-template/internal/kit/actors/beatemup"
 	beatemupphasescene "github.com/boilerplate/ebiten-template/internal/kit/scenes/phases/beatemup"
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
-// BeatemupPhaseScene is the game-layer beat-em-up phase scene.
-// It embeds TilemapScene for tilemap/camera/space management and delegates
-// actor update and altitude-aware draw ordering to the kit beatemup scene.
 type BeatemupPhaseScene struct {
 	*scene.TilemapScene
-	kitScene *beatemupphasescene.BeatemupPhaseScene
 
-	player       beatemupkit.BeatEmUpActorEntity
-	hasPlayer    bool
-	deathTrigger utils.DelayTrigger
+	count       int
+	player      beatemupkit.BeatEmUpActorEntity
+	mainText    *font.FontText
+	bodyCounter *BodyCounter
+	allowPause  bool
+
+	// Complete phase
+	reachedEndpoint bool
+	hasPlayer       bool
+	goal            phases.Goal
+
+	// Navigation triggers
+	completionTrigger utils.DelayTrigger
+	deathTrigger      utils.DelayTrigger
+
+	// UI effects
+	ShowDrawScreenFlash int
+
+	sequencePlayer sequencestypes.Player
+	pauseScreen    *pause.PauseScreen
+	pauseMenu      *menu.Menu
+
+	// kitScene owns death-sequence activation.
+	kitScene *beatemupphasescene.BeatemupPhaseScene
 }
 
-// NewBeatemupPhaseScene constructs a BeatemupPhaseScene wired to the given AppContext.
-func NewBeatemupPhaseScene(ctx *app.AppContext) navigation.Scene {
-	ts := scene.NewTilemapScene(ctx)
-	s := &BeatemupPhaseScene{TilemapScene: ts}
-	s.SetAppContext(ctx)
+func NewBeatemupPhaseScene(ctx *app.AppContext) *BeatemupPhaseScene {
+	tilemapScene := scene.NewTilemapScene(ctx)
 
 	cfg := config.Get()
-	s.kitScene = beatemupphasescene.New(
-		ts.Camera(),
+	kitScene := beatemupphasescene.New(
+		tilemapScene.Camera(),
 		ctx.Space,
 		float64(cfg.ScreenWidth),
 		float64(cfg.ScreenHeight),
 	)
+
+	s := &BeatemupPhaseScene{
+		TilemapScene: tilemapScene,
+		mainText:     ctx.Font,
+		bodyCounter:  &BodyCounter{},
+		kitScene:     kitScene,
+	}
+	s.SetAppContext(ctx)
+
+	subscribeEvents(ctx, s)
+
 	return s
 }
 
 func (s *BeatemupPhaseScene) OnStart() {
 	s.TilemapScene.OnStart()
-
-	s.Tilemap().CreateCollisionBodies(s.PhysicsSpace(), nil)
+	s.count = 0
 
 	ctx := s.AppContext()
+
 	s.hasPlayer = s.Tilemap().HasPlayerStartPosition()
 
 	if s.hasPlayer {
@@ -67,12 +110,13 @@ func (s *BeatemupPhaseScene) OnStart() {
 		ctx.ActorManager.RegisterPrimary(s.player)
 		s.PhysicsSpace().AddBody(s.player)
 
+		// Wire player into kit scene and set the game-specific death callback.
 		s.kitScene.SetPlayer(p)
 		s.kitScene.OnDeathStarted = func() {
-			if ctx.VFX != nil {
+			if s.AppContext().VFX != nil {
 				deathX, deathY := s.player.GetPositionMin()
 				deathW, deathH := s.player.GetShape().Width(), s.player.GetShape().Height()
-				ctx.VFX.SpawnDeathExplosion(
+				s.AppContext().VFX.SpawnDeathExplosion(
 					float64(deathX)+float64(deathW)/2,
 					float64(deathY)+float64(deathH)/2,
 					50,
@@ -81,32 +125,160 @@ func (s *BeatemupPhaseScene) OnStart() {
 			s.deathTrigger.Enable(timing.FromDuration(time.Second))
 		}
 
+		// Optionally block input for the current player of this phase
+		if phase, err := ctx.PhaseManager.GetCurrentPhase(); err == nil && phase.BlockPlayerMovement {
+			if p, ok := ctx.ActorManager.GetPlayer(); ok {
+				p.BlockMovement()
+			}
+		}
+	}
+
+	s.initTilemap()
+
+	// After init bodies, set body counter
+	s.bodyCounter.setBodyCounter(s.PhysicsSpace())
+
+	s.PhysicsSpace().Bodies()
+
+	// Init collision bodies (obstacles and endpoints) - always created regardless of player
+	s.Tilemap().CreateCollisionBodies(s.PhysicsSpace(), func(id string) body.Touchable {
+		return bodyphysics.NewTouchTrigger(func() {
+			s.endpointTrigger(id)
+		}, s.player)
+	})
+
+	if s.hasPlayer {
 		s.SetCameraConfig(scene.CameraConfig{Mode: scene.CameraModeFollow})
+		// Beat-em-up cameras follow freely; no vertical-only-upward constraint.
 		s.Camera().SetVerticalOnlyUpward(false)
 		s.Camera().SetFollowTarget(s.player)
-		s.SetPlayerStartPosition(s.player)
 	} else {
+		// No player: set camera to fixed mode at CameraStart position or top-left
 		s.SetCameraConfig(scene.CameraConfig{Mode: scene.CameraModeFixed})
+
 		if x, y, found := s.Tilemap().GetCameraStartPosition(); found {
 			s.Camera().SetPositionTopLeft(float64(x), float64(y))
 		} else {
 			s.Camera().SetPositionTopLeft(0, 0)
 		}
 	}
+
+	s.pauseScreen = pause.NewPauseScreen(ebiten.KeyEnter, 250*time.Millisecond)
+
+	// Create pause menu
+	s.pauseMenu = menu.NewMenu()
+	s.pauseMenu.SetFontSize(8)
+	// Resume
+	s.pauseMenu.AddItem("", func() {
+		s.pauseScreen.Toggle()
+	})
+	// Exit to Menu
+	s.pauseMenu.AddItem("", func() {
+		s.pauseScreen.Toggle()
+		s.freezeAllActors()
+		ctx.AudioManager.PauseCurrentMusic()
+		ctx.SceneManager.NavigateTo(
+			scenestypes.SceneMenu,
+			transition.NewFader(0, time.Duration(2*time.Second)),
+			true,
+		)
+	})
+
+	// Set up pause menu navigation and selection callbacks
+	s.pauseMenu.SetOnNavigate(func() {
+		ctx.AudioManager.PlaySound("assets/audio/Menu_Click.ogg")
+	})
+	s.pauseMenu.SetOnSelect(func() {
+		ctx.AudioManager.PlaySound("assets/audio/Menu_Select2.ogg")
+	})
+
+	s.pauseScreen.SetMenu(s.pauseMenu)
+	s.pauseScreen.SetFont(s.mainText)
+	s.refreshPauseMenuLabels()
+
+	s.pauseScreen.SetOnStart(func(p *pause.PauseScreen) {
+		p.SetMenu(s.pauseMenu) // Reset to main pause menu on open
+		if ctx.AudioManager != nil {
+			ctx.AudioManager.PauseCurrentMusic()
+		}
+	})
+	s.pauseScreen.SetOnFinish(func(p *pause.PauseScreen) {
+		if ctx.AudioManager != nil {
+			ctx.AudioManager.ResumeCurrentMusic()
+		}
+	})
+
+	phase, err := ctx.PhaseManager.GetCurrentPhase()
+	if err == nil && phase.SequencePath != "" {
+		s.sequencePlayer = sequences.NewSequencePlayer(ctx)
+		s.allowPause = phase.GoalType != gamescenephases.SequenceGoalType
+		s.sequencePlayer.PlaySequence(phase.SequencePath)
+	}
+
+	s.initGoal()
+}
+
+func (s *BeatemupPhaseScene) initGoal() {
+	phase, _ := s.AppContext().PhaseManager.GetCurrentPhase()
+	switch phase.GoalType {
+	case gamescenephases.ReactEndpointType:
+		s.goal = &ReachEndpointGoal{scene: s}
+	case gamescenephases.SequenceGoalType:
+		s.goal = &phases.SequenceGoal{
+			Player:         s.sequencePlayer,
+			OnCompleteFunc: s.defaultCompletion,
+		}
+	case gamescenephases.NoGoalType:
+		s.goal = &phases.NoGoal{}
+	default:
+		s.goal = &phases.NoGoal{}
+	}
+}
+
+func (s *BeatemupPhaseScene) freezeAllActors() {
+	if s.TilemapScene == nil {
+		return
+	}
+	ctx := s.AppContext()
+	if ctx == nil || ctx.ActorManager == nil {
+		return
+	}
+	ctx.ActorManager.ForEach(func(actor actors.ActorEntity) {
+		actor.SetImmobile(true)
+		actor.SetFreeze(true)
+	})
+}
+
+func (s *BeatemupPhaseScene) defaultCompletion() {
+	s.completionTrigger.Enable(timing.FromDuration(time.Second))
 }
 
 func (s *BeatemupPhaseScene) Update() error {
-	if err := s.kitScene.Update(); err != nil {
-		return err
+	if s.pauseScreen != nil && s.canPause() {
+		s.pauseScreen.Update()
+		if s.pauseScreen.IsPaused() {
+			return nil
+		}
 	}
 
-	// Detect player death triggered by combat (Hurt → Dying/Dead state).
-	if s.hasPlayer && s.player != nil && !s.kitScene.DeathActive() &&
-		(s.player.State() == actors.Dying || s.player.State() == actors.Dead) {
+	if s.sequencePlayer != nil {
+		s.sequencePlayer.Update()
+	}
+
+	if s.AppContext().VFX != nil {
+		s.AppContext().VFX.Update()
+	}
+
+	// Check if player died (from any cause) and death sequence hasn't started.
+	// Beat-em-up has no fall-death path; only state-machine death triggers reboot.
+	if s.hasPlayer && s.kitScene != nil && !s.kitScene.DeathActive() && (s.player.State() == actors.Dying || s.player.State() == actors.Dead) {
 		s.kitScene.StartDeathSequence()
 	}
 
+	// Update navigation triggers
+	s.completionTrigger.Update()
 	s.deathTrigger.Update()
+
 	if s.deathTrigger.Trigger() {
 		s.AppContext().SceneManager.NavigateTo(
 			scenestypes.ScenePhaseReboot,
@@ -115,24 +287,253 @@ func (s *BeatemupPhaseScene) Update() error {
 		)
 	}
 
-	return s.TilemapScene.Update()
+	// Check goal completion
+	if s.goal != nil && s.goal.IsCompleted() && !s.completionTrigger.IsEnabled() {
+		s.goal.OnCompletion()
+	}
+
+	if config.Get().CamDebug {
+		s.Camera().CamDebug()
+	}
+
+	if s.completionTrigger.Trigger() {
+		s.AppContext().CompleteCurrentPhase(transition.NewFader(0, config.Get().FadeVisibleDuration), true)
+	}
+
+	// Update camera
+	s.Camera().Update()
+	// Call BaseScene.Update directly for Schedule handling (skip TilemapScene.Update to avoid double camera update)
+	if err := s.BaseScene.Update(); err != nil {
+		return err
+	}
+
+	s.count++
+
+	// Execute bodies updates
+	space := s.PhysicsSpace()
+	for _, i := range space.Bodies() {
+		switch b := i.(type) {
+		// ActorEntity case should come first. It can be confused with body.Obstacle
+		case beatemupkit.BeatEmUpActorEntity:
+			if b.State() == actors.Dead {
+				if s.AppContext().VFX != nil {
+					x, y := b.GetPositionMin()
+					w, h := b.GetShape().Width(), b.GetShape().Height()
+					s.AppContext().VFX.SpawnDeathExplosion(
+						float64(x)+float64(w)/2,
+						float64(y)+float64(h)/2,
+						30,
+					)
+				}
+				s.PhysicsSpace().RemoveBody(i)
+				continue
+			}
+			if err := b.Update(space); err != nil {
+				return err
+			}
+		case items.Item:
+			// Remove items marked as removed
+			if b.IsRemoved() {
+				s.PhysicsSpace().RemoveBody(i)
+				continue
+			}
+			if err := b.Update(space); err != nil {
+				return err
+			}
+		case body.Obstacle:
+			continue
+		}
+	}
+
+	// Update projectiles
+	if s.AppContext().ProjectileManager != nil {
+		s.AppContext().ProjectileManager.Update()
+	}
+
+	// Check for trigger collisions (spikes, endpoints, etc.)
+	// This ensures non-blocking trigger bodies call their OnTouch() callbacks
+	// Must happen after actor updates to detect collisions at current positions
+	if s.hasPlayer && s.player != nil {
+		space.ResolveCollisions(s.player)
+	}
+
+	// Remove bodies queued for removal
+	space.ProcessRemovals()
+
+	return nil
 }
 
 func (s *BeatemupPhaseScene) Draw(screen *ebiten.Image) {
-	screen.Fill(color.RGBA{0, 0, 0, 0xff})
+	screen.Fill(color.RGBA{0, 0, 0, 0xff}) // force black
 
+	// Get tilemap image and draw based on camera
 	tilemap, err := s.Tilemap().Image(screen)
 	if err != nil {
 		log.Fatal(err)
 	}
 	s.Camera().Draw(tilemap, s.Tilemap().ImageOptions(), screen)
 
-	s.kitScene.DrawActors(screen)
+	// Draw bodies based on camera using altitude-aware ordering
+	space := s.PhysicsSpace()
+	for _, b := range draworder.SortByGroundYAltitude(space.Bodies()) {
+		switch sb := b.(type) {
+		case beatemupkit.BeatEmUpActorEntity:
+			opts := sb.ImageOptions()
+			sb.UpdateImageOptions()
+			s.Camera().Draw(sb.Image(), opts, screen)
+			if config.Get().CollisionBox {
+				s.Camera().DrawCollisionBox(screen, sb)
+			}
+		case items.Item:
+			if sb.IsRemoved() {
+				continue
+			}
+			opts := sb.ImageOptions()
+			sb.UpdateImageOptions()
+			s.Camera().Draw(sb.Image(), opts, screen)
+			if config.Get().CollisionBox {
+				s.Camera().DrawCollisionBox(screen, sb)
+			}
+		case body.Obstacle:
+			if config.Get().CollisionBox {
+				s.Camera().DrawCollisionBox(screen, sb)
+			}
+		}
+	}
+
+	// Draw bullets with camera offset
+	if s.AppContext().ProjectileManager != nil {
+		camX, camY := s.Camera().GetActualCenter()
+		camX -= float64(config.Get().ScreenWidth) / 2
+		camY -= float64(config.Get().ScreenHeight) / 2
+		s.AppContext().ProjectileManager.DrawWithOffset(screen, camX, camY)
+	}
+
+	if config.Get().CollisionBox {
+		// Projectile collision boxes (green/non-obstructive style)
+		if pm := s.AppContext().ProjectileManager; pm != nil {
+			pm.DrawCollisionBoxesWithOffset(func(b body.Collidable) {
+				s.Camera().DrawCollisionBox(screen, b)
+			})
+		}
+
+		// TODO: beat-em-up melee hitbox debug when a concrete beat-em-up player type exists.
+	}
+
+	if s.ShowDrawScreenFlash > 0 {
+		screenutil.DrawScreenFlash(screen)
+		s.ShowDrawScreenFlash--
+	}
+
+	if s.AppContext().VFX != nil {
+		s.AppContext().VFX.Draw(screen, s.Camera())
+	}
+
+	if s.pauseScreen != nil && s.pauseScreen.IsPaused() {
+		s.drawPause(screen)
+	}
 }
 
 func (s *BeatemupPhaseScene) OnFinish() {
 	s.TilemapScene.OnFinish()
+	if s.AppContext().ProjectileManager != nil {
+		s.AppContext().ProjectileManager.Clear()
+	}
+	// Ensure we remove any movement block applied at phase start (for whichever actor is the current player)
 	if s.hasPlayer {
+		if p, ok := s.AppContext().ActorManager.GetPlayer(); ok {
+			p.UnblockMovement()
+		}
 		s.AppContext().ActorManager.Unregister(s.player)
+	}
+}
+
+// TriggerScreenFlash triggers a white screen flash effect for feedback.
+func (s *BeatemupPhaseScene) TriggerScreenFlash() {
+	s.ShowDrawScreenFlash = 2
+}
+
+func (s *BeatemupPhaseScene) endpointTrigger(eventType string) {
+	if !s.hasPlayer {
+		return
+	}
+
+	// Prevent multiple triggers (e.g., from continuous spike collision)
+	if s.kitScene != nil && s.kitScene.DeathActive() {
+		return
+	}
+
+	switch eventType {
+	case "SPIKE":
+		if s.kitScene != nil {
+			s.kitScene.StartDeathSequence()
+		}
+		return
+	case "CUTSCENE":
+		// TODO: Implement this
+	}
+
+	s.reachedEndpoint = true
+}
+
+func (s *BeatemupPhaseScene) initTilemap() {
+	// Set items position from tilemap
+	f := items.NewItemFactory(gameitems.InitItemMap(s.AppContext()))
+	scene.InitItems(s.TilemapScene, f)
+
+	// Set enemies position from tilemap
+	enemyFactory := enemies.NewEnemyFactory(gameenemies.InitEnemyMap(s.AppContext()))
+	scene.InitEnemies(s.TilemapScene, enemyFactory)
+
+	// Set NPCs position from tilemap
+	npcFactory := npcs.NewNpcFactory(gamenpcs.InitNpcMap(s.AppContext()))
+	scene.InitNPCs(s.TilemapScene, npcFactory)
+
+	if s.hasPlayer {
+		s.SetPlayerStartPosition(s.player)
+	}
+}
+
+func (s *BeatemupPhaseScene) canPause() bool {
+	return s.allowPause && !s.sequencePlayer.IsPlaying()
+}
+
+func (s *BeatemupPhaseScene) refreshPauseMenuLabels() {
+	i18n := s.AppContext().I18n
+
+	if s.pauseMenu != nil {
+		s.pauseMenu.UpdateItemLabel(0, i18n.T("menu.start"))
+		s.pauseMenu.UpdateItemLabel(1, i18n.T("menu.exit"))
+	}
+}
+
+func (s *BeatemupPhaseScene) drawPause(screen *ebiten.Image) {
+	if !s.canPause() || s.pauseScreen == nil || !s.pauseScreen.IsPaused() {
+		return
+	}
+
+	cfg := config.Get()
+	for x := 0; x < cfg.ScreenWidth; x++ {
+		for y := 0; y < cfg.ScreenWidth; y++ {
+			if x%2 == 0 && y%2 == 0 {
+				vector.DrawFilledRect(screen, float32(x), float32(y), 1, 1, color.Black, false)
+			}
+		}
+	}
+
+	speed := 10
+	initialW, initialH := cfg.ScreenWidth/4, cfg.ScreenHeight/4
+	w := max(min(initialW+s.pauseScreen.Count()*speed, cfg.ScreenWidth/2), 1)
+	h := max(min(initialH+s.pauseScreen.Count()*speed, cfg.ScreenHeight/2), 1)
+	container := ebiten.NewImage(w, h)
+	op := &ebiten.DrawImageOptions{}
+	op.GeoM.Translate(float64(cfg.ScreenWidth)/2, float64(cfg.ScreenHeight)/2)
+	op.GeoM.Translate(-float64(w/2), -float64(h/2))
+	container.Fill(color.Black)
+	screen.DrawImage(container, op)
+
+	// Draw menu on top of background
+	if menu := s.pauseScreen.Menu(); menu != nil {
+		menu.Draw(screen, s.pauseScreen.Font(), cfg.ScreenWidth/2, cfg.ScreenHeight/2)
 	}
 }
