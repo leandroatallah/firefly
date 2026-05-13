@@ -17,6 +17,7 @@ func (m MovementModelEnum) String() string {
 	MovementModelMap := map[MovementModelEnum]string{
 		TopDown:  "TopDown",
 		Platform: "Platform",
+		BeatEmUp: "BeatEmUp",
 	}
 	return MovementModelMap[m]
 }
@@ -24,6 +25,7 @@ func (m MovementModelEnum) String() string {
 const (
 	TopDown MovementModelEnum = iota
 	Platform
+	BeatEmUp
 )
 
 func NewMovementModel(model MovementModelEnum, playerMovementBlocker PlayerMovementBlocker) (MovementModel, error) {
@@ -32,6 +34,8 @@ func NewMovementModel(model MovementModelEnum, playerMovementBlocker PlayerMovem
 		return NewTopDownMovementModel(playerMovementBlocker), nil
 	case Platform:
 		return NewPlatformMovementModel(playerMovementBlocker), nil
+	case BeatEmUp:
+		return NewBeatEmUpMovementModel(playerMovementBlocker), nil
 	default:
 		return nil, fmt.Errorf("unknown movement model type")
 	}

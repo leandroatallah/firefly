@@ -209,6 +209,17 @@ func (s *Space) Query(rect image.Rectangle) []body.Collidable {
 	return result
 }
 
+// collisionRects returns the collision rectangles for a body.
+// If no specific collision shapes are defined, it falls back to the body's own position.
+// This is consistent with the pattern used in CheckGround.
+func collisionRects(b body.Collidable) []image.Rectangle {
+	rects := b.CollisionPosition()
+	if len(rects) == 0 {
+		return []image.Rectangle{b.Position()}
+	}
+	return rects
+}
+
 func HasCollision(a, b body.Collidable) bool {
 	// Every body must have an ID
 	if a.ID() == "" || b.ID() == "" {
@@ -220,8 +231,8 @@ func HasCollision(a, b body.Collidable) bool {
 		return false
 	}
 
-	rectsA := a.CollisionPosition()
-	rectsB := b.CollisionPosition()
+	rectsA := collisionRects(a)
+	rectsB := collisionRects(b)
 
 	for _, r := range rectsA {
 		for _, s := range rectsB {
