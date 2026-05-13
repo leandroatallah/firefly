@@ -39,4 +39,8 @@ func TestKitSkillsPackageSurface(t *testing.T) {
 			t.Errorf("FromConfig(nil, ...) should return empty slice, got %d skills", len(result))
 		}
 	})
+
+	t.Run("EightDirectionalMovementSkill_satisfies_Skill", func(t *testing.T) {
+		var _ skill.Skill = (*kitskills.EightDirectionalMovementSkill)(nil)
+	})
 }
