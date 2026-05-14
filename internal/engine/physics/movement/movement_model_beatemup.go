@@ -44,17 +44,19 @@ func (m *BeatEmUpMovementModel) Update(b body.MovableCollidable, space body.Bodi
 	vx16 = increaseVelocity(vx16, scaledAccX)
 	vy16 = increaseVelocity(vy16, scaledAccY)
 
-	// 2D speed cap
+	// 2D speed cap — only applied when MaxSpeed > 0; zero means uncapped.
 	speedMax16 := fp16.To16(b.MaxSpeed())
 	if mult := config.Get().Physics.SpeedMultiplier; mult != 0 {
 		speedMax16 = int(float64(speedMax16) * mult)
 	}
-	velSq := int64(vx16)*int64(vx16) + int64(vy16)*int64(vy16)
-	maxSq := int64(speedMax16) * int64(speedMax16)
-	if velSq > maxSq {
-		scale := float64(speedMax16) / math.Sqrt(float64(velSq))
-		vx16 = int(float64(vx16) * scale)
-		vy16 = int(float64(vy16) * scale)
+	if speedMax16 > 0 {
+		velSq := int64(vx16)*int64(vx16) + int64(vy16)*int64(vy16)
+		maxSq := int64(speedMax16) * int64(speedMax16)
+		if velSq > maxSq {
+			scale := float64(speedMax16) / math.Sqrt(float64(velSq))
+			vx16 = int(float64(vx16) * scale)
+			vy16 = int(float64(vy16) * scale)
+		}
 	}
 
 	b.CheckMovementDirectionX()

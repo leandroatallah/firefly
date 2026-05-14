@@ -257,11 +257,16 @@ func (c *Character) Update(space body.BodiesSpace) error {
 	}
 	c.count++
 
+	// Resolve the platform model once; nil for non-platform movement models.
+	var platformModel *physicsmovement.PlatformMovementModel
+	if pm, ok := c.movementModel.(*physicsmovement.PlatformMovementModel); ok {
+		platformModel = pm
+	}
 	for _, s := range c.skills {
 		if activeSkill, ok := s.(skill.ActiveSkill); ok {
-			activeSkill.HandleInput(c, c.movementModel.(*physicsmovement.PlatformMovementModel), space)
+			activeSkill.HandleInput(c, platformModel, space)
 		}
-		s.Update(c, c.movementModel.(*physicsmovement.PlatformMovementModel))
+		s.Update(c, platformModel)
 	}
 
 	// Handle movement by Movement State - must happen BEFORE UpdateMovement
