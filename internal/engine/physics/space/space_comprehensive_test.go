@@ -67,8 +67,9 @@ func TestHasCollision_MultipleCollisionRects(t *testing.T) {
 	a := bodyphysics.NewObstacleRect(bodyphysics.NewRect(0, 0, 10, 10))
 	a.SetID("a")
 
-	b := bodyphysics.NewObstacleRect(bodyphysics.NewRect(100, 100, 10, 10))
+	b := bodyphysics.NewObstacleRect(bodyphysics.NewRect(0, 0, 10, 10))
 	b.SetID("b")
+	b.SetPosition(100, 100)
 
 	// HasCollision checks CollisionPosition which for ObstacleRect is the main body
 	if HasCollision(a, b) {
