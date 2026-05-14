@@ -1,6 +1,7 @@
 package kitskills
 
 import (
+	"log"
 	"time"
 
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
@@ -33,7 +34,15 @@ func FromConfig(cfg *schemas.SkillsConfig, deps SkillDeps) []skill.Skill {
 
 	// Movement skill
 	if cfg.Movement != nil && isEnabled(cfg.Movement.Enabled) {
-		skills = append(skills, NewHorizontalMovementSkill())
+		switch cfg.Movement.Mode {
+		case "", schemas.MovementModeHorizontal:
+			skills = append(skills, NewHorizontalMovementSkill())
+		case schemas.MovementModeEightDir:
+			skills = append(skills, NewEightDirectionalMovementSkill())
+		default:
+			log.Printf("unknown movement mode: %q; falling back to horizontal", cfg.Movement.Mode)
+			skills = append(skills, NewHorizontalMovementSkill())
+		}
 	}
 
 	// Jump skill

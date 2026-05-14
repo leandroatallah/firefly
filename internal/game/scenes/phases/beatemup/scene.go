@@ -4,6 +4,7 @@
 package gamebeatemupphase
 
 import (
+	"image"
 	"image/color"
 	"log"
 	"time"
@@ -134,6 +135,10 @@ func (s *BeatemupPhaseScene) OnStart() {
 	}
 
 	s.initTilemap()
+
+	// Bound the camera to the full tilemap rectangle so it cannot scroll outside the arena.
+	tilemapRect := image.Rect(0, 0, s.GetTilemapWidth(), s.GetTilemapHeight())
+	s.Camera().SetBounds(&tilemapRect)
 
 	// After init bodies, set body counter
 	s.bodyCounter.setBodyCounter(s.PhysicsSpace())

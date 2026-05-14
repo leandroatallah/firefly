@@ -28,6 +28,7 @@ type AssetData struct {
 type MovementConfig struct {
 	Enabled         *bool   `json:"enabled,omitempty"`
 	HorizontalSpeed float64 `json:"horizontal_speed,omitempty"`
+	Mode            string  `json:"mode,omitempty"` // "" | "horizontal" | "eight_dir"
 }
 
 // JumpConfig defines jump ability parameters.

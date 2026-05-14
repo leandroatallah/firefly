@@ -179,3 +179,54 @@ func TestFromConfig_NilSubConfigs(t *testing.T) {
 		t.Errorf("expected 0 skills for all nil sub-configs, got %d", len(skills))
 	}
 }
+
+// --- Story 058: Movement Mode discriminator (T-F1..T-F4) ---
+
+// TestFromConfig_MovementMode covers all Mode discriminator cases in one table-driven test.
+// T-F1: "eight_dir" -> EightDirectionalMovementSkill
+// T-F2: "horizontal" -> HorizontalMovementSkill
+// T-F3: "" (empty) -> HorizontalMovementSkill (backward-compatible default)
+// T-F4: unknown mode -> HorizontalMovementSkill (fallback, no panic)
+func TestFromConfig_MovementMode(t *testing.T) {
+	type wantType int
+	const (
+		wantHorizontal wantType = iota
+		wantEightDir
+	)
+
+	tests := []struct {
+		name     string
+		mode     string
+		wantKind wantType
+	}{
+		{name: "eight_dir produces EightDirectionalMovementSkill", mode: "eight_dir", wantKind: wantEightDir},
+		{name: "horizontal produces HorizontalMovementSkill", mode: "horizontal", wantKind: wantHorizontal},
+		{name: "empty mode defaults to HorizontalMovementSkill", mode: "", wantKind: wantHorizontal},
+		{name: "unknown mode falls back to HorizontalMovementSkill without panic", mode: "jetpack", wantKind: wantHorizontal},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			cfg := &schemas.SkillsConfig{
+				Movement: &schemas.MovementConfig{Enabled: ptrBool(true), Mode: tc.mode},
+			}
+
+			skills := FromConfig(cfg, SkillDeps{})
+
+			if len(skills) != 1 {
+				t.Fatalf("expected exactly 1 movement skill, got %d", len(skills))
+			}
+
+			switch tc.wantKind {
+			case wantEightDir:
+				if _, ok := skills[0].(*EightDirectionalMovementSkill); !ok {
+					t.Fatalf("expected *EightDirectionalMovementSkill for mode=%q, got %T", tc.mode, skills[0])
+				}
+			case wantHorizontal:
+				if _, ok := skills[0].(*HorizontalMovementSkill); !ok {
+					t.Fatalf("expected *HorizontalMovementSkill for mode=%q, got %T", tc.mode, skills[0])
+				}
+			}
+		})
+	}
+}

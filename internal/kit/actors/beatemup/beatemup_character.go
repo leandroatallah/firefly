@@ -1,13 +1,41 @@
 package beatemup
 
-import kitactors "github.com/boilerplate/ebiten-template/internal/kit/actors"
+import (
+	"io/fs"
+
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/animation"
+	"github.com/boilerplate/ebiten-template/internal/engine/data/schemas"
+	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
+	bodyphysics "github.com/boilerplate/ebiten-template/internal/engine/physics/body"
+	physicsmovement "github.com/boilerplate/ebiten-template/internal/engine/physics/movement"
+	"github.com/boilerplate/ebiten-template/internal/engine/render/sprites"
+	kitactors "github.com/boilerplate/ebiten-template/internal/kit/actors"
+)
 
 type BeatEmUpCharacter struct {
+	*actors.Character
 	*kitactors.MeleeCharacter
 }
 
-func NewBeatEmUpCharacter() *BeatEmUpCharacter {
-	return &BeatEmUpCharacter{
+func NewBeatEmUpCharacter(
+	fsys fs.FS,
+	stateMap map[string]animation.SpriteState,
+	spriteData schemas.SpriteData,
+	bodyRect *bodyphysics.Rect,
+	blocker physicsmovement.PlayerMovementBlocker,
+) (*BeatEmUpCharacter, error) {
+	s, err := sprites.GetSpritesFromAssets(fsys, spriteData.Assets, stateMap)
+	if err != nil {
+		return nil, err
+	}
+	c := actors.NewCharacter(s, bodyRect)
+	be := &BeatEmUpCharacter{
+		Character:      c,
 		MeleeCharacter: kitactors.NewMeleeCharacter(),
 	}
+	c.SetMovementModel(physicsmovement.NewBeatEmUpMovementModel(blocker))
+	c.SetFaceDirection(spriteData.FacingDirection)
+	c.SetFrameRate(spriteData.FrameRate)
+	c.SetOwner(be)
+	return be, nil
 }
