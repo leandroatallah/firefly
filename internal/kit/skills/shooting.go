@@ -35,7 +35,7 @@ func (s *ShootingSkill) SetStateTransitionHandler(handler body.StateTransitionHa
 }
 
 // HandleInputWithDirection processes shooting with explicit direction flags.
-func (s *ShootingSkill) HandleInputWithDirection(b body.MovableCollidable, model *physicsmovement.PlatformMovementModel, _ body.BodiesSpace, up, down, left, right bool) {
+func (s *ShootingSkill) HandleInputWithDirection(b body.MovableCollidable, model physicsmovement.MovementModel, _ body.BodiesSpace, up, down, left, right bool) {
 	direction := s.detectShootDirection(b, model, up, down, left, right)
 
 	s.lastDirection = direction
@@ -71,7 +71,7 @@ func (s *ShootingSkill) HandleInputWithDirection(b body.MovableCollidable, model
 }
 
 // HandleInput processes shooting input from the command reader.
-func (s *ShootingSkill) HandleInput(b body.MovableCollidable, model *physicsmovement.PlatformMovementModel, space body.BodiesSpace) {
+func (s *ShootingSkill) HandleInput(b body.MovableCollidable, model physicsmovement.MovementModel, space body.BodiesSpace) {
 	cmds := input.CommandsReader()
 
 	if cmds.WeaponNext && !s.weaponNextHeld {
@@ -97,7 +97,7 @@ func (s *ShootingSkill) IsActive() bool {
 }
 
 // Update processes inventory cooldowns and tracks shoot-held state.
-func (s *ShootingSkill) Update(b body.MovableCollidable, model *physicsmovement.PlatformMovementModel) {
+func (s *ShootingSkill) Update(b body.MovableCollidable, model physicsmovement.MovementModel) {
 	// Update inventory weapons (cooldowns)
 	s.inv.Update()
 
@@ -114,7 +114,7 @@ func (s *ShootingSkill) ActivationKey() ebiten.Key {
 	return ebiten.KeyX
 }
 
-func (s *ShootingSkill) detectShootDirection(b body.MovableCollidable, model *physicsmovement.PlatformMovementModel, up, down, left, right bool) body.ShootDirection {
+func (s *ShootingSkill) detectShootDirection(b body.MovableCollidable, model physicsmovement.MovementModel, up, down, left, right bool) body.ShootDirection {
 	isDucking := false
 	if duckable, ok := b.(interface{ IsDucking() bool }); ok {
 		isDucking = duckable.IsDucking()
@@ -124,7 +124,10 @@ func (s *ShootingSkill) detectShootDirection(b body.MovableCollidable, model *ph
 		return body.ShootDirectionStraight
 	}
 
-	isGrounded := model != nil && model.OnGround()
+	isGrounded := false
+	if g, ok := model.(physicsmovement.Grounded); ok {
+		isGrounded = g.OnGround()
+	}
 
 	if down && !isGrounded {
 		if left || right {

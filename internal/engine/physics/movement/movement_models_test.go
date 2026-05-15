@@ -1,6 +1,7 @@
 package movement
 
 import (
+	"math"
 	"testing"
 
 	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
@@ -571,5 +572,364 @@ func TestMovementModelEnum_String(t *testing.T) {
 				t.Errorf("%d.String() = %s; want %s", tt.enum, got, tt.want)
 			}
 		})
+	}
+}
+
+func TestBeatEmUpMovementModel_New(t *testing.T) {
+	blocker := &mockPlayerMovementBlocker{}
+	model := NewBeatEmUpMovementModel(blocker)
+
+	if model == nil {
+		t.Fatal("NewBeatEmUpMovementModel returned nil")
+	}
+	if model.playerMovementBlocker != blocker {
+		t.Error("expected playerMovementBlocker to be set")
+	}
+	if model.isScripted {
+		t.Error("expected isScripted=false by default")
+	}
+}
+
+func TestBeatEmUpMovementModel_SetIsScripted(t *testing.T) {
+	model := NewBeatEmUpMovementModel(nil)
+
+	model.SetIsScripted(true)
+	if !model.isScripted {
+		t.Error("expected isScripted=true")
+	}
+
+	model.SetIsScripted(false)
+	if model.isScripted {
+		t.Error("expected isScripted=false")
+	}
+}
+
+func TestBeatEmUpMovementModel_FreezeGuard(t *testing.T) {
+	config.Set(&config.AppConfig{
+		ScreenWidth:  320,
+		ScreenHeight: 240,
+		Physics:      config.PhysicsConfig{SpeedMultiplier: 1.0},
+	})
+
+	sp := space.NewSpace()
+	actor := newMockMovableCollidable()
+	actor.SetPosition(100, 100)
+	actor.SetVelocity(fp16.To16(3), fp16.To16(3))
+	actor.SetFreeze(true)
+	sp.AddBody(actor)
+
+	model := NewBeatEmUpMovementModel(nil)
+
+	if err := model.Update(actor, sp); err != nil {
+		t.Fatalf("Update with freeze returned error: %v", err)
+	}
+
+	pos := actor.Position().Min
+	if pos.X != 100 || pos.Y != 100 {
+		t.Errorf("expected position unchanged at (100,100); got (%d,%d)", pos.X, pos.Y)
+	}
+
+	vx, vy := actor.Velocity()
+	if vx != fp16.To16(3) || vy != fp16.To16(3) {
+		t.Errorf("expected velocity unchanged at (%d,%d); got (%d,%d)",
+			fp16.To16(3), fp16.To16(3), vx, vy)
+	}
+}
+
+func TestBeatEmUpMovementModel_NoGravityWhenIdle(t *testing.T) {
+	config.Set(&config.AppConfig{
+		ScreenWidth:  320,
+		ScreenHeight: 240,
+		Physics:      config.PhysicsConfig{SpeedMultiplier: 1.0},
+	})
+
+	sp := space.NewSpace()
+	actor := newMockMovableCollidable()
+	actor.SetPosition(100, 100)
+	actor.SetVelocity(0, 0)
+	actor.SetAcceleration(0, 0)
+	sp.AddBody(actor)
+
+	model := NewBeatEmUpMovementModel(nil)
+
+	for i := 0; i < 60; i++ {
+		if err := model.Update(actor, sp); err != nil {
+			t.Fatalf("frame %d: Update returned error: %v", i, err)
+		}
+		_, vy := actor.Velocity()
+		if vy != 0 {
+			t.Fatalf("frame %d: expected vy=0 (no gravity); got %d", i, vy)
+		}
+	}
+
+	pos := actor.Position().Min
+	if pos.Y != 100 {
+		t.Errorf("expected Y position unchanged at 100; got %d", pos.Y)
+	}
+}
+
+func TestBeatEmUpMovementModel_DiagonalSpeedNormalization(t *testing.T) {
+	config.Set(&config.AppConfig{
+		ScreenWidth:  320,
+		ScreenHeight: 240,
+		Physics:      config.PhysicsConfig{SpeedMultiplier: 1.0},
+	})
+
+	tests := []struct {
+		name   string
+		accelX int
+		accelY int
+		check  func(t *testing.T, vx16, vy16 int)
+	}{
+		{
+			name:   "cardinal-X",
+			accelX: fp16.To16(2),
+			accelY: 0,
+			check: func(t *testing.T, vx16, vy16 int) {
+				absVX := vx16
+				if absVX < 0 {
+					absVX = -absVX
+				}
+				// |vx| should approach fp16.To16(5) (allow some friction slack)
+				cap5 := fp16.To16(5)
+				if absVX > cap5+cap5/20 {
+					t.Errorf("cardinal-X: |vx16|=%d exceeded cap=%d", absVX, cap5)
+				}
+				if absVX < cap5/2 {
+					t.Errorf("cardinal-X: |vx16|=%d well below cap=%d, expected near cap", absVX, cap5)
+				}
+				if vy16 != 0 {
+					t.Errorf("cardinal-X: expected vy16=0; got %d", vy16)
+				}
+			},
+		},
+		{
+			name:   "diagonal",
+			accelX: fp16.To16(2),
+			accelY: fp16.To16(2),
+			check: func(t *testing.T, vx16, vy16 int) {
+				cap5 := fp16.To16(5)
+				mag := math.Sqrt(float64(vx16)*float64(vx16) + float64(vy16)*float64(vy16))
+				if mag > float64(cap5)*1.05 {
+					t.Errorf("diagonal: magnitude %.2f exceeded 1.05*cap=%.2f", mag, float64(cap5)*1.05)
+				}
+				absVX := vx16
+				if absVX < 0 {
+					absVX = -absVX
+				}
+				absVY := vy16
+				if absVY < 0 {
+					absVY = -absVY
+				}
+				diff := absVX - absVY
+				if diff < 0 {
+					diff = -diff
+				}
+				// Allow modest asymmetry from friction interplay.
+				if diff > cap5/4 {
+					t.Errorf("diagonal: |vx|-|vy| asymmetry too large: |vx|=%d |vy|=%d", absVX, absVY)
+				}
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			sp := space.NewSpace()
+			actor := newMockMovableCollidable()
+			actor.SetMaxSpeed(5)
+			actor.SetPosition(100, 100)
+			sp.AddBody(actor)
+
+			model := NewBeatEmUpMovementModel(nil)
+
+			for i := 0; i < 60; i++ {
+				actor.SetAcceleration(tt.accelX, tt.accelY)
+				if err := model.Update(actor, sp); err != nil {
+					t.Fatalf("frame %d: Update returned error: %v", i, err)
+				}
+			}
+
+			vx16, vy16 := actor.Velocity()
+			tt.check(t, vx16, vy16)
+		})
+	}
+}
+
+func TestBeatEmUpMovementModel_XObstacleCollision(t *testing.T) {
+	config.Set(&config.AppConfig{
+		ScreenWidth:  320,
+		ScreenHeight: 240,
+		Physics:      config.PhysicsConfig{SpeedMultiplier: 1.0},
+	})
+
+	sp := space.NewSpace()
+
+	actor := bodyphysics.NewObstacleRect(bodyphysics.NewRect(0, 0, 10, 10))
+	actor.SetID("actor")
+	actor.SetPosition(100, 100)
+	actor.SetMaxSpeed(30)
+	actor.SetVelocity(fp16.To16(20), 0)
+	sp.AddBody(actor)
+
+	obstacle := bodyphysics.NewObstacleRect(bodyphysics.NewRect(0, 0, 10, 10))
+	obstacle.SetID("obstacle")
+	obstacle.SetIsObstructive(true)
+	obstacle.SetPosition(120, 100)
+	obstacle.AddCollisionBodies()
+	sp.AddBody(obstacle)
+
+	model := NewBeatEmUpMovementModel(nil)
+	if err := model.Update(actor, sp); err != nil {
+		t.Fatalf("Update returned error: %v", err)
+	}
+
+	pos := actor.Position().Min
+	if pos.X >= 120 {
+		t.Errorf("expected actor.X < 120 (blocked by obstacle); got %d", pos.X)
+	}
+	if pos.X < 100 {
+		t.Errorf("expected actor.X >= 100; got %d", pos.X)
+	}
+}
+
+func TestBeatEmUpMovementModel_YObstacleCollision(t *testing.T) {
+	config.Set(&config.AppConfig{
+		ScreenWidth:  320,
+		ScreenHeight: 240,
+		Physics:      config.PhysicsConfig{SpeedMultiplier: 1.0},
+	})
+
+	sp := space.NewSpace()
+
+	actor := bodyphysics.NewObstacleRect(bodyphysics.NewRect(0, 0, 10, 10))
+	actor.SetID("actor")
+	actor.SetPosition(100, 100)
+	actor.SetMaxSpeed(30)
+	actor.SetVelocity(0, fp16.To16(20))
+	sp.AddBody(actor)
+
+	obstacle := bodyphysics.NewObstacleRect(bodyphysics.NewRect(0, 0, 10, 10))
+	obstacle.SetID("obstacle")
+	obstacle.SetIsObstructive(true)
+	obstacle.SetPosition(100, 120)
+	obstacle.AddCollisionBodies()
+	sp.AddBody(obstacle)
+
+	model := NewBeatEmUpMovementModel(nil)
+	if err := model.Update(actor, sp); err != nil {
+		t.Fatalf("Update returned error: %v", err)
+	}
+
+	pos := actor.Position().Min
+	if pos.Y >= 120 {
+		t.Errorf("expected actor.Y < 120 (blocked by obstacle); got %d", pos.Y)
+	}
+}
+
+func TestBeatEmUpMovementModel_FrictionAppliedEachFrame(t *testing.T) {
+	config.Set(&config.AppConfig{
+		ScreenWidth:  320,
+		ScreenHeight: 240,
+		Physics:      config.PhysicsConfig{SpeedMultiplier: 1.0},
+	})
+
+	sp := space.NewSpace()
+	actor := newMockMovableCollidable()
+	actor.SetPosition(100, 100)
+	actor.SetVelocity(fp16.To16(4), fp16.To16(4))
+	actor.SetAcceleration(0, 0)
+	sp.AddBody(actor)
+
+	model := NewBeatEmUpMovementModel(nil)
+	if err := model.Update(actor, sp); err != nil {
+		t.Fatalf("Update returned error: %v", err)
+	}
+
+	vx16, vy16 := actor.Velocity()
+	if vx16 >= fp16.To16(4) {
+		t.Errorf("expected vx16 < fp16.To16(4)=%d; got %d", fp16.To16(4), vx16)
+	}
+	if vy16 >= fp16.To16(4) {
+		t.Errorf("expected vy16 < fp16.To16(4)=%d; got %d", fp16.To16(4), vy16)
+	}
+	if vx16 <= 0 {
+		t.Errorf("expected vx16 > 0 (friction not full stop); got %d", vx16)
+	}
+	if vy16 <= 0 {
+		t.Errorf("expected vy16 > 0 (friction not full stop); got %d", vy16)
+	}
+}
+
+func TestBeatEmUpMovementModel_AccelerationResetAfterUpdate(t *testing.T) {
+	config.Set(&config.AppConfig{
+		ScreenWidth:  320,
+		ScreenHeight: 240,
+		Physics:      config.PhysicsConfig{SpeedMultiplier: 1.0},
+	})
+
+	sp := space.NewSpace()
+	actor := newMockMovableCollidable()
+	actor.SetPosition(100, 100)
+	actor.SetAcceleration(fp16.To16(2), fp16.To16(2))
+	sp.AddBody(actor)
+
+	model := NewBeatEmUpMovementModel(nil)
+	if err := model.Update(actor, sp); err != nil {
+		t.Fatalf("Update returned error: %v", err)
+	}
+
+	accX, accY := actor.Acceleration()
+	if accX != 0 || accY != 0 {
+		t.Errorf("expected acceleration reset to (0,0); got (%d,%d)", accX, accY)
+	}
+}
+
+func TestBeatEmUpMovementModel_ClampToPlayAreaEngaged(t *testing.T) {
+	config.Set(&config.AppConfig{
+		ScreenWidth:  320,
+		ScreenHeight: 240,
+		Physics:      config.PhysicsConfig{SpeedMultiplier: 1.0},
+	})
+
+	sp := space.NewSpace()
+	actor := bodyphysics.NewObstacleRect(bodyphysics.NewRect(0, 0, 10, 10))
+	actor.SetID("actor")
+	actor.SetPosition(-10, -10)
+	actor.SetMaxSpeed(10)
+	sp.AddBody(actor)
+
+	model := NewBeatEmUpMovementModel(nil)
+	if err := model.Update(actor, sp); err != nil {
+		t.Fatalf("Update returned error: %v", err)
+	}
+
+	pos := actor.Position().Min
+	if pos.X != 0 {
+		t.Errorf("expected actor.X clamped to 0; got %d", pos.X)
+	}
+	if pos.Y != 0 {
+		t.Errorf("expected actor.Y clamped to 0; got %d", pos.Y)
+	}
+}
+
+func TestBeatEmUpMovementModel_FactoryWiring(t *testing.T) {
+	blocker := &mockPlayerMovementBlocker{}
+	model, err := NewMovementModel(BeatEmUp, blocker)
+	if err != nil {
+		t.Fatalf("NewMovementModel(BeatEmUp) failed: %v", err)
+	}
+	if model == nil {
+		t.Fatal("expected non-nil model for BeatEmUp")
+	}
+	if _, ok := model.(*BeatEmUpMovementModel); !ok {
+		t.Errorf("expected *BeatEmUpMovementModel; got %T", model)
+	}
+}
+
+func TestBeatEmUpMovementModel_EnumString(t *testing.T) {
+	got := BeatEmUp.String()
+	if got != "BeatEmUp" {
+		t.Errorf("BeatEmUp.String() = %q; want %q", got, "BeatEmUp")
 	}
 }
