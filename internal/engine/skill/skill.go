@@ -17,14 +17,14 @@ const (
 
 // Skill defines the interface for a passive player ability.
 type Skill interface {
-	Update(actor body.MovableCollidable, model *physicsmovement.PlatformMovementModel)
+	Update(actor body.MovableCollidable, model physicsmovement.MovementModel)
 	IsActive() bool
 }
 
 // ActiveSkill defines the interface for a skill that requires user input.
 type ActiveSkill interface {
 	Skill
-	HandleInput(body body.MovableCollidable, model *physicsmovement.PlatformMovementModel, space body.BodiesSpace)
+	HandleInput(body body.MovableCollidable, model physicsmovement.MovementModel, space body.BodiesSpace)
 	ActivationKey() ebiten.Key
 }
 
@@ -71,7 +71,7 @@ func (s *SkillBase) SetTimer(t int) { s.timer = t }
 func (s *SkillBase) IncTimer() { s.timer++ }
 
 // Update is a no-op base implementation.
-func (s *SkillBase) Update(_ body.MovableCollidable, _ *physicsmovement.PlatformMovementModel) {}
+func (s *SkillBase) Update(_ body.MovableCollidable, _ physicsmovement.MovementModel) {}
 
 // IsActive returns true if the skill is currently in its active phase.
 func (s *SkillBase) IsActive() bool {

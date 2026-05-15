@@ -22,7 +22,7 @@ func NewEightDirectionalMovementSkill() *EightDirectionalMovementSkill {
 	return s
 }
 
-func (s *EightDirectionalMovementSkill) Update(b body.MovableCollidable, model *physicsmovement.PlatformMovementModel) {
+func (s *EightDirectionalMovementSkill) Update(b body.MovableCollidable, model physicsmovement.MovementModel) {
 	s.SkillBase.Update(b, model)
 }
 
@@ -30,8 +30,8 @@ func (s *EightDirectionalMovementSkill) ActivationKey() ebiten.Key {
 	return s.activationKey
 }
 
-func (s *EightDirectionalMovementSkill) HandleInput(b body.MovableCollidable, model *physicsmovement.PlatformMovementModel, _ body.BodiesSpace) {
-	if model != nil && model.IsInputBlocked() {
+func (s *EightDirectionalMovementSkill) HandleInput(b body.MovableCollidable, model physicsmovement.MovementModel, _ body.BodiesSpace) {
+	if blocker, ok := model.(physicsmovement.InputBlocker); ok && blocker.IsInputBlocked() {
 		return
 	}
 	if b.Immobile() {

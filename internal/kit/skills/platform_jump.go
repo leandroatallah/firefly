@@ -53,14 +53,18 @@ func (s *JumpSkill) ActivationKey() ebiten.Key {
 }
 
 // HandleInput checks for the jump activation key.
-func (s *JumpSkill) HandleInput(b body.MovableCollidable, model *physicsmovement.PlatformMovementModel, space body.BodiesSpace) {
-	if model != nil && model.IsInputBlocked() {
+func (s *JumpSkill) HandleInput(b body.MovableCollidable, model physicsmovement.MovementModel, space body.BodiesSpace) {
+	pm, _ := model.(*physicsmovement.PlatformMovementModel)
+	if pm == nil {
+		return
+	}
+	if pm.IsInputBlocked() {
 		return
 	}
 	cmds := input.CommandsReader()
 	jumpPressed := cmds.Jump
 	if jumpPressed && !s.jumpPressed {
-		s.tryActivate(b, model, space)
+		s.tryActivate(b, pm, space)
 	}
 	if !jumpPressed && s.jumpPressed && s.jumpCutPending {
 		s.applyJumpCut(b)
@@ -69,14 +73,19 @@ func (s *JumpSkill) HandleInput(b body.MovableCollidable, model *physicsmovement
 }
 
 // Update advances jump state (coyote time, jump buffering).
-func (s *JumpSkill) Update(b body.MovableCollidable, model *physicsmovement.PlatformMovementModel) {
+func (s *JumpSkill) Update(b body.MovableCollidable, model physicsmovement.MovementModel) {
 	s.SkillBase.Update(b, model)
+
+	pm, _ := model.(*physicsmovement.PlatformMovementModel)
+	if pm == nil {
+		return
+	}
 
 	if s.jumpCutPending && !b.IsGoingUp() {
 		s.jumpCutPending = false
 	}
 
-	s.handleCoyoteAndJumpBuffering(b, model, model.OnGround())
+	s.handleCoyoteAndJumpBuffering(b, pm, pm.OnGround())
 }
 
 func (s *JumpSkill) tryActivate(b body.MovableCollidable, model *physicsmovement.PlatformMovementModel, space body.BodiesSpace) {

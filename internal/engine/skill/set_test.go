@@ -15,7 +15,7 @@ type stubSkill struct {
 	updateCalled int
 }
 
-func (s *stubSkill) Update(body.MovableCollidable, *physicsmovement.PlatformMovementModel) {
+func (s *stubSkill) Update(body.MovableCollidable, physicsmovement.MovementModel) {
 	s.updateCalled++
 }
 
@@ -25,7 +25,7 @@ type stubActiveSkill struct {
 	key ebiten.Key
 }
 
-func (s *stubActiveSkill) HandleInput(body.MovableCollidable, *physicsmovement.PlatformMovementModel, body.BodiesSpace) {
+func (s *stubActiveSkill) HandleInput(body.MovableCollidable, physicsmovement.MovementModel, body.BodiesSpace) {
 }
 
 func (s *stubActiveSkill) ActivationKey() ebiten.Key {

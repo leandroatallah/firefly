@@ -34,7 +34,7 @@ func (s *Set) Get(key ebiten.Key) (ActiveSkill, bool) {
 }
 
 // Update calls Update on every registered skill.
-func (s *Set) Update(actor body.MovableCollidable, model *physicsmovement.PlatformMovementModel) {
+func (s *Set) Update(actor body.MovableCollidable, model physicsmovement.MovementModel) {
 	for _, sk := range s.skills {
 		sk.Update(actor, model)
 	}

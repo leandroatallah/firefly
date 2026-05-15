@@ -30,6 +30,15 @@
 - [Sonnet 4.6] [Workflow Gatekeeper] 2026-05-14 [REJECTED — backtrack to Feature Implementer]: Two blocking issues found:
   1. SPEC Section 2 requires `log warn "unknown movement mode: <m>; falling back to horizontal"` in the `default` branch of the `switch cfg.Movement.Mode` in `internal/kit/skills/factory.go`. The implementation silently falls back with no log output — this is a spec deviation.
   2. Constitution non-negotiable: "Table-driven tests for all logic with multiple input/output scenarios." `TestFromConfig_MovementMode_EightDir`, `TestFromConfig_MovementMode_Horizontal`, `TestFromConfig_MovementMode_EmptyDefaultsToHorizontal`, and `TestFromConfig_MovementMode_UnknownFallsBackToHorizontal` in `internal/kit/skills/factory_test.go` test the same function with varying Mode inputs and must be a single table-driven test. Coverage: kit/skills 93.7%, kit/actors/beatemup 90.0%. golangci-lint: 0 issues. All other ACs verified passing.
+- [Opus 4.7] [Architectural Follow-up] 2026-05-15 [FINISHED]: Decoupled engine layer from `*PlatformMovementModel` concrete type. The Feature Implementer's safe-assertion in `character.go:Update` (passing `nil` to skills for non-platform models) was a tactical fix that left genre coupling in the engine. This follow-up removes that coupling. Changes:
+  - `internal/engine/physics/movement/movement_model.go` — added `Grounded`, `InputBlocker`, `GravityController` capability interfaces alongside `MovementModel`.
+  - `internal/engine/skill/skill.go`, `set.go`, `set_test.go` — `Skill.Update` and `ActiveSkill.HandleInput` now accept `physicsmovement.MovementModel` (interface), not `*PlatformMovementModel` (concrete).
+  - `internal/engine/entity/actors/character.go` — `Update` passes `c.movementModel` straight through, no assertion. `handleState` reads `onGround` via `physicsmovement.Grounded` instead of the concrete platform type.
+  - `internal/engine/entity/actors/movement/state_side_to_side.go` — `setGravity` uses `physicsmovement.GravityController` interface.
+  - `internal/kit/skills/{platform_jump,platform_move,eight_dir_move,dash,shooting}.go` — accept `MovementModel`; platform-specific skills assert to `*PlatformMovementModel` internally and no-op when absent; `IsInputBlocked` queried via `InputBlocker` interface where genre-agnostic.
+  - `internal/engine/entity/actors/character_test.go` — `mockSkill.Update` signature updated.
+  - Engine no longer references any concrete movement model. Genre lives in `kit/` only.
+  - `go build ./...` clean, `go vet ./...` clean, `go test ./...` all 68 packages pass.
 - [Sonnet 4.6] [Workflow Gatekeeper] 2026-05-14 [APPROVED]: Both prior blockers resolved.
   1. `internal/kit/skills/factory.go` default case now emits `log.Printf("unknown movement mode: %q; falling back to horizontal", cfg.Movement.Mode)` — confirmed by test run output showing the log line for mode="jetpack".
   2. `internal/kit/skills/factory_test.go` T-F1..T-F4 collapsed into single `TestFromConfig_MovementMode` table-driven test with four subtests (eight_dir, horizontal, empty, unknown).

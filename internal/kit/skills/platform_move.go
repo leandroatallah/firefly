@@ -29,7 +29,7 @@ func NewHorizontalMovementSkill() *HorizontalMovementSkill {
 }
 
 // Update is a no-op for horizontal movement (input handled in HandleInput).
-func (s *HorizontalMovementSkill) Update(b body.MovableCollidable, model *physicsmovement.PlatformMovementModel) {
+func (s *HorizontalMovementSkill) Update(b body.MovableCollidable, model physicsmovement.MovementModel) {
 	s.SkillBase.Update(b, model)
 }
 
@@ -39,8 +39,8 @@ func (s *HorizontalMovementSkill) ActivationKey() ebiten.Key {
 }
 
 // HandleInput processes left/right movement commands.
-func (s *HorizontalMovementSkill) HandleInput(b body.MovableCollidable, model *physicsmovement.PlatformMovementModel, _ body.BodiesSpace) {
-	if model != nil && model.IsInputBlocked() {
+func (s *HorizontalMovementSkill) HandleInput(b body.MovableCollidable, model physicsmovement.MovementModel, _ body.BodiesSpace) {
+	if blocker, ok := model.(physicsmovement.InputBlocker); ok && blocker.IsInputBlocked() {
 		return
 	}
 	if b.Immobile() {

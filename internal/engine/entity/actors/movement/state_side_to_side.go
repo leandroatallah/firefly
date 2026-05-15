@@ -77,8 +77,8 @@ func (s *SideToSideMovementState) Move(space body.BodiesSpace) {
 		if provider, ok := s.actor.(interface {
 			MovementModel() physicsmovement.MovementModel
 		}); ok {
-			if pm, ok := provider.MovementModel().(*physicsmovement.PlatformMovementModel); ok {
-				pm.SetGravityEnabled(enabled)
+			if gc, ok := provider.MovementModel().(physicsmovement.GravityController); ok {
+				gc.SetGravityEnabled(enabled)
 			}
 		}
 	}

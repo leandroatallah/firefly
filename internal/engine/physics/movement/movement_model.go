@@ -11,6 +11,23 @@ type MovementModel interface {
 	SetIsScripted(isScripted bool)
 }
 
+// Grounded is implemented by movement models that track an on-ground state.
+// Models without grounding semantics (e.g. top-down) may simply not implement it;
+// callers should treat the absence of Grounded as "always grounded".
+type Grounded interface {
+	OnGround() bool
+}
+
+// InputBlocker is implemented by movement models that can suppress player input.
+type InputBlocker interface {
+	IsInputBlocked() bool
+}
+
+// GravityController is implemented by movement models that expose a gravity toggle.
+type GravityController interface {
+	SetGravityEnabled(enabled bool)
+}
+
 type MovementModelEnum int
 
 func (m MovementModelEnum) String() string {

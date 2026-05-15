@@ -43,21 +43,30 @@ func (d *DashSkill) ActivationKey() ebiten.Key {
 }
 
 // HandleInput checks for the dash activation key.
-func (d *DashSkill) HandleInput(b body.MovableCollidable, model *physicsmovement.PlatformMovementModel, space body.BodiesSpace) {
+func (d *DashSkill) HandleInput(b body.MovableCollidable, model physicsmovement.MovementModel, space body.BodiesSpace) {
+	pm, _ := model.(*physicsmovement.PlatformMovementModel)
+	if pm == nil {
+		return
+	}
 	cmds := input.CommandsReader()
 	dashPressed := cmds.Dash
 	if dashPressed && !d.dashPressed {
-		d.tryActivate(b, model, space)
+		d.tryActivate(b, pm, space)
 	}
 	d.dashPressed = dashPressed
 }
 
 // Update manages the skill's state, timers, and applies its effects.
-func (d *DashSkill) Update(b body.MovableCollidable, model *physicsmovement.PlatformMovementModel) {
+func (d *DashSkill) Update(b body.MovableCollidable, model physicsmovement.MovementModel) {
 	d.SkillBase.Update(b, model)
 
+	pm, _ := model.(*physicsmovement.PlatformMovementModel)
+	if pm == nil {
+		return
+	}
+
 	// Reset air dash capability when the player lands.
-	if model.OnGround() {
+	if pm.OnGround() {
 		d.airDashUsed = false
 	}
 
@@ -67,18 +76,18 @@ func (d *DashSkill) Update(b body.MovableCollidable, model *physicsmovement.Plat
 		if d.Timer() <= 0 {
 			d.SetState(skill.StateCooldown)
 			d.SetTimer(d.Cooldown())
-			model.SetDashActive(false, 0)
-			model.SetGravityEnabled(true)
+			pm.SetDashActive(false, 0)
+			pm.SetGravityEnabled(true)
 		} else {
 			// Apply dash movement by setting it in the movement model
 			dirX := 1
 			if b.FaceDirection() == animation.FaceDirectionLeft {
 				dirX = -1
 			}
-			model.SetDashActive(true, d.Speed()*dirX)
+			pm.SetDashActive(true, d.Speed()*dirX)
 			// Override gravity during air dash to maintain height (Cuphead-style)
-			if !model.OnGround() {
-				model.SetGravityEnabled(false)
+			if !pm.OnGround() {
+				pm.SetGravityEnabled(false)
 				vx, _ := b.Velocity()
 				b.SetVelocity(vx, 0)
 			}

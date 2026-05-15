@@ -105,7 +105,7 @@ func TestCharacter_StateTransitionOverride(t *testing.T) {
 
 type mockSkill struct{}
 
-func (m *mockSkill) Update(actor body.MovableCollidable, model *physicsmovement.PlatformMovementModel) {
+func (m *mockSkill) Update(actor body.MovableCollidable, model physicsmovement.MovementModel) {
 }
 func (m *mockSkill) IsActive() bool { return false }
 

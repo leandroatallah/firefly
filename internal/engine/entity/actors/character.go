@@ -257,16 +257,11 @@ func (c *Character) Update(space body.BodiesSpace) error {
 	}
 	c.count++
 
-	// Resolve the platform model once; nil for non-platform movement models.
-	var platformModel *physicsmovement.PlatformMovementModel
-	if pm, ok := c.movementModel.(*physicsmovement.PlatformMovementModel); ok {
-		platformModel = pm
-	}
 	for _, s := range c.skills {
 		if activeSkill, ok := s.(skill.ActiveSkill); ok {
-			activeSkill.HandleInput(c, platformModel, space)
+			activeSkill.HandleInput(c, c.movementModel, space)
 		}
-		s.Update(c, platformModel)
+		s.Update(c, c.movementModel)
 	}
 
 	// Handle movement by Movement State - must happen BEFORE UpdateMovement
@@ -381,11 +376,11 @@ func (c *Character) handleState() {
 		return
 	}
 
-	// Get grounded state if available from the platform movement model.
-	// Default to true for other models (like top-down) to maintain existing behavior.
+	// Get grounded state from any model that implements Grounded.
+	// Default to true for models without grounding semantics (e.g. top-down).
 	onGround := true
-	if pm, ok := c.movementModel.(*physicsmovement.PlatformMovementModel); ok {
-		onGround = pm.OnGround()
+	if g, ok := c.movementModel.(physicsmovement.Grounded); ok {
+		onGround = g.OnGround()
 	}
 
 	setNewState := func(s ActorStateEnum) {
