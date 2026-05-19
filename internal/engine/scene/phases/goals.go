@@ -8,6 +8,16 @@ type Goal interface {
 	OnCompletion()
 }
 
+// GoalType constants for identifying the completion criteria of a phase.
+// These live in the engine package so both kit and game layers can reference them.
+//
+//nolint:gochecknoglobals
+var (
+	ReactEndpointType GoalType = "reach_endpoint"
+	SequenceGoalType  GoalType = "sequence"
+	NoGoalType        GoalType = "no_goal"
+)
+
 // SequenceGoal: Complete when sequence finishes
 type SequenceGoal struct {
 	Player         sequences.Player
@@ -32,3 +42,18 @@ func (g *NoGoal) IsCompleted() bool {
 }
 
 func (g *NoGoal) OnCompletion() {}
+
+// ReachEndpointGoal completes when a flag is flipped via Reach().
+// The optional OnCompletion_ callback is invoked by OnCompletion when set.
+type ReachEndpointGoal struct {
+	reached       bool
+	OnCompletion_ func() // optional callback (e.g., game-layer freeze/audio fade)
+}
+
+func (g *ReachEndpointGoal) IsCompleted() bool { return g.reached }
+func (g *ReachEndpointGoal) OnCompletion() {
+	if g.OnCompletion_ != nil {
+		g.OnCompletion_()
+	}
+}
+func (g *ReachEndpointGoal) Reach() { g.reached = true }
