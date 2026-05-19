@@ -84,7 +84,8 @@
     "frame_rate": 6,
     "skills": {
       "movement": {
-        "enabled": true
+        "enabled": true,
+        "mode": "eight_dir"
       },
       "jump": {
         "enabled": true,

@@ -45,12 +45,6 @@ func NewWithOptions(opts Options[Player]) (*BeatemupPhaseScene, error) {
 		return nil, errors.New("beatemupphasescene: Options.PlayerFactory must not be nil")
 	}
 
-	// Validate the factory by calling it now so the error propagates to the caller.
-	_, err := opts.PlayerFactory(opts.Ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	cfg := config.Get()
 	sw := float64(cfg.ScreenWidth)
 	sh := float64(cfg.ScreenHeight)
