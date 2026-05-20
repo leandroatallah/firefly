@@ -234,15 +234,38 @@ func HasCollision(a, b body.Collidable) bool {
 	rectsA := collisionRects(a)
 	rectsB := collisionRects(b)
 
+	bboxOverlap := false
 	for _, r := range rectsA {
 		for _, s := range rectsB {
 			if r.Overlaps(s) {
-				return true
+				bboxOverlap = true
+				break
 			}
+		}
+		if bboxOverlap {
+			break
 		}
 	}
 
-	return false
+	if !bboxOverlap {
+		return false
+	}
+
+	da, okA := a.(DepthLaneBody)
+	db, okB := b.(DepthLaneBody)
+	if !okA || !okB {
+		return true
+	}
+
+	tol := da.LaneHalfWidth()
+	if db.LaneHalfWidth() > tol {
+		tol = db.LaneHalfWidth()
+	}
+	diff := da.GroundY() - db.GroundY()
+	if diff < 0 {
+		diff = -diff
+	}
+	return diff <= tol
 }
 
 func (s *Space) SetTilemapDimensionsProvider(provider tilemaplayer.TilemapDimensionsProvider) {
