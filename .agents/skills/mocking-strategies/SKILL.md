@@ -3,6 +3,7 @@ name: mocking-strategies
 description: Best practices for creating and placing mocks, including i18n and physics isolation.
 ---
 
+
 # Mocking Strategies
 
 ## Placement Rules

@@ -3,6 +3,7 @@ name: caveman
 description: Forces terse AI responses to cut output tokens 65-75% while preserving accuracy
 ---
 
+
 # Caveman Skill
 
 ## Overview

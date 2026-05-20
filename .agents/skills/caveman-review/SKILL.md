@@ -1,3 +1,6 @@
+---
+inclusion: always
+---
 # Caveman Review
 
 One-line PR comments with direct, actionable feedback.

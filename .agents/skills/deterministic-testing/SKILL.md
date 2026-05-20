@@ -3,6 +3,7 @@ name: deterministic-testing
 description: Ensure tests are reliable, fast, and deterministic by avoiding time dependencies and flakiness.
 ---
 
+
 # Deterministic & Fast Tests
 
 ## Rules
