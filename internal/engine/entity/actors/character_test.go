@@ -2,14 +2,12 @@ package actors_test
 
 import (
 	"bytes"
-	"image"
 	"io"
 	"os"
 	"strings"
 	"testing"
 
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
-	"github.com/boilerplate/ebiten-template/internal/engine/contracts/tilemaplayer"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
 	"github.com/boilerplate/ebiten-template/internal/engine/debug"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
