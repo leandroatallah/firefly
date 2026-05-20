@@ -3,6 +3,7 @@ name: doc-update
 description: Guidelines for writing and updating project documentation files based on the current user story.
 ---
 
+
 # Documentation Update
 
 When a story adds, changes, or removes behaviour, the relevant docs must be updated as part of the same story — not as a follow-up.
