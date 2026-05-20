@@ -1,12 +1,17 @@
 package actors_test
 
 import (
+	"bytes"
 	"image"
+	"io"
+	"os"
+	"strings"
 	"testing"
 
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/tilemaplayer"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
+	"github.com/boilerplate/ebiten-template/internal/engine/debug"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
 	bodyphysics "github.com/boilerplate/ebiten-template/internal/engine/physics/body"
 	physicsmovement "github.com/boilerplate/ebiten-template/internal/engine/physics/movement"
@@ -511,4 +516,66 @@ func TestCharacter_handleState_AirPeakStaysJumping(t *testing.T) {
 	if c.State() != actors.Falling {
 		t.Errorf("expected state to transition to Falling when vy >= threshold, but got %v", c.State())
 	}
+}
+
+func captureStdout(t *testing.T, fn func()) string {
+	t.Helper()
+	r, w, err := os.Pipe()
+	if err != nil {
+		t.Fatalf("os.Pipe: %v", err)
+	}
+	old := os.Stdout
+	os.Stdout = w
+	done := make(chan string, 1)
+	go func() {
+		var buf bytes.Buffer
+		_, _ = io.Copy(&buf, r)
+		done <- buf.String()
+	}()
+	fn()
+	_ = w.Close()
+	os.Stdout = old
+	return <-done
+}
+
+func TestCharacter_AddSkill_DebugLog(t *testing.T) {
+	img := ebiten.NewImage(1, 1)
+	sMap := sprites.SpriteMap{actors.Idle: &sprites.Sprite{Image: img}}
+	rect := bodyphysics.NewRect(0, 0, 16, 16)
+
+	t.Run("logs skill type when channel enabled", func(t *testing.T) {
+		debug.Reset()
+		t.Cleanup(debug.Reset)
+		debug.InitFromReader(strings.NewReader(`{"skill_added":true}`))
+
+		c := actors.NewCharacter(sMap, rect)
+		c.SetID("hero")
+
+		got := captureStdout(t, func() {
+			c.AddSkill(&mockSkill{})
+		})
+
+		if !strings.Contains(got, "mockSkill") {
+			t.Fatalf("expected output to contain skill type name, got %q", got)
+		}
+		if !strings.Contains(got, "hero") {
+			t.Fatalf("expected output to contain player ID, got %q", got)
+		}
+	})
+
+	t.Run("silent when channel disabled", func(t *testing.T) {
+		debug.Reset()
+		t.Cleanup(debug.Reset)
+		debug.InitFromReader(strings.NewReader(`{"skill_added":false}`))
+
+		c := actors.NewCharacter(sMap, rect)
+
+		got := captureStdout(t, func() {
+			c.AddSkill(&mockSkill{})
+		})
+
+		if got != "" {
+			t.Fatalf("expected no output when channel disabled, got %q", got)
+		}
+	})
 }

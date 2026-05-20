@@ -1,7 +1,10 @@
 package kitskills
 
 import (
+	"strings"
+
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
+	"github.com/boilerplate/ebiten-template/internal/engine/debug"
 	"github.com/boilerplate/ebiten-template/internal/engine/input"
 	physicsmovement "github.com/boilerplate/ebiten-template/internal/engine/physics/movement"
 	"github.com/boilerplate/ebiten-template/internal/engine/skill"
@@ -43,6 +46,8 @@ func (s *EightDirectionalMovementSkill) HandleInput(b body.MovableCollidable, mo
 	cmds := input.CommandsReader()
 	speed := b.Speed()
 
+	debug.Watch("eight_dir_move", b.ID(), s.DebugCmd(cmds))
+
 	if cmds.Left {
 		b.OnMoveLeft(speed)
 	}
@@ -55,4 +60,23 @@ func (s *EightDirectionalMovementSkill) HandleInput(b body.MovableCollidable, mo
 	if cmds.Down {
 		b.OnMoveDown(speed)
 	}
+}
+
+func (s *EightDirectionalMovementSkill) DebugCmd(cmds input.PlayerCommands) string {
+	out := []string{}
+
+	if cmds.Left {
+		out = append(out, "Left")
+	}
+	if cmds.Right {
+		out = append(out, "Right")
+	}
+	if cmds.Up {
+		out = append(out, "Up")
+	}
+	if cmds.Down {
+		out = append(out, "Down")
+	}
+
+	return strings.Join(out, "+")
 }

@@ -536,6 +536,7 @@ func (c *Character) MovementModel() physicsmovement.MovementModel {
 }
 
 func (c *Character) AddSkill(s skill.Skill) {
+	debug.Log("skill_added", "skill=%T player=%s", s, c.ID())
 	c.skills = append(c.skills, s)
 }
 

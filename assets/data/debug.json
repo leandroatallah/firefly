@@ -1,3 +1,5 @@
 {
-  "player_state": false
+  "player_state": false,
+  "skill_added": false,
+  "eight_dir_move": true
 }
