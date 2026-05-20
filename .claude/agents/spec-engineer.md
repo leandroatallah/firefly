@@ -72,11 +72,13 @@ SPEC.md is consumed by agents (TDD Specialist, Feature Implementer). Optimize fo
 
 ## NOTES.md Format
 
-Human-readable companion. No format constraints. Include:
-- Pre-spec investigation findings and their rationale.
-- Risks and mitigations.
-- Out-of-scope decisions and why.
-- Any non-obvious design choices that don't fit in a signature.
+Human-readable companion. **Max 1 page.** Three sections only:
+
+1. **Design Choices** — Why we chose X over Y. Include only non-obvious constraints or tradeoffs (e.g., "we put this in Update() not handleGravity() because..."). Drop exploration narrative.
+2. **Risks & Quirks** — Quantization, regressions, gotchas, or edge cases that affect future work (e.g., "fp16 truncation causes sub-pixel jumps"). Keep it brief.
+3. **Future** — Bulleted list of out-of-scope work (no explanation). Example: `[ ] MaxAltitudeFallSpeed config`.
+
+**Omit:** investigation findings (in SPEC + git blame), exploration details, design rationale already in the code.
 
 ## Integration
 
