@@ -10,30 +10,31 @@ Update this file when a story moves to `active/` or `done/`, or when sequencing 
 
 | Order | Story | Depends on | Notes |
 |---|---|---|---|
-| 1 | `056-eight-dir-movement-skill` | — | Kit skill addition. Independent. |
-| 2 | `057-beatemup-movement-model` | — | Engine physics addition. Can run in parallel with 056. |
-| 3 | `058-wire-beatemup-movement` | 056, 057 | Wires skill + model. Unlocks playable beat-em-up. |
-| 4 | `059-thin-game-phase-scenes` | none functional | Large refactor. Land last to amortize review cost. |
+| 1 | `061-altitude-jump-ground-detection` | 058 (done) | Activates altitude gravity + landing in `BeatEmUpMovementModel` |
+| 2 | `062-depth-aware-collision` | 061 (logical prior) | Depth-lane gate in `HasCollision`; can start after 061 |
+| 3 | `063-shadow-component` | 061 | Shadow requires altitude to be live; independent of 062 |
+| 4 | `064-beatemup-footprint-rect` | — | JSON `footprint_rect` schema + beat-em-up `Footprint()` accessor. Complements 062 (depth-lane gate); independent. |
 
 ---
 
 ## Dependencies
 
 ```
-056 ──┐
-      ├──► 058 ──► (beat-em-up playable)
-057 ──┘
+058 (done)
+  └─ 061-altitude-jump-ground-detection
+       ├─ 062-depth-aware-collision
+       └─ 063-shadow-component
 
-059 ── independent ── (architectural cleanup; lands after 058 for cleaner diff)
+064-beatemup-footprint-rect (independent; feeds collision shapes used by 062)
 ```
 
 ---
 
 ## Sequencing Notes
 
-- **058 before 059**: 058 adds one `Camera().SetBounds(tilemapRect)` call to the beat-em-up scene's `OnStart`. 059 moves `OnStart` into kit. Landing 058 first lets that line move with the rest of `OnStart` in 059 — no rework. Reverse order forces 058 to wire through 059's new `Options` plumbing.
-- **059 alone has no user-facing change** — it is pure refactor. Sequence so that user-facing stories (056 → 057 → 058) ship first.
-- **056 and 057 in parallel** is safe — different packages, no shared files.
+- 061 is the prerequisite for both 062 and 063; 062 and 063 can proceed in parallel once 061 is done.
+- 062 and 063 have no dependency on each other.
+- 064 has no hard dependency; can ship in parallel with 061–063. Pairs naturally with 062 (062 = depth-lane gate mechanism; 064 = footprint shape fed into collision checks).
 
 ---
 
@@ -41,11 +42,15 @@ Update this file when a story moves to `active/` or `done/`, or when sequencing 
 
 Future stories not yet written. One line each.
 
-- (none)
+- `060-html-report-generator` — in backlog.
 
 ---
 
 ## Recently Completed
 
-- `055-kit-genre-phase-scenes` — genre routing, beat-em-up scene shell, altitude draw sort. Deferred items recorded in its `PROGRESS.md`; closed by 059.
+- `059-thin-game-phase-scenes` — consolidate scene `OnStart` logic into kit layer (pure refactor).
+- `058-wire-beatemup-movement` — wire `EightDirectionalMovementSkill` + `BeatEmUpMovementModel` into `BeatEmUpCharacter`; decouple engine from `*PlatformMovementModel`.
+- `057-beatemup-movement-model` — `BeatEmUpMovementModel` with 8-way floor movement, friction, speed cap; altitude-silent.
+- `056-eight-dir-movement-skill` — `EightDirectionalMovementSkill` kit skill.
+- `055-kit-genre-phase-scenes` — genre routing, beat-em-up scene shell, altitude draw sort. Closed by 059.
 - `054-` and earlier — see `.agents/work/done/`.
