@@ -86,6 +86,21 @@ Output:
 
 Open `output/docs/index.html` in a browser (no server required).
 
+### Serving Reports Locally
+
+Preview generated reports in a browser without manual file navigation:
+
+```bash
+make serve
+```
+
+Starts HTTP server on `http://localhost:8080`:
+- **Domain docs:** http://localhost:8080/docs/index.html
+- **Diff reports:** http://localhost:8080/tmp/
+- Press Ctrl+C to stop
+
+Both `make gen-diff` and `make gen-docs` write immediately to `output/`; refresh your browser after generating new reports.
+
 ## Input Schemas
 
 ### Diff Report
