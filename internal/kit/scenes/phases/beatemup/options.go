@@ -58,5 +58,11 @@ func NewWithOptions(opts Options[Player]) (*BeatemupPhaseScene, error) {
 	s.menuScene = opts.MenuSceneType
 	s.debugDrawHook = opts.DebugDrawHook
 
+	p, err := opts.PlayerFactory(opts.Ctx)
+	if err != nil {
+		return nil, err
+	}
+	s.player = p
+
 	return s, nil
 }

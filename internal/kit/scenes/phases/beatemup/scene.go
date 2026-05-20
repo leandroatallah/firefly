@@ -170,11 +170,14 @@ func (s *BeatemupPhaseScene) fullOnStart() {
 	s.hasPlayer = ts.Tilemap().HasPlayerStartPosition()
 
 	if s.hasPlayer {
-		p, err := s.playerFactory(s.appCtx)
-		if err != nil {
-			log.Fatal(err)
+		if s.player == nil {
+			p, err := s.playerFactory(s.appCtx)
+			if err != nil {
+				log.Fatal(err)
+			}
+			s.player = p
 		}
-		s.player = p
+		p := s.player
 		if ae, ok := any(p).(actors.ActorEntity); ok {
 			s.appCtx.ActorManager.Register(ae)
 			s.appCtx.ActorManager.RegisterPrimary(ae)
