@@ -1,14 +1,17 @@
 package kitactors
 
-import "github.com/boilerplate/ebiten-template/internal/kit/actors/platformer"
+// healthSetter is the minimal interface PlayerDeathBehavior needs.
+type healthSetter interface {
+	SetHealth(int)
+}
 
 // PlayerDeathBehavior defines the behavior when a player dies.
 type PlayerDeathBehavior struct {
-	player platformer.PlatformerActorEntity
+	player healthSetter
 }
 
 // NewPlayerDeathBehavior creates a new PlayerDeathBehavior for the given player.
-func NewPlayerDeathBehavior(p platformer.PlatformerActorEntity) *PlayerDeathBehavior {
+func NewPlayerDeathBehavior(p healthSetter) *PlayerDeathBehavior {
 	return &PlayerDeathBehavior{player: p}
 }
 
