@@ -71,5 +71,30 @@ func (m *BeatEmUpMovementModel) Update(b body.MovableCollidable, space body.Bodi
 	vx16 = reduceVelocity(vx16)
 	vy16 = reduceVelocity(vy16)
 	b.SetVelocity(vx16, vy16)
+
+	// Altitude axis (story 061)
+	vAlt16 := b.VAltitude16()
+	alt := b.Altitude()
+
+	grounded := alt <= 0 && vAlt16 >= 0
+	if !grounded {
+		cfg := config.Get()
+		if vAlt16 < 0 {
+			vAlt16 += cfg.Physics.UpwardGravity
+		} else {
+			vAlt16 += cfg.Physics.DownwardGravity
+		}
+
+		alt -= fp16.From16(vAlt16)
+
+		if alt <= 0 {
+			alt = 0
+			vAlt16 = 0
+		}
+
+		b.SetAltitude(alt)
+		b.SetVAltitude16(vAlt16)
+	}
+
 	return nil
 }

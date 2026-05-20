@@ -933,3 +933,252 @@ func TestBeatEmUpMovementModel_EnumString(t *testing.T) {
 		t.Errorf("BeatEmUp.String() = %q; want %q", got, "BeatEmUp")
 	}
 }
+
+// --- Story 061: Altitude axis (jump + ground detection) ---
+
+// beatEmUpAltitudeTestConfig sets the standard config used by all T-061-* tests.
+func beatEmUpAltitudeTestConfig() {
+	config.Set(&config.AppConfig{
+		ScreenWidth:  320,
+		ScreenHeight: 240,
+		Physics: config.PhysicsConfig{
+			UpwardGravity:   2,
+			DownwardGravity: 4,
+			SpeedMultiplier: 1.0,
+		},
+	})
+}
+
+// T-061-1: rising arc — UpwardGravity accumulates [AC-1]
+func TestBeatEmUpMovementModel_Altitude_RisingArc_UpwardGravity(t *testing.T) {
+	beatEmUpAltitudeTestConfig()
+
+	sp := space.NewSpace()
+	actor := newMockMovableCollidable()
+	actor.SetPosition(100, 100)
+	actor.SetAltitude(20)
+	preVAlt16 := -fp16.To16(10)
+	actor.SetVAltitude16(preVAlt16)
+	sp.AddBody(actor)
+
+	model := NewBeatEmUpMovementModel(nil)
+	if err := model.Update(actor, sp); err != nil {
+		t.Fatalf("Update returned error: %v", err)
+	}
+
+	postVAlt16 := actor.VAltitude16()
+	wantVAlt16 := preVAlt16 + 2 // UpwardGravity
+	if postVAlt16 != wantVAlt16 {
+		t.Errorf("rising arc: VAltitude16() = %d; want %d (pre %d + UpwardGravity 2)",
+			postVAlt16, wantVAlt16, preVAlt16)
+	}
+
+	postAlt := actor.Altitude()
+	if postAlt <= 20 {
+		t.Errorf("rising arc: Altitude() = %d; want > 20 (actor rising; negative vAlt16 increases altitude)", postAlt)
+	}
+	if postAlt <= 0 {
+		t.Errorf("rising arc: Altitude() = %d; want > 0 (still airborne)", postAlt)
+	}
+}
+
+// T-061-2: falling — DownwardGravity accumulates [AC-1]
+func TestBeatEmUpMovementModel_Altitude_FallingArc_DownwardGravity(t *testing.T) {
+	beatEmUpAltitudeTestConfig()
+
+	sp := space.NewSpace()
+	actor := newMockMovableCollidable()
+	actor.SetPosition(100, 100)
+	actor.SetAltitude(50)
+	preVAlt16 := fp16.To16(2)
+	actor.SetVAltitude16(preVAlt16)
+	sp.AddBody(actor)
+
+	model := NewBeatEmUpMovementModel(nil)
+	if err := model.Update(actor, sp); err != nil {
+		t.Fatalf("Update returned error: %v", err)
+	}
+
+	postVAlt16 := actor.VAltitude16()
+	wantVAlt16 := preVAlt16 + 4 // DownwardGravity
+	if postVAlt16 != wantVAlt16 {
+		t.Errorf("falling arc: VAltitude16() = %d; want %d (pre %d + DownwardGravity 4)",
+			postVAlt16, wantVAlt16, preVAlt16)
+	}
+
+	postAlt := actor.Altitude()
+	if postAlt >= 50 {
+		t.Errorf("falling arc: Altitude() = %d; want < 50 (integrated by positive velocity)", postAlt)
+	}
+	if postAlt <= 0 {
+		t.Errorf("falling arc: Altitude() = %d; want > 0 (still airborne)", postAlt)
+	}
+}
+
+// T-061-3: landing clamps altitude and zeroes velocity [AC-4]
+func TestBeatEmUpMovementModel_Altitude_LandingClamp(t *testing.T) {
+	beatEmUpAltitudeTestConfig()
+
+	sp := space.NewSpace()
+	actor := newMockMovableCollidable()
+	actor.SetPosition(100, 100)
+	actor.SetAltitude(1)
+	actor.SetVAltitude16(fp16.To16(50))
+	sp.AddBody(actor)
+
+	model := NewBeatEmUpMovementModel(nil)
+	if err := model.Update(actor, sp); err != nil {
+		t.Fatalf("Update returned error: %v", err)
+	}
+
+	if got := actor.Altitude(); got != 0 {
+		t.Errorf("landing: Altitude() = %d; want 0 (clamped)", got)
+	}
+	if got := actor.VAltitude16(); got != 0 {
+		t.Errorf("landing: VAltitude16() = %d; want 0 (zeroed on landing)", got)
+	}
+}
+
+// T-061-4: idempotent grounded — no mutation [AC-2, AC-7]
+func TestBeatEmUpMovementModel_Altitude_GroundedIdempotent(t *testing.T) {
+	beatEmUpAltitudeTestConfig()
+
+	sp := space.NewSpace()
+	actor := newMockMovableCollidable()
+	actor.SetPosition(100, 100)
+	actor.SetAltitude(0)
+	actor.SetVAltitude16(0)
+	sp.AddBody(actor)
+
+	model := NewBeatEmUpMovementModel(nil)
+	for i := 0; i < 5; i++ {
+		if err := model.Update(actor, sp); err != nil {
+			t.Fatalf("frame %d: Update returned error: %v", i, err)
+		}
+		if got := actor.Altitude(); got != 0 {
+			t.Fatalf("frame %d: Altitude() = %d; want 0 (grounded should not mutate)", i, got)
+		}
+		if got := actor.VAltitude16(); got != 0 {
+			t.Fatalf("frame %d: VAltitude16() = %d; want 0 (grounded should not mutate)", i, got)
+		}
+	}
+}
+
+// T-061-5: freeze guard skips altitude mutation [AC-6]
+func TestBeatEmUpMovementModel_Altitude_FreezeGuard(t *testing.T) {
+	beatEmUpAltitudeTestConfig()
+
+	sp := space.NewSpace()
+	actor := newMockMovableCollidable()
+	actor.SetPosition(100, 100)
+	actor.SetAltitude(30)
+	preVAlt16 := fp16.To16(5)
+	actor.SetVAltitude16(preVAlt16)
+	actor.SetFreeze(true)
+	sp.AddBody(actor)
+
+	model := NewBeatEmUpMovementModel(nil)
+	if err := model.Update(actor, sp); err != nil {
+		t.Fatalf("Update returned error: %v", err)
+	}
+
+	if got := actor.VAltitude16(); got != preVAlt16 {
+		t.Errorf("freeze: VAltitude16() = %d; want %d (unchanged)", got, preVAlt16)
+	}
+	if got := actor.Altitude(); got != 30 {
+		t.Errorf("freeze: Altitude() = %d; want 30 (unchanged)", got)
+	}
+}
+
+// T-061-6: 2D regression — body never touching altitude stays at 0 [AC-7]
+func TestBeatEmUpMovementModel_Altitude_2DRegression(t *testing.T) {
+	beatEmUpAltitudeTestConfig()
+
+	sp := space.NewSpace()
+	actor := newMockMovableCollidable()
+	actor.SetPosition(100, 100)
+	actor.SetMaxSpeed(10)
+	actor.SetVelocity(fp16.To16(2), 0)
+	sp.AddBody(actor)
+
+	preX := actor.Position().Min.X
+
+	model := NewBeatEmUpMovementModel(nil)
+	for i := 0; i < 30; i++ {
+		if err := model.Update(actor, sp); err != nil {
+			t.Fatalf("frame %d: Update returned error: %v", i, err)
+		}
+		if got := actor.Altitude(); got != 0 {
+			t.Fatalf("frame %d: Altitude() = %d; want 0 (2D body untouched)", i, got)
+		}
+		if got := actor.VAltitude16(); got != 0 {
+			t.Fatalf("frame %d: VAltitude16() = %d; want 0 (2D body untouched)", i, got)
+		}
+	}
+
+	postX := actor.Position().Min.X
+	if postX == preX {
+		t.Errorf("2D regression: X did not move (pre=%d post=%d); 2D motion broken", preX, postX)
+	}
+}
+
+// T-061-7: external jump impulse → full rise/fall/land arc [AC-1, AC-3, AC-4, AC-5]
+func TestBeatEmUpMovementModel_Altitude_JumpArc(t *testing.T) {
+	beatEmUpAltitudeTestConfig()
+
+	sp := space.NewSpace()
+	actor := newMockMovableCollidable()
+	actor.SetPosition(100, 100)
+	actor.SetAltitude(0)
+	actor.SetVAltitude16(0)
+	sp.AddBody(actor)
+
+	model := NewBeatEmUpMovementModel(nil)
+
+	// Step A: external jump impulse.
+	actor.SetVAltitude16(-fp16.To16(8))
+
+	var roseFrame, peakFrame int
+	rose := false
+	peaked := false
+	landed := false
+	const maxFrames = 600
+	frames := 0
+
+	for i := 0; i < maxFrames; i++ {
+		if err := model.Update(actor, sp); err != nil {
+			t.Fatalf("frame %d: Update returned error: %v", i, err)
+		}
+		frames = i + 1
+
+		if !rose && actor.Altitude() > 0 {
+			rose = true
+			roseFrame = i
+		}
+		if rose && !peaked && actor.VAltitude16() >= 0 {
+			peaked = true
+			peakFrame = i
+		}
+		if frames > 1 && actor.Altitude() == 0 && actor.VAltitude16() == 0 && rose {
+			landed = true
+			break
+		}
+	}
+
+	if !rose {
+		t.Fatalf("jump arc: actor never rose above 0 altitude within %d frames", maxFrames)
+	}
+	if !peaked {
+		t.Fatalf("jump arc: actor never reached peak (VAltitude16 >= 0) within %d frames", maxFrames)
+	}
+	if peakFrame < roseFrame {
+		t.Errorf("jump arc: peak frame %d < rose frame %d (out of order)", peakFrame, roseFrame)
+	}
+	if !landed {
+		t.Fatalf("jump arc: actor did not land within %d frames (alt=%d vAlt16=%d)",
+			maxFrames, actor.Altitude(), actor.VAltitude16())
+	}
+	if frames >= maxFrames {
+		t.Errorf("jump arc: loop did not terminate before %d frames", maxFrames)
+	}
+}
