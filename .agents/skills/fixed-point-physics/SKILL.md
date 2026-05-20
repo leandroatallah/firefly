@@ -3,6 +3,7 @@ name: fixed-point-physics
 description: Testing strategies for fixed-point arithmetic and physics collision edge cases.
 ---
 
+
 # Fixed-Point Arithmetic & Physics Testing
 
 Validate positions using `fp16` conversions:

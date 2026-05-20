@@ -1,3 +1,6 @@
+---
+inclusion: always
+---
 # Caveman Commit
 
 Terse git commit messages for the caveman skill.
