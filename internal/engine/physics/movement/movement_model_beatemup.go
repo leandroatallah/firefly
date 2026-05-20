@@ -1,10 +1,12 @@
 package movement
 
 import (
+	"fmt"
 	"math"
 
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
+	"github.com/boilerplate/ebiten-template/internal/engine/debug"
 	"github.com/boilerplate/ebiten-template/internal/engine/utils/fp16"
 )
 
@@ -31,8 +33,11 @@ func (m *BeatEmUpMovementModel) Update(b body.MovableCollidable, space body.Bodi
 	vx16, vy16 := b.Velocity()
 
 	// Apply previous-frame velocity with collision resolution
-	_, _, _ = b.ApplyValidPosition(vx16, true, space)  // X axis
-	_, _, _ = b.ApplyValidPosition(vy16, false, space) // Y axis
+	_, _, blockX := b.ApplyValidPosition(vx16, true, space)  // X axis
+	_, _, blockY := b.ApplyValidPosition(vy16, false, space) // Y axis
+	debug.Watch("beatemup_vel", b.ID(), fmt.Sprintf("vx=%d vy=%d blockX=%v blockY=%v", vx16, vy16, blockX, blockY))
+	shapes := b.CollisionShapes()
+	debug.Watch("beatemup_collisions", b.ID(), fmt.Sprintf("count=%d shapes=%+v", len(shapes), shapes))
 	vx16, vy16 = b.Velocity()
 
 	// Prevents leaving the play area

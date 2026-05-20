@@ -1,5 +1,8 @@
 {
   "player_state": false,
   "skill_added": false,
-  "eight_dir_move": true
+  "eight_dir_move": false,
+
+  "beatemup_vel": false,
+  "beatemup_collisions": false
 }
