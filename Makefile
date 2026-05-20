@@ -1,4 +1,4 @@
-.PHONY: build-wasm clean sync-agents sync-skills setup help dashboard kanban
+.PHONY: build-wasm clean sync-agents sync-skills setup help dashboard kanban build-gen gen-diff gen-docs
 
 help:
 	@echo "Usage: make [target]"
@@ -7,6 +7,9 @@ help:
 	@echo "  dashboard    Show real-time SDD pipeline dashboard"
 	@echo "  kanban       Generate kanban.html from stories"
 	@echo "  build-wasm   Build the WASM binary and create a zip for deployment"
+	@echo "  build-gen    Build HTML report generators (diff, domain-docs)"
+	@echo "  gen-diff     Generate diff report from JSON input (INPUT=path/to/input.json)"
+	@echo "  gen-docs     Generate domain docs from JSON input (INPUT=path/to/input.json)"
 	@echo "  sync-skills  Create/update skill symlinks for all AI tools"
 	@echo "  sync-agents  Sync agent files to all AI tools"
 	@echo "  setup        Install git hooks and create skill symlinks"
@@ -36,3 +39,20 @@ setup:
 
 clean:
 	rm -f game.wasm growbel-wasm.zip
+
+build-gen:
+	@go build -o scripts/gen/cmd/diff/diff ./scripts/gen/cmd/diff
+	@go build -o scripts/gen/cmd/domain-docs/domain-docs ./scripts/gen/cmd/domain-docs
+	@echo "Generators built."
+
+gen-diff:
+	@if [ ! -f scripts/gen/cmd/diff/diff ]; then $(MAKE) build-gen; fi
+	@if [ -z "$(INPUT)" ]; then echo "Usage: make gen-diff INPUT=path/to/input.json"; exit 1; fi
+	@cat $(INPUT) | ./scripts/gen/cmd/diff/diff
+	@echo "Diff report generated."
+
+gen-docs:
+	@if [ ! -f scripts/gen/cmd/domain-docs/domain-docs ]; then $(MAKE) build-gen; fi
+	@if [ -z "$(INPUT)" ]; then echo "Usage: make gen-docs INPUT=path/to/input.json"; exit 1; fi
+	@cat $(INPUT) | ./scripts/gen/cmd/domain-docs/domain-docs
+	@echo "Domain docs generated."
