@@ -70,14 +70,14 @@ Translates the feature request into a User Story with Acceptance Criteria using 
 ### 2. Spec Engineer (`@spec-engineer`)
 Transforms the story into a Technical Specification: interface contracts, state machine transitions, pre/post-conditions.
 - Moves folder from `backlog/` to `active/` using `bash scripts/story.sh start <id-slug>`.
-- Writes `SPEC.md` (agent-optimized, token-efficient) and `NOTES.md` (human context: risks, rationale, investigation findings), updates `PROGRESS.md`.
+- Writes `SPEC.md` (agent-optimized, token-efficient) and `NOTES.md` (human context: design tradeoffs, risks, future hooks), updates `PROGRESS.md`.
 
 **SPEC.md vs NOTES.md:**
 
 | File | Audience | Content |
 |---|---|---|
 | `SPEC.md` | Agents | Signatures, pseudocode, `pre/act/post` test triples, post-conditions. No prose rationale. |
-| `NOTES.md` | Humans | Investigation findings, risks, out-of-scope, design rationale. |
+| `NOTES.md` | Humans | **Design Choices** (why we chose X over Y; non-obvious constraints). **Risks** (quantization, regressions, gotchas). **Future** (brief list of out-of-scope work). Max 1 page. Drop: investigation findings (in SPEC + git blame) and exploration details. |
 
 ### 3. Mock Generator (`@mock-generator`)
 Inspects `internal/engine/contracts/` and `internal/engine/mocks/`, generates or updates mocks required by the spec.
