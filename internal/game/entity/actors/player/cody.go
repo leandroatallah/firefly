@@ -88,7 +88,7 @@ func (p *CodyPlayer) Update(space body.BodiesSpace) error {
 }
 
 func (p *CodyPlayer) GetCharacter() *actors.Character {
-	return p.BeatEmUpCharacter.Character
+	return p.Character
 }
 
 func (p *CodyPlayer) GetSpriteData() *schemas.SpriteData {

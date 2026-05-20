@@ -367,20 +367,6 @@ func TestCharacter_handleState_ContributorSkippedDuringHurted(t *testing.T) {
 	}
 }
 
-type stubSpace struct {
-	body.BodiesSpace
-}
-
-func (s *stubSpace) GetTilemapDimensionsProvider() tilemaplayer.TilemapDimensionsProvider {
-	return nil
-}
-func (s *stubSpace) Query(_ image.Rectangle) []body.Collidable {
-	return nil
-}
-func (s *stubSpace) ResolveCollisions(_ body.Collidable) (bool, bool) {
-	return false, false
-}
-
 func captureStdout(t *testing.T, fn func()) string {
 	t.Helper()
 	r, w, err := os.Pipe()
