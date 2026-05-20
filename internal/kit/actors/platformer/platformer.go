@@ -119,6 +119,47 @@ func NewPlatformerCharacter(fsys fs.FS, stateMap map[string]animation.SpriteStat
 	c.SetFaceDirection(spriteData.FacingDirection)
 	c.SetFrameRate(spriteData.FrameRate)
 	c.SetOwner(pf)
+	c.SetMovementTransitionHandler(platformerMovementTransitions)
 
 	return pf, nil
+}
+
+func platformerMovementTransitions(c *actors.Character) {
+	onGround := true
+	if g, ok := c.MovementModel().(physicsmovement.Grounded); ok {
+		onGround = g.OnGround()
+	}
+	state := c.State()
+	set := func(s actors.ActorStateEnum) { c.SetNewStateFatal(s) }
+
+	switch {
+	case state == actors.Landing:
+		if c.IsWalking() && onGround {
+			set(actors.Walking)
+		} else if c.IsAnimationFinished() {
+			set(actors.Idle)
+		}
+	case state == actors.Jumping:
+		if c.IsFalling() {
+			set(actors.Falling)
+			return
+		}
+		if c.IsAnimationFinished() && onGround {
+			set(actors.Idle)
+		}
+	case state == actors.Falling && !c.IsFalling() && onGround:
+		set(actors.Landing)
+	case c.IsGoingUp():
+		set(actors.Jumping)
+	case state != actors.Falling && c.IsFalling():
+		set(actors.Falling)
+	case state == actors.Ducking && !c.IsDucking():
+		set(actors.Idle)
+	case state != actors.Ducking && c.IsDucking():
+		set(actors.Ducking)
+	case state != actors.Walking && c.IsWalking() && onGround:
+		set(actors.Walking)
+	case state != actors.Idle && c.IsIdle() && onGround:
+		set(actors.Idle)
+	}
 }

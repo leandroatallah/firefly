@@ -52,6 +52,10 @@ type Character struct {
 	// StateTransitionHandler, when non-nil, is called before the default handleState
 	// logic. Return true to suppress the default transitions.
 	StateTransitionHandler func(*Character) bool
+	// MovementTransitionHandler, when non-nil, drives genre-specific movement
+	// state transitions (Walking, Idle, Jumping, Falling, …). Registered by kit
+	// genre layers (platformer, beatemup). Called after contributors.
+	MovementTransitionHandler func(*Character)
 	// OnStateChange is called after every successful state change with the old and new state.
 	OnStateChange func(oldState, newState ActorStateEnum)
 	bodyphysics.Ownership
@@ -60,6 +64,11 @@ type Character struct {
 // SetStateTransitionHandler sets a function that can override the default state transition logic.
 func (c *Character) SetStateTransitionHandler(handler func(*Character) bool) {
 	c.StateTransitionHandler = handler
+}
+
+// SetMovementTransitionHandler sets the genre-specific movement state handler.
+func (c *Character) SetMovementTransitionHandler(h func(*Character)) {
+	c.MovementTransitionHandler = h
 }
 
 func NewCharacter(s sprites.SpriteMap, bodyRect *bodyphysics.Rect) *Character { // Modified signature
@@ -344,103 +353,66 @@ func (c *Character) handleState() {
 	if c.state == nil {
 		return
 	}
+	c.tickInvulnerability()
+	if c.handleTerminalStates() {
+		return
+	}
+	if c.StateTransitionHandler != nil && c.StateTransitionHandler(c) {
+		return
+	}
+	if c.Health() <= 0 && c.state.State() != Dying {
+		c.SetNewStateFatal(Dying)
+		return
+	}
+	if c.state.State() == Hurted && c.state.IsAnimationFinished() {
+		c.SetNewStateFatal(Idle)
+		return
+	}
+	if c.pollStateContributors() {
+		return
+	}
+	if c.MovementTransitionHandler != nil {
+		c.MovementTransitionHandler(c)
+	}
+	debug.Watch("player_state", c.ID(), c.state.State())
+}
 
-	// Handle invulnerability timer
+func (c *Character) tickInvulnerability() {
 	if c.invulnerabilityTimer > 0 {
 		c.invulnerabilityTimer--
 		if c.invulnerabilityTimer == 0 {
 			c.SetInvulnerability(false)
 		}
 	}
+}
 
+// handleTerminalStates drives Dying→Dead and short-circuits on Exiting/Dying/Dead.
+func (c *Character) handleTerminalStates() bool {
 	state := c.state.State()
-
-	// Standard transitions
 	if state == Dying && c.IsAnimationFinished() {
 		c.SetNewStateFatal(Dead)
-		return
+		return true
 	}
+	return state == Exiting || state == Dying || state == Dead
+}
 
-	// When the character is exiting, dying or dead, the state no longer changes.
-	if state == Exiting || state == Dying || state == Dead {
-		return
+// pollStateContributors polls registered StateContributors.
+// Skips when Hurted so the animation completes before anything overrides it.
+func (c *Character) pollStateContributors() bool {
+	if c.state.State() == Hurted {
+		return false
 	}
-
-	// Allow game-specific logic to override the default behavior
-	if c.StateTransitionHandler != nil && c.StateTransitionHandler(c) {
-		return
-	}
-
-	if c.Health() <= 0 && state != Dying {
-		c.SetNewStateFatal(Dying)
-		return
-	}
-
-	// Get grounded state from any model that implements Grounded.
-	// Default to true for models without grounding semantics (e.g. top-down).
-	onGround := true
-	if g, ok := c.movementModel.(physicsmovement.Grounded); ok {
-		onGround = g.OnGround()
-	}
-
-	setNewState := func(s ActorStateEnum) {
-		state, err := c.NewState(s)
-		if err != nil {
-			log.Fatal(err)
-		}
-		c.SetState(state)
-	}
-
-	// Poll skill state contributors before default movement transitions.
-	// Skip during animation-critical states so Hurted/Landing/Jumping finish correctly.
-	if state != Hurted && state != Landing && state != Jumping {
-		for _, sc := range c.stateContributors {
-			if target, ok := sc.ContributeState(state); ok {
-				setNewState(target)
-				return
+	for _, sc := range c.stateContributors {
+		if target, ok := sc.ContributeState(c.state.State()); ok {
+			s, err := c.NewState(target)
+			if err != nil {
+				log.Fatal(err)
 			}
+			c.SetState(s)
+			return true
 		}
 	}
-
-	switch {
-	case state == Hurted:
-		isAnimationOver := c.state.IsAnimationFinished()
-		if isAnimationOver {
-			setNewState(Idle)
-		}
-	case state == Landing:
-		isAnimationOver := c.state.IsAnimationFinished()
-		if c.IsWalking() && onGround {
-			setNewState(Walking)
-		} else if isAnimationOver {
-			setNewState(Idle)
-		}
-	case state == Jumping:
-		if c.IsFalling() {
-			setNewState(Falling)
-			return
-		}
-		isAnimationOver := c.state.IsAnimationFinished()
-		if isAnimationOver && onGround {
-			setNewState(Idle)
-		}
-	case state == Falling && !c.IsFalling() && onGround:
-		setNewState(Landing)
-	case c.IsGoingUp():
-		setNewState(Jumping)
-	case state != Falling && c.IsFalling():
-		setNewState(Falling)
-	case state == Ducking && !c.IsDucking():
-		setNewState(Idle)
-	case state != Ducking && c.IsDucking():
-		setNewState(Ducking)
-	case state != Walking && c.IsWalking() && onGround:
-		setNewState(Walking)
-	case state != Idle && c.IsIdle() && onGround:
-		setNewState(Idle)
-	}
-
-	debug.Watch("player_state", c.ID(), c.state.State())
+	return false
 }
 
 func (c *Character) Hurt(damage int) {

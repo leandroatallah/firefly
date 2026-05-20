@@ -4,10 +4,126 @@ import (
 	"image"
 	"testing"
 
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
+	"github.com/boilerplate/ebiten-template/internal/engine/contracts/tilemaplayer"
+	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
 	bodyphysics "github.com/boilerplate/ebiten-template/internal/engine/physics/body"
+	physicsmovement "github.com/boilerplate/ebiten-template/internal/engine/physics/movement"
 	"github.com/boilerplate/ebiten-template/internal/engine/render/sprites"
+	"github.com/hajimehoshi/ebiten/v2"
 )
+
+func init() {
+	config.Set(&config.AppConfig{
+		Physics: config.PhysicsConfig{
+			DownwardGravity: 4,
+			UpwardGravity:   2,
+		},
+	})
+}
+
+type stubSpace struct{ body.BodiesSpace }
+
+func (s *stubSpace) GetTilemapDimensionsProvider() tilemaplayer.TilemapDimensionsProvider {
+	return nil
+}
+func (s *stubSpace) Query(_ image.Rectangle) []body.Collidable        { return nil }
+func (s *stubSpace) ResolveCollisions(_ body.Collidable) (bool, bool) { return false, false }
+
+func newPlatformerTestCharacter(states ...actors.ActorStateEnum) *actors.Character {
+	img := ebiten.NewImage(1, 1)
+	sMap := sprites.SpriteMap{
+		actors.Idle:    &sprites.Sprite{Image: img},
+		actors.Walking: &sprites.Sprite{Image: img},
+		actors.Jumping: &sprites.Sprite{Image: img},
+		actors.Falling: &sprites.Sprite{Image: img},
+		actors.Landing: &sprites.Sprite{Image: img},
+		actors.Hurted:  &sprites.Sprite{Image: img},
+		actors.Dying:   &sprites.Sprite{Image: img},
+		actors.Dead:    &sprites.Sprite{Image: img},
+	}
+	rect := bodyphysics.NewRect(0, 0, 16, 16)
+	c := actors.NewCharacter(sMap, rect)
+	c.SetMaxHealth(100)
+	c.SetHealth(100)
+	c.SetMovementTransitionHandler(platformerMovementTransitions)
+	if len(states) > 0 && states[0] != actors.Idle {
+		s, _ := c.NewState(states[0])
+		c.SetState(s)
+	}
+	return c
+}
+
+// JumpingToIdle/LandingToIdle/FallingToLanding use no movement model so
+// UpdateMovement is a no-op and onGround defaults to true.
+
+func TestPlatformerMovement_JumpingToIdle(t *testing.T) {
+	c := newPlatformerTestCharacter(actors.Jumping)
+	c.Update(nil)
+	if c.State() != actors.Idle {
+		t.Errorf("expected Idle, got %v", c.State())
+	}
+}
+
+func TestPlatformerMovement_LandingToIdle(t *testing.T) {
+	c := newPlatformerTestCharacter(actors.Landing)
+	c.Update(nil)
+	if c.State() != actors.Idle {
+		t.Errorf("expected Idle, got %v", c.State())
+	}
+}
+
+func TestPlatformerMovement_FallingToLanding(t *testing.T) {
+	c := newPlatformerTestCharacter(actors.Falling)
+	c.Update(nil)
+	if c.State() != actors.Landing {
+		t.Errorf("expected Landing, got %v", c.State())
+	}
+}
+
+func TestPlatformerMovement_JumpFlicker(t *testing.T) {
+	c := newPlatformerTestCharacter(actors.Jumping)
+	model := physicsmovement.NewPlatformMovementModel(nil)
+	model.SetOnGround(false)
+	c.SetMovementModel(model)
+	c.SetVelocity(0, -100)
+	c.Update(&stubSpace{})
+	if c.State() != actors.Jumping {
+		t.Errorf("expected Jumping while vy < 0 and airborne, got %v", c.State())
+	}
+}
+
+func TestPlatformerMovement_AirPeakStaysJumping(t *testing.T) {
+	config.Set(&config.AppConfig{
+		ScreenWidth:  256,
+		ScreenHeight: 240,
+		Physics: config.PhysicsConfig{
+			SpeedMultiplier: 1.0,
+			DownwardGravity: 5,
+			UpwardGravity:   4,
+			MaxFallSpeed:    100,
+		},
+	})
+
+	c := newPlatformerTestCharacter(actors.Jumping)
+	c.SetMaxSpeed(100)
+	model := physicsmovement.NewPlatformMovementModel(nil)
+	model.SetOnGround(false)
+	c.SetMovementModel(model)
+	c.SetVelocity(0, -4)
+	c.Update(&stubSpace{})
+	if c.State() != actors.Jumping {
+		_, curVy := c.Velocity()
+		t.Errorf("expected Jumping at air peak (vy=%d), got %v", curVy, c.State())
+	}
+
+	c.SetVelocity(0, 5)
+	c.Update(&stubSpace{})
+	if c.State() != actors.Falling {
+		t.Errorf("expected Falling when vy >= threshold, got %v", c.State())
+	}
+}
 
 func TestPlatformerCharacter_SetOnJump(t *testing.T) {
 	character := &PlatformerCharacter{}
