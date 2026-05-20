@@ -42,8 +42,8 @@ For **cross-story sequencing** (what to work on next, dependencies between stori
 
 - [x] Story Architect
 - [x] Spec Engineer
-- [/] Mock Generator   ← Use [/] for In Progress
-- [ ] TDD Specialist
+- [-] Mock Generator   ← Use [-] for Skipped (design decision rules it out)
+- [/] TDD Specialist   ← Use [/] for In Progress
 - [ ] Feature Implementer
 - [ ] Workflow Gatekeeper
 
@@ -55,6 +55,9 @@ Agents must log **twice** per stage: once at the start and once at completion.
   Example:
   `- [Gemini] [Mock Generator] 2026-04-15 [STARTED]: Generating mocks for ICombat interface.`
   `- [Gemini] [Mock Generator] 2026-04-15 [FINISHED]: Mocks created in internal/engine/mocks/mock_combat.go.`
+  
+When skipping a stage due to design decision (e.g., no contracts needed), log once:
+  `- [Gemini] [Mock Generator] 2026-04-15 [SKIPPED]: No contract interfaces — mocks not required per SPEC.`
 ```
 
 The Log section is the agent's working memory. **Mandatory Logging:**
@@ -81,7 +84,8 @@ Transforms the story into a Technical Specification: interface contracts, state 
 
 ### 3. Mock Generator (`@mock-generator`)
 Inspects `internal/engine/contracts/` and `internal/engine/mocks/`, generates or updates mocks required by the spec.
-- Updates `PROGRESS.md` (or marks "skipped — no mocks required").
+- If spec requires mocks: generates them, updates `PROGRESS.md` with `[x]`, logs `[FINISHED]`.
+- If spec has no contracts (e.g., leaf-utility package): marks `PROGRESS.md` with `[-]`, logs `[SKIPPED]` with reason.
 
 ### 4. TDD Specialist (`@tdd-specialist`)
 Writes failing `_test.go` files (Red phase) that exactly match the Spec's acceptance criteria.
