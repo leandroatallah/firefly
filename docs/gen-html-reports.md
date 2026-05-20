@@ -186,6 +186,18 @@ func main() {
 }
 ```
 
+### With Claude Code (`/gen-diff-report`)
+
+The recommended way to generate diff reports without writing JSON manually.
+
+With unstaged changes in your working tree, run in Claude Code:
+
+```
+/gen-diff-report
+```
+
+Claude Code reads `git diff`, builds the JSON, saves it to `output/tmp/input-<slug>.json`, runs `make gen-diff`, and reports the output path. Preview with `make serve`.
+
 ### From External Tools
 
 Agents and scripts can generate JSON and pipe to the commands:
@@ -193,9 +205,6 @@ Agents and scripts can generate JSON and pipe to the commands:
 ```bash
 # From a bash script
 my-diff-generator | ./scripts/gen/cmd/diff/diff
-
-# From Python
-python3 gen_domain_docs.py | go run scripts/gen/cmd/domain-docs
 ```
 
 ### Output Directories
