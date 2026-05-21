@@ -209,3 +209,125 @@ func (m *testCollidable) Altitude() int           { return 0 }
 func (m *testCollidable) SetAltitude(alt int)     {}
 func (m *testCollidable) Altitude16() int         { return 0 }
 func (m *testCollidable) SetAltitude16(alt16 int) {}
+
+// depthLaneCollidable embeds *testCollidable and adds the DepthLaneBody
+// opt-in surface (GroundY, LaneHalfWidth). It is used to drive the
+// depth-aware collision gating tests for story 062.
+type depthLaneCollidable struct {
+	*testCollidable
+	groundY       int
+	laneHalfWidth int
+}
+
+func (d *depthLaneCollidable) GroundY() int       { return d.groundY }
+func (d *depthLaneCollidable) LaneHalfWidth() int { return d.laneHalfWidth }
+
+// TestHasCollisionDepthLane verifies that HasCollision applies depth-lane
+// gating when BOTH bodies opt-in via the DepthLaneBody interface. When only
+// one (or neither) side opts in, the legacy 2D bbox-overlap behavior must be
+// preserved.
+//
+// Algorithm under test:
+//  1. bbox overlap first (short-circuit on miss)
+//  2. if BOTH bodies implement DepthLaneBody, additionally require
+//     abs(a.GroundY() - b.GroundY()) <= max(a.LaneHalfWidth(), b.LaneHalfWidth())
+func TestHasCollisionDepthLane(t *testing.T) {
+	type bodySpec struct {
+		rect    image.Rectangle
+		groundY int
+		halfW   int
+		optIn   bool
+	}
+
+	makeBody := func(id string, s bodySpec) contractsbody.Collidable {
+		base := newTestCollidable(id, s.rect, false)
+		if !s.optIn {
+			return base
+		}
+		return &depthLaneCollidable{
+			testCollidable: base,
+			groundY:        s.groundY,
+			laneHalfWidth:  s.halfW,
+		}
+	}
+
+	cases := []struct {
+		name string
+		a    bodySpec
+		b    bodySpec
+		want bool
+	}{
+		{
+			name: "T-062-1 same-lane bbox overlap returns true",
+			a:    bodySpec{rect: image.Rect(0, 0, 10, 10), groundY: 100, halfW: 8, optIn: true},
+			b:    bodySpec{rect: image.Rect(5, 5, 15, 15), groundY: 104, halfW: 8, optIn: true},
+			want: true,
+		},
+		{
+			name: "T-062-2 different-lane bbox overlap returns false",
+			a:    bodySpec{rect: image.Rect(0, 0, 10, 10), groundY: 100, halfW: 8, optIn: true},
+			b:    bodySpec{rect: image.Rect(5, 5, 15, 15), groundY: 120, halfW: 8, optIn: true},
+			want: false,
+		},
+		{
+			name: "T-062-3 legacy 2D bbox overlap when neither opts in",
+			a:    bodySpec{rect: image.Rect(0, 0, 10, 10), optIn: false},
+			b:    bodySpec{rect: image.Rect(5, 5, 15, 15), optIn: false},
+			want: true,
+		},
+		{
+			name: "T-062-4 same-lane but no bbox overlap returns false",
+			a:    bodySpec{rect: image.Rect(0, 0, 10, 10), groundY: 100, halfW: 8, optIn: true},
+			b:    bodySpec{rect: image.Rect(50, 50, 60, 60), groundY: 100, halfW: 8, optIn: true},
+			want: false,
+		},
+		{
+			name: "T-062-5 halfW=0 with equal GroundY returns true",
+			a:    bodySpec{rect: image.Rect(0, 0, 10, 10), groundY: 100, halfW: 0, optIn: true},
+			b:    bodySpec{rect: image.Rect(5, 5, 15, 15), groundY: 100, halfW: 0, optIn: true},
+			want: true,
+		},
+		{
+			name: "T-062-6 halfW=0 with GroundY off by one returns false",
+			a:    bodySpec{rect: image.Rect(0, 0, 10, 10), groundY: 100, halfW: 0, optIn: true},
+			b:    bodySpec{rect: image.Rect(5, 5, 15, 15), groundY: 101, halfW: 0, optIn: true},
+			want: false,
+		},
+		{
+			name: "T-062-7 mixed opt-in falls back to legacy 2D overlap",
+			a:    bodySpec{rect: image.Rect(0, 0, 10, 10), groundY: 100, halfW: 8, optIn: true},
+			b:    bodySpec{rect: image.Rect(5, 5, 15, 15), optIn: false},
+			want: true,
+		},
+		{
+			name: "T-062-8A asymmetric halfW uses max and passes",
+			a:    bodySpec{rect: image.Rect(0, 0, 10, 10), groundY: 100, halfW: 2, optIn: true},
+			b:    bodySpec{rect: image.Rect(5, 5, 15, 15), groundY: 108, halfW: 10, optIn: true},
+			want: true,
+		},
+		{
+			name: "T-062-8B asymmetric halfW uses max and fails",
+			a:    bodySpec{rect: image.Rect(0, 0, 10, 10), groundY: 100, halfW: 2, optIn: true},
+			b:    bodySpec{rect: image.Rect(5, 5, 15, 15), groundY: 111, halfW: 10, optIn: true},
+			want: false,
+		},
+		{
+			name: "T-062-9 equal GroundY with bbox overlap returns true",
+			a:    bodySpec{rect: image.Rect(0, 0, 10, 10), groundY: 100, halfW: 8, optIn: true},
+			b:    bodySpec{rect: image.Rect(5, 5, 15, 15), groundY: 100, halfW: 8, optIn: true},
+			want: true,
+		},
+	}
+
+	for _, tc := range cases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			a := makeBody("a", tc.a)
+			b := makeBody("b", tc.b)
+
+			if got := HasCollision(a, b); got != tc.want {
+				t.Fatalf("HasCollision(a, b) = %v, want %v", got, tc.want)
+			}
+		})
+	}
+}
