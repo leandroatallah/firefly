@@ -29,7 +29,7 @@ Each story moves through the pipeline as a self-contained folder:
 
 `PROGRESS.md` is the single source of truth for **per-story pipeline state**. Every agent updates it before finishing.
 
-For **cross-story sequencing** (what to work on next, dependencies between stories), see [`.agents/work/ROADMAP.md`](work/ROADMAP.md). Story IDs do not imply execution order.
+For **cross-story sequencing** (what to work on next, dependencies between stories), see the active epic's `ROADMAP.md` under `.agents/work/epics/[epic]/ROADMAP.md`. The epic index is at [`.agents/work/ROADMAP.md`](work/ROADMAP.md). Story IDs do not imply execution order.
 
 ## PROGRESS.md Format
 

@@ -15,7 +15,9 @@ Where to find persistent context across sessions:
 | Why a design decision was made | `docs/adr/` |
 | Ubiquitous language + non-negotiable standards | `.agents/constitution.md` |
 | Active / backlog / done stories | `.agents/work/` |
-| Cross-story sequencing (what to do next, dependencies) | `.agents/work/ROADMAP.md` |
+| Active epic (goal, AC, child stories) | `.agents/work/epics/[epic]/EPIC.md` |
+| Cross-story sequencing (what to do next, dependencies) | `.agents/work/epics/[epic]/ROADMAP.md` |
+| Epic index (what epics exist) | `.agents/work/ROADMAP.md` |
 | SDD pipeline (Story → Spec → TDD → Code) | `.agents/WORKFLOW.md` |
 | Testing patterns + coverage priorities | `AGENTS.md` |
 | Engine internals | `internal/engine/README.md` |
