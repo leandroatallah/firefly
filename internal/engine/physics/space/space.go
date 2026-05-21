@@ -220,6 +220,18 @@ func collisionRects(b body.Collidable) []image.Rectangle {
 	return rects
 }
 
+// HasCollision reports whether two bodies are currently colliding.
+//
+// The check runs in two phases:
+//  1. 2D AABB overlap on the bodies' collision rectangles (screen-space).
+//     This is the only check that runs for plain 2D bodies.
+//  2. Depth-lane gate (opt-in, 2.5D): if BOTH a and b implement
+//     DepthLaneBody, an additional constraint requires their ground-Y
+//     coordinates to lie within max(a.LaneHalfWidth, b.LaneHalfWidth) of
+//     each other. This filters bbox overlaps that LOOK on-screen but
+//     happen at different floor depths in a 2.5D beat-em-up plane.
+//
+// Returns false for empty IDs or self-pair.
 func HasCollision(a, b body.Collidable) bool {
 	// Every body must have an ID
 	if a.ID() == "" || b.ID() == "" {
@@ -234,6 +246,9 @@ func HasCollision(a, b body.Collidable) bool {
 	rectsA := collisionRects(a)
 	rectsB := collisionRects(b)
 
+	// Phase 1 — 2D bbox overlap (screen-space AABB).
+	// A miss here short-circuits; bodies that do not visually overlap can
+	// never collide, regardless of depth.
 	bboxOverlap := false
 	for _, r := range rectsA {
 		for _, s := range rectsB {
@@ -251,16 +266,26 @@ func HasCollision(a, b body.Collidable) bool {
 		return false
 	}
 
+	// Phase 2 — depth-lane gate (opt-in, 2.5D).
+	// When BOTH bodies implement DepthLaneBody, the bbox overlap alone is
+	// not enough: their ground projections must also lie within the same
+	// depth lane. Bodies that do not opt in keep the legacy 2D behavior
+	// (bbox overlap == collision), so plain 2D scenes are unaffected.
 	da, okA := a.(DepthLaneBody)
 	db, okB := b.(DepthLaneBody)
 	if !okA || !okB {
 		return true
 	}
 
+	// Pair tolerance is the LARGER of the two half-widths so a "wide" body
+	// (e.g. a hitbox tuned to forgive depth misalignment) governs the match.
 	tol := da.LaneHalfWidth()
 	if db.LaneHalfWidth() > tol {
 		tol = db.LaneHalfWidth()
 	}
+	// Compare ground-Y (depth axis, pre-altitude) — NOT screen-Y. This is
+	// why DepthLaneBody exposes GroundY() explicitly rather than reusing
+	// GetPosition16(), whose Y already has altitude subtracted.
 	diff := da.GroundY() - db.GroundY()
 	if diff < 0 {
 		diff = -diff
