@@ -47,16 +47,28 @@ func FromConfig(cfg *schemas.SkillsConfig, deps SkillDeps) []skill.Skill {
 
 	// Jump skill
 	if cfg.Jump != nil && isEnabled(cfg.Jump.Enabled) {
-		jumpSkill := NewJumpSkill()
-		if cfg.Jump.JumpCutMultiplier > 0 {
-			jumpSkill.SetJumpCutMultiplier(cfg.Jump.JumpCutMultiplier)
-		}
-		if deps.OnJump != nil {
-			jumpSkill.OnJump = func(b body.MovableCollidable) {
-				deps.OnJump(b)
+		isBeatEmUp := cfg.Movement != nil && cfg.Movement.Mode == schemas.MovementModeEightDir
+		if isBeatEmUp {
+			js := NewBeatEmUpJumpSkill()
+			if cfg.Jump.JumpCutMultiplier > 0 {
+				js.SetJumpCutMultiplier(cfg.Jump.JumpCutMultiplier)
 			}
+			if deps.OnJump != nil {
+				js.OnJump = func(b body.MovableCollidable) { deps.OnJump(b) }
+			}
+			skills = append(skills, js)
+		} else {
+			jumpSkill := NewJumpSkill()
+			if cfg.Jump.JumpCutMultiplier > 0 {
+				jumpSkill.SetJumpCutMultiplier(cfg.Jump.JumpCutMultiplier)
+			}
+			if deps.OnJump != nil {
+				jumpSkill.OnJump = func(b body.MovableCollidable) {
+					deps.OnJump(b)
+				}
+			}
+			skills = append(skills, jumpSkill)
 		}
-		skills = append(skills, jumpSkill)
 	}
 
 	// Dash skill

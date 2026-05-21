@@ -25,6 +25,12 @@ func (m *BeatEmUpMovementModel) SetIsScripted(isScripted bool) {
 	m.isScripted = isScripted
 }
 
+// IsInputBlocked reports whether player input should be ignored.
+// Satisfies the movement.InputBlocker interface.
+func (m *BeatEmUpMovementModel) IsInputBlocked() bool {
+	return m.playerMovementBlocker != nil && m.playerMovementBlocker.IsMovementBlocked()
+}
+
 func (m *BeatEmUpMovementModel) Update(b body.MovableCollidable, space body.BodiesSpace) error {
 	if b.Freeze() {
 		return nil
