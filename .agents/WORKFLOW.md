@@ -80,7 +80,24 @@ Transforms the story into a Technical Specification: interface contracts, state 
 | File | Audience | Content |
 |---|---|---|
 | `SPEC.md` | Agents | Signatures, pseudocode, `pre/act/post` test triples, post-conditions. No prose rationale. |
-| `NOTES.md` | Humans | **Design Choices** (why we chose X over Y; non-obvious constraints). **Risks** (quantization, regressions, gotchas). **Future** (brief list of out-of-scope work). Max 1 page. Drop: investigation findings (in SPEC + git blame) and exploration details. |
+| `NOTES.md` | Humans | **Design Choices** (why we chose X over Y; non-obvious constraints). **Risks** (quantization, regressions, gotchas). **Future** (brief list of out-of-scope work). **Playtest** (see below). Max 1 page. Drop: investigation findings (in SPEC + git blame) and exploration details. |
+
+**NOTES.md — Playtest section:**
+
+Add a `## Playtest` section so it's clear how to observe the story's behaviour after implementation:
+
+```markdown
+## Playtest
+
+**Standalone:** Yes — run `go run cmd/game/main.go`, [steps to reproduce].
+
+-- or --
+
+**Standalone:** No — requires story [ID]-[slug] (input binding / next mechanic).
+Until then, verified via unit tests only.
+```
+
+Spec Engineer fills this in. If the story is testable in isolation, provide the minimal steps. If it depends on a later story to wire up the trigger or UI, say so explicitly so the developer knows not to expect visible behaviour after this story alone.
 
 ### 3. Mock Generator (`@mock-generator`)
 Inspects `internal/engine/contracts/` and `internal/engine/mocks/`, generates or updates mocks required by the spec.
