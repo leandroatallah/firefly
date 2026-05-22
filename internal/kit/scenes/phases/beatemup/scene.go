@@ -31,6 +31,7 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/utils"
 	"github.com/boilerplate/ebiten-template/internal/engine/utils/timing"
 	beatemupkit "github.com/boilerplate/ebiten-template/internal/kit/actors/beatemup"
+	"github.com/boilerplate/ebiten-template/internal/kit/render/shadow"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/vector"
 )
@@ -87,6 +88,11 @@ type BeatemupPhaseScene struct {
 
 	// actorDrawHandler overrides the draw loop per actor (used in tests to record draw order).
 	actorDrawHandler func(screen *ebiten.Image, b body.Collidable) bool
+
+	// shadowDrawer overrides the shadow draw pass (used in tests to record draw order).
+	// Red-Phase: field exists but is never invoked by DrawActors; the Feature
+	// Implementer will wire it into the draw pipeline.
+	shadowDrawer func(screen *ebiten.Image, bodies []body.Collidable)
 
 	// Debug hook invoked at the end of Draw.
 	debugDrawHook func(*ebiten.Image)
@@ -546,6 +552,11 @@ func (s *BeatemupPhaseScene) DrawActors(screen *ebiten.Image) {
 	if s.space == nil {
 		return
 	}
+	if s.shadowDrawer != nil {
+		s.shadowDrawer(screen, s.space.Bodies())
+	} else {
+		shadow.DrawAll(screen, s.camera, s.space.Bodies())
+	}
 	for _, b := range draworder.SortByGroundYAltitude(s.space.Bodies()) {
 		if s.actorDrawHandler != nil {
 			s.actorDrawHandler(screen, b)
@@ -582,6 +593,7 @@ func (s *BeatemupPhaseScene) fullDraw(screen *ebiten.Image) {
 	tilemapImg, _ := s.tilemapScene.Tilemap().Image(screen)
 	s.camera.Draw(tilemapImg, s.tilemapScene.Tilemap().ImageOptions(), screen)
 	space := s.space
+	shadow.DrawAll(screen, s.camera, space.Bodies())
 	for _, b := range draworder.SortByGroundYAltitude(space.Bodies()) {
 		switch sb := b.(type) {
 		case beatemupkit.BeatEmUpActorEntity:
@@ -712,6 +724,12 @@ func (s *BeatemupPhaseScene) AddBodyForTest(b body.Collidable) {
 // record the draw order without a full graphics context.
 func (s *BeatemupPhaseScene) SetActorDrawHandlerForTest(f func(*ebiten.Image, body.Collidable) bool) {
 	s.actorDrawHandler = f
+}
+
+// SetShadowDrawerForTest overrides the shadow draw pass so tests can record
+// the relative draw order between shadows and actors.
+func (s *BeatemupPhaseScene) SetShadowDrawerForTest(f func(*ebiten.Image, []body.Collidable)) {
+	s.shadowDrawer = f
 }
 
 // SpaceContainsBodyForTest reports whether the given body is still in the space.

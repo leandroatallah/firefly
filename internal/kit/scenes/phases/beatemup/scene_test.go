@@ -231,3 +231,40 @@ func TestBeatemupPhaseScene_CameraNotVerticalOnlyUpward(t *testing.T) {
 		t.Error("beat-em-up camera must NOT have VerticalOnlyUpward set; got true")
 	}
 }
+
+// --- T-S8 (063-shadow-component): shadow drawn before actor sprite ---------
+
+func TestBeatemupPhaseScene_ShadowDrawnBeforeActor(t *testing.T) {
+	scene := beatemupphasescene.NewForTest(beatemupphasescene.TestOptions{
+		ScreenWidth:  320,
+		ScreenHeight: 200,
+	})
+
+	// One airborne body (alt16 > 0).
+	airborne := newMockBeatEmUpActor("air", 0, 16)
+	scene.AddBodyForTest(airborne)
+
+	var order []string
+	scene.SetShadowDrawerForTest(func(_ *ebiten.Image, bodies []body.Collidable) {
+		for _, b := range bodies {
+			order = append(order, "shadow("+b.ID()+")")
+		}
+	})
+	scene.SetActorDrawHandlerForTest(func(_ *ebiten.Image, b body.Collidable) bool {
+		order = append(order, "actor("+b.ID()+")")
+		return true
+	})
+
+	headless := ebiten.NewImage(320, 200)
+	scene.DrawActors(headless)
+
+	want := []string{"shadow(air)", "actor(air)"}
+	if len(order) != len(want) {
+		t.Fatalf("draw order length = %d, want %d (got %v)", len(order), len(want), order)
+	}
+	for i := range want {
+		if order[i] != want[i] {
+			t.Fatalf("draw order = %v; want %v", order, want)
+		}
+	}
+}
