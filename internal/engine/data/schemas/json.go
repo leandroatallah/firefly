@@ -21,6 +21,7 @@ func (s ShapeRect) Rect() (x, y, width, height int) {
 type AssetData struct {
 	Path           string      `json:"path"`
 	CollisionRects []ShapeRect `json:"collision_rect"`
+	FootprintRect  *ShapeRect  `json:"footprint_rect,omitempty"`
 	Loop           *bool       `json:"loop,omitempty"`
 }
 
