@@ -1,5 +1,12 @@
 # ADR-009 — Per-Actor State Instance Override
 
+## Quick Reference
+
+- **When to cite:** State needs complex constructor args OR shared instance across multiple enums (e.g., melee combo steps).
+- **Key constraint:** Override map populated at wiring time only; per-actor, no cross-actor leakage.
+- **DO:** Use `InstallState` helper; call `SetStateInstance` for all related enums pointing to the same instance.
+- **DON'T:** Use registry factory when state requires shared identity across combo steps. See ADR-002 for the default path.
+
 ## Status
 Accepted
 

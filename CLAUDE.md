@@ -1,10 +1,12 @@
 # Standards
 
+**Scope:** Entry point + context map. Standards → `.agents/constitution.md`. Testing patterns → `.agents/TESTING.md`. Pipeline → `.agents/WORKFLOW.md`. Architecture → `.agents/ARCHITECTURE_MAP.md`.
+
 See `.agents/constitution.md` for non-negotiable project standards (language, architecture, ubiquitous language, test rules).
 
 ---
 
-See `AGENTS.md` for the primary workflow and skills reference.
+See `AGENTS.md` for coverage priorities, code style, and story management scripts.
 
 ## Context Map
 

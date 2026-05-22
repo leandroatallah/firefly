@@ -1,5 +1,12 @@
 # ADR-008 — StateContributor Hook for Extensible State Transitions
 
+## Quick Reference
+
+- **When to cite:** Adding a skill-driven compound state (dash, shoot, or combinations).
+- **Key constraint:** Polled after `StateTransitionHandler`, before built-in movement. First `(state, true)` wins. Skipped during `Hurted`/`Landing`/`Jumping`.
+- **DO:** Implement `StateContributor` in game layer; wire via `WireStateContributors`. Order matters — register dash before shoot if dash takes precedence.
+- **DON'T:** Wedge game-specific states into engine `handleState`; each contributor must not re-check animation-critical guard (handled centrally).
+
 ## Status
 Accepted
 

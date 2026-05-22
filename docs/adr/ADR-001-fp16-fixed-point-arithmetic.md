@@ -1,5 +1,12 @@
 # ADR-001 — FP16 Fixed-Point Arithmetic for Positions
 
+## Quick Reference
+
+- **When to cite:** Any position/velocity math or physics calculation.
+- **Key constraint:** 1 pixel = 16 units. Use `<<4`, not `<<16`. See ADR-007 for scale clarification.
+- **DO:** `x16 := pixel << 4` · `velocity := pixels * 16` · use `fp16.To16` / `fp16.From16`.
+- **DON'T:** Mix pixel-space and x16 values without conversion.
+
 ## Status
 Accepted
 

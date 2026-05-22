@@ -1,5 +1,12 @@
 # ADR-003 — Goroutine-Based Audio Looping
 
+## Quick Reference
+
+- **When to cite:** Implementing audio looping, pause, or fade-out.
+- **Key constraint:** ~100ms polling gap at loop point — not sample-accurate. Each track owns one goroutine.
+- **DO:** Use `fadeCancel` to stop loops; always cancel before starting a new loop on the same track.
+- **DON'T:** Use for sample-accurate loops; leave goroutines running without a cancel path.
+
 ## Status
 Accepted
 

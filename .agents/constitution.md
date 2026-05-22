@@ -15,17 +15,17 @@ Every agent in this pipeline MUST read this file before producing any output. Th
 
 Use these terms consistently across all stories, specs, and code:
 
-| Term | Meaning |
-|---|---|
-| `Actor` | An entity with a state machine (player, enemy) |
-| `Item` | A collectible or interactable entity |
-| `Body` | A physics body with position and velocity |
-| `Space` / `BodiesSpace` | The physics world that holds and updates bodies |
-| `Scene` | A self-contained game state (menu, phase, cutscene) |
-| `Phase` | A playable game level scene |
-| `Sequence` | A scripted, frame-by-frame event chain |
-| `Contract` | A Go interface in `internal/engine/contracts/` |
-| `State` | A named node in an Actor's state machine |
+| Term | Meaning | Package |
+|---|---|---|
+| `Actor` | An entity with a state machine (player, enemy) | `internal/engine/entity/actors` |
+| `Item` | A collectible or interactable entity | `internal/engine/entity/items` |
+| `Body` | A physics body with position and velocity | `internal/engine/physics/body` |
+| `Space` / `BodiesSpace` | The physics world that holds and updates bodies | `internal/engine/physics/space` |
+| `Scene` | A self-contained game state (menu, phase, cutscene) | `internal/engine/scene` |
+| `Phase` | A playable game level scene | `internal/game/scenes/phases` |
+| `Sequence` | A scripted, frame-by-frame event chain | `internal/engine/sequences` |
+| `Contract` | A Go interface in `internal/engine/contracts/` | `internal/engine/contracts` |
+| `State` | A named node in an Actor's state machine | `internal/engine/entity/actors` |
 
 ## Bounded Contexts
 

@@ -1,6 +1,6 @@
 # Agent Guidelines
 
-This document provides specialized instructions for AI agents working on this project. Coverage targets, testing patterns, workflow scripts, and code style rules are all here.
+**Scope:** Coverage priorities, code style, story management scripts. Testing patterns → `.agents/TESTING.md`. Pipeline stages → `.agents/WORKFLOW.md`. Standards → `.agents/constitution.md`.
 
 ## 🎯 Goal
 
@@ -20,62 +20,7 @@ Achieve **80%+ test coverage** across the codebase, prioritizing the engine's en
 
 ## 🛠 Testing Strategy & Patterns
 
-### 1. Table-Driven Tests
-
-Prefer table-driven tests for logic with multiple input/output scenarios (e.g., movement, collisions, math).
-
-```go
-tests := []struct {
-    name    string
-    input   int
-    want    int
-}{
-    {"Case A", 1, 2},
-    {"Case B", 2, 4},
-}
-```
-
-### 2. Mocking & Contracts
-
-- Use the interfaces in `internal/engine/contracts/` to create mock implementations for testing.
-- **Reusable Mocks**: If a mock is used in more than one test file across different packages, place it in `internal/engine/mocks`. This prevents code duplication.
-- **Package-Specific Mocks**: If a mock is only relevant to a single package, define it within the `_test.go` file of that package or a `mocks_test.go` file in the same directory.
-- Avoid using actual Ebitengine windows or GPU-dependent code in unit tests.
-- Mock `BodiesSpace` to test `Actor` or `Item` updates in isolation.
-
-### 3. Physics & Fixed-Point Arithmetic
-
-- Always validate positions using `fp16.From16()` and `fp16.To16()` when checking `x16` and `y16` values.
-- **Important**: The fp16 scale factor is 16, not 65536. See [ADR-007](docs/adr/ADR-007-fp16-scale-factor.md).
-  - 1 pixel = 16 units (not 65536)
-  - Use `<<4` for pixel-to-fp16 conversion (not `<<16`)
-  - Velocity of 6 pixels/frame = 96 units/frame (not 393216)
-- Test edge cases for collisions:
-  - One pixel before collision.
-  - Partial overlap.
-  - Full overlap.
-  - Multiple collidables in one space.
-  - Fast movement (skipping over thin walls).
-
-### 4. Scene Lifecycle
-
-- Test that `OnStart()`, `Update()`, `Draw()`, and `OnFinish()` are called in the correct order.
-- Validate `NavigateTo` and `NavigateBack` logic using a mock `SceneManager`.
-
-### 5. Headless Ebitengine
-
-- For tests that require an `ebiten.Image`, use `ebiten.NewImage(w, h)` in a headless environment.
-- Avoid tests that depend on human interaction or specific frame timings (use `timing` package mocks).
-
-### 6. Internationalization (i18n)
-
-- The `I18nManager` loads translations from `assets/lang/{langCode}.json` files.
-- Use `T(key, args...)` to retrieve translated strings with optional `fmt.Sprintf`-style formatting.
-- When testing i18n-dependent code:
-  - Create a mock `fs.FS` using `embed.FS` or `fstest.MapFS` for unit tests.
-  - Test missing keys (should return the key itself as fallback).
-  - Test formatting arguments: `T("key_with_%d", count)`.
-  - Test missing language files (should return an error from `Load()`).
+See **[`.agents/TESTING.md`](.agents/TESTING.md)** for all patterns and examples (table-driven tests, mocking, physics/fp16, scene lifecycle, headless Ebitengine, i18n).
 
 ## 📋 Feature Implementation Workflow
 
@@ -86,9 +31,7 @@ See **[`.agents/WORKFLOW.md`](.agents/WORKFLOW.md)** for the complete Spec-Drive
 1. **Check Dashboard**: Run `bash scripts/story.sh` to see what is currently in progress across all worktrees.
 2. **Analyze Coverage**: Use the coverage tools to identify gaps:
 ...
-3. **Double-Logging**: 
-   - **Start**: Mark `[/]` in `PROGRESS.md` and log `[STARTED]`.
-   - **Finish**: Mark `[x]` in `PROGRESS.md` and log `[FINISHED]`.
+3. **Progress**: Mark `[/]` in `PROGRESS.md` when starting; `[x]` when done.
 4. **Identify Gaps**: Read the source file and identify functions or branches with 0% coverage.
 4. **Create Test File**: If it doesn't exist, create `[filename]_test.go`.
 5. **Write Tests**: Follow the patterns in this document and the referenced skills. Ensure you test both "happy paths" and error/edge cases.
