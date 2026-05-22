@@ -38,9 +38,21 @@ func (m *BeatEmUpMovementModel) Update(b body.MovableCollidable, space body.Bodi
 
 	vx16, vy16 := b.Velocity()
 
-	// Apply previous-frame velocity with collision resolution
-	_, _, blockX := b.ApplyValidPosition(vx16, true, space)  // X axis
-	_, _, blockY := b.ApplyValidPosition(vy16, false, space) // Y axis
+	// Obstacle collision uses the ground-plane footprint regardless of altitude.
+	// Position() subtracts altitude from Y, so an airborne body's screen rect
+	// would falsely overlap background tiles above the walkable lane. Zeroing
+	// altitude temporarily makes the collision check use the shadow position,
+	// matching beat-em-up convention: walls block ground movement even when
+	// jumping, but background decorations never block.
+	savedAlt16 := b.Altitude16()
+	if savedAlt16 != 0 {
+		b.SetAltitude16(0)
+	}
+	_, _, blockX := b.ApplyValidPosition(vx16, true, space)
+	_, _, blockY := b.ApplyValidPosition(vy16, false, space)
+	if savedAlt16 != 0 {
+		b.SetAltitude16(savedAlt16)
+	}
 	debug.Watch("beatemup_vel", b.ID(), fmt.Sprintf("vx=%d vy=%d blockX=%v blockY=%v", vx16, vy16, blockX, blockY))
 	shapes := b.CollisionShapes()
 	debug.Watch("beatemup_collisions", b.ID(), fmt.Sprintf("count=%d shapes=%+v", len(shapes), shapes))

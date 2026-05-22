@@ -10,6 +10,7 @@ import (
 	bodyphysics "github.com/boilerplate/ebiten-template/internal/engine/physics/body"
 	physicsmovement "github.com/boilerplate/ebiten-template/internal/engine/physics/movement"
 	"github.com/boilerplate/ebiten-template/internal/engine/physics/space"
+	"github.com/boilerplate/ebiten-template/internal/engine/utils/fp16"
 )
 
 // -- Test helpers --------------------------------------------------------
@@ -67,7 +68,7 @@ func TestBeatEmUpJumpSkill_GroundedJumpFires(t *testing.T) {
 		s.HandleInput(actor, model, sp)
 	})
 
-	wantV := -cfg.Physics.JumpForce
+	wantV := -fp16.To16(cfg.Physics.JumpForce)
 	if got := actor.VAltitude16(); got != wantV {
 		t.Errorf("VAltitude16 after grounded jump: got %d, want %d", got, wantV)
 	}
@@ -126,7 +127,7 @@ func TestBeatEmUpJumpSkill_CoyoteJumpFires(t *testing.T) {
 		s.HandleInput(actor, model, sp)
 	})
 
-	wantV := -cfg.Physics.JumpForce
+	wantV := -fp16.To16(cfg.Physics.JumpForce)
 	if got := actor.VAltitude16(); got != wantV {
 		t.Errorf("VAltitude16 after coyote jump: got %d, want %d", got, wantV)
 	}
@@ -154,7 +155,7 @@ func TestBeatEmUpJumpSkill_BufferedJumpFiresOnLanding(t *testing.T) {
 
 	s.Update(actor, model)
 
-	wantV := -cfg.Physics.JumpForce
+	wantV := -fp16.To16(cfg.Physics.JumpForce)
 	if got := actor.VAltitude16(); got != wantV {
 		t.Errorf("VAltitude16 after buffered fire: got %d, want %d", got, wantV)
 	}

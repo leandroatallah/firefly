@@ -17,6 +17,7 @@ import (
 type EightDirectionalMovementSkill struct {
 	skill.SkillBase
 	activationKey ebiten.Key
+	wasMoving     bool
 }
 
 func NewEightDirectionalMovementSkill() *EightDirectionalMovementSkill {
@@ -47,6 +48,12 @@ func (s *EightDirectionalMovementSkill) HandleInput(b body.MovableCollidable, mo
 	speed := b.Speed()
 
 	debug.Watch("eight_dir_move", b.ID(), s.DebugCmd(cmds))
+
+	moving := cmds.Left || cmds.Right || cmds.Up || cmds.Down
+	if moving && !s.wasMoving {
+		debug.Log("skill_activated", "skill=EightDirectionalMovementSkill player=%s", b.ID())
+	}
+	s.wasMoving = moving
 
 	if cmds.Left {
 		b.OnMoveLeft(speed)

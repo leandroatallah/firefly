@@ -268,7 +268,11 @@ func (c *Character) Update(space body.BodiesSpace) error {
 
 	for _, s := range c.skills {
 		if activeSkill, ok := s.(skill.ActiveSkill); ok {
+			wasActive := activeSkill.IsActive()
 			activeSkill.HandleInput(c, c.movementModel, space)
+			if !wasActive && activeSkill.IsActive() {
+				debug.Log("skill_activated", "skill=%T player=%s key=%v", activeSkill, c.ID(), activeSkill.ActivationKey())
+			}
 		}
 		s.Update(c, c.movementModel)
 	}

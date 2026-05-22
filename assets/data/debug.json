@@ -1,6 +1,7 @@
 {
   "player_state": false,
   "skill_added": false,
+  "skill_activated": false,
   "eight_dir_move": false,
 
   "beatemup_vel": false,

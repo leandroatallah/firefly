@@ -3,9 +3,11 @@ package kitskills
 import (
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
+	"github.com/boilerplate/ebiten-template/internal/engine/debug"
 	"github.com/boilerplate/ebiten-template/internal/engine/input"
 	physicsmovement "github.com/boilerplate/ebiten-template/internal/engine/physics/movement"
 	"github.com/boilerplate/ebiten-template/internal/engine/skill"
+	"github.com/boilerplate/ebiten-template/internal/engine/utils/fp16"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -79,7 +81,8 @@ func (s *BeatEmUpJumpSkill) tryActivate(b body.MovableCollidable) {
 		if force <= 0 {
 			return
 		}
-		b.SetVAltitude16(-force)
+		b.SetVAltitude16(-fp16.To16(force))
+		debug.Log("skill_activated", "skill=BeatEmUpJumpSkill player=%s", b.ID())
 		s.jumpCutPending = true
 		if s.OnJump != nil {
 			s.OnJump(b)
@@ -136,7 +139,8 @@ func (s *BeatEmUpJumpSkill) Update(b body.MovableCollidable, model physicsmoveme
 		if force <= 0 {
 			return
 		}
-		b.SetVAltitude16(-force)
+		b.SetVAltitude16(-fp16.To16(force))
+		debug.Log("skill_activated", "skill=BeatEmUpJumpSkill player=%s (buffered)", b.ID())
 		s.jumpCutPending = true
 		if s.OnJump != nil {
 			s.OnJump(b)
