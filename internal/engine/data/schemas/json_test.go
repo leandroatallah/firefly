@@ -133,3 +133,43 @@ func TestParticleData_ImageModeOmitsPixel(t *testing.T) {
 		t.Errorf("Image = %q, want jump-particles-24.png", pd.Image)
 	}
 }
+
+// T-S1: AssetData unmarshals with footprint_rect present → FootprintRect non-nil
+// and its values match the JSON. This pins the schema contract added for story
+// 064 (beatemup actors need a per-state footprint declared in JSON).
+func TestAssetData_UnmarshalsFootprintRect_Present(t *testing.T) {
+	raw := []byte(`{
+		"path": "p",
+		"collision_rect": [],
+		"footprint_rect": {"x": 2, "y": 4, "width": 10, "height": 3}
+	}`)
+
+	var a AssetData
+	if err := json.Unmarshal(raw, &a); err != nil {
+		t.Fatalf("unmarshal: %v", err)
+	}
+	if a.FootprintRect == nil {
+		t.Fatal("FootprintRect = nil; want populated *ShapeRect")
+	}
+	x, y, w, h := a.FootprintRect.Rect()
+	if x != 2 || y != 4 || w != 10 || h != 3 {
+		t.Errorf("FootprintRect = (%d,%d,%d,%d), want (2,4,10,3)", x, y, w, h)
+	}
+}
+
+// T-S2: AssetData unmarshals when footprint_rect is absent → FootprintRect is
+// nil (the field is optional; older asset JSON must keep working unchanged).
+func TestAssetData_UnmarshalsFootprintRect_Absent(t *testing.T) {
+	raw := []byte(`{
+		"path": "p",
+		"collision_rect": []
+	}`)
+
+	var a AssetData
+	if err := json.Unmarshal(raw, &a); err != nil {
+		t.Fatalf("unmarshal: %v", err)
+	}
+	if a.FootprintRect != nil {
+		t.Errorf("FootprintRect = %+v; want nil when omitted from JSON", a.FootprintRect)
+	}
+}
