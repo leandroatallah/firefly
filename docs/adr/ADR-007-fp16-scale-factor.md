@@ -4,6 +4,13 @@
 **Date:** 2026-04-06  
 **Context:** Projectile system implementation (US-028)
 
+## Quick Reference
+
+- **When to cite:** Any fp16 conversion or position/velocity math; correcting a scale assumption.
+- **Key constraint:** Scale = 16, not 65536. The name "fp16" is misleading — it is NOT 16-bit fixed-point.
+- **DO:** `pos << 4`, `velocity * 16`, `fp16.To16` / `fp16.From16`.
+- **DON'T:** Use `<<16`; assume 65536 units/pixel. See ADR-001 for the system overview.
+
 ## Problem
 
 The naming "fp16" suggests a 16-bit fixed-point system with 65536 units per pixel (2^16), but the actual implementation uses a scale factor of 16.

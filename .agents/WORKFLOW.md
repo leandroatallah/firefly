@@ -1,5 +1,7 @@
 # Spec-Driven Development (SDD) Pipeline
 
+**Scope:** Pipeline stages, story folder format, PROGRESS.md rules. Testing patterns → `.agents/TESTING.md`. Standards → `.agents/constitution.md`.
+
 A multi-agent workflow for implementing features with formal specification and TDD. The spec is the source of truth — code is its expression.
 
 ## Entry Point
@@ -42,27 +44,16 @@ For **cross-story sequencing** (what to work on next, dependencies between stori
 
 - [x] Story Architect
 - [x] Spec Engineer
-- [-] Mock Generator   ← Use [-] for Skipped (design decision rules it out)
+- [-] Mock Generator   ← Use [-] for Skipped; add one-line reason inline
 - [/] TDD Specialist   ← Use [/] for In Progress
 - [ ] Feature Implementer
 - [ ] Workflow Gatekeeper
-
-## Log
-
-Agents must log **twice** per stage: once at the start and once at completion.
-
-- **[Model] [Agent] [date] [Action]**: [Details]
-  Example:
-  `- [Gemini] [Mock Generator] 2026-04-15 [STARTED]: Generating mocks for ICombat interface.`
-  `- [Gemini] [Mock Generator] 2026-04-15 [FINISHED]: Mocks created in internal/engine/mocks/mock_combat.go.`
-  
-When skipping a stage due to design decision (e.g., no contracts needed), log once:
-  `- [Gemini] [Mock Generator] 2026-04-15 [SKIPPED]: No contract interfaces — mocks not required per SPEC.`
 ```
 
-The Log section is the agent's working memory. **Mandatory Logging:**
-1. **Start of Task:** Immediately update `PROGRESS.md` with `[/]` (In Progress) and a `[STARTED]` log entry.
-2. **End of Task:** Update `PROGRESS.md` with `[x]` (Complete) and a `[FINISHED]` log entry with a summary of the work.
+**Rules:**
+- Checklist only — no log entries, no timestamps, no narrative.
+- Mark `[/]` when starting a stage; `[x]` when done; `[-]` when skipping with a one-line reason on the same line.
+- If you need to record a design decision or notable finding, add it to `NOTES.md` instead.
 
 ## Pipeline Stages
 

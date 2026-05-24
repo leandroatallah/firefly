@@ -1,5 +1,12 @@
 # ADR-006 — Three-Layer Architecture: Engine / Kit / Game
 
+## Quick Reference
+
+- **When to cite:** Deciding where to place new code (engine vs kit vs game).
+- **Key constraint:** `game` → `kit` → `engine`. No reverse imports.
+- **DO:** 80%+ genre reuse → `kit`; game-specific → `game`; abstract/interface → `engine`.
+- **DON'T:** Add genre-specific code to `engine`; add game-specific code to `kit`.
+
 ## Status
 Accepted (amended from two-layer; kit layer validated by stories 046–052)
 

@@ -1,5 +1,12 @@
 # ADR-004 — Space / Body / MovementModel Physics Layers
 
+## Quick Reference
+
+- **When to cite:** Physics work — movement, collision, body management.
+- **Key constraint:** Three distinct layers: Body owns shape, Space resolves collisions, MovementModel drives velocity. Do not mix concerns.
+- **DO:** Mock adjacent interfaces in tests; swap `MovementModel` to change movement behavior.
+- **DON'T:** Put movement logic in Body; put collision resolution in MovementModel.
+
 ## Status
 Accepted
 

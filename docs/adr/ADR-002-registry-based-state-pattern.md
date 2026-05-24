@@ -1,5 +1,12 @@
 # ADR-002 — Registry-Based State Pattern with `init()` Registration
 
+## Quick Reference
+
+- **When to cite:** Adding a new actor state or testing state transitions.
+- **Key constraint:** Enums assigned at runtime — never persist or compare across restarts.
+- **DO:** Add a new file with an `init()` call; register states before exercising transitions in tests.
+- **DON'T:** Edit the engine switch for game states. For complex constructor deps, see ADR-009.
+
 ## Status
 Accepted
 

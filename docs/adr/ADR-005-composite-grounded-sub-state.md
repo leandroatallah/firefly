@@ -1,5 +1,12 @@
 # ADR-005 — Composite Grounded Sub-State Machine
 
+## Quick Reference
+
+- **When to cite:** Adding a new grounded sub-state (idle, walk, duck, aim-lock) or debugging grounded transitions.
+- **Key constraint:** `GroundedState` owns all sub-states; parent state machine only sees `StateGrounded`.
+- **DO:** Implement `groundedSubState` interface; add a case to `newSubState`.
+- **DON'T:** Add grounded variants as top-level states in the parent machine.
+
 ## Status
 Accepted
 
