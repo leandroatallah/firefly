@@ -78,6 +78,42 @@
             "height": 30
           }
         ]
+      },
+      "melee_attack_step_0": {
+        "path": "assets/images/cody-melee-0.png",
+        "loop": false,
+        "collision_rect": [
+          {
+            "x": 6,
+            "y": 2,
+            "width": 18,
+            "height": 30
+          }
+        ]
+      },
+      "melee_attack_step_1": {
+        "path": "assets/images/cody-melee-0.png",
+        "loop": false,
+        "collision_rect": [
+          {
+            "x": 6,
+            "y": 2,
+            "width": 18,
+            "height": 30
+          }
+        ]
+      },
+      "melee_attack_step_2": {
+        "path": "assets/images/cody-melee-1.png",
+        "loop": false,
+        "collision_rect": [
+          {
+            "x": 6,
+            "y": 2,
+            "width": 18,
+            "height": 30
+          }
+        ]
       }
     },
     "facing_direction": 0,

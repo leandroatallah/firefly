@@ -129,7 +129,7 @@ func (p *CodyPlayer) SetMelee(w *weapon.MeleeWeapon, vfxMgr vfx.Manager) {
 	char := p.GetCharacter()
 	stepStates := kitstates.MeleeAttackStepStates(len(w.Steps()))
 
-	st := meleeengine.InstallState(char, p, w, vfxMgr, kitstates.StateMeleeAttack, kitstates.StateGrounded, actors.Falling, stepStates)
+	st := meleeengine.InstallState(char, p, w, nil, kitstates.StateMeleeAttack, kitstates.StateGrounded, actors.Falling, stepStates)
 
 	controller := meleeengine.New(w, st, kitstates.StateMeleeAttack, stepStates, p.meleeStepAnimDuration)
 	p.SetMeleeController(controller)
