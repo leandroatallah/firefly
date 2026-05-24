@@ -113,13 +113,44 @@ func (c *BeatEmUpCharacter) CollisionPosition() []image.Rectangle {
 func beatemupMovementTransitions(c *actors.Character) {
 	vx, vy := c.Velocity()
 	threshold := config.Get().Physics.DownwardGravity
-	isMoving := vx > threshold || vx < -threshold || vy > threshold || vy < -threshold
+	isMovingGround := vx > threshold || vx < -threshold || vy > threshold || vy < -threshold
 	state := c.State()
+	vAlt16 := c.VAltitude16()
+	altitude := c.Altitude()
+	airborne := altitude > 0
 	set := func(s actors.ActorStateEnum) { c.SetNewStateFatal(s) }
 	switch {
-	case state != actors.Walking && isMoving:
+	case state == actors.Landing:
+		if !c.IsAnimationFinished() {
+			return
+		}
+		if isMovingGround {
+			set(actors.Walking)
+		} else {
+			set(actors.Idle)
+		}
+		return
+	case state == actors.Jumping && vAlt16 >= 0 && airborne:
+		set(actors.Falling)
+		return
+	case vAlt16 < 0:
+		if state != actors.Jumping {
+			set(actors.Jumping)
+		}
+		return
+	case vAlt16 > 0 && airborne:
+		if state != actors.Falling {
+			set(actors.Falling)
+		}
+		return
+	case state == actors.Falling && !airborne:
+		set(actors.Landing)
+		return
+	case airborne:
+		return
+	case state != actors.Walking && isMovingGround:
 		set(actors.Walking)
-	case state != actors.Idle && !isMoving:
+	case state != actors.Idle && !isMovingGround:
 		set(actors.Idle)
 	}
 }
