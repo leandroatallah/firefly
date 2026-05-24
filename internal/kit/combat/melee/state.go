@@ -12,6 +12,8 @@ import (
 type weaponIface interface {
 	combat.Weapon
 	IsHitboxActive() bool
+	IsSwinging() bool
+	IsInStartup() bool
 	ApplyHitbox(space contractsbody.BodiesSpace)
 	StepIndex() int
 	ComboWindowRemaining() int
@@ -138,13 +140,16 @@ func (s *State) OnStart(currentCount int) {
 func (s *State) OnFinish() {}
 
 // Update advances the weapon and state by one frame.
+// The state exits when both the animation has played in full AND the weapon is
+// no longer swinging or in startup. This decouples sprite frame count from
+// weapon physical timing: a 2-frame or 20-frame animation both work correctly.
 func (s *State) Update() actors.ActorStateEnum {
 	s.weapon.Update()
 	if s.weapon.IsHitboxActive() {
 		s.weapon.ApplyHitbox(s.space)
 	}
 	s.frame++
-	if s.frame >= s.animFrames {
+	if s.frame >= s.animFrames && !s.weapon.IsSwinging() && !s.weapon.IsInStartup() {
 		return s.returnTo
 	}
 	return s.activeStepEnum()

@@ -27,6 +27,8 @@ func init() {
 type meleeWeaponIface interface {
 	combat.Weapon
 	IsHitboxActive() bool
+	IsSwinging() bool
+	IsInStartup() bool
 	ApplyHitbox(space contractsbody.BodiesSpace)
 	StepIndex() int
 	ComboWindowRemaining() int
