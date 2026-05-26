@@ -112,12 +112,11 @@ func (c *BeatEmUpCharacter) CollisionPosition() []image.Rectangle {
 }
 
 // GroundY implements space.DepthLaneBody.
-// Returns the body's pre-altitude ground Y (the depth position on the floor
-// plane). Altitude is kept separate and must not be subtracted here — depth
-// gating compares floor positions, not screen positions.
+// Returns the bottom edge of the body projected onto the floor plane (feet
+// position). Position().Max.Y is the screen bottom (groundY - alt + height);
+// adding Altitude() recovers the altitude-independent floor bottom.
 func (c *BeatEmUpCharacter) GroundY() int {
-	_, y16 := c.GetPosition16()
-	return y16 / 16 // == fp16.From16(y16); pre-altitude depth Y
+	return c.Position().Max.Y + c.Altitude()
 }
 
 // LaneHalfWidth implements space.DepthLaneBody.

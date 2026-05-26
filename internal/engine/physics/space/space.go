@@ -212,6 +212,54 @@ func (s *Space) Query(rect image.Rectangle) []body.Collidable {
 // collisionRects returns the collision rectangles for a body.
 // If no specific collision shapes are defined, it falls back to the body's own position.
 // This is consistent with the pattern used in CheckGround.
+// resolveDepthLane returns the DepthLaneBody for b, checking b itself first
+// and then walking the owner chain via LastOwner. This is necessary because
+// ApplyValidPosition operates on the inner *CollidableBody rather than the
+// outer game-layer struct (e.g. BeatEmUpCharacter) that implements
+// DepthLaneBody.
+func resolveDepthLane(b body.Collidable) (DepthLaneBody, bool) {
+	if dl, ok := b.(DepthLaneBody); ok {
+		return dl, true
+	}
+	if owner := b.LastOwner(); owner != nil {
+		if dl, ok := owner.(DepthLaneBody); ok {
+			return dl, true
+		}
+	}
+	return nil, false
+}
+
+// altitudeOf returns the body's current altitude in pixels, checking the body
+// itself and then its owner chain. Returns 0 if the body carries no altitude.
+func altitudeOf(b body.Collidable) int {
+	type altGetter interface{ Altitude() int }
+	if ag, ok := b.(altGetter); ok {
+		return ag.Altitude()
+	}
+	if owner := b.LastOwner(); owner != nil {
+		if ag, ok := owner.(altGetter); ok {
+			return ag.Altitude()
+		}
+	}
+	return 0
+}
+
+// floorProjectedRects returns the body's collision rects shifted down by its
+// altitude so they represent floor-plane positions rather than screen positions.
+// For grounded bodies (altitude == 0) this is a no-op.
+func floorProjectedRects(b body.Collidable) []image.Rectangle {
+	rects := collisionRects(b)
+	alt := altitudeOf(b)
+	if alt == 0 {
+		return rects
+	}
+	shifted := make([]image.Rectangle, len(rects))
+	for i, r := range rects {
+		shifted[i] = r.Add(image.Pt(0, alt))
+	}
+	return shifted
+}
+
 func collisionRects(b body.Collidable) []image.Rectangle {
 	rects := b.CollisionPosition()
 	if len(rects) == 0 {
@@ -220,77 +268,63 @@ func collisionRects(b body.Collidable) []image.Rectangle {
 	return rects
 }
 
+// rectSlicesOverlap reports whether any rect in ra overlaps any rect in rb.
+func rectSlicesOverlap(ra, rb []image.Rectangle) bool {
+	for _, r := range ra {
+		for _, s := range rb {
+			if r.Overlaps(s) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 // HasCollision reports whether two bodies are currently colliding.
 //
-// The check runs in two phases:
-//  1. 2D AABB overlap on the bodies' collision rectangles (screen-space).
-//     This is the only check that runs for plain 2D bodies.
-//  2. Depth-lane gate (opt-in, 2.5D): if BOTH a and b implement
-//     DepthLaneBody, an additional constraint requires their ground-Y
-//     coordinates to lie within max(a.LaneHalfWidth, b.LaneHalfWidth) of
-//     each other. This filters bbox overlaps that LOOK on-screen but
-//     happen at different floor depths in a 2.5D beat-em-up plane.
+// For plain 2D bodies (neither implements DepthLaneBody): screen-space AABB
+// overlap only.
+//
+// For 2.5D beat-em-up bodies (both implement DepthLaneBody, resolved through
+// the owner chain):
+//  1. Depth-lane gate: different floor lanes → no collision (early exit).
+//     This prevents airborne bodies from colliding with background obstacles
+//     at different floor depths.
+//  2. Floor-projected AABB: rects are shifted down by each body's altitude
+//     before the overlap test. This ensures same-depth obstacles still block
+//     an airborne body even when it has visually cleared them on screen.
 //
 // Returns false for empty IDs or self-pair.
 func HasCollision(a, b body.Collidable) bool {
-	// Every body must have an ID
 	if a.ID() == "" || b.ID() == "" {
 		return false
 	}
-
-	// Prevent to check the same body
 	if a.ID() == b.ID() {
 		return false
 	}
 
-	rectsA := collisionRects(a)
-	rectsB := collisionRects(b)
+	da, okA := resolveDepthLane(a)
+	db, okB := resolveDepthLane(b)
 
-	// Phase 1 — 2D bbox overlap (screen-space AABB).
-	// A miss here short-circuits; bodies that do not visually overlap can
-	// never collide, regardless of depth.
-	bboxOverlap := false
-	for _, r := range rectsA {
-		for _, s := range rectsB {
-			if r.Overlaps(s) {
-				bboxOverlap = true
-				break
-			}
+	if okA && okB {
+		// Phase 1 — depth-lane gate.
+		tol := da.LaneHalfWidth()
+		if db.LaneHalfWidth() > tol {
+			tol = db.LaneHalfWidth()
 		}
-		if bboxOverlap {
-			break
+		diff := da.GroundY() - db.GroundY()
+		if diff < 0 {
+			diff = -diff
 		}
+		if diff > tol {
+			return false
+		}
+		// Phase 2 — floor-projected AABB.
+		return rectSlicesOverlap(floorProjectedRects(a), floorProjectedRects(b))
 	}
 
-	if !bboxOverlap {
-		return false
-	}
-
-	// Phase 2 — depth-lane gate (opt-in, 2.5D).
-	// When BOTH bodies implement DepthLaneBody, the bbox overlap alone is
-	// not enough: their ground projections must also lie within the same
-	// depth lane. Bodies that do not opt in keep the legacy 2D behavior
-	// (bbox overlap == collision), so plain 2D scenes are unaffected.
-	da, okA := a.(DepthLaneBody)
-	db, okB := b.(DepthLaneBody)
-	if !okA || !okB {
-		return true
-	}
-
-	// Pair tolerance is the LARGER of the two half-widths so a "wide" body
-	// (e.g. a hitbox tuned to forgive depth misalignment) governs the match.
-	tol := da.LaneHalfWidth()
-	if db.LaneHalfWidth() > tol {
-		tol = db.LaneHalfWidth()
-	}
-	// Compare ground-Y (depth axis, pre-altitude) — NOT screen-Y. This is
-	// why DepthLaneBody exposes GroundY() explicitly rather than reusing
-	// GetPosition16(), whose Y already has altitude subtracted.
-	diff := da.GroundY() - db.GroundY()
-	if diff < 0 {
-		diff = -diff
-	}
-	return diff <= tol
+	// Legacy 2D: screen-space AABB only.
+	return rectSlicesOverlap(collisionRects(a), collisionRects(b))
 }
 
 func (s *Space) SetTilemapDimensionsProvider(provider tilemaplayer.TilemapDimensionsProvider) {
