@@ -4,6 +4,7 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/animation"
 	contractsbody "github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/combat"
+	"github.com/boilerplate/ebiten-template/internal/engine/data/schemas"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
 	"github.com/boilerplate/ebiten-template/internal/engine/utils/fp16"
 )
@@ -18,6 +19,7 @@ type weaponIface interface {
 	StepIndex() int
 	ComboWindowRemaining() int
 	ResetCombo()
+	SetActiveFramesOverride(override *[2]int)
 }
 
 // vfxSpawner is the minimum surface needed to render the slash VFX.
@@ -50,6 +52,9 @@ type State struct {
 	frame               int
 	startCount          int
 	stepUsed            int
+
+	assets        map[string]schemas.AssetData
+	stepStateName func(stepIdx int) string
 }
 
 // SetStepStates assigns the per-step state enums used by State() and Update()
@@ -57,6 +62,15 @@ type State struct {
 // to the meleeAttackEnum (which typically has no registered sprite).
 func (s *State) SetStepStates(stepStates []actors.ActorStateEnum) {
 	s.stepStates = stepStates
+}
+
+// SetHitboxFrameResolver configures per-step hitbox frame overrides sourced from
+// asset data. assets is a map keyed by asset/state name; stepStateName maps a
+// combo step index to its asset name. Both must be non-nil for the resolver to
+// take effect.
+func (s *State) SetHitboxFrameResolver(assets map[string]schemas.AssetData, stepStateName func(stepIdx int) string) {
+	s.assets = assets
+	s.stepStateName = stepStateName
 }
 
 // activeStepEnum returns the state enum that corresponds to the current swing
@@ -120,6 +134,16 @@ func (s *State) OnStart(currentCount int) {
 	}
 
 	s.stepUsed = s.weapon.StepIndex()
+
+	var override *[2]int
+	if s.assets != nil && s.stepStateName != nil {
+		name := s.stepStateName(s.stepUsed)
+		if asset, ok := s.assets[name]; ok && asset.HitboxFrames != nil {
+			hf := asset.HitboxFrames
+			override = &[2]int{hf.Start, hf.End}
+		}
+	}
+	s.weapon.SetActiveFramesOverride(override)
 
 	x16, y16 := s.owner.GetPosition16()
 	faceDir := s.owner.FaceDirection()

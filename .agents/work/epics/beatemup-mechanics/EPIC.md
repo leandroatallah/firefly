@@ -25,9 +25,13 @@ The coordinate model: **X** = horizontal, **Y** = ground/depth, **Altitude** = h
 | `058-wire-beatemup-movement` | done | Wire movement into `BeatEmUpCharacter`; decouple engine from platform model |
 | `061-altitude-jump-ground-detection` | done | Altitude gravity + landing in `BeatEmUpMovementModel` |
 | `062-depth-aware-collision` | done | Depth-lane gate in `HasCollision` |
-| `063-shadow-component` | backlog | Shadow at `(X, GroundY)` |
-| `064-beatemup-footprint-rect` | backlog | JSON `footprint_rect` schema + `Footprint()` accessor |
-| `065-beatemup-jump-skill` | backlog | `BeatEmUpJumpSkill`: altitude jump with coyote time, buffering, jump-cut |
+| `063-shadow-component` | done | Shadow at `(X, GroundY)` |
+| `064-beatemup-footprint-rect` | done | JSON `footprint_rect` schema + `Footprint()` accessor |
+| `065-beatemup-jump-skill` | done | `BeatEmUpJumpSkill`: altitude jump with coyote time, buffering, jump-cut |
+| `066-beatemup-airborne-state-transitions` | done | Airborne state transitions for `BeatEmUpCharacter` |
+| `069-depth-lane-body-impl` | done | `DepthLaneBody` on `ObstacleRect` and `BeatEmUpCharacter` |
+| `067-actor-json-hitbox-active-frames` | backlog | Hitbox active-frame data in actor JSON |
+| `068-actor-json-sprite-render-offset` | backlog | Sprite render offset in actor JSON |
 
 ## Out of Scope
 

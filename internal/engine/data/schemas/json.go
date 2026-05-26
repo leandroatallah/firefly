@@ -17,12 +17,19 @@ func (s ShapeRect) Rect() (x, y, width, height int) {
 	return s.X, s.Y, s.Width, s.Height
 }
 
+// HitboxFrameRange defines the active frame range for a hitbox within an animation.
+type HitboxFrameRange struct {
+	Start int `json:"start"`
+	End   int `json:"end"`
+}
+
 // AssetData holds information about a single asset, including its path and collision areas.
 type AssetData struct {
-	Path           string      `json:"path"`
-	CollisionRects []ShapeRect `json:"collision_rect"`
-	FootprintRect  *ShapeRect  `json:"footprint_rect,omitempty"`
-	Loop           *bool       `json:"loop,omitempty"`
+	Path           string            `json:"path"`
+	CollisionRects []ShapeRect       `json:"collision_rect"`
+	FootprintRect  *ShapeRect        `json:"footprint_rect,omitempty"`
+	Loop           *bool             `json:"loop,omitempty"`
+	HitboxFrames   *HitboxFrameRange `json:"hitbox_frames,omitempty"`
 }
 
 // MovementConfig defines horizontal movement parameters.
