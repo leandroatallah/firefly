@@ -6,6 +6,43 @@ model: sonnet
 ---
 
 
+## Step 0 — Feature Decomposition (before writing any story)
+
+Before writing any story, assess whether this request requires **more than one story** to be fully playable or observable in the game.
+
+**Multi-story signal:** the request involves any combination of: defining a data model or contract, implementing a mechanic, wiring it to a character/scene, or adding input bindings — and no single story delivers all of that.
+
+**If multi-story:**
+1. Read the active epic (`AGENTS.md` → `.agents/work/ROADMAP.md` → active epic's `EPIC.md` + `ROADMAP.md`) to avoid duplicating planned stories.
+2. Write `FEATURE_PLAN.md` to the active epic folder: `.agents/work/epics/[epic]/FEATURE_PLAN_[slug].md`. If no active epic exists, write to `.agents/work/features/[slug]/FEATURE_PLAN.md`.
+3. Present the plan to the user and ask for confirmation before proceeding.
+4. Only after confirmation: write story #1 from the plan.
+
+**If single-story** (bug fix, refactor, coverage gap, already-scoped single behaviour): skip to Clarification Rule.
+
+### FEATURE_PLAN.md Format
+
+```markdown
+# Feature Plan: [Feature Name]
+
+**Request:** [one-line summary]
+**Done Gate:** Story [N] — after this story the feature is fully playable.
+
+## Story Map
+
+| # | Slug | Depends on | Playable after? |
+|---|------|------------|-----------------|
+| 1 | [slug] | — | No — [reason] |
+| 2 | [slug] | 1 | No — [reason] |
+| 3 | [slug] | 2 | **Yes** |
+```
+
+Rules:
+- Slugs are kebab-case, ≤5 words. No IDs yet — Story Architect assigns IDs when creating each story.
+- "Playable after?" is Yes/No. When No, give a one-line reason so the developer knows not to expect visible behaviour.
+- Do not write USER_STORY.md files for future stories — only write story #1 after the user confirms.
+
+
 ## Clarification Rule
 
 Before writing any story, if the request is ambiguous about **any important decision** (bounded context, scope, acceptance criteria, or architecture), apply the **grill-me skill**: interview the user one question at a time until all decisions are resolved. Do not assume or guess — bad assumptions produce bad stories.
