@@ -38,21 +38,9 @@ func (m *BeatEmUpMovementModel) Update(b body.MovableCollidable, space body.Bodi
 
 	vx16, vy16 := b.Velocity()
 
-	// Obstacle collision uses the ground-plane footprint regardless of altitude.
-	// Position() subtracts altitude from Y, so an airborne body's screen rect
-	// would falsely overlap background tiles above the walkable lane. Zeroing
-	// altitude temporarily makes the collision check use the shadow position,
-	// matching beat-em-up convention: walls block ground movement even when
-	// jumping, but background decorations never block.
-	savedAlt16 := b.Altitude16()
-	if savedAlt16 != 0 {
-		b.SetAltitude16(0)
-	}
+	// Wall/obstacle blocking is depth-gated via DepthLaneBody (story 069); no altitude wrap needed.
 	_, _, blockX := b.ApplyValidPosition(vx16, true, space)
 	_, _, blockY := b.ApplyValidPosition(vy16, false, space)
-	if savedAlt16 != 0 {
-		b.SetAltitude16(savedAlt16)
-	}
 	debug.Watch("beatemup_vel", b.ID(), fmt.Sprintf("vx=%d vy=%d blockX=%v blockY=%v", vx16, vy16, blockX, blockY))
 	shapes := b.CollisionShapes()
 	debug.Watch("beatemup_collisions", b.ID(), fmt.Sprintf("count=%d shapes=%+v", len(shapes), shapes))
@@ -103,6 +91,7 @@ func (m *BeatEmUpMovementModel) Update(b body.MovableCollidable, space body.Bodi
 			vAlt16 += cfg.Physics.DownwardGravity
 		}
 
+		prevAlt := alt
 		alt -= fp16.From16(vAlt16)
 
 		if alt <= 0 {
@@ -112,6 +101,17 @@ func (m *BeatEmUpMovementModel) Update(b body.MovableCollidable, space body.Bodi
 
 		b.SetAltitude(alt)
 		b.SetVAltitude16(vAlt16)
+
+		// Shift collision shapes to follow the altitude change.
+		// Shapes are positioned in screen space (groundY - altitude), so a
+		// change in altitude must be reflected as an equal shift in their Y.
+		altDelta := alt - prevAlt
+		if altDelta != 0 {
+			for _, shape := range b.CollisionShapes() {
+				sx16, sy16 := shape.GetPosition16()
+				shape.SetPosition16(sx16, sy16-fp16.To16(altDelta))
+			}
+		}
 	}
 
 	return nil

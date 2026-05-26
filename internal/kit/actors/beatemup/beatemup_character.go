@@ -10,6 +10,7 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
 	bodyphysics "github.com/boilerplate/ebiten-template/internal/engine/physics/body"
 	physicsmovement "github.com/boilerplate/ebiten-template/internal/engine/physics/movement"
+	"github.com/boilerplate/ebiten-template/internal/engine/physics/space"
 	"github.com/boilerplate/ebiten-template/internal/engine/render/sprites"
 	kitactors "github.com/boilerplate/ebiten-template/internal/kit/actors"
 )
@@ -108,6 +109,22 @@ func (c *BeatEmUpCharacter) CollisionPosition() []image.Rectangle {
 		return []image.Rectangle{local.Add(image.Pt(minX, minY))}
 	}
 	return c.CollidableBody.CollisionPosition()
+}
+
+// GroundY implements space.DepthLaneBody.
+// Returns the body's pre-altitude ground Y (the depth position on the floor
+// plane). Altitude is kept separate and must not be subtracted here — depth
+// gating compares floor positions, not screen positions.
+func (c *BeatEmUpCharacter) GroundY() int {
+	_, y16 := c.GetPosition16()
+	return y16 / 16 // == fp16.From16(y16); pre-altitude depth Y
+}
+
+// LaneHalfWidth implements space.DepthLaneBody.
+// Returns space.DefaultLaneHalfWidth (8 px) — a fixed tolerance that covers
+// the character's footprint depth extent for standard beat-em-up lane matching.
+func (c *BeatEmUpCharacter) LaneHalfWidth() int {
+	return space.DefaultLaneHalfWidth
 }
 
 func beatemupMovementTransitions(c *actors.Character) {

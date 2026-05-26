@@ -10,6 +10,11 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
+// defaultLaneHalfWidth mirrors space.DefaultLaneHalfWidth (8 px).
+// Defined locally to avoid an import cycle: the space package already
+// imports this (body) package via state_collision_manager.go.
+const defaultLaneHalfWidth = 8
+
 type ObstacleRect struct {
 	Ownership
 	*MovableBody
@@ -124,3 +129,26 @@ func (o *ObstacleRect) Altitude() int       { return o.MovableBody.Altitude() }
 func (o *ObstacleRect) Altitude16() int     { return o.MovableBody.Altitude16() }
 func (o *ObstacleRect) SetAltitude(a int)   { o.MovableBody.SetAltitude(a) }
 func (o *ObstacleRect) SetAltitude16(a int) { o.MovableBody.SetAltitude16(a) }
+
+// GroundY implements space.DepthLaneBody.
+// Returns the pre-altitude bottom edge in world (depth) coordinates.
+// Uses the raw y16 field (not Position().Max.Y) so that airborne bodies
+// return their floor-projected bottom rather than their screen-offset bottom.
+// For obstacles (altitude always 0), the result is identical to Position().Max.Y.
+func (o *ObstacleRect) GroundY() int {
+	_, y16 := o.GetPosition16()
+	return y16/16 + o.GetShape().(*Rect).Height()
+}
+
+// LaneHalfWidth implements space.DepthLaneBody.
+// Returns max(height, defaultLaneHalfWidth) so that a character whose feet line
+// falls anywhere across the obstacle's full Y-extent triggers the gate.
+// Zero-height obstacles fall back to defaultLaneHalfWidth to avoid an
+// exact-equal-match requirement.
+func (o *ObstacleRect) LaneHalfWidth() int {
+	h := o.GetShape().(*Rect).Height()
+	if h < defaultLaneHalfWidth {
+		return defaultLaneHalfWidth
+	}
+	return h
+}
