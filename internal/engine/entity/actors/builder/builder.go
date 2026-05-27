@@ -112,3 +112,27 @@ func ApplySkills(
 	}
 	return nil
 }
+
+// ApplyRenderOffsets reads per-state RenderOffset entries from the sprite data
+// and registers them on the character via SetRenderOffset. Assets that omit
+// RenderOffset are skipped; this function is a no-op for all-nil data.
+func ApplyRenderOffsets(
+	character actors.ActorEntity,
+	data schemas.SpriteData,
+	stateMap map[string]animation.SpriteState,
+) {
+	for key, asset := range data.Assets {
+		if asset.RenderOffset == nil {
+			continue
+		}
+		st, ok := stateMap[key]
+		if !ok {
+			continue
+		}
+		enum, ok := st.(actors.ActorStateEnum)
+		if !ok {
+			continue
+		}
+		character.GetCharacter().SetRenderOffset(enum, asset.RenderOffset.X, asset.RenderOffset.Y)
+	}
+}

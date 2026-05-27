@@ -55,6 +55,7 @@ func init() {
 	WalkingShooting = RegisterState("walk_shoot", func(b BaseState) ActorState { return &WalkingShootingState{BaseState: b} })
 	JumpingShooting = RegisterState("jump_shoot", func(b BaseState) ActorState { return &JumpingShootingState{BaseState: b} })
 	FallingShooting = RegisterState("fall_shoot", func(b BaseState) ActorState { return &FallingShootingState{BaseState: b} })
+
 }
 
 // BaseState provides shared bookkeeping (entry count, tick) for all concrete states.

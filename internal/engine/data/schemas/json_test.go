@@ -173,3 +173,66 @@ func TestAssetData_UnmarshalsFootprintRect_Absent(t *testing.T) {
 		t.Errorf("FootprintRect = %+v; want nil when omitted from JSON", a.FootprintRect)
 	}
 }
+
+// T-S1 (story 068): AssetData unmarshals with render_offset present → RenderOffset
+// non-nil with matching X, Y values. Pins the schema contract for per-state
+// draw-time pixel nudges.
+func TestAssetData_UnmarshalsRenderOffset_Present(t *testing.T) {
+	raw := []byte(`{
+		"path": "p",
+		"collision_rect": [],
+		"render_offset": {"x": -4, "y": 2}
+	}`)
+
+	var a AssetData
+	if err := json.Unmarshal(raw, &a); err != nil {
+		t.Fatalf("unmarshal: %v", err)
+	}
+	if a.RenderOffset == nil {
+		t.Fatal("RenderOffset = nil; want populated *SpriteOffset")
+	}
+	if a.RenderOffset.X != -4 || a.RenderOffset.Y != 2 {
+		t.Errorf("RenderOffset = (%d, %d), want (-4, 2)", a.RenderOffset.X, a.RenderOffset.Y)
+	}
+}
+
+// T-S2 (story 068): AssetData unmarshals when render_offset is absent →
+// RenderOffset is nil. All existing actor JSON files omit this key and must
+// continue to parse without producing an offset.
+func TestAssetData_UnmarshalsRenderOffset_Absent(t *testing.T) {
+	raw := []byte(`{
+		"path": "p",
+		"collision_rect": []
+	}`)
+
+	var a AssetData
+	if err := json.Unmarshal(raw, &a); err != nil {
+		t.Fatalf("unmarshal: %v", err)
+	}
+	if a.RenderOffset != nil {
+		t.Errorf("RenderOffset = %+v; want nil when omitted from JSON", a.RenderOffset)
+	}
+}
+
+// T-S3 (story 068): AssetData unmarshals render_offset {x:0, y:0} → RenderOffset
+// is a non-nil pointer to the zero SpriteOffset value. Distinguishes "explicitly
+// zero" from "absent" at the schema layer (consumer code may still treat them
+// identically at draw time).
+func TestAssetData_UnmarshalsRenderOffset_Zero(t *testing.T) {
+	raw := []byte(`{
+		"path": "p",
+		"collision_rect": [],
+		"render_offset": {"x": 0, "y": 0}
+	}`)
+
+	var a AssetData
+	if err := json.Unmarshal(raw, &a); err != nil {
+		t.Fatalf("unmarshal: %v", err)
+	}
+	if a.RenderOffset == nil {
+		t.Fatal("RenderOffset = nil; want non-nil pointer to zero SpriteOffset")
+	}
+	if *a.RenderOffset != (SpriteOffset{}) {
+		t.Errorf("RenderOffset = %+v, want zero SpriteOffset", *a.RenderOffset)
+	}
+}

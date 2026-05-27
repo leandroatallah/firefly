@@ -8,6 +8,7 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/schemas"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
+	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/builder"
 	bodyphysics "github.com/boilerplate/ebiten-template/internal/engine/physics/body"
 	physicsmovement "github.com/boilerplate/ebiten-template/internal/engine/physics/movement"
 	"github.com/boilerplate/ebiten-template/internal/engine/physics/space"
@@ -63,6 +64,7 @@ func NewBeatEmUpCharacter(
 		return nil, err
 	}
 	c := actors.NewCharacter(s, bodyRect)
+	builder.ApplyRenderOffsets(c, spriteData, stateMap)
 	be := &BeatEmUpCharacter{
 		Character:      c,
 		MeleeCharacter: kitactors.NewMeleeCharacter(),

@@ -49,6 +49,10 @@ type Character struct {
 	// the global stateless factory. Register via SetStateInstance.
 	perActorInstances map[ActorStateEnum]ActorState
 
+	// renderOffsets holds per-state pixel-space draw-time nudges. Applied as the
+	// final translation in UpdateImageOptions; no effect on physics or collision.
+	renderOffsets map[ActorStateEnum]image.Point
+
 	// StateTransitionHandler, when non-nil, is called before the default handleState
 	// logic. Return true to suppress the default transitions.
 	StateTransitionHandler func(*Character) bool
@@ -351,6 +355,13 @@ func (c *Character) UpdateImageOptions() {
 	// 4. Translate the whole assembly to the body's world position.
 	x, y := c.GetPositionMin()
 	c.imageOptions.GeoM.Translate(float64(x), float64(y))
+
+	// 5. Per-state render offset (screen-space, post-flip, post-anchor).
+	if c.renderOffsets != nil {
+		if p, ok := c.renderOffsets[c.state.State()]; ok {
+			c.imageOptions.GeoM.Translate(float64(p.X), float64(p.Y))
+		}
+	}
 }
 
 func (c *Character) handleState() {
@@ -541,3 +552,23 @@ func (c *Character) Altitude() int       { return c.MovableBody.Altitude() }
 func (c *Character) Altitude16() int     { return c.MovableBody.Altitude16() }
 func (c *Character) SetAltitude(a int)   { c.MovableBody.SetAltitude(a) }
 func (c *Character) SetAltitude16(a int) { c.MovableBody.SetAltitude16(a) }
+
+// SetRenderOffset registers a pixel-space draw-time nudge for the given state.
+// The offset is applied after all other transforms (flip, scale, world translate)
+// and has no effect on physics or collision.
+func (c *Character) SetRenderOffset(state ActorStateEnum, dx, dy int) {
+	if c.renderOffsets == nil {
+		c.renderOffsets = make(map[ActorStateEnum]image.Point)
+	}
+	c.renderOffsets[state] = image.Pt(dx, dy)
+}
+
+// RenderOffset returns the registered draw-time offset for the given state.
+// Returns (image.Point{}, false) when no offset has been registered.
+func (c *Character) RenderOffset(state ActorStateEnum) (image.Point, bool) {
+	if c.renderOffsets == nil {
+		return image.Point{}, false
+	}
+	p, ok := c.renderOffsets[state]
+	return p, ok
+}

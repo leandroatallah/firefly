@@ -23,6 +23,13 @@ type HitboxFrameRange struct {
 	End   int `json:"end"`
 }
 
+// SpriteOffset defines a pixel-space draw-time offset applied after all other
+// transforms. It has no effect on physics or collision.
+type SpriteOffset struct {
+	X int `json:"x"`
+	Y int `json:"y"`
+}
+
 // AssetData holds information about a single asset, including its path and collision areas.
 type AssetData struct {
 	Path           string            `json:"path"`
@@ -30,6 +37,7 @@ type AssetData struct {
 	FootprintRect  *ShapeRect        `json:"footprint_rect,omitempty"`
 	Loop           *bool             `json:"loop,omitempty"`
 	HitboxFrames   *HitboxFrameRange `json:"hitbox_frames,omitempty"`
+	RenderOffset   *SpriteOffset     `json:"render_offset,omitempty"`
 }
 
 // MovementConfig defines horizontal movement parameters.
