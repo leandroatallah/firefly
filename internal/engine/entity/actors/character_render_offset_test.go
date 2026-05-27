@@ -41,7 +41,7 @@ func translation(c *actors.Character) (float64, float64) {
 func TestCharacter_RenderOffset_RoundTrip(t *testing.T) {
 	c := newRenderOffsetCharacter()
 
-	c.SetRenderOffset(actors.Idle, -4, 2)
+	c.SetRenderOffset(actors.Idle, -4, 2, nil)
 
 	gotIdle, okIdle := c.RenderOffset(actors.Idle)
 	if !okIdle {
@@ -109,7 +109,7 @@ func TestCharacter_UpdateImageOptions_AppliesRenderOffset(t *testing.T) {
 			name:  "offset (-4, 0) shifts X left by 4",
 			state: actors.Idle,
 			setup: func(c *actors.Character) {
-				c.SetRenderOffset(actors.Idle, -4, 0)
+				c.SetRenderOffset(actors.Idle, -4, 0, nil)
 			},
 			wantDx: -4,
 			wantDy: 0,
@@ -118,7 +118,7 @@ func TestCharacter_UpdateImageOptions_AppliesRenderOffset(t *testing.T) {
 			name:  "offset (0, 3) shifts Y down by 3",
 			state: actors.Idle,
 			setup: func(c *actors.Character) {
-				c.SetRenderOffset(actors.Idle, 0, 3)
+				c.SetRenderOffset(actors.Idle, 0, 3, nil)
 			},
 			wantDx: 0,
 			wantDy: 3,
@@ -127,7 +127,7 @@ func TestCharacter_UpdateImageOptions_AppliesRenderOffset(t *testing.T) {
 			name:  "offset registered for another state has no effect on current state",
 			state: actors.Idle,
 			setup: func(c *actors.Character) {
-				c.SetRenderOffset(actors.Walking, -10, -10)
+				c.SetRenderOffset(actors.Walking, -10, -10, nil)
 			},
 			wantDx: 0,
 			wantDy: 0,
@@ -136,7 +136,7 @@ func TestCharacter_UpdateImageOptions_AppliesRenderOffset(t *testing.T) {
 			name:  "explicit zero offset behaves like no offset",
 			state: actors.Idle,
 			setup: func(c *actors.Character) {
-				c.SetRenderOffset(actors.Idle, 0, 0)
+				c.SetRenderOffset(actors.Idle, 0, 0, nil)
 			},
 			wantDx: 0,
 			wantDy: 0,
@@ -172,7 +172,7 @@ func TestCharacter_UpdateImageOptions_RenderOffset_NotMirroredWhenFacingLeft(t *
 
 	c := newRenderOffsetCharacter()
 	c.SetFaceDirection(animation.FaceDirectionLeft)
-	c.SetRenderOffset(actors.Idle, -4, 0)
+	c.SetRenderOffset(actors.Idle, -4, 0, nil)
 
 	gotTx, gotTy := translation(c)
 

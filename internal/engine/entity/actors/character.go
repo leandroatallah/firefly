@@ -17,6 +17,14 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
+// renderOffset is the internal per-state draw-time offset stored in Character.
+// XFlipped, when non-nil, overrides X for left-facing draws; nil falls back to X.
+type renderOffset struct {
+	X        int
+	Y        int
+	XFlipped *int // nil -> use X for left-facing
+}
+
 // Character is the central entity type that combines physics, animation, and the
 // actor state machine. It embeds movable/collidable/alive body components and
 // delegates per-frame state transitions to handleState.
@@ -51,7 +59,7 @@ type Character struct {
 
 	// renderOffsets holds per-state pixel-space draw-time nudges. Applied as the
 	// final translation in UpdateImageOptions; no effect on physics or collision.
-	renderOffsets map[ActorStateEnum]image.Point
+	renderOffsets map[ActorStateEnum]renderOffset
 
 	// StateTransitionHandler, when non-nil, is called before the default handleState
 	// logic. Return true to suppress the default transitions.
@@ -358,8 +366,12 @@ func (c *Character) UpdateImageOptions() {
 
 	// 5. Per-state render offset (screen-space, post-flip, post-anchor).
 	if c.renderOffsets != nil {
-		if p, ok := c.renderOffsets[c.state.State()]; ok {
-			c.imageOptions.GeoM.Translate(float64(p.X), float64(p.Y))
+		if o, ok := c.renderOffsets[c.state.State()]; ok {
+			x := o.X
+			if fDirection == animation.FaceDirectionLeft && o.XFlipped != nil {
+				x = *o.XFlipped
+			}
+			c.imageOptions.GeoM.Translate(float64(x), float64(o.Y))
 		}
 	}
 }
@@ -553,22 +565,29 @@ func (c *Character) Altitude16() int     { return c.MovableBody.Altitude16() }
 func (c *Character) SetAltitude(a int)   { c.MovableBody.SetAltitude(a) }
 func (c *Character) SetAltitude16(a int) { c.MovableBody.SetAltitude16(a) }
 
-// SetRenderOffset registers a pixel-space draw-time nudge for the given state.
-// The offset is applied after all other transforms (flip, scale, world translate)
-// and has no effect on physics or collision.
-func (c *Character) SetRenderOffset(state ActorStateEnum, dx, dy int) {
+// SetRenderOffset registers a per-state pixel-space draw-time offset.
+// dxFlipped is the optional left-facing X override; pass nil to reuse dx for both facings.
+// dxFlipped == &0 is a valid explicit zero override (distinct from nil).
+func (c *Character) SetRenderOffset(state ActorStateEnum, dx, dy int, dxFlipped *int) {
 	if c.renderOffsets == nil {
-		c.renderOffsets = make(map[ActorStateEnum]image.Point)
+		c.renderOffsets = make(map[ActorStateEnum]renderOffset)
 	}
-	c.renderOffsets[state] = image.Pt(dx, dy)
+	c.renderOffsets[state] = renderOffset{X: dx, Y: dy, XFlipped: dxFlipped}
 }
 
-// RenderOffset returns the registered draw-time offset for the given state.
+// RenderOffset returns the resolved offset for the given state at the current facing.
 // Returns (image.Point{}, false) when no offset has been registered.
 func (c *Character) RenderOffset(state ActorStateEnum) (image.Point, bool) {
 	if c.renderOffsets == nil {
 		return image.Point{}, false
 	}
-	p, ok := c.renderOffsets[state]
-	return p, ok
+	o, ok := c.renderOffsets[state]
+	if !ok {
+		return image.Point{}, false
+	}
+	x := o.X
+	if c.FaceDirection() == animation.FaceDirectionLeft && o.XFlipped != nil {
+		x = *o.XFlipped
+	}
+	return image.Pt(x, o.Y), true
 }

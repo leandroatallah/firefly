@@ -9,6 +9,7 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/context"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/schemas"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
+	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/builder"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors/events"
 	bodyphysics "github.com/boilerplate/ebiten-template/internal/engine/physics/body"
 	physicsmovement "github.com/boilerplate/ebiten-template/internal/engine/physics/movement"
@@ -100,6 +101,7 @@ func NewPlatformerCharacter(fsys fs.FS, stateMap map[string]animation.SpriteStat
 		return nil, err
 	}
 	c := actors.NewCharacter(s, bodyRect)
+	builder.ApplyRenderOffsets(c, spriteData, stateMap)
 	pf := &PlatformerCharacter{
 		Character: c,
 	}

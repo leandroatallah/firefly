@@ -8,12 +8,7 @@ Update this file when a story moves to `active/` or `done/`, or when sequencing 
 
 ## Active Sequence
 
-All foundation stories (061–066, 069) are done. Next work items:
-
-| Order | Story                                    | Depends on | Notes                                      |
-| ----- | ---------------------------------------- | ---------- | ------------------------------------------ |
-| 1     | `067-actor-json-hitbox-active-frames`    | —          | Hitbox active-frame data in actor JSON     |
-| 2     | `068-actor-json-sprite-render-offset`    | —          | Sprite render offset in actor JSON         |
+1. `070-render-offset-facing-kit-wiring` — per-facing `x_flipped` in `SpriteOffset`; wire `ApplyRenderOffsets` into platformer kit constructor.
 
 ---
 
@@ -29,15 +24,10 @@ All foundation stories (061–066, 069) are done. Next work items:
        ├─ 065-beatemup-jump-skill (done)
        └─ 066-beatemup-airborne-state-transitions (done)
 
-067-actor-json-hitbox-active-frames (independent)
-068-actor-json-sprite-render-offset (independent)
+067-actor-json-hitbox-active-frames (done)
+068-actor-json-sprite-render-offset (done)
+  └─ 070-render-offset-facing-kit-wiring (backlog)
 ```
-
----
-
-## Sequencing Notes
-
-- 067 and 068 are independent of each other and can ship in parallel.
 
 ---
 
@@ -51,6 +41,8 @@ Future stories not yet written. One line each.
 
 ## Recently Completed
 
+- `068-actor-json-sprite-render-offset` — per-state sprite render offset in actor JSON.
+- `067-actor-json-hitbox-active-frames` — hitbox active-frames override from JSON.
 - `069-depth-lane-body-impl` — `DepthLaneBody` on `ObstacleRect` and `BeatEmUpCharacter`; correct depth-lane collision for airborne bodies.
 - `066-beatemup-airborne-state-transitions` — airborne state transitions for `BeatEmUpCharacter`.
 - `065-beatemup-jump-skill` — `BeatEmUpJumpSkill` kit skill: altitude-axis jump with coyote time, buffering, jump-cut.

@@ -30,8 +30,9 @@ The coordinate model: **X** = horizontal, **Y** = ground/depth, **Altitude** = h
 | `065-beatemup-jump-skill` | done | `BeatEmUpJumpSkill`: altitude jump with coyote time, buffering, jump-cut |
 | `066-beatemup-airborne-state-transitions` | done | Airborne state transitions for `BeatEmUpCharacter` |
 | `069-depth-lane-body-impl` | done | `DepthLaneBody` on `ObstacleRect` and `BeatEmUpCharacter` |
-| `067-actor-json-hitbox-active-frames` | backlog | Hitbox active-frame data in actor JSON |
-| `068-actor-json-sprite-render-offset` | backlog | Sprite render offset in actor JSON |
+| `067-actor-json-hitbox-active-frames` | done | Hitbox active-frame data in actor JSON |
+| `068-actor-json-sprite-render-offset` | done | Sprite render offset in actor JSON |
+| `070-render-offset-facing-kit-wiring` | backlog | Per-facing `x_flipped` in `SpriteOffset`; wire `ApplyRenderOffsets` into platformer kit |
 
 ## Out of Scope
 
