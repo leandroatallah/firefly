@@ -16,6 +16,7 @@ type Game struct {
 	AppContext    *AppContext
 	debugVisible  bool
 	debugFontFace *text.GoTextFace
+	slowMoApplied bool
 }
 
 func NewGame(ctx *AppContext) *Game {
@@ -26,6 +27,14 @@ func NewGame(ctx *AppContext) *Game {
 }
 
 func (g *Game) Update() error {
+	if !g.slowMoApplied {
+		g.slowMoApplied = true
+		cfg := g.AppContext.Config
+		if tps, ok := EffectiveTPS(cfg.SlowMo, cfg.SlowMoFactor, ebiten.DefaultTPS); ok {
+			ebiten.SetTPS(tps)
+		}
+	}
+
 	g.AppContext.FrameCount++
 
 	if inpututil.IsKeyJustPressed(ebiten.KeyF1) {

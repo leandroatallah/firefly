@@ -55,6 +55,80 @@ func TestGameUpdateAndDrawIntegration(t *testing.T) {
 	}
 }
 
+// TestGameUpdateSlowMoAppliedGuard verifies the one-time guard that applies
+// ebiten.SetTPS at the first Game.Update tick when slow-motion is configured.
+//
+// We intentionally do NOT assert on ebiten.CurrentTPS() because Ebitengine
+// does not guarantee that CurrentTPS reflects a SetTPS call outside an active
+// RunGame loop — asserting it would be flaky. The pure EffectiveTPS helper
+// (see slowmo_test.go) exercises the clamp/rounding/no-op math; here we only
+// verify the observable wiring on the Game struct:
+//   - slowMoApplied flips to true on the first Update regardless of cfg.SlowMo
+//   - the SceneManager.Update path still runs when the slow-mo branch fires
+func TestGameUpdateSlowMoAppliedGuard(t *testing.T) {
+	t.Run("T-G1 slowMoApplied flips on first Update when SlowMo disabled", func(t *testing.T) {
+		cfg := &config.AppConfig{
+			ScreenWidth:  320,
+			ScreenHeight: 240,
+			SlowMo:       false,
+		}
+		ctx := &AppContext{
+			Config:          cfg,
+			DialogueManager: &mocks.MockDialogueManager{},
+			SceneManager:    &mocks.MockSceneManager{},
+		}
+		game := NewGame(ctx)
+
+		if game.slowMoApplied {
+			t.Fatalf("expected slowMoApplied=false before any Update, got true")
+		}
+
+		if err := game.Update(); err != nil {
+			t.Fatalf("unexpected error on first Update: %v", err)
+		}
+		if !game.slowMoApplied {
+			t.Fatalf("expected slowMoApplied=true after first Update (regardless of cfg.SlowMo)")
+		}
+
+		// Second update must remain safe (idempotent guard).
+		if err := game.Update(); err != nil {
+			t.Fatalf("unexpected error on second Update: %v", err)
+		}
+		if !game.slowMoApplied {
+			t.Fatalf("expected slowMoApplied to remain true after second Update")
+		}
+	})
+
+	t.Run("T-G2 SceneManager.Update still called when slow-mo branch runs", func(t *testing.T) {
+		cfg := &config.AppConfig{
+			ScreenWidth:  320,
+			ScreenHeight: 240,
+			SlowMo:       true,
+			SlowMoFactor: 0.25,
+		}
+		sm := &mocks.MockSceneManager{}
+		ctx := &AppContext{
+			Config:          cfg,
+			DialogueManager: &mocks.MockDialogueManager{},
+			SceneManager:    sm,
+		}
+		game := NewGame(ctx)
+
+		if err := game.Update(); err != nil {
+			t.Fatalf("unexpected error on Update: %v", err)
+		}
+		if !sm.UpdateCalled {
+			t.Fatalf("expected SceneManager.Update to be called when slow-mo branch runs")
+		}
+		if ctx.FrameCount != 1 {
+			t.Fatalf("expected FrameCount=1 after one Update, got %d", ctx.FrameCount)
+		}
+		if !game.slowMoApplied {
+			t.Fatalf("expected slowMoApplied=true after first Update with SlowMo enabled")
+		}
+	})
+}
+
 func TestAppContextPhaseNavigationIntegration(t *testing.T) {
 	pm := phases.NewManager()
 	sceneType1 := navigation.SceneType(1)
@@ -93,4 +167,50 @@ func TestAppContextPhaseNavigationIntegration(t *testing.T) {
 	if sm.LastSceneType != sceneType2 {
 		t.Fatalf("CompleteCurrentPhase navigated to scene %d, want %d", sm.LastSceneType, sceneType2)
 	}
+}
+
+// TestGame_OverlayOpenSuppressesSceneUpdate verifies that when the debug
+// overlay is open, Game.Update skips both SceneManager.Update and
+// DialogueManager.Update, but still advances FrameCount.
+//
+// AC-8: overlay open → SceneManager.Update and DialogueManager.Update not called.
+func TestGame_OverlayOpenSuppressesSceneUpdate(t *testing.T) {
+	t.Run("T-G1 overlay open suppresses scene and dialogue update", func(t *testing.T) {
+		cfg := &config.AppConfig{
+			ScreenWidth:  320,
+			ScreenHeight: 240,
+		}
+
+		sm := &mocks.MockSceneManager{}
+		dm := &mocks.MockDialogueManager{}
+		ctx := &AppContext{
+			Config:          cfg,
+			SceneManager:    sm,
+			DialogueManager: dm,
+		}
+
+		game := NewGame(ctx)
+
+		// Open the overlay via the test-friendly accessor.
+		overlay := game.DebugOverlay()
+		if overlay == nil {
+			t.Fatalf("DebugOverlay() returned nil, want non-nil overlay")
+		}
+		overlay.Open()
+
+		startFrame := ctx.FrameCount
+		if err := game.Update(); err != nil {
+			t.Fatalf("unexpected error on Update: %v", err)
+		}
+
+		if sm.UpdateCalled {
+			t.Fatalf("SceneManager.Update was called while overlay open, want suppressed")
+		}
+		if dm.UpdateCalls != 0 {
+			t.Fatalf("DialogueManager.Update was called %d times while overlay open, want 0", dm.UpdateCalls)
+		}
+		if ctx.FrameCount != startFrame+1 {
+			t.Fatalf("FrameCount = %d, want %d (frame should still advance)", ctx.FrameCount, startFrame+1)
+		}
+	})
 }

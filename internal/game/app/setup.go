@@ -27,7 +27,7 @@ import (
 func Setup(assets fs.FS) error {
 	cfg := config.Get()
 	// Basic Ebiten setup
-	ebiten.SetWindowSize(cfg.ScreenWidth*3, cfg.ScreenHeight*3)
+	ebiten.SetWindowSize(cfg.ScreenWidth*2, cfg.ScreenHeight*2)
 	ebiten.SetFullscreen(cfg.Fullscreen)
 	ebiten.SetWindowTitle("Ebitengine Boilerplate")
 
@@ -74,7 +74,7 @@ func Setup(assets fs.FS) error {
 	for _, p := range GetPhases() {
 		phaseManager.AddPhase(p)
 	}
-	phaseManager.SetCurrentPhase(1)
+	phaseManager.SetCurrentPhase(2)
 
 	appContext := &app.AppContext{
 		AudioManager:    audioManager,

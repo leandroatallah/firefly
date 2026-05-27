@@ -64,6 +64,8 @@ func NewConfig() *config.AppConfig {
 	flag.BoolVar(&cfg.EnableTypingSounds, "typing-sounds", true, "Enable typing sound effects")
 	flag.Float64Var(&cfg.TypingSoundVolume, "typing-sound-volume", 0.6, "Typing sound effect volume multiplier")
 	flag.IntVar(&cfg.TypingSoundCooldownFrames, "typing-sound-cooldown", 5, "Frames between typing sounds")
+	flag.BoolVar(&cfg.SlowMo, "slow-mo", false, "Enable slow-motion debug mode (lowers effective TPS)")
+	flag.Float64Var(&cfg.SlowMoFactor, "slow-mo-factor", 0.25, "Slow-motion TPS multiplier (clamped to [0.05, 1.0])")
 
 	return cfg
 }
