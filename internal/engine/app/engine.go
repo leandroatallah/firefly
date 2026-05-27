@@ -7,6 +7,7 @@ import (
 
 	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
 	"github.com/boilerplate/ebiten-template/internal/engine/debug"
+	"github.com/boilerplate/ebiten-template/internal/engine/ui/debugoverlay"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
@@ -14,16 +15,22 @@ import (
 
 type Game struct {
 	AppContext    *AppContext
-	debugVisible  bool
 	debugFontFace *text.GoTextFace
 	slowMoApplied bool
+	debugOverlay  *debugoverlay.DebugOverlay
 }
 
 func NewGame(ctx *AppContext) *Game {
 	debug.Init("assets/data/debug.json")
 	return &Game{
-		AppContext: ctx,
+		AppContext:   ctx,
+		debugOverlay: debugoverlay.New(),
 	}
+}
+
+// DebugOverlay returns the debug overlay instance for external control (e.g. tests).
+func (g *Game) DebugOverlay() *debugoverlay.DebugOverlay {
+	return g.debugOverlay
 }
 
 func (g *Game) Update() error {
@@ -38,7 +45,16 @@ func (g *Game) Update() error {
 	g.AppContext.FrameCount++
 
 	if inpututil.IsKeyJustPressed(ebiten.KeyF1) {
-		g.debugVisible = !g.debugVisible
+		if g.debugOverlay.IsOpen() {
+			g.debugOverlay.Close()
+		} else {
+			g.debugOverlay.Open()
+		}
+	}
+
+	if g.debugOverlay.IsOpen() {
+		g.debugOverlay.Update()
+		return nil
 	}
 
 	// Update Dialogue Manager
@@ -59,9 +75,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		g.AppContext.DialogueManager.Draw(screen)
 	}
 
-	if g.debugVisible {
-		g.DebugPhysics(screen)
-	}
+	g.debugOverlay.Draw(screen)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
@@ -91,5 +105,4 @@ func (g *Game) DebugPhysics(screen *ebiten.Image) {
 	op.GeoM.Translate(5, 15)
 	op.ColorScale.ScaleWithColor(color.White)
 	text.Draw(screen, b.String(), g.debugFontFace, op)
-
 }

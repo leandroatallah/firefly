@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
+	"github.com/boilerplate/ebiten-template/internal/engine/debug"
 	"github.com/boilerplate/ebiten-template/internal/engine/utils/fp16"
 	"github.com/boilerplate/ebiten-template/internal/engine/utils/timing"
 )
@@ -66,6 +67,9 @@ func NewConfig() *config.AppConfig {
 	flag.IntVar(&cfg.TypingSoundCooldownFrames, "typing-sound-cooldown", 5, "Frames between typing sounds")
 	flag.BoolVar(&cfg.SlowMo, "slow-mo", false, "Enable slow-motion debug mode (lowers effective TPS)")
 	flag.Float64Var(&cfg.SlowMoFactor, "slow-mo-factor", 0.25, "Slow-motion TPS multiplier (clamped to [0.05, 1.0])")
+
+	debug.Register("cam_debug", &cfg.CamDebug)
+	debug.Register("collision_box", &cfg.CollisionBox)
 
 	return cfg
 }

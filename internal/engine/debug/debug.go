@@ -12,9 +12,10 @@ import (
 //nolint:gochecknoglobals
 var (
 	enabled    atomic.Bool
-	mu         sync.Mutex // guards watchCache and initialization
-	channels   atomic.Pointer[map[string]bool]
+	mu         sync.Mutex // guards watchCache, registry, and initialization
+	channels   atomic.Pointer[map[string]*bool]
 	watchCache map[string]string
+	registry   map[string]*bool
 )
 
 func init() {
@@ -44,23 +45,31 @@ func InitFromReader(r io.Reader) {
 		return
 	}
 
-	var m map[string]bool
-	if err := json.NewDecoder(r).Decode(&m); err != nil {
+	var raw map[string]bool
+	if err := json.NewDecoder(r).Decode(&raw); err != nil {
 		return
 	}
 
+	m := make(map[string]*bool, len(raw))
 	anyOn := false
-	for _, v := range m {
+	for k, v := range raw {
+		val := v
+		m[k] = &val
 		if v {
 			anyOn = true
-			break
 		}
 	}
 
 	mu.Lock()
+	if registry == nil {
+		registry = make(map[string]*bool)
+	}
 	channels.Store(&m)
-	enabled.Store(anyOn)
+	for k, p := range m {
+		registry[k] = p
+	}
 	mu.Unlock()
+	enabled.Store(anyOn)
 }
 
 // Log writes a formatted line to stdout on every call when channel is
@@ -113,15 +122,17 @@ func Enabled(channel string) bool {
 	if m == nil {
 		return false
 	}
-	return (*m)[channel]
+	p := (*m)[channel]
+	return p != nil && *p
 }
 
-// Reset clears all internal state (channels, watchCache). Test-only helper;
-// safe to call from production code but normally unnecessary.
+// Reset clears all internal state (channels, watchCache, registry). Test-only
+// helper; safe to call from production code but normally unnecessary.
 func Reset() {
 	mu.Lock()
 	channels.Store(nil)
 	watchCache = make(map[string]string)
+	registry = nil
 	mu.Unlock()
 	enabled.Store(false)
 }
