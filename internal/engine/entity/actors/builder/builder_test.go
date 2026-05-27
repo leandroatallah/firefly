@@ -547,3 +547,69 @@ func (m *minimalActor) VAltitude16() int              { return 0 }
 func (m *minimalActor) SetVAltitude16(v16 int)        {}
 func (m *minimalActor) AccelerationAltitude() int     { return 0 }
 func (m *minimalActor) SetAccelerationAltitude(a int) {}
+
+// T-B1 (story 068): ApplyRenderOffsets registers each non-nil RenderOffset on
+// the character keyed by the matching enum from stateMap. Assets without a
+// RenderOffset must not register anything (RenderOffset() returns ok=false).
+func TestApplyRenderOffsets_RegistersPerStateOffsets(t *testing.T) {
+	actor := newMockActorWithCollision()
+	character := actors.NewCharacter(sprites.SpriteMap{}, bodyphysics.NewRect(0, 0, 16, 16))
+	actor.SetCharacter(character)
+
+	spriteData := schemas.SpriteData{
+		Assets: map[string]schemas.AssetData{
+			"idle":    {Path: "i.png", RenderOffset: &schemas.SpriteOffset{X: -4, Y: 0}},
+			"jumping": {Path: "j.png", RenderOffset: &schemas.SpriteOffset{X: 8, Y: -2}},
+			"walking": {Path: "w.png"}, // no offset
+		},
+	}
+	stateMap, err := BuildStateMap(spriteData)
+	if err != nil {
+		t.Fatalf("BuildStateMap: %v", err)
+	}
+
+	ApplyRenderOffsets(actor, spriteData, stateMap)
+
+	if got, ok := character.RenderOffset(actors.Idle); !ok || got != image.Pt(-4, 0) {
+		t.Errorf("RenderOffset(Idle) = (%v, ok=%v); want ((-4, 0), true)", got, ok)
+	}
+	if got, ok := character.RenderOffset(actors.Jumping); !ok || got != image.Pt(8, -2) {
+		t.Errorf("RenderOffset(Jumping) = (%v, ok=%v); want ((8, -2), true)", got, ok)
+	}
+	if got, ok := character.RenderOffset(actors.Walking); ok {
+		t.Errorf("RenderOffset(Walking) = (%v, ok=true); want ok=false (no render_offset in asset)", got)
+	}
+}
+
+// T-B2 (story 068): ApplyRenderOffsets is a no-op when every asset omits
+// RenderOffset. No state must report ok=true. Guarantees zero regression for
+// the existing actor JSON files (AC-4, AC-8).
+func TestApplyRenderOffsets_NoOpWhenAllOffsetsNil(t *testing.T) {
+	actor := newMockActorWithCollision()
+	character := actors.NewCharacter(sprites.SpriteMap{}, bodyphysics.NewRect(0, 0, 16, 16))
+	actor.SetCharacter(character)
+
+	spriteData := schemas.SpriteData{
+		Assets: map[string]schemas.AssetData{
+			"idle":    {Path: "i.png"},
+			"walking": {Path: "w.png"},
+		},
+	}
+	stateMap, err := BuildStateMap(spriteData)
+	if err != nil {
+		t.Fatalf("BuildStateMap: %v", err)
+	}
+
+	ApplyRenderOffsets(actor, spriteData, stateMap)
+
+	for key, st := range stateMap {
+		enum, ok := st.(actors.ActorStateEnum)
+		if !ok {
+			t.Fatalf("stateMap[%q] is not ActorStateEnum (got %T)", key, st)
+		}
+		if got, ok := character.RenderOffset(enum); ok {
+			t.Errorf("RenderOffset(%v) = (%v, ok=true) for asset %q with nil RenderOffset; want ok=false",
+				enum, got, key)
+		}
+	}
+}
