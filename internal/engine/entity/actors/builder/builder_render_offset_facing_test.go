@@ -11,15 +11,11 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/render/sprites"
 )
 
-// intPtr is a small helper so tests can build *int values for XFlipped.
-func intPtr(v int) *int { return &v }
-
-// T-B1 (story 070): ApplyRenderOffsets forwards the XFlipped pointer from
-// schemas.SpriteOffset into the character's render-offset registry. The
-// per-facing resolution is observable at draw time via Character.RenderOffset
-// which returns the X resolved against the current facing direction.
+// T-B1 (story 070): ApplyRenderOffsets forwards SpriteOffset {X,Y} into the
+// character's render-offset registry. Per-facing X resolution is observable at
+// draw time via Character.RenderOffset which auto-mirrors X when facing left.
 // Covers AC-5, AC-10.
-func TestApplyRenderOffsets_ForwardsXFlippedPerFacing(t *testing.T) {
+func TestApplyRenderOffsets_FacingAware(t *testing.T) {
 	tests := []struct {
 		name        string
 		assetOffset schemas.SpriteOffset
@@ -27,40 +23,22 @@ func TestApplyRenderOffsets_ForwardsXFlippedPerFacing(t *testing.T) {
 		wantPt      image.Point
 	}{
 		{
-			name:        "XFlipped set, facing right -> uses X",
-			assetOffset: schemas.SpriteOffset{X: -4, Y: 2, XFlipped: intPtr(6)},
+			name:        "facing right uses X as-is",
+			assetOffset: schemas.SpriteOffset{X: 10, Y: 2},
 			facing:      animation.FaceDirectionRight,
-			wantPt:      image.Pt(-4, 2),
+			wantPt:      image.Pt(10, 2),
 		},
 		{
-			name:        "XFlipped set, facing left -> uses XFlipped",
-			assetOffset: schemas.SpriteOffset{X: -4, Y: 2, XFlipped: intPtr(6)},
+			name:        "facing left auto-mirrors X",
+			assetOffset: schemas.SpriteOffset{X: 10, Y: 2},
 			facing:      animation.FaceDirectionLeft,
-			wantPt:      image.Pt(6, 2),
+			wantPt:      image.Pt(-10, 2),
 		},
 		{
-			name:        "XFlipped nil, facing right -> uses X",
-			assetOffset: schemas.SpriteOffset{X: -4, Y: 2},
-			facing:      animation.FaceDirectionRight,
-			wantPt:      image.Pt(-4, 2),
-		},
-		{
-			name:        "XFlipped nil, facing left -> falls back to X (068 regression)",
+			name:        "facing left auto-mirrors negative X",
 			assetOffset: schemas.SpriteOffset{X: -4, Y: 2},
 			facing:      animation.FaceDirectionLeft,
-			wantPt:      image.Pt(-4, 2),
-		},
-		{
-			name:        "XFlipped=0 explicit, facing left -> 0",
-			assetOffset: schemas.SpriteOffset{X: -4, Y: 2, XFlipped: intPtr(0)},
-			facing:      animation.FaceDirectionLeft,
-			wantPt:      image.Pt(0, 2),
-		},
-		{
-			name:        "XFlipped=0 explicit, facing right -> uses X",
-			assetOffset: schemas.SpriteOffset{X: -4, Y: 2, XFlipped: intPtr(0)},
-			facing:      animation.FaceDirectionRight,
-			wantPt:      image.Pt(-4, 2),
+			wantPt:      image.Pt(4, 2),
 		},
 	}
 
@@ -83,8 +61,6 @@ func TestApplyRenderOffsets_ForwardsXFlippedPerFacing(t *testing.T) {
 
 			ApplyRenderOffsets(actor, spriteData, stateMap)
 
-			// Drive facing direction on the character itself; RenderOffset
-			// resolves X against the current facing at call time.
 			character.SetAcceleration(0, 0)
 			character.SetFaceDirection(tt.facing)
 

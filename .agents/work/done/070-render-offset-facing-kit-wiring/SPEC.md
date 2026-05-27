@@ -1,5 +1,21 @@
 # SPEC — 070-render-offset-facing-kit-wiring
 
+> **Post-implementation revision (2026-05-27):** Auto-mirror semantics. The
+> `XFlipped *int` override was removed entirely. `SpriteOffset` is now
+> `{X, Y}` only. `Character.SetRenderOffset(state, dx, dy)` is 3-arg. When
+> facing left, `RenderOffset()` and `UpdateImageOptions` step 5 negate `X`
+> automatically (auto-mirror), since the offset is applied post-flip in
+> screen space and must follow the mirrored sprite content. The original
+> design preserved `X` across facings (068 regression guard) and offered
+> per-asset opt-in via `x_flipped`. In practice every real use case wants
+> the negated value, so YAGNI applied: removed the field, the JSON key, the
+> override tests, and the explicit-zero path. The sections below describing
+> `XFlipped`, `*int` plumbing, T-S1/T-S3, and the "X only, facing left →
+> same X" T-C2 row are superseded.
+
+---
+
+
 ## 1. Schema [AC-1, AC-2, AC-8]
 
 **File:** `internal/engine/data/schemas/json.go` (package `schemas`)

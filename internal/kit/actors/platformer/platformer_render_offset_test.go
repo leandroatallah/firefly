@@ -79,15 +79,13 @@ func TestNewPlatformerCharacter_AppliesRenderOffsetsFromSpriteData(t *testing.T)
 	}
 }
 
-// T-P1b (story 070): The XFlipped pointer survives the platformer constructor
-// pipeline — when facing left, the registered offset must resolve to the
-// flipped X. Guards against a future refactor that strips the pointer when
-// copying through the builder.
-func TestNewPlatformerCharacter_AppliesRenderOffsetsWithXFlipped(t *testing.T) {
+// T-P1b (story 070): Render offset survives the platformer constructor
+// pipeline and auto-mirrors X when the embedded Character faces left.
+// Guards against a future refactor that drops facing-aware resolution.
+func TestNewPlatformerCharacter_AppliesRenderOffsetsAutoMirrorsLeft(t *testing.T) {
 	fsys, stateMap, spriteData, bodyRect := newPlatformerRenderOffsetFixtures(t)
-	flipped := 5
 	asset := spriteData.Assets["idle"]
-	asset.RenderOffset = &schemas.SpriteOffset{X: -2, Y: 0, XFlipped: &flipped}
+	asset.RenderOffset = &schemas.SpriteOffset{X: -2, Y: 0}
 	spriteData.Assets["idle"] = asset
 
 	pf, err := platformer.NewPlatformerCharacter(fsys, stateMap, spriteData, bodyRect)
@@ -95,7 +93,6 @@ func TestNewPlatformerCharacter_AppliesRenderOffsetsWithXFlipped(t *testing.T) {
 		t.Fatalf("NewPlatformerCharacter: %v", err)
 	}
 
-	// Drive facing on the embedded Character; RenderOffset resolves at call time.
 	pf.SetAcceleration(0, 0)
 	pf.SetFaceDirection(animation.FaceDirectionLeft)
 
@@ -103,8 +100,8 @@ func TestNewPlatformerCharacter_AppliesRenderOffsetsWithXFlipped(t *testing.T) {
 	if !ok {
 		t.Fatalf("RenderOffset(Idle) ok = false; want true")
 	}
-	if got != image.Pt(5, 0) {
-		t.Errorf("RenderOffset(Idle) facing-left = %v, want (5, 0) (XFlipped not propagated)", got)
+	if got != image.Pt(2, 0) {
+		t.Errorf("RenderOffset(Idle) facing-left = %v, want (2, 0) (auto-mirror)", got)
 	}
 }
 

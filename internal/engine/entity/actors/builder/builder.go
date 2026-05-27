@@ -133,6 +133,6 @@ func ApplyRenderOffsets(
 		if !ok {
 			continue
 		}
-		character.GetCharacter().SetRenderOffset(enum, asset.RenderOffset.X, asset.RenderOffset.Y, asset.RenderOffset.XFlipped)
+		character.GetCharacter().SetRenderOffset(enum, asset.RenderOffset.X, asset.RenderOffset.Y)
 	}
 }

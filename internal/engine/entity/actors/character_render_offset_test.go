@@ -41,7 +41,7 @@ func translation(c *actors.Character) (float64, float64) {
 func TestCharacter_RenderOffset_RoundTrip(t *testing.T) {
 	c := newRenderOffsetCharacter()
 
-	c.SetRenderOffset(actors.Idle, -4, 2, nil)
+	c.SetRenderOffset(actors.Idle, -4, 2)
 
 	gotIdle, okIdle := c.RenderOffset(actors.Idle)
 	if !okIdle {
@@ -109,7 +109,7 @@ func TestCharacter_UpdateImageOptions_AppliesRenderOffset(t *testing.T) {
 			name:  "offset (-4, 0) shifts X left by 4",
 			state: actors.Idle,
 			setup: func(c *actors.Character) {
-				c.SetRenderOffset(actors.Idle, -4, 0, nil)
+				c.SetRenderOffset(actors.Idle, -4, 0)
 			},
 			wantDx: -4,
 			wantDy: 0,
@@ -118,7 +118,7 @@ func TestCharacter_UpdateImageOptions_AppliesRenderOffset(t *testing.T) {
 			name:  "offset (0, 3) shifts Y down by 3",
 			state: actors.Idle,
 			setup: func(c *actors.Character) {
-				c.SetRenderOffset(actors.Idle, 0, 3, nil)
+				c.SetRenderOffset(actors.Idle, 0, 3)
 			},
 			wantDx: 0,
 			wantDy: 3,
@@ -127,7 +127,7 @@ func TestCharacter_UpdateImageOptions_AppliesRenderOffset(t *testing.T) {
 			name:  "offset registered for another state has no effect on current state",
 			state: actors.Idle,
 			setup: func(c *actors.Character) {
-				c.SetRenderOffset(actors.Walking, -10, -10, nil)
+				c.SetRenderOffset(actors.Walking, -10, -10)
 			},
 			wantDx: 0,
 			wantDy: 0,
@@ -136,7 +136,7 @@ func TestCharacter_UpdateImageOptions_AppliesRenderOffset(t *testing.T) {
 			name:  "explicit zero offset behaves like no offset",
 			state: actors.Idle,
 			setup: func(c *actors.Character) {
-				c.SetRenderOffset(actors.Idle, 0, 0, nil)
+				c.SetRenderOffset(actors.Idle, 0, 0)
 			},
 			wantDx: 0,
 			wantDy: 0,
@@ -160,33 +160,26 @@ func TestCharacter_UpdateImageOptions_AppliesRenderOffset(t *testing.T) {
 	}
 }
 
-// T-C3: Facing-left mirroring does NOT invert the offset's X. The offset is
-// applied AFTER Scale(-1, 1), so a left-facing actor with X:-4 is still
-// shifted -4 px on screen (additive, not mirrored). Decision documented in
-// NOTES.md and SPEC.md §3.
-func TestCharacter_UpdateImageOptions_RenderOffset_NotMirroredWhenFacingLeft(t *testing.T) {
-	// Capture left-facing baseline (no offset registered).
+// T-C3 (story 070): Facing-left auto-mirrors X. Render offset is applied
+// AFTER Scale(-1, 1) in screen space, so to keep alignment with the mirrored
+// sprite content the X is negated when facing left. Y is facing-independent.
+func TestCharacter_UpdateImageOptions_RenderOffset_AutoMirrorsWhenFacingLeft(t *testing.T) {
 	base := newRenderOffsetCharacter()
+	base.SetAcceleration(0, 0)
 	base.SetFaceDirection(animation.FaceDirectionLeft)
 	baseTx, baseTy := translation(base)
 
 	c := newRenderOffsetCharacter()
+	c.SetAcceleration(0, 0)
 	c.SetFaceDirection(animation.FaceDirectionLeft)
-	c.SetRenderOffset(actors.Idle, -4, 0, nil)
+	c.SetRenderOffset(actors.Idle, -4, 0)
 
 	gotTx, gotTy := translation(c)
 
-	wantTx := baseTx + (-4) // additive, NOT mirrored to +4
+	wantTx := baseTx + 4 // -X auto-mirrored
 	wantTy := baseTy
 	if gotTx != wantTx || gotTy != wantTy {
 		t.Errorf("facing-left translation = (%v, %v), want (%v, %v); left-baseline=(%v, %v)",
 			gotTx, gotTy, wantTx, wantTy, baseTx, baseTy)
-	}
-
-	// Sanity guard: if the offset had been mirrored, the X would equal
-	// baseTx + 4 instead. Make the regression explicit.
-	if gotTx == baseTx+4 {
-		t.Errorf("offset X was mirrored when facing left (got %v = baseline + 4); "+
-			"AC-9 / SPEC §3 require additive, non-mirrored behavior", gotTx)
 	}
 }

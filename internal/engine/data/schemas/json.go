@@ -26,9 +26,8 @@ type HitboxFrameRange struct {
 // SpriteOffset defines a pixel-space draw-time offset applied after all other
 // transforms. It has no effect on physics or collision.
 type SpriteOffset struct {
-	X        int  `json:"x"`
-	Y        int  `json:"y"`
-	XFlipped *int `json:"x_flipped,omitempty"`
+	X int `json:"x"`
+	Y int `json:"y"`
 }
 
 // AssetData holds information about a single asset, including its path and collision areas.
