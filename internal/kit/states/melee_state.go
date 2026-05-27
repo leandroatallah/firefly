@@ -33,6 +33,7 @@ type meleeWeaponIface interface {
 	StepIndex() int
 	ComboWindowRemaining() int
 	ResetCombo()
+	SetActiveFramesOverride(override *[2]int)
 }
 
 // meleeVFXSpawner is the minimum surface needed by MeleeAttackState to render

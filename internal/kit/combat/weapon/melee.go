@@ -41,6 +41,13 @@ type MeleeWeapon struct {
 
 	faceDir              animation.FacingDirectionEnum
 	originX16, originY16 int
+
+	// pendingOverride is set by SetActiveFramesOverride and consumed by
+	// startSwing on the next swing start. Separating it from activeFramesOverride
+	// ensures that a caller-supplied override survives the Fire → startSwing
+	// transition while any stale override from a previous swing is discarded.
+	pendingOverride      *[2]int
+	activeFramesOverride *[2]int
 }
 
 // NewMeleeWeapon constructs a MeleeWeapon with combo-step configuration.
@@ -108,6 +115,14 @@ func (w *MeleeWeapon) AdvanceCombo() bool {
 	return true
 }
 
+// SetActiveFramesOverride queues a per-swing override for the hitbox active frame window.
+// When non-nil, IsHitboxActive uses override[0]/override[1] instead of the step's ActiveFrames.
+// The override is consumed and cleared at the start of the next swing so it cannot leak to
+// subsequent swings or shared weapon instances (AC-8).
+func (w *MeleeWeapon) SetActiveFramesOverride(override *[2]int) {
+	w.pendingOverride = override
+}
+
 // Fire begins a melee swing at the current combo step.
 // If the step has startup frames, the swing is deferred until the countdown elapses.
 func (w *MeleeWeapon) Fire(x16, y16 int, faceDir animation.FacingDirectionEnum, _ body.ShootDirection, _ int) {
@@ -126,7 +141,12 @@ func (w *MeleeWeapon) Fire(x16, y16 int, faceDir animation.FacingDirectionEnum, 
 	w.startSwing()
 }
 
+// startSwing initialises a new swing. pendingOverride is consumed and transferred
+// to activeFramesOverride at this point, clearing any stale value from a prior swing
+// and installing whatever the caller queued via SetActiveFramesOverride (AC-8).
 func (w *MeleeWeapon) startSwing() {
+	w.activeFramesOverride = w.pendingOverride
+	w.pendingOverride = nil
 	w.swinging = true
 	w.swingFrame = 0
 	w.hitThisSwing = make(map[combat.Damageable]struct{})
@@ -169,9 +189,13 @@ func (w *MeleeWeapon) Update() {
 }
 
 // IsHitboxActive returns true when the current swing frame is within the active-frame window.
+// If activeFramesOverride is set, it takes precedence over the step's ActiveFrames.
 func (w *MeleeWeapon) IsHitboxActive() bool {
 	if !w.swinging {
 		return false
+	}
+	if w.activeFramesOverride != nil {
+		return w.swingFrame >= w.activeFramesOverride[0] && w.swingFrame <= w.activeFramesOverride[1]
 	}
 	step := w.steps[w.stepIndex]
 	return w.swingFrame >= step.ActiveFrames[0] && w.swingFrame <= step.ActiveFrames[1]
