@@ -66,7 +66,7 @@ func (o *DebugOverlay) Update() bool {
 		o.cursor = 0
 	}
 
-	if o.keyJustPressed(ebiten.KeyF1) {
+	if o.keyJustPressed(ebiten.KeyF1) || o.keyJustPressed(ebiten.KeyEscape) {
 		o.open = false
 		return false
 	}
@@ -92,23 +92,47 @@ func (o *DebugOverlay) Draw(screen *ebiten.Image) {
 	panel.Fill(color.RGBA{0, 0, 0, 180})
 	screen.DrawImage(panel, nil)
 
+	if o.face == nil {
+		return
+	}
+
 	entries := debug.List()
+	const (
+		xPad     = 10
+		yStart   = 14
+		lineH    = 14
+		groupGap = 8
+	)
+	y := float64(yStart)
+	var prevGroup debug.Group = -1
 	for i, e := range entries {
+		if e.Group != prevGroup {
+			if prevGroup != -1 {
+				y += groupGap
+			}
+			header := "--- " + e.Group.String() + " ---"
+			op := &text.DrawOptions{}
+			op.GeoM.Translate(xPad, y)
+			op.ColorScale.ScaleWithColor(color.RGBA{180, 180, 180, 255})
+			text.Draw(screen, header, o.face, op)
+			y += lineH
+			prevGroup = e.Group
+		}
+
 		mark := "[ ]"
 		if e.Ptr != nil && *e.Ptr {
 			mark = "[x]"
 		}
 		line := mark + " " + e.Name
-		if o.face == nil {
-			continue
-		}
+
 		op := &text.DrawOptions{}
-		op.GeoM.Translate(10, float64(20+i*16))
+		op.GeoM.Translate(xPad, y)
 		if i == o.cursor {
 			op.ColorScale.ScaleWithColor(color.RGBA{255, 255, 0, 255})
 		} else {
 			op.ColorScale.ScaleWithColor(color.White)
 		}
 		text.Draw(screen, line, o.face, op)
+		y += lineH
 	}
 }

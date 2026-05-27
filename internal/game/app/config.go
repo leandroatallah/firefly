@@ -68,8 +68,14 @@ func NewConfig() *config.AppConfig {
 	flag.BoolVar(&cfg.SlowMo, "slow-mo", false, "Enable slow-motion debug mode (lowers effective TPS)")
 	flag.Float64Var(&cfg.SlowMoFactor, "slow-mo-factor", 0.25, "Slow-motion TPS multiplier (clamped to [0.05, 1.0])")
 
-	debug.Register("cam_debug", &cfg.CamDebug)
-	debug.Register("collision_box", &cfg.CollisionBox)
-
 	return cfg
+}
+
+// RegisterDebugFlags binds CLI debug flag pointers (on the global config
+// singleton) into the debug registry so the runtime overlay can toggle them.
+// Must be called AFTER config.Set so the pointers reference the live config.
+func RegisterDebugFlags() {
+	c := config.Get()
+	debug.Register("cam_debug", &c.CamDebug)
+	debug.Register("collision_box", &c.CollisionBox)
 }

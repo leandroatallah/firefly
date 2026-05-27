@@ -18,6 +18,7 @@ func main() {
 	cfg := gamesetup.NewConfig()
 	flag.Parse()
 	config.Set(cfg)
+	gamesetup.RegisterDebugFlags()
 
 	err := gamesetup.Setup(embedFs)
 	if err != nil {

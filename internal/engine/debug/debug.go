@@ -29,18 +29,29 @@ func init() {
 func Init(path string) {
 	f, err := os.Open(path)
 	if err != nil {
-		Reset()
+		clearChannels()
 		return
 	}
 	defer f.Close()
 	InitFromReader(f)
 }
 
+// clearChannels resets channels + watchCache + enabled flag, preserving the
+// registry so externally-registered pointers (e.g. CLI debug flags) survive
+// across Init calls.
+func clearChannels() {
+	mu.Lock()
+	channels.Store(nil)
+	watchCache = make(map[string]string)
+	mu.Unlock()
+	enabled.Store(false)
+}
+
 // InitFromReader is the test-friendly seam used by Init internally and by
 // unit tests to feed JSON without touching the filesystem. A nil reader
 // disables all channels.
 func InitFromReader(r io.Reader) {
-	Reset()
+	clearChannels()
 	if r == nil {
 		return
 	}
@@ -61,13 +72,7 @@ func InitFromReader(r io.Reader) {
 	}
 
 	mu.Lock()
-	if registry == nil {
-		registry = make(map[string]*bool)
-	}
 	channels.Store(&m)
-	for k, p := range m {
-		registry[k] = p
-	}
 	mu.Unlock()
 	enabled.Store(anyOn)
 }
@@ -115,9 +120,6 @@ func watchSlow(channel, key string, value any) {
 // Enabled reports whether channel is currently enabled. Exposed for tests
 // and for callers wishing to guard expensive argument construction.
 func Enabled(channel string) bool {
-	if !enabled.Load() {
-		return false
-	}
 	m := channels.Load()
 	if m == nil {
 		return false

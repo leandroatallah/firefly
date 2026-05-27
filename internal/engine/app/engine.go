@@ -44,7 +44,8 @@ func (g *Game) Update() error {
 
 	g.AppContext.FrameCount++
 
-	if inpututil.IsKeyJustPressed(ebiten.KeyF1) {
+	f1Toggled := inpututil.IsKeyJustPressed(ebiten.KeyF1)
+	if f1Toggled {
 		if g.debugOverlay.IsOpen() {
 			g.debugOverlay.Close()
 		} else {
@@ -53,7 +54,9 @@ func (g *Game) Update() error {
 	}
 
 	if g.debugOverlay.IsOpen() {
-		g.debugOverlay.Update()
+		if !f1Toggled {
+			g.debugOverlay.Update()
+		}
 		return nil
 	}
 

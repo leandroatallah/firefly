@@ -106,6 +106,7 @@ func Setup(assets fs.FS) error {
 
 	// Create and run the game
 	game := app.NewGame(appContext)
+	game.DebugOverlay().SetFont(fontSmall.NewFace(8))
 
 	// Set initial game scene
 	initialScene := scenestypes.SceneMenu
