@@ -558,9 +558,9 @@ func TestApplyRenderOffsets_RegistersPerStateOffsets(t *testing.T) {
 
 	spriteData := schemas.SpriteData{
 		Assets: map[string]schemas.AssetData{
-			"idle":    {Path: "i.png", RenderOffset: &schemas.SpriteOffset{X: -4, Y: 0}},
-			"jumping": {Path: "j.png", RenderOffset: &schemas.SpriteOffset{X: 8, Y: -2}},
-			"walking": {Path: "w.png"}, // no offset
+			"idle": {Path: "i.png", RenderOffset: &schemas.SpriteOffset{X: -4, Y: 0}},
+			"jump": {Path: "j.png", RenderOffset: &schemas.SpriteOffset{X: 8, Y: -2}},
+			"walk": {Path: "w.png"}, // no offset
 		},
 	}
 	stateMap, err := BuildStateMap(spriteData)
@@ -591,8 +591,8 @@ func TestApplyRenderOffsets_NoOpWhenAllOffsetsNil(t *testing.T) {
 
 	spriteData := schemas.SpriteData{
 		Assets: map[string]schemas.AssetData{
-			"idle":    {Path: "i.png"},
-			"walking": {Path: "w.png"},
+			"idle": {Path: "i.png"},
+			"walk": {Path: "w.png"},
 		},
 	}
 	stateMap, err := BuildStateMap(spriteData)

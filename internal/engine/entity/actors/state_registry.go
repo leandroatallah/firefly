@@ -30,17 +30,6 @@ func RegisterState(name string, constructor StateConstructor) ActorStateEnum {
 	return enumValue
 }
 
-// RegisterStateAlias maps an additional name to an already-registered enum value.
-// This allows JSON asset files to use either the canonical short key (e.g. "walk")
-// or a descriptive alias (e.g. "walking") and have them resolve to the same enum.
-// Panics if enum is not yet registered.
-func RegisterStateAlias(alias string, enum ActorStateEnum) {
-	if _, ok := stateConstructors[enum]; !ok {
-		panic(fmt.Sprintf("RegisterStateAlias: enum %d is not registered", enum))
-	}
-	stateEnums[alias] = enum
-}
-
 // NewState constructs an ActorState for the given actor and state enum using the registered constructor.
 func NewState(actor ActorEntity, state ActorStateEnum) (ActorState, error) {
 	constructor, ok := stateConstructors[state]

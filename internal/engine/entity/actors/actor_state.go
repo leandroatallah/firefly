@@ -56,12 +56,6 @@ func init() {
 	JumpingShooting = RegisterState("jump_shoot", func(b BaseState) ActorState { return &JumpingShootingState{BaseState: b} })
 	FallingShooting = RegisterState("fall_shoot", func(b BaseState) ActorState { return &FallingShootingState{BaseState: b} })
 
-	// Long-form aliases: allow asset JSON to use descriptive keys such as
-	// "walking" or "jumping" interchangeably with the canonical short keys.
-	RegisterStateAlias("walking", Walking)
-	RegisterStateAlias("jumping", Jumping)
-	RegisterStateAlias("falling", Falling)
-	RegisterStateAlias("landing", Landing)
 }
 
 // BaseState provides shared bookkeeping (entry count, tick) for all concrete states.
