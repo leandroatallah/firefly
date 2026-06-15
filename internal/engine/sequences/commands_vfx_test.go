@@ -1,6 +1,7 @@
 package sequences
 
 import (
+	"image/color"
 	"testing"
 
 	"github.com/boilerplate/ebiten-template/internal/engine/app"
@@ -11,6 +12,7 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/physics/space"
 	"github.com/boilerplate/ebiten-template/internal/engine/render/camera"
 	"github.com/boilerplate/ebiten-template/internal/engine/render/particles"
+	"github.com/boilerplate/ebiten-template/internal/engine/render/vfx"
 	"github.com/boilerplate/ebiten-template/internal/engine/scene"
 	"github.com/hajimehoshi/ebiten/v2"
 )
@@ -43,6 +45,7 @@ func (v *stubVFXManager) SpawnPuff(_ string, _ float64, _ float64, _ int, _ floa
 func (v *stubVFXManager) SpawnDirectionalPuff(_ string, _ float64, _ float64, _ bool, _ int, _ float64) {
 }
 func (v *stubVFXManager) TriggerScreenFlash() {}
+func (v *stubVFXManager) Clear()              {}
 
 func TestSpawnTextCommand_Init_ScreenType(t *testing.T) {
 	ctx := &app.AppContext{}
@@ -228,5 +231,212 @@ func TestSpawnTextCommandUpdate(t *testing.T) {
 	cmd := &SpawnTextCommand{Text: "Test", Type: "screen"}
 	if !cmd.Update() {
 		t.Error("SpawnTextCommand.Update() should return true (instant command)")
+	}
+}
+
+func TestFadeOutCommand_Init_StartsFadeOut(t *testing.T) {
+	ctx := &app.AppContext{
+		FadeOverlay: vfx.NewFadeOverlay(),
+	}
+
+	cmd := &FadeOutCommand{Frames: 20}
+	cmd.Init(ctx)
+
+	if !ctx.FadeOverlay.IsActive() {
+		t.Error("expected FadeOverlay to be active after Init")
+	}
+}
+
+func TestFadeOutCommand_Init_DefaultFrames(t *testing.T) {
+	ctx := &app.AppContext{
+		FadeOverlay: vfx.NewFadeOverlay(),
+	}
+
+	cmd := &FadeOutCommand{Frames: 0}
+	cmd.Init(ctx)
+
+	if cmd.Frames <= 0 {
+		t.Errorf("expected Frames set to default, got %d", cmd.Frames)
+	}
+}
+
+func TestFadeOutCommand_Update_ReturnsNotDoneWhileFading(t *testing.T) {
+	fade := vfx.NewFadeOverlay()
+	ctx := &app.AppContext{
+		FadeOverlay: fade,
+	}
+
+	cmd := &FadeOutCommand{Frames: 10}
+	cmd.Init(ctx)
+
+	fade.Update()
+	done := cmd.Update()
+	if done {
+		t.Error("expected Update to return false while animation is running")
+	}
+}
+
+func TestFadeOutCommand_Update_ReturnsDoneWhenAnimationComplete(t *testing.T) {
+	fade := vfx.NewFadeOverlay()
+	ctx := &app.AppContext{
+		FadeOverlay: fade,
+	}
+
+	cmd := &FadeOutCommand{Frames: 10}
+	cmd.Init(ctx)
+
+	// Run until animation completes
+	for i := 0; i < 15; i++ {
+		fade.Update()
+	}
+
+	done := cmd.Update()
+	if !done {
+		t.Error("expected Update to return true when animation completes")
+	}
+	// Fade should persist on screen
+	if !fade.IsPersisting() {
+		t.Error("expected fade to persist (IsPersisting=true)")
+	}
+	if fade.Alpha() < 255 {
+		t.Errorf("expected fade alpha at 255, got %v", fade.Alpha())
+	}
+}
+
+func TestFadeInCommand_Init_StartsFadeIn(t *testing.T) {
+	ctx := &app.AppContext{
+		FadeOverlay: vfx.NewFadeOverlay(),
+	}
+
+	cmd := &FadeInCommand{Frames: 20}
+	cmd.Init(ctx)
+
+	if !ctx.FadeOverlay.IsActive() {
+		t.Error("expected FadeOverlay to be active after FadeInCommand.Init")
+	}
+}
+
+func TestFadeInCommand_Init_DefaultFrames(t *testing.T) {
+	ctx := &app.AppContext{
+		FadeOverlay: vfx.NewFadeOverlay(),
+	}
+
+	cmd := &FadeInCommand{Frames: 0}
+	cmd.Init(ctx)
+
+	if cmd.Frames <= 0 {
+		t.Errorf("expected Frames set to default, got %d", cmd.Frames)
+	}
+}
+
+func TestFadeInCommand_Update_ReturnsNotDoneWhileFading(t *testing.T) {
+	fade := vfx.NewFadeOverlay()
+	ctx := &app.AppContext{
+		FadeOverlay: fade,
+	}
+
+	cmd := &FadeInCommand{Frames: 10}
+	cmd.Init(ctx)
+
+	fade.Update()
+	done := cmd.Update()
+	if done {
+		t.Error("expected Update to return false while animation is running")
+	}
+}
+
+func TestFadeInCommand_Update_ReturnsDoneWhenAnimationComplete(t *testing.T) {
+	fade := vfx.NewFadeOverlay()
+	ctx := &app.AppContext{
+		FadeOverlay: fade,
+	}
+
+	cmd := &FadeInCommand{Frames: 10}
+	cmd.Init(ctx)
+
+	for i := 0; i < 15; i++ {
+		fade.Update()
+	}
+
+	done := cmd.Update()
+	if !done {
+		t.Error("expected Update to return true when animation completes")
+	}
+	if fade.IsPersisting() {
+		t.Error("expected fade not persisting after fade-in completes")
+	}
+	if fade.Alpha() != 0 {
+		t.Errorf("expected fade alpha=0 after fade-in, got %v", fade.Alpha())
+	}
+}
+func TestSolidColorCommand_Init(t *testing.T) {
+	ctx := &app.AppContext{
+		SolidColorOverlay: vfx.NewSolidColor(),
+	}
+
+	c := color.RGBA{R: 255, G: 0, B: 0, A: 255}
+	cmd := &SolidColorCommand{Frames: 20, Color: c}
+	cmd.Init(ctx)
+
+	if !ctx.SolidColorOverlay.IsActive() {
+		t.Error("expected SolidColorOverlay to be active after Init")
+	}
+	if cmd.Frames != 20 {
+		t.Errorf("expected Frames=20, got %d", cmd.Frames)
+	}
+}
+
+func TestSolidColorCommand_Update(t *testing.T) {
+	overlay := vfx.NewSolidColor()
+	ctx := &app.AppContext{
+		SolidColorOverlay: overlay,
+	}
+	cmd := &SolidColorCommand{Frames: 2}
+	cmd.Init(ctx)
+
+	if cmd.Update() {
+		t.Error("expected Update to return false while animating")
+	}
+
+	overlay.Update() // frame 1
+	if cmd.Update() {
+		t.Error("expected Update to return false while animating")
+	}
+
+	overlay.Update() // frame 2
+	if !cmd.Update() {
+		t.Error("expected Update to return true after animation completes")
+	}
+}
+func TestSolidColorCommand_Update_NilContext(t *testing.T) {
+	cmd := &SolidColorCommand{}
+	if !cmd.Update() {
+		t.Error("expected Update to return true when context or overlay is nil")
+	}
+}
+
+func TestFadeOutCommand_Update_NilContext(t *testing.T) {
+	cmd := &FadeOutCommand{}
+	if !cmd.Update() {
+		t.Error("expected Update to return true when context or overlay is nil")
+	}
+}
+
+func TestFadeInCommand_Update_NilContext(t *testing.T) {
+	cmd := &FadeInCommand{}
+	if !cmd.Update() {
+		t.Error("expected Update to return true when context or overlay is nil")
+	}
+}
+
+func TestSolidColorCommand_Init_DefaultFrames(t *testing.T) {
+	ctx := &app.AppContext{
+		SolidColorOverlay: vfx.NewSolidColor(),
+	}
+
+	cmd := &SolidColorCommand{Frames: 0}
+	cmd.Init(ctx)
+	if cmd.Frames <= 0 {
+		t.Errorf("expected Frames set to default, got %d", cmd.Frames)
 	}
 }

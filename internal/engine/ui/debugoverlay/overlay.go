@@ -4,6 +4,7 @@ import (
 	"image/color"
 
 	"github.com/boilerplate/ebiten-template/internal/engine/debug"
+	"github.com/boilerplate/ebiten-template/internal/engine/ui/overlayutil"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
@@ -12,7 +13,7 @@ import (
 // DebugOverlay is an in-game overlay that lists all registered debug flags
 // and allows toggling them interactively.
 type DebugOverlay struct {
-	open           bool
+	overlayutil.Base
 	cursor         int
 	face           *text.GoTextFace
 	keyJustPressed func(ebiten.Key) bool
@@ -28,13 +29,13 @@ func New() *DebugOverlay {
 }
 
 // Open makes the overlay visible.
-func (o *DebugOverlay) Open() { o.open = true }
+func (o *DebugOverlay) Open() { o.Base.Open() }
 
 // Close hides the overlay.
-func (o *DebugOverlay) Close() { o.open = false }
+func (o *DebugOverlay) Close() { o.Base.Close() }
 
 // IsOpen reports whether the overlay is currently visible.
-func (o *DebugOverlay) IsOpen() bool { return o.open }
+func (o *DebugOverlay) IsOpen() bool { return o.Base.IsOpen() }
 
 // SetFont sets the font face used when drawing entry labels.
 func (o *DebugOverlay) SetFont(f *text.GoTextFace) { o.face = f }
@@ -43,7 +44,7 @@ func (o *DebugOverlay) SetFont(f *text.GoTextFace) { o.face = f }
 // consumed the frame (i.e. the overlay is still open after processing),
 // and false when the overlay is closed or was already closed.
 func (o *DebugOverlay) Update() bool {
-	if !o.open {
+	if !o.IsOpen() {
 		return false
 	}
 
@@ -67,7 +68,7 @@ func (o *DebugOverlay) Update() bool {
 	}
 
 	if o.keyJustPressed(ebiten.KeyF1) || o.keyJustPressed(ebiten.KeyEscape) {
-		o.open = false
+		o.Close()
 		return false
 	}
 
@@ -82,15 +83,11 @@ func (o *DebugOverlay) Update() bool {
 
 // Draw renders the overlay onto screen. No-op when the overlay is closed.
 func (o *DebugOverlay) Draw(screen *ebiten.Image) {
-	if !o.open {
+	if !o.IsOpen() {
 		return
 	}
 
-	// semi-transparent panel
-	w, h := screen.Bounds().Dx(), screen.Bounds().Dy()
-	panel := ebiten.NewImage(w, h)
-	panel.Fill(color.RGBA{0, 0, 0, 180})
-	screen.DrawImage(panel, nil)
+	overlayutil.DrawDimPanel(screen)
 
 	if o.face == nil {
 		return
@@ -110,11 +107,7 @@ func (o *DebugOverlay) Draw(screen *ebiten.Image) {
 			if prevGroup != -1 {
 				y += groupGap
 			}
-			header := "--- " + e.Group.String() + " ---"
-			op := &text.DrawOptions{}
-			op.GeoM.Translate(xPad, y)
-			op.ColorScale.ScaleWithColor(color.RGBA{180, 180, 180, 255})
-			text.Draw(screen, header, o.face, op)
+			overlayutil.DrawText(screen, o.face, "--- "+e.Group.String()+" ---", xPad, y, color.RGBA{180, 180, 180, 255})
 			y += lineH
 			prevGroup = e.Group
 		}
@@ -123,16 +116,11 @@ func (o *DebugOverlay) Draw(screen *ebiten.Image) {
 		if e.Ptr != nil && *e.Ptr {
 			mark = "[x]"
 		}
-		line := mark + " " + e.Name
-
-		op := &text.DrawOptions{}
-		op.GeoM.Translate(xPad, y)
+		c := color.Color(color.White)
 		if i == o.cursor {
-			op.ColorScale.ScaleWithColor(color.RGBA{255, 255, 0, 255})
-		} else {
-			op.ColorScale.ScaleWithColor(color.White)
+			c = color.RGBA{255, 255, 0, 255}
 		}
-		text.Draw(screen, line, o.face, op)
+		overlayutil.DrawText(screen, o.face, mark+" "+e.Name, xPad, y, c)
 		y += lineH
 	}
 }

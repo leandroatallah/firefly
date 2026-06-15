@@ -31,14 +31,16 @@ func (c *EventCommand) Update() bool {
 
 // DialogueCommand displays one or more lines of text and waits for player input.
 type DialogueCommand struct {
-	Lines            []string
-	Position         string
-	Speed            int
-	SpeechID         string
-	SpeechAudio      []string
-	EnableSpeechSkip *bool
-	Accumulative     *bool
-	dialogueManager  dialogue.Manager
+	Lines               []string
+	Position            string
+	Speed               int
+	SpeechID            string
+	SpeechAudio         []string
+	EnableSpeechSkip    *bool
+	EnablePlayerAdvance *bool
+	Accumulative        *bool
+	HideIndicator       *bool
+	dialogueManager     dialogue.Manager
 }
 
 func (c *DialogueCommand) Init(appContext any) {
@@ -52,13 +54,10 @@ func (c *DialogueCommand) Init(appContext any) {
 
 	s := c.dialogueManager.GetActiveSpeech()
 
-	skipEnabled := false
-	if c.EnableSpeechSkip != nil {
-		skipEnabled = *c.EnableSpeechSkip
-	} else if ctx.Config != nil && ctx.Config.EnableSpeechSkip {
-		skipEnabled = true
-	}
+	skipEnabled := c.EnableSpeechSkip != nil && *c.EnableSpeechSkip
 	c.dialogueManager.SetSpeechSkipEnabled(skipEnabled)
+	playerAdvance := c.EnablePlayerAdvance == nil || *c.EnablePlayerAdvance
+	c.dialogueManager.SetPlayerAdvanceEnabled(playerAdvance)
 	if len(c.SpeechAudio) > 0 {
 		c.dialogueManager.SetSpeechAudioQueue(c.SpeechAudio)
 	} else {
@@ -69,12 +68,29 @@ func (c *DialogueCommand) Init(appContext any) {
 		s.SetAccumulative(*c.Accumulative)
 	}
 
+	if c.HideIndicator != nil && *c.HideIndicator {
+		s.SetIndicator(nil)
+	}
+
 	c.dialogueManager.ShowMessages(c.Lines, c.Position, c.Speed)
 }
 
 func (c *DialogueCommand) Update() bool {
 	// The command is done when the dialogue manager is no longer speaking.
 	return !c.dialogueManager.IsSpeaking()
+}
+
+type DialogueResetCommand struct {
+	dialogueManager dialogue.Manager
+}
+
+func (c *DialogueResetCommand) Init(appContext any) {
+	appContext.(*app.AppContext).DialogueManager.ClearSpeechAudioQueue()
+	appContext.(*app.AppContext).DialogueManager.Stop()
+}
+
+func (c *DialogueResetCommand) Update() bool {
+	return true
 }
 
 // DelayCommand waits for a specified number of frames.

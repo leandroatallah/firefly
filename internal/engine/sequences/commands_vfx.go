@@ -1,6 +1,7 @@
 package sequences
 
 import (
+	"image/color"
 	"log"
 	"math"
 
@@ -9,6 +10,84 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
 	"github.com/boilerplate/ebiten-template/internal/engine/render/camera"
 )
+
+// FadeOutCommand fades the screen to black over a given number of frames and keeps it black.
+// The fade persists until Reset() is called on the overlay or a FadeInCommand is used.
+type FadeOutCommand struct {
+	Frames int
+	Color  color.RGBA
+	ctx    *app.AppContext
+}
+
+func (c *FadeOutCommand) Init(appContext any) {
+	c.ctx = appContext.(*app.AppContext)
+	if c.Frames <= 0 {
+		c.Frames = 17
+	}
+	if c.ctx != nil && c.ctx.FadeOverlay != nil {
+		c.ctx.FadeOverlay.FadeOut(c.Frames)
+	}
+}
+
+func (c *FadeOutCommand) Update() bool {
+	if c.ctx == nil || c.ctx.FadeOverlay == nil {
+		return true
+	}
+	// Command done when animation completes (not animating anymore)
+	return !c.ctx.FadeOverlay.IsActive()
+}
+
+// FadeInCommand fades the screen from black over a given number of frames.
+// Intended to be used after a FadeOutCommand or when the overlay is at full alpha.
+type FadeInCommand struct {
+	Frames int
+	Color  color.RGBA
+	ctx    *app.AppContext
+}
+
+func (c *FadeInCommand) Init(appContext any) {
+	c.ctx = appContext.(*app.AppContext)
+	if c.Frames <= 0 {
+		c.Frames = 17
+	}
+	if c.ctx != nil && c.ctx.FadeOverlay != nil {
+		c.ctx.FadeOverlay.FadeIn(c.Frames)
+	}
+}
+
+func (c *FadeInCommand) Update() bool {
+	if c.ctx == nil || c.ctx.FadeOverlay == nil {
+		return true
+	}
+	return !c.ctx.FadeOverlay.IsActive()
+}
+
+// SolidColorCommand cover the screen to a solid color (default is black) over a given number of frames.
+// The overlay persists until Reset() is called on the overlay.
+type SolidColorCommand struct {
+	Frames int
+	ctx    *app.AppContext
+	Color  color.RGBA
+}
+
+func (c *SolidColorCommand) Init(appContext any) {
+	c.ctx = appContext.(*app.AppContext)
+	if c.Frames <= 0 {
+		c.Frames = 17
+	}
+	if c.ctx != nil && c.ctx.SolidColorOverlay != nil {
+		c.ctx.SolidColorOverlay.SetColor(c.Color)
+		c.ctx.SolidColorOverlay.FadeOut(c.Frames)
+	}
+}
+
+func (c *SolidColorCommand) Update() bool {
+	if c.ctx == nil || c.ctx.SolidColorOverlay == nil {
+		return true
+	}
+	// Command done when animation completes (not animating anymore)
+	return !c.ctx.SolidColorOverlay.IsActive()
+}
 
 type SpawnTextCommand struct {
 	TargetID string `json:"target_id,omitempty"`

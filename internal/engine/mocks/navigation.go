@@ -9,17 +9,19 @@ import (
 // MockScene implements navigation.Scene
 type MockScene struct {
 	DrawCount     int
+	DrawOverCount int
 	UpdateCount   int
 	StartCount    int
 	FinishCount   int
 	AppContextSet any
 }
 
-func (s *MockScene) Draw(screen *ebiten.Image) { s.DrawCount++ }
-func (s *MockScene) Update() error             { s.UpdateCount++; return nil }
-func (s *MockScene) OnStart()                  { s.StartCount++ }
-func (s *MockScene) OnFinish()                 { s.FinishCount++ }
-func (s *MockScene) SetAppContext(ctx any)     { s.AppContextSet = ctx }
+func (s *MockScene) Draw(screen *ebiten.Image)     { s.DrawCount++ }
+func (s *MockScene) DrawOver(screen *ebiten.Image) { s.DrawOverCount++ }
+func (s *MockScene) Update() error                 { s.UpdateCount++; return nil }
+func (s *MockScene) OnStart()                      { s.StartCount++ }
+func (s *MockScene) OnFinish()                     { s.FinishCount++ }
+func (s *MockScene) SetAppContext(ctx any)         { s.AppContextSet = ctx }
 
 // MockSceneFactory implements navigation.SceneFactory
 type MockSceneFactory struct {
@@ -75,6 +77,7 @@ func (t *MockTransition) Complete() {
 type MockSceneManager struct {
 	UpdateCalled   bool
 	DrawCalled     bool
+	DrawOverCalled bool
 	LastSceneType  navigation.SceneType
 	LastFresh      bool
 	NavigateCalls  int
@@ -82,8 +85,9 @@ type MockSceneManager struct {
 	Transitioning  bool
 }
 
-func (m *MockSceneManager) AudioManager() audio.Manager { return nil }
-func (m *MockSceneManager) Draw(screen *ebiten.Image)   { m.DrawCalled = true }
+func (m *MockSceneManager) AudioManager() audio.Manager   { return nil }
+func (m *MockSceneManager) Draw(screen *ebiten.Image)     { m.DrawCalled = true }
+func (m *MockSceneManager) DrawOver(screen *ebiten.Image) { m.DrawOverCalled = true }
 func (m *MockSceneManager) NavigateTo(sceneType navigation.SceneType, trans navigation.Transition, fresh bool) {
 	m.NavigateCalls++
 	m.LastSceneType = sceneType

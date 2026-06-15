@@ -442,6 +442,9 @@ func (s *BeatemupPhaseScene) fullUpdate() error {
 	}
 	if s.sequencePlayer != nil {
 		s.sequencePlayer.Update()
+		if s.sequencePlayer.IsDebugPaused() {
+			return nil
+		}
 	}
 	if s.appCtx.VFX != nil {
 		s.appCtx.VFX.Update()
@@ -644,6 +647,15 @@ func (s *BeatemupPhaseScene) fullDraw(screen *ebiten.Image) {
 	}
 	if s.pauseScreen != nil && s.pauseScreen.IsPaused() {
 		s.drawPause(screen)
+	}
+	if s.sequencePlayer != nil {
+		s.sequencePlayer.Draw(screen)
+	}
+}
+
+func (s *BeatemupPhaseScene) DrawOver(screen *ebiten.Image) {
+	if s.sequencePlayer != nil {
+		s.sequencePlayer.DrawOver(screen)
 	}
 }
 

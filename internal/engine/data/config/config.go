@@ -41,17 +41,20 @@ type AppConfig struct {
 	MainFontFace  string
 	SmallFontFace string
 
-	CamDebug     bool
-	CollisionBox bool
-	NoSound      bool
-	SkipIntro    bool
-	Fullscreen   bool
-	Language     string
+	CamDebug      bool
+	CollisionBox  bool
+	SequenceDebug bool
+	NoSound       bool
+	SkipIntro     bool
+	Fullscreen    bool
+	Language      string
 
 	SlowMo       bool    // when true, lower effective TPS by SlowMoFactor
 	SlowMoFactor float64 // multiplier on ebiten.DefaultTPS, valid range (0,1]; clamped at apply time
 
-	EnableSpeechSkip          bool
+	FastForward       bool    // when true, raise effective TPS by FastForwardFactor
+	FastForwardFactor float64 // multiplier on ebiten.DefaultTPS, valid range [1,∞); clamped at apply time
+
 	EnableTypingSounds        bool
 	TypingSoundVolume         float64
 	TypingSoundCooldownFrames int

@@ -43,3 +43,4 @@ func (m *mockSpeech) Color() color.Color                     { return color.Blac
 func (m *mockSpeech) SetSkipFlash(frames int)                {}
 func (m *mockSpeech) IsAccumulative() bool                   { return false }
 func (m *mockSpeech) SetAccumulative(bool)                   {}
+func (m *mockSpeech) SetIndicator(*ebiten.Image)             {}

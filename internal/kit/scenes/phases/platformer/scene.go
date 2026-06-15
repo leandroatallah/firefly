@@ -86,6 +86,11 @@ type PlatformerPhaseScene struct {
 	// Debug hook invoked at the end of Draw.
 	debugDrawHook func(*ebiten.Image)
 
+	// Optional game-layer overrides.
+	customGoal      phases.Goal
+	endpointHandler func(id string) bool
+	onStarted       func()
+
 	// VFX vignette (may be nil)
 	vfx        *enginevfx.Vignette
 	flashCount int
@@ -155,7 +160,7 @@ func (s *PlatformerPhaseScene) OnStart() {
 	if s.hasPlayer {
 		s.cameraMode = scene.CameraModeFollow
 		s.camera.SetFollowing(true)
-		s.camera.SetVerticalOnlyUpward(true)
+		s.camera.SetVerticalOnlyUpward(false)
 		if s.player != nil {
 			s.camera.SetFollowTarget(s.player)
 			if s.hasFlipper {
@@ -228,7 +233,7 @@ func (s *PlatformerPhaseScene) fullOnStart() {
 	if s.hasPlayer {
 		ts.SetCameraConfig(scene.CameraConfig{Mode: scene.CameraModeFollow})
 		s.camera.SetFollowing(true)
-		s.camera.SetVerticalOnlyUpward(true)
+		s.camera.SetVerticalOnlyUpward(false)
 		s.camera.SetFollowTarget(s.player)
 		// Production players implement body.Movable.
 		if mv, ok := any(s.player).(body.Movable); ok {
@@ -257,6 +262,10 @@ func (s *PlatformerPhaseScene) fullOnStart() {
 	s.buildSequencePlayer()
 	s.initGoal()
 	s.subscribeEvents()
+
+	if s.onStarted != nil {
+		s.onStarted()
+	}
 }
 
 func (s *PlatformerPhaseScene) buildPauseScreen() {
@@ -308,6 +317,10 @@ func (s *PlatformerPhaseScene) buildSequencePlayer() {
 }
 
 func (s *PlatformerPhaseScene) initGoal() {
+	if s.customGoal != nil {
+		s.goal = s.customGoal
+		return
+	}
 	phase, _ := s.appCtx.PhaseManager.GetCurrentPhase()
 	switch phase.GoalType {
 	case phases.ReactEndpointType:
@@ -383,6 +396,9 @@ func (s *PlatformerPhaseScene) endpointTrigger(id string) {
 	if s.deathActive {
 		return
 	}
+	if s.endpointHandler != nil && s.endpointHandler(id) {
+		return
+	}
 	switch id {
 	case "SPIKE":
 		s.startDeathSequence()
@@ -429,9 +445,6 @@ func (s *PlatformerPhaseScene) Update() error {
 		return s.fullUpdate()
 	}
 	// minimal mode (existing Update body)
-	if s.hasPlayer && s.player != nil {
-		s.checkPlayerFallDeath()
-	}
 	if s.space == nil {
 		return nil
 	}
@@ -462,6 +475,9 @@ func (s *PlatformerPhaseScene) fullUpdate() error {
 	}
 	if s.sequencePlayer != nil {
 		s.sequencePlayer.Update()
+		if s.sequencePlayer.IsDebugPaused() {
+			return nil
+		}
 	}
 	if s.appCtx.VFX != nil {
 		s.appCtx.VFX.Update()
@@ -471,9 +487,6 @@ func (s *PlatformerPhaseScene) fullUpdate() error {
 		if s.screenFlipper.IsFlipping() {
 			return nil
 		}
-	}
-	if s.hasPlayer && s.player != nil {
-		s.checkPlayerFallDeath()
 	}
 	if s.hasPlayer && s.player != nil && !s.deathActive &&
 		(s.player.State() == s.dyingState || s.player.State() == s.deadState) {
@@ -495,7 +508,7 @@ func (s *PlatformerPhaseScene) fullUpdate() error {
 		s.camera.CamDebug()
 	}
 	if s.completionTrigger.Trigger() {
-		s.appCtx.CompleteCurrentPhase(transition.NewFader(0, config.Get().FadeVisibleDuration), true)
+		s.appCtx.CompleteCurrentPhase(nil, true)
 	}
 	s.camera.Update()
 	if err := s.tilemapScene.BaseScene.Update(); err != nil {
@@ -557,10 +570,6 @@ func (s *PlatformerPhaseScene) DeathActive() bool { return s.deathActive }
 // a state check in the game layer).
 func (s *PlatformerPhaseScene) StartDeathSequence() { s.startDeathSequence() }
 
-// CheckPlayerFallDeath runs the fall-death check for the current frame.
-// Game layers call this instead of maintaining their own duplicate logic.
-func (s *PlatformerPhaseScene) CheckPlayerFallDeath() { s.checkPlayerFallDeath() }
-
 // DrawActors renders the actor bodies (without filling the background). Game
 // layers call this after drawing the tilemap so actors sort correctly with
 // game-specific bodies (items, etc.) that share the same sorted pass.
@@ -600,6 +609,10 @@ func (s *PlatformerPhaseScene) Draw(screen *ebiten.Image) {
 	// minimal draw (existing body)
 	screen.Fill(color.RGBA{0, 0, 0, 0xff})
 	s.DrawActors(screen)
+}
+
+func (s *PlatformerPhaseScene) DrawOver(screen *ebiten.Image) {
+	s.sequencePlayer.DrawOver(screen)
 }
 
 func (s *PlatformerPhaseScene) fullDraw(screen *ebiten.Image) {
@@ -661,6 +674,9 @@ func (s *PlatformerPhaseScene) fullDraw(screen *ebiten.Image) {
 	if s.pauseScreen != nil && s.pauseScreen.IsPaused() {
 		s.drawPause(screen)
 	}
+	if s.sequencePlayer != nil {
+		s.sequencePlayer.Draw(screen)
+	}
 }
 
 func (s *PlatformerPhaseScene) drawPause(screen *ebiten.Image) {
@@ -695,6 +711,48 @@ func (s *PlatformerPhaseScene) SetDebugDrawHook(f func(*ebiten.Image)) {
 	s.debugDrawHook = f
 }
 
+// SetGoal installs a game-layer goal. When set, the kit's GoalType switch is
+// skipped and the provided goal is used as-is.
+func (s *PlatformerPhaseScene) SetGoal(g phases.Goal) { s.customGoal = g }
+
+// SetEndpointHandler installs a game-layer handler invoked on endpoint touch
+// before the kit's built-in SPIKE/CUTSCENE/default logic. Return true to
+// indicate the touch was handled and suppress the default behavior.
+func (s *PlatformerPhaseScene) SetEndpointHandler(f func(id string) bool) {
+	s.endpointHandler = f
+}
+
+// SetOnStarted installs a callback invoked at the end of OnStart, after the
+// player, tilemap actors, goal and events have been wired. Useful for
+// post-init scans of the physics space.
+func (s *PlatformerPhaseScene) SetOnStarted(f func()) { s.onStarted = f }
+
+// Space exposes the physics space for game-layer body counters / queries.
+func (s *PlatformerPhaseScene) Space() body.BodiesSpace { return s.space }
+
+// Player exposes the active player (may be nil if the phase has no player).
+func (s *PlatformerPhaseScene) Player() Player { return s.player }
+
+// PlaySequence plays a sequence file on the scene's sequence player,
+// constructing one on-demand if the phase did not have a default sequence.
+// Game-layer code uses this for ad-hoc cutscenes triggered by gameplay events.
+func (s *PlatformerPhaseScene) PlaySequence(path string) {
+	if s.sequencePlayer == nil {
+		s.sequencePlayer = sequences.NewSequencePlayer(s.appCtx)
+	}
+	s.sequencePlayer.PlaySequence(path)
+}
+
+// CompletionTrigger returns the kit's completion trigger so game-layer goals
+// can schedule phase completion through the same path as built-in goals.
+func (s *PlatformerPhaseScene) EnableCompletionTrigger(frames int) {
+	s.completionTrigger.Enable(frames)
+}
+
+// FreezeAllActors freezes every registered actor. Exposed so game-layer goals
+// can reuse the same freeze logic as the built-in completion path.
+func (s *PlatformerPhaseScene) FreezeAllActors() { s.freezeAllActors() }
+
 // TriggerScreenFlash triggers a white flash overlay for the next two frames.
 func (s *PlatformerPhaseScene) TriggerScreenFlash() {
 	s.flashCount = 2
@@ -714,26 +772,6 @@ func (s *PlatformerPhaseScene) DisableVignetteDarkness() {
 		return
 	}
 	s.vfx.Disable()
-}
-
-// checkPlayerFallDeath fires startDeathSequence when the player's top Y
-// exceeds the camera's bottom edge.
-func (s *PlatformerPhaseScene) checkPlayerFallDeath() {
-	if s.camera == nil || s.player == nil {
-		return
-	}
-	if s.deathActive {
-		return
-	}
-
-	_, camY := s.camera.GetActualCenter()
-	_, playerY := s.player.GetPositionMin()
-
-	cameraBottom := camY + s.screenHeight/2
-	playerTop := float64(playerY)
-	if playerTop > cameraBottom {
-		s.startDeathSequence()
-	}
 }
 
 // startDeathSequence activates the death state on the player.
@@ -806,11 +844,6 @@ func (s *PlatformerPhaseScene) SetPlayerForTest(p Player) {
 // can assert it was invoked with the correct state.
 func (s *PlatformerPhaseScene) SetSetNewStateFatalRecorder(f func(actors.ActorStateEnum)) {
 	s.setNewStateFatalHook = f
-}
-
-// CheckPlayerFallDeathForTest exposes checkPlayerFallDeath for white-box testing.
-func (s *PlatformerPhaseScene) CheckPlayerFallDeathForTest() {
-	s.checkPlayerFallDeath()
 }
 
 // DeathActiveForTest returns whether the death sequence is active.

@@ -12,6 +12,7 @@ type MockDialogueManager struct {
 	UpdateFunc                  func() error
 	DrawFunc                    func(screen *ebiten.Image)
 	IsSpeakingFunc              func() bool
+	StopFunc                    func()
 	AddSpeechFunc               func(s speech.Speech)
 	SetSpeechFunc               func(id string)
 	SetActiveSpeechFunc         func(id string)
@@ -24,11 +25,13 @@ type MockDialogueManager struct {
 	SetDefaultSpeechAudioFunc   func(paths []string)
 	ApplyDefaultSpeechAudioFunc func(lineCount int)
 	SetSpeechSkipEnabledFunc    func(enabled bool)
+	SetPlayerAdvanceEnabledFunc func(enabled bool)
 	ShowMessagesFunc            func(lines []string, position string, speed int)
 
 	UpdateCalls                  int
 	DrawCalls                    int
 	IsSpeakingCalls              int
+	StopCalls                    int
 	AddSpeechCalls               int
 	SetSpeechCalls               int
 	SetActiveSpeechCalls         int
@@ -41,6 +44,7 @@ type MockDialogueManager struct {
 	SetDefaultSpeechAudioCalls   int
 	ApplyDefaultSpeechAudioCalls int
 	SetSpeechSkipEnabledCalls    int
+	SetPlayerAdvanceEnabledCalls int
 	ShowMessagesCalls            int
 
 	LastAddedSpeech speech.Speech
@@ -75,6 +79,13 @@ func (m *MockDialogueManager) IsSpeaking() bool {
 		return m.IsSpeakingFunc()
 	}
 	return m.IsSpeakingValue
+}
+
+func (m *MockDialogueManager) Stop() {
+	m.StopCalls++
+	if m.StopFunc != nil {
+		m.StopFunc()
+	}
 }
 
 func (m *MockDialogueManager) AddSpeech(s speech.Speech) {
@@ -166,6 +177,13 @@ func (m *MockDialogueManager) SetSpeechSkipEnabled(enabled bool) {
 	m.SetSpeechSkipEnabledCalls++
 	if m.SetSpeechSkipEnabledFunc != nil {
 		m.SetSpeechSkipEnabledFunc(enabled)
+	}
+}
+
+func (m *MockDialogueManager) SetPlayerAdvanceEnabled(enabled bool) {
+	m.SetPlayerAdvanceEnabledCalls++
+	if m.SetPlayerAdvanceEnabledFunc != nil {
+		m.SetPlayerAdvanceEnabledFunc(enabled)
 	}
 }
 

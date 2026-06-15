@@ -1,5 +1,7 @@
 package sequences
 
+import "github.com/hajimehoshi/ebiten/v2"
+
 // Command is an action to be executed in a sequence.
 // It can be initialized, and it is updated every frame until it is done.
 type Command interface {
@@ -22,8 +24,11 @@ type Sequence interface {
 type Player interface {
 	IsPlaying() bool
 	IsOver() bool
+	IsDebugPaused() bool
 	Play(sequence Sequence)
 	PlaySequence(filePath string)
 	Stop()
 	Update()
+	Draw(screen *ebiten.Image)
+	DrawOver(screen *ebiten.Image)
 }

@@ -6,6 +6,7 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/app"
 	"github.com/boilerplate/ebiten-template/internal/engine/audio"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/navigation"
+	"github.com/boilerplate/ebiten-template/internal/engine/debug"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -48,6 +49,10 @@ func (m *SceneManager) Draw(screen *ebiten.Image) {
 	}
 }
 
+func (m *SceneManager) DrawOver(screen *ebiten.Image) {
+	m.current.DrawOver(screen)
+}
+
 func (m *SceneManager) SwitchTo(scene navigation.Scene) {
 	if m.current != nil {
 		m.current.OnFinish()
@@ -67,8 +72,20 @@ func (m *SceneManager) SetFactory(factory SceneFactory) {
 func (m *SceneManager) NavigateTo(
 	sceneType navigation.SceneType, sceneTransition navigation.Transition, freshInstance bool,
 ) {
+	debug.Log("scene_manager", "[NavigateTo] sceneType: %v, sceneTransition: %v, freshInstance: %v", sceneType, sceneTransition, freshInstance)
 	if m.current != nil {
 		m.previousScene = m.current
+	}
+
+	// Reset transient state including fades on scene change
+	if m.AppContext() != nil {
+		ctx := m.AppContext()
+		if ctx.FadeOverlay != nil {
+			ctx.FadeOverlay.Reset()
+		}
+		if ctx.SolidColorOverlay != nil {
+			ctx.SolidColorOverlay.Reset()
+		}
 	}
 
 	scene, err := m.factory.Create(sceneType, freshInstance)
@@ -96,6 +113,17 @@ func (m *SceneManager) NavigateBack(sceneTransition navigation.Transition) {
 
 	sceneToLoad := m.previousScene
 	m.previousScene = nil // Clear previous scene after navigating back
+
+	// Reset transient state including fades on scene change
+	if m.AppContext() != nil {
+		ctx := m.AppContext()
+		if ctx.FadeOverlay != nil {
+			ctx.FadeOverlay.Reset()
+		}
+		if ctx.SolidColorOverlay != nil {
+			ctx.SolidColorOverlay.Reset()
+		}
+	}
 
 	if sceneTransition != nil {
 		m.transitioner = sceneTransition

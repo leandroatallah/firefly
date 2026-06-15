@@ -12,8 +12,8 @@ import (
 
 const (
 	// Celeste is 320 x 180
-	ScreenWidth   = 256
-	ScreenHeight  = 240
+	ScreenWidth   = 320
+	ScreenHeight  = 224
 	DefaultVolume = 0.5
 	MainFontFace  = "assets/fonts/pressstart2p.ttf"
 	SmallFontFace = "assets/fonts/tiny5.ttf"
@@ -48,7 +48,6 @@ func NewConfig() *config.AppConfig {
 		FadeVisibleDuration: 0,
 		Language:            "en",
 
-		EnableSpeechSkip:          false,
 		EnableTypingSounds:        true,
 		TypingSoundVolume:         0.6,
 		TypingSoundCooldownFrames: 15,
@@ -56,17 +55,18 @@ func NewConfig() *config.AppConfig {
 
 	flag.BoolVar(&cfg.CamDebug, "cam-debug", false, "Enable camera debug")
 	flag.BoolVar(&cfg.CollisionBox, "collision-box", false, "Enable collision box debug")
+	flag.BoolVar(&cfg.SequenceDebug, "sequence-debug", false, "Enable sequence step-through debug (Enter: next, Esc: end)")
 	flag.BoolVar(&cfg.NoSound, "no-sound", false, "Disable game sound")
 	flag.BoolVar(&cfg.SkipIntro, "skip-intro", false, "Skip all intros and start in phases")
 	flag.BoolVar(&cfg.Fullscreen, "fullscreen", false, "Start game in fullscreen mode")
 	flag.StringVar(&cfg.Language, "lang", "en", "Initial language (en, pt-br)")
-	// Temporary debug flags; only speech-skip is expected to remain as a global debug override.
-	flag.BoolVar(&cfg.EnableSpeechSkip, "speech-skip", true, "Enable skipping speech typing with Enter")
 	flag.BoolVar(&cfg.EnableTypingSounds, "typing-sounds", true, "Enable typing sound effects")
 	flag.Float64Var(&cfg.TypingSoundVolume, "typing-sound-volume", 0.6, "Typing sound effect volume multiplier")
 	flag.IntVar(&cfg.TypingSoundCooldownFrames, "typing-sound-cooldown", 5, "Frames between typing sounds")
 	flag.BoolVar(&cfg.SlowMo, "slow-mo", false, "Enable slow-motion debug mode (lowers effective TPS)")
 	flag.Float64Var(&cfg.SlowMoFactor, "slow-mo-factor", 0.25, "Slow-motion TPS multiplier (clamped to [0.05, 1.0])")
+	flag.BoolVar(&cfg.FastForward, "fast-forward", false, "Enable fast-forward debug mode (raises effective TPS)")
+	flag.Float64Var(&cfg.FastForwardFactor, "fast-forward-factor", 4.0, "Fast-forward TPS multiplier (clamped to [1.0, 16.0])")
 
 	return cfg
 }
@@ -78,4 +78,7 @@ func RegisterDebugFlags() {
 	c := config.Get()
 	debug.Register("cam_debug", &c.CamDebug)
 	debug.Register("collision_box", &c.CollisionBox)
+	debug.Register("sequence_debug", &c.SequenceDebug)
+	debug.Register("slow_mo", &c.SlowMo)
+	debug.Register("fast_forward", &c.FastForward)
 }

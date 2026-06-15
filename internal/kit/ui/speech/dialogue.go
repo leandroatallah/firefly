@@ -41,6 +41,7 @@ type Manager struct {
 	defaultSpeechAudio    []string
 	defaultSpeechIndex    int
 	dialogueSkipEnabled   bool
+	playerAdvanceEnabled  bool
 	prevConfirm           bool
 }
 
@@ -51,8 +52,9 @@ type typingSoundPolicy interface {
 // NewManager creates a new dialogue manager.
 func NewManager(s ...enginespeech.Speech) *Manager {
 	m := &Manager{
-		speeches: make(map[string]enginespeech.Speech),
-		config:   config.Get(),
+		speeches:             make(map[string]enginespeech.Speech),
+		config:               config.Get(),
+		playerAdvanceEnabled: true,
 	}
 	for _, s := range s {
 		m.AddSpeech(s)
@@ -129,6 +131,10 @@ func (m *Manager) SetSpeechSkipEnabled(enabled bool) {
 	m.dialogueSkipEnabled = enabled
 }
 
+func (m *Manager) SetPlayerAdvanceEnabled(enabled bool) {
+	m.playerAdvanceEnabled = enabled
+}
+
 // ShowMessages displays a list of messages.
 func (m *Manager) ShowMessages(lines []string, position string, speed int) {
 	if len(lines) == 0 {
@@ -159,6 +165,24 @@ func (m *Manager) IsSpeaking() bool {
 	return m.isSpeaking
 }
 
+// Stop immediately ends any active dialogue, hides the active speech, and clears
+// queued speech audio. Used to force a clean slate when jumping scenes mid-line.
+func (m *Manager) Stop() {
+	if s := m.GetActiveSpeech(); s != nil {
+		s.Hide()
+		s.ResetText()
+	}
+	m.stopSpeechAudio(true)
+	m.isSpeaking = false
+	m.waitingForInput = false
+	m.currentText = ""
+	m.lines = nil
+	m.currentLine = 0
+	m.typingSoundLastCount = 0
+	m.typingSoundCooldown = 0
+	m.prevConfirm = false
+}
+
 // Update updates the dialogue state. It handles input for proceeding.
 func (m *Manager) Update() error {
 	if !m.isSpeaking {
@@ -173,7 +197,15 @@ func (m *Manager) Update() error {
 	m.updateTypingSound(s)
 	m.updateSpeechAudio()
 
-	if !m.waitingForInput && !s.IsSpellingComplete() && m.shouldSkipTyping() {
+	// Edge-detect Confirm once per frame. Both skip-typing and line advance must
+	// trigger only on the press edge: Confirm is a held (level) signal, so the
+	// same keypress that advances a line would otherwise immediately skip the
+	// next line's typing while the key is still down (typing only ran on line 1).
+	cmds := input.CommandsReader()
+	confirmJustPressed := cmds.Confirm && !m.prevConfirm
+	m.prevConfirm = cmds.Confirm
+
+	if !m.waitingForInput && !s.IsSpellingComplete() && m.shouldSkipTyping(confirmJustPressed) {
 		s.CompleteSpelling()
 		m.stopSpeechAudio(false)
 		m.waitingForInput = true
@@ -186,8 +218,7 @@ func (m *Manager) Update() error {
 	}
 
 	if m.waitingForInput {
-		cmds := input.CommandsReader()
-		if cmds.Confirm && !m.prevConfirm {
+		if confirmJustPressed && m.playerAdvanceEnabled {
 			m.currentLine++
 			if m.currentLine >= len(m.lines) {
 				s.Hide()
@@ -204,7 +235,6 @@ func (m *Manager) Update() error {
 				m.startSpeechAudioIfNeeded()
 			}
 		}
-		m.prevConfirm = cmds.Confirm
 	}
 	return nil
 }
@@ -229,12 +259,11 @@ func (m *Manager) getCurrentMessage() string {
 	return m.lines[m.currentLine]
 }
 
-func (m *Manager) shouldSkipTyping() bool {
-	cfg := m.config
-	if !m.dialogueSkipEnabled && (cfg == nil || !cfg.EnableSpeechSkip) {
+func (m *Manager) shouldSkipTyping(confirmJustPressed bool) bool {
+	if !m.dialogueSkipEnabled {
 		return false
 	}
-	return input.CommandsReader().Confirm
+	return confirmJustPressed
 }
 
 func (m *Manager) startSpeechAudioIfNeeded() {

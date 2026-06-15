@@ -169,7 +169,63 @@ func TestAppContextPhaseNavigationIntegration(t *testing.T) {
 	}
 }
 
-// TestGame_OverlayOpenSuppressesSceneUpdate verifies that when the debug
+// TestGame_F3F4_ToggleSlowMoFastForward verifies that flipping cfg.SlowMo /
+// cfg.FastForward between Update calls is reflected in the game's last-seen
+// values on the next tick (the TPS dirty-check wiring).
+func TestGame_F3F4_ToggleSlowMoFastForward(t *testing.T) {
+	t.Run("T-FF1 lastSlowMo tracks cfg.SlowMo across ticks", func(t *testing.T) {
+		cfg := &config.AppConfig{
+			ScreenWidth:  320,
+			ScreenHeight: 240,
+			SlowMo:       false,
+			SlowMoFactor: 0.5,
+		}
+		ctx := &AppContext{Config: cfg, SceneManager: &mocks.MockSceneManager{}, DialogueManager: &mocks.MockDialogueManager{}}
+		game := NewGame(ctx)
+
+		if err := game.Update(); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if game.lastSlowMo != false {
+			t.Fatalf("lastSlowMo = %v, want false", game.lastSlowMo)
+		}
+
+		cfg.SlowMo = true
+		if err := game.Update(); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if game.lastSlowMo != true {
+			t.Fatalf("lastSlowMo = %v, want true after toggle", game.lastSlowMo)
+		}
+	})
+
+	t.Run("T-FF2 lastFastForward tracks cfg.FastForward across ticks", func(t *testing.T) {
+		cfg := &config.AppConfig{
+			ScreenWidth:       320,
+			ScreenHeight:      240,
+			FastForward:       false,
+			FastForwardFactor: 2.0,
+		}
+		ctx := &AppContext{Config: cfg, SceneManager: &mocks.MockSceneManager{}, DialogueManager: &mocks.MockDialogueManager{}}
+		game := NewGame(ctx)
+
+		if err := game.Update(); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if game.lastFastForward != false {
+			t.Fatalf("lastFastForward = %v, want false", game.lastFastForward)
+		}
+
+		cfg.FastForward = true
+		if err := game.Update(); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if game.lastFastForward != true {
+			t.Fatalf("lastFastForward = %v, want true after toggle", game.lastFastForward)
+		}
+	})
+}
+
 // overlay is open, Game.Update skips both SceneManager.Update and
 // DialogueManager.Update, but still advances FrameCount.
 //

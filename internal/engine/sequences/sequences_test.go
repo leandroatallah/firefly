@@ -8,6 +8,7 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/app"
 	contractseq "github.com/boilerplate/ebiten-template/internal/engine/contracts/sequences"
 	"github.com/boilerplate/ebiten-template/internal/engine/entity/actors"
+	"github.com/boilerplate/ebiten-template/internal/engine/event"
 	"github.com/boilerplate/ebiten-template/internal/engine/mocks"
 )
 
@@ -342,4 +343,91 @@ func TestEndBlockingPhase_UnblocksPlayer(t *testing.T) {
 		t.Error("sequence should have completed")
 	}
 	// UnblockMovement is a no-op on MockActor but the path is exercised
+}
+
+// blockCountActor tracks BlockMovement/UnblockMovement balance so tests can
+// assert the player is left unblocked.
+type blockCountActor struct {
+	mocks.MockActor
+	blockCount int
+}
+
+func (a *blockCountActor) BlockMovement() { a.blockCount++ }
+func (a *blockCountActor) UnblockMovement() {
+	a.blockCount--
+	if a.blockCount < 0 {
+		a.blockCount = 0
+	}
+}
+
+func writeSeq(t *testing.T, body string) *Sequence {
+	t.Helper()
+	path := filepath.Join(t.TempDir(), "seq.json")
+	if err := os.WriteFile(path, []byte(body), 0644); err != nil {
+		t.Fatalf("write seq: %v", err)
+	}
+	seq, err := NewSequenceFromJSON(path)
+	if err != nil {
+		t.Fatalf("load seq: %v", err)
+	}
+	return seq
+}
+
+// TestReentrantChainDefersAndRunsToCompletion guards against re-entrant Play
+// corruption. A command (here a non-blocking event) synchronously chains to
+// another sequence from inside the player's own advance loop. The chained Play
+// must be deferred until the advance unwinds — otherwise it rewrites the
+// player's index/sequence mid-loop, skipping the chained sequence's commands
+// and unbalancing movement blocking. With the fix the chained sequence runs to
+// completion and blocking stays balanced.
+func TestReentrantChainDefersAndRunsToCompletion(t *testing.T) {
+	ctx := &app.AppContext{}
+	em := event.NewManager()
+	ctx.EventManager = em
+	am := actors.NewManager()
+	ctx.ActorManager = am
+
+	pl := &blockCountActor{}
+	pl.Id = "player"
+	am.RegisterPrimary(pl)
+
+	sp := NewSequencePlayer(ctx)
+
+	// seqB blocks movement and runs a 3-frame delay.
+	seqB := writeSeq(t, `{"commands":[{"command":"delay","frames":3}],"block_player_movement":true}`)
+
+	// seqA blocks movement; its non-blocking event command chains to seqB from
+	// inside the advance loop — the case that corrupts state without deferral.
+	em.Subscribe("chain_b", func(e event.Event) { sp.Play(seqB) })
+	seqA := writeSeq(t, `{"commands":[{"command":"event","event_type":"chain_b","block_sequence":false},{"command":"delay","frames":1}],"block_player_movement":true}`)
+
+	sp.Play(seqA)
+
+	// The chain has been applied after Play returns: seqB is current and the
+	// player is blocked exactly once (seqA's block handed off to seqB's).
+	if pl.blockCount != 1 {
+		t.Fatalf("after chain, expected blockCount=1, got %d", pl.blockCount)
+	}
+	if !sp.IsPlaying() {
+		t.Fatal("expected chained seqB to be playing")
+	}
+
+	// seqB's 3-frame delay must actually tick: the player stays blocked through
+	// it and only unblocks when it finishes.
+	sp.Update()
+	sp.Update()
+	if pl.blockCount != 1 {
+		t.Fatalf("seqB should still be blocking mid-delay, got blockCount=%d", pl.blockCount)
+	}
+	sp.Update() // delay completes -> unblocks
+
+	for i := 0; i < 3 && sp.IsPlaying(); i++ {
+		sp.Update()
+	}
+	if sp.IsPlaying() {
+		t.Fatal("expected all sequences to finish")
+	}
+	if pl.blockCount != 0 {
+		t.Fatalf("player left blocked after chain: blockCount=%d", pl.blockCount)
+	}
 }

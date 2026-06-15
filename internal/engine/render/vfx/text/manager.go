@@ -44,3 +44,8 @@ func (m *Manager) Draw(screen *ebiten.Image, cam *camera.Controller) {
 		ft.Draw(screen, cam)
 	}
 }
+
+// Clear removes all active floating text.
+func (m *Manager) Clear() {
+	m.texts = m.texts[:0]
+}

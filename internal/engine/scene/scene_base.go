@@ -31,6 +31,8 @@ func NewScene() *BaseScene {
 
 func (s *BaseScene) Draw(screen *ebiten.Image) {}
 
+func (s *BaseScene) DrawOver(screen *ebiten.Image) {}
+
 func (s *BaseScene) Update() error {
 	// Update scheduled actions
 	for i := 0; i < len(s.scheduledActions); i++ {

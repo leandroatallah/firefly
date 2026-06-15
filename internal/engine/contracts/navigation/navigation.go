@@ -12,6 +12,8 @@ type SceneType int
 type Scene interface {
 	// Draw renders the scene to the given screen image.
 	Draw(screen *ebiten.Image)
+	// DrawOver is similar to Draw but delayed to cover all screen images.
+	DrawOver(screen *ebiten.Image)
 	// Update advances the scene by one game tick, returning any error.
 	Update() error
 	// OnStart is called once when the scene becomes active.
@@ -41,6 +43,8 @@ type SceneManager interface {
 	AudioManager() audio.Manager
 	// Draw renders the current scene (and any active transition) to the screen.
 	Draw(screen *ebiten.Image)
+	// DrawOver is similar to Draw but renders after to cover all screen.
+	DrawOver(screen *ebiten.Image)
 	// NavigateTo transitions to the scene identified by sceneType.
 	NavigateTo(sceneType SceneType, sceneTransition Transition, freshInstance bool)
 	// NavigateBack transitions to the previously active scene.

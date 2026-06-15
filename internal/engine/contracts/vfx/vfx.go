@@ -1,6 +1,8 @@
 package vfx
 
 import (
+	"image/color"
+
 	"github.com/boilerplate/ebiten-template/internal/engine/assets/font"
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	"github.com/boilerplate/ebiten-template/internal/engine/render/camera"
@@ -15,6 +17,8 @@ type Manager interface {
 
 	// Update advances all active effects by one game tick.
 	Update()
+	// Clear removes all active particles and floating text.
+	Clear()
 	// Draw renders all active effects to the screen using the given camera.
 	Draw(screen *ebiten.Image, cam *camera.Controller)
 
@@ -48,4 +52,22 @@ type Manager interface {
 	SpawnDirectionalPuff(typeKey string, x float64, y float64, faceRight bool, count int, randRange float64)
 	// TriggerScreenFlash triggers a full-screen flash effect.
 	TriggerScreenFlash()
+}
+
+// Overlay is a full-screen visual overlay effect.
+type Overlay interface {
+	// FadeOut starts a fade-out (alpha 0→255) with the given duration in frames.
+	FadeOut(frames int)
+	// FadeIn starts a fade-in (alpha 255→0) with the given duration in frames.
+	FadeIn(frames int)
+	// Update advances the overlay by one frame. Returns true when complete.
+	Update() bool
+	// IsActive returns true if the overlay is currently active.
+	IsActive() bool
+	// Reset clears the overlay state.
+	Reset()
+	// Draw renders the overlay to the screen.
+	Draw(screen *ebiten.Image)
+	// Set overlay color
+	SetColor(color.Color)
 }

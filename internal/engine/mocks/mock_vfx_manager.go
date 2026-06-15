@@ -13,6 +13,7 @@ import (
 type MockVFXManager struct {
 	SetAppContextFunc          func(appContext any)
 	UpdateFunc                 func()
+	ClearFunc                  func()
 	DrawFunc                   func(screen *ebiten.Image, cam *camera.Controller)
 	AddParticleFunc            func(p *particles.Particle)
 	AddTraumaFunc              func(cam *camera.Controller, amount float64)
@@ -38,6 +39,12 @@ func (m *MockVFXManager) SetAppContext(appContext any) {
 func (m *MockVFXManager) Update() {
 	if m.UpdateFunc != nil {
 		m.UpdateFunc()
+	}
+}
+
+func (m *MockVFXManager) Clear() {
+	if m.ClearFunc != nil {
+		m.ClearFunc()
 	}
 }
 

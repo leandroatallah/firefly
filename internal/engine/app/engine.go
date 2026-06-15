@@ -7,17 +7,23 @@ import (
 
 	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
 	"github.com/boilerplate/ebiten-template/internal/engine/debug"
+	"github.com/boilerplate/ebiten-template/internal/engine/ui/actorinspector"
 	"github.com/boilerplate/ebiten-template/internal/engine/ui/debugoverlay"
+	"github.com/boilerplate/ebiten-template/internal/engine/ui/phaseoverlay"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
 )
 
 type Game struct {
-	AppContext    *AppContext
-	debugFontFace *text.GoTextFace
-	slowMoApplied bool
-	debugOverlay  *debugoverlay.DebugOverlay
+	AppContext      *AppContext
+	debugFontFace   *text.GoTextFace
+	slowMoApplied   bool
+	lastSlowMo      bool
+	lastFastForward bool
+	debugOverlay    *debugoverlay.DebugOverlay
+	phaseOverlay    *phaseoverlay.PhaseOverlay
+	actorInspector  *actorinspector.Overlay
 }
 
 func NewGame(ctx *AppContext) *Game {
@@ -25,6 +31,13 @@ func NewGame(ctx *AppContext) *Game {
 	return &Game{
 		AppContext:   ctx,
 		debugOverlay: debugoverlay.New(),
+		phaseOverlay: phaseoverlay.New(),
+		actorInspector: actorinspector.New(func() actorinspector.ActorSource {
+			if ctx.ActorManager == nil {
+				return nil
+			}
+			return ctx.ActorManager
+		}),
 	}
 }
 
@@ -33,19 +46,37 @@ func (g *Game) DebugOverlay() *debugoverlay.DebugOverlay {
 	return g.debugOverlay
 }
 
+// PhaseOverlay returns the phase-jump overlay instance for external wiring
+// (entry list + select handler) and tests.
+func (g *Game) PhaseOverlay() *phaseoverlay.PhaseOverlay {
+	return g.phaseOverlay
+}
+
+// ActorInspector returns the actor inspector overlay instance for external wiring.
+func (g *Game) ActorInspector() *actorinspector.Overlay {
+	return g.actorInspector
+}
+
 func (g *Game) Update() error {
-	if !g.slowMoApplied {
+	cfg := g.AppContext.Config
+	if !g.slowMoApplied || g.lastSlowMo != cfg.SlowMo || g.lastFastForward != cfg.FastForward {
 		g.slowMoApplied = true
-		cfg := g.AppContext.Config
+		g.lastSlowMo = cfg.SlowMo
+		g.lastFastForward = cfg.FastForward
+		// Slow-mo takes precedence over fast-forward when both are enabled.
 		if tps, ok := EffectiveTPS(cfg.SlowMo, cfg.SlowMoFactor, ebiten.DefaultTPS); ok {
 			ebiten.SetTPS(tps)
+		} else if tps, ok := FastForwardTPS(cfg.FastForward, cfg.FastForwardFactor, ebiten.DefaultTPS); ok {
+			ebiten.SetTPS(tps)
+		} else {
+			ebiten.SetTPS(ebiten.DefaultTPS)
 		}
 	}
 
 	g.AppContext.FrameCount++
 
 	f1Toggled := inpututil.IsKeyJustPressed(ebiten.KeyF1)
-	if f1Toggled {
+	if f1Toggled && !g.phaseOverlay.IsOpen() && !g.actorInspector.IsOpen() {
 		if g.debugOverlay.IsOpen() {
 			g.debugOverlay.Close()
 		} else {
@@ -58,6 +89,45 @@ func (g *Game) Update() error {
 			g.debugOverlay.Update()
 		}
 		return nil
+	}
+
+	f2Toggled := inpututil.IsKeyJustPressed(ebiten.KeyF2)
+	if f2Toggled && !g.actorInspector.IsOpen() {
+		if g.phaseOverlay.IsOpen() {
+			g.phaseOverlay.Close()
+		} else {
+			g.phaseOverlay.Open()
+		}
+	}
+
+	if g.phaseOverlay.IsOpen() {
+		if !f2Toggled {
+			g.phaseOverlay.Update()
+		}
+		return nil
+	}
+
+	f5Toggled := inpututil.IsKeyJustPressed(ebiten.KeyF5)
+	if f5Toggled {
+		if g.actorInspector.IsOpen() {
+			g.actorInspector.Close()
+		} else {
+			g.actorInspector.Open()
+		}
+	}
+
+	if g.actorInspector.IsOpen() {
+		if !f5Toggled {
+			g.actorInspector.Update()
+		}
+		return nil
+	}
+
+	if inpututil.IsKeyJustPressed(ebiten.KeyF3) {
+		cfg.SlowMo = !cfg.SlowMo
+	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyF4) {
+		cfg.FastForward = !cfg.FastForward
 	}
 
 	// Update Dialogue Manager
@@ -78,7 +148,11 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		g.AppContext.DialogueManager.Draw(screen)
 	}
 
+	g.AppContext.SceneManager.DrawOver(screen)
+
 	g.debugOverlay.Draw(screen)
+	g.phaseOverlay.Draw(screen)
+	g.actorInspector.Draw(screen)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {

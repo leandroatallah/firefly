@@ -2,6 +2,7 @@ package gamesetup
 
 import (
 	"io/fs"
+	"log"
 
 	"github.com/boilerplate/ebiten-template/internal/engine/app"
 	"github.com/boilerplate/ebiten-template/internal/engine/assets/font"
@@ -12,11 +13,12 @@ import (
 	"github.com/boilerplate/ebiten-template/internal/engine/event"
 	"github.com/boilerplate/ebiten-template/internal/engine/physics/space"
 	"github.com/boilerplate/ebiten-template/internal/engine/render/particles/vfx"
+	enginestylevfx "github.com/boilerplate/ebiten-template/internal/engine/render/vfx"
 	"github.com/boilerplate/ebiten-template/internal/engine/scene"
 	"github.com/boilerplate/ebiten-template/internal/engine/scene/phases"
+	"github.com/boilerplate/ebiten-template/internal/engine/ui/phaseoverlay"
 	enginespeech "github.com/boilerplate/ebiten-template/internal/engine/ui/speech"
 	gamescene "github.com/boilerplate/ebiten-template/internal/game/scenes"
-	gamescenephases "github.com/boilerplate/ebiten-template/internal/game/scenes/phases"
 	scenestypes "github.com/boilerplate/ebiten-template/internal/game/scenes/types"
 	gamespeech "github.com/boilerplate/ebiten-template/internal/game/ui/speech"
 	"github.com/boilerplate/ebiten-template/internal/kit/combat/projectile"
@@ -27,7 +29,7 @@ import (
 func Setup(assets fs.FS) error {
 	cfg := config.Get()
 	// Basic Ebiten setup
-	ebiten.SetWindowSize(cfg.ScreenWidth*2, cfg.ScreenHeight*2)
+	ebiten.SetWindowSize(cfg.ScreenWidth*3, cfg.ScreenHeight*3)
 	ebiten.SetFullscreen(cfg.Fullscreen)
 	ebiten.SetWindowTitle("Ebitengine Boilerplate")
 
@@ -74,23 +76,26 @@ func Setup(assets fs.FS) error {
 	for _, p := range GetPhases() {
 		phaseManager.AddPhase(p)
 	}
-	phaseManager.SetCurrentPhase(2)
+	phaseManager.SetCurrentPhase(1)
 
 	appContext := &app.AppContext{
-		AudioManager:    audioManager,
-		DialogueManager: dialogueManager,
-		EventManager:    event.NewManager(),
-		ActorManager:    actorManager,
-		SceneManager:    sceneManager,
-		PhaseManager:    phaseManager,
-		I18n:            i18nManager,
-		ImageManager:    nil,
-		DataManager:     nil,
-		Assets:          assets,
-		Config:          config.Get(),
-		Space:           space.NewSpace(),
-		VFX:             vfxManager,
-		Font:            fontMain,
+		AudioManager:      audioManager,
+		DialogueManager:   dialogueManager,
+		EventManager:      event.NewManager(),
+		ActorManager:      actorManager,
+		SceneManager:      sceneManager,
+		PhaseManager:      phaseManager,
+		I18n:              i18nManager,
+		ImageManager:      nil,
+		DataManager:       nil,
+		Assets:            assets,
+		Config:            config.Get(),
+		Space:             space.NewSpace(),
+		VFX:               vfxManager,
+		FadeOverlay:       enginestylevfx.NewFadeOverlay(),
+		SolidColorOverlay: enginestylevfx.NewSolidColor(),
+
+		Font: fontMain,
 	}
 	projManager := projectile.NewManager(appContext.Space)
 	projManager.SetVFXManager(vfxManager)
@@ -107,12 +112,31 @@ func Setup(assets fs.FS) error {
 	// Create and run the game
 	game := app.NewGame(appContext)
 	game.DebugOverlay().SetFont(fontSmall.NewFace(8))
+	game.ActorInspector().SetFont(fontSmall.NewFace(8))
+
+	// F2 phase-jump overlay: list every phase and warp to the chosen one.
+	phaseEntries := make([]phaseoverlay.Entry, 0, len(GetPhases()))
+	for _, p := range GetPhases() {
+		phaseEntries = append(phaseEntries, phaseoverlay.Entry{ID: p.ID, Name: p.Name})
+	}
+	game.PhaseOverlay().SetFont(fontSmall.NewFace(8))
+	game.PhaseOverlay().SetEntries(phaseEntries)
+	game.PhaseOverlay().SetOnSelect(func(id int) {
+		if err := appContext.PhaseManager.SetCurrentPhase(id); err != nil {
+			log.Printf("phase jump: %v", err)
+			return
+		}
+		// Force a fresh start: the jump bypasses normal progression, so clear
+		// any audio, dialogue, and VFX still lingering from the previous phase.
+		appContext.ResetTransientState()
+		appContext.GoToCurrentPhaseScene(nil, true)
+	})
 
 	// Set initial game scene
 	initialScene := scenestypes.SceneMenu
 	if cfg.SkipIntro {
 		phase, _ := phaseManager.GetCurrentPhase()
-		initialScene = gamescenephases.SceneTypeForGenre(phase.Genre)
+		initialScene = phase.SceneType
 	}
 	game.AppContext.SceneManager.NavigateTo(initialScene, nil, false)
 

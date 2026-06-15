@@ -3,6 +3,7 @@ package sequences
 import (
 	"encoding/json"
 	"fmt"
+	"image/color"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -44,13 +45,15 @@ type CommandData struct {
 	Type string `json:"command"`
 
 	// Fields for "dialogue"
-	Lines            []string `json:"lines,omitempty"`
-	Position         string   `json:"position,omitempty"`
-	SpeechSpeed      int      `json:"speech_speed,omitempty"`
-	SpeechID         string   `json:"speech_id,omitempty"`
-	SpeechAudio      []string `json:"speech_audio,omitempty"`
-	EnableSpeechSkip *bool    `json:"enable_speech_skip,omitempty"`
-	Accumulative     *bool    `json:"accumulative,omitempty"`
+	Lines               []string `json:"lines,omitempty"`
+	Position            string   `json:"position,omitempty"`
+	SpeechSpeed         int      `json:"speech_speed,omitempty"`
+	SpeechID            string   `json:"speech_id,omitempty"`
+	SpeechAudio         []string `json:"speech_audio,omitempty"`
+	EnableSpeechSkip    *bool    `json:"enable_speech_skip,omitempty"`
+	EnablePlayerAdvance *bool    `json:"enable_player_advance,omitempty"`
+	Accumulative        *bool    `json:"accumulative,omitempty"`
+	HideIndicator       *bool    `json:"hide_indicator,omitempty"`
 
 	// Fields for "delay"
 	Frames int `json:"frames,omitempty"`
@@ -104,6 +107,9 @@ type CommandData struct {
 	// Fields for "vignette_radius"
 	InitialRadius float64 `json:"initial_radius,omitempty"`
 	FinalRadius   float64 `json:"final_radius,omitempty"`
+
+	// Fields for vfx
+	Color color.RGBA `json:"color,omitempty"`
 }
 
 // SequenceData is a wrapper used for parsing a full sequence from JSON.
@@ -122,9 +128,17 @@ func (cd *CommandData) ToCommand() sequences.Command {
 		if speed == 0 && cd.Speed > 0 {
 			speed = int(cd.Speed)
 		}
-		return &DialogueCommand{Lines: cd.Lines, Position: cd.Position, Speed: speed, SpeechID: cd.SpeechID, SpeechAudio: cd.SpeechAudio, EnableSpeechSkip: cd.EnableSpeechSkip, Accumulative: cd.Accumulative}
+		return &DialogueCommand{Lines: cd.Lines, Position: cd.Position, Speed: speed, SpeechID: cd.SpeechID, SpeechAudio: cd.SpeechAudio, EnableSpeechSkip: cd.EnableSpeechSkip, EnablePlayerAdvance: cd.EnablePlayerAdvance, Accumulative: cd.Accumulative, HideIndicator: cd.HideIndicator}
+	case "dialogue_reset":
+		return &DialogueResetCommand{}
 	case "delay":
 		return &DelayCommand{Frames: cd.Frames}
+	case "fade_out":
+		return &FadeOutCommand{Frames: cd.Frames, Color: cd.Color}
+	case "fade_in":
+		return &FadeInCommand{Frames: cd.Frames, Color: cd.Color}
+	case "solid_color":
+		return &SolidColorCommand{Frames: cd.Frames, Color: cd.Color}
 	case "move_actor":
 		return &MoveActorCommand{
 			TargetID: cd.TargetID,

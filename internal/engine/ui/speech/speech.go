@@ -27,6 +27,7 @@ type Speech interface {
 	SetSkipFlash(frames int)
 	IsAccumulative() bool
 	SetAccumulative(bool)
+	SetIndicator(*ebiten.Image)
 }
 
 type SpeechBase struct {
@@ -42,6 +43,7 @@ type SpeechBase struct {
 	color         color.Color
 	skipFlash     int
 	accumulative  bool
+	Indicator     *ebiten.Image
 }
 
 func NewSpeechBase(fontSource *SpeechFont) *SpeechBase {
@@ -154,6 +156,10 @@ func (s *SpeechBase) IsAccumulative() bool {
 
 func (s *SpeechBase) SetAccumulative(acc bool) {
 	s.accumulative = acc
+}
+
+func (s *SpeechBase) SetIndicator(img *ebiten.Image) {
+	s.Indicator = img
 }
 
 func (s *SpeechBase) Image(screen *ebiten.Image) *ebiten.Image {

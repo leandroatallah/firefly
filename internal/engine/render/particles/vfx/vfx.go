@@ -348,6 +348,12 @@ func (m *Manager) Update() {
 	m.textManager.Update()
 }
 
+// Clear removes all active particles and floating text.
+func (m *Manager) Clear() {
+	m.system.Clear()
+	m.textManager.Clear()
+}
+
 func (m *Manager) Draw(screen *ebiten.Image, cam *camera.Controller) {
 	m.system.Draw(screen, cam)
 	m.textManager.Draw(screen, cam)

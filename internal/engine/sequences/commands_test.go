@@ -19,6 +19,7 @@ type stubSpeech struct {
 	id              string
 	spellingDone    bool
 	accumulativeVal bool
+	indicatorVal    *ebiten.Image
 }
 
 func (s *stubSpeech) ID() string                     { return s.id }
@@ -41,6 +42,7 @@ func (s *stubSpeech) Color() color.Color             { return color.Black }
 func (s *stubSpeech) SetSkipFlash(_ int)             {}
 func (s *stubSpeech) IsAccumulative() bool           { return s.accumulativeVal }
 func (s *stubSpeech) SetAccumulative(v bool)         { s.accumulativeVal = v }
+func (s *stubSpeech) SetIndicator(v *ebiten.Image)   { s.indicatorVal = v }
 
 func newTestDialogueManager() dialogue.Manager {
 	stub := &stubSpeech{id: dialogue.BubbleSpeechID}

@@ -39,6 +39,8 @@ type AppContext struct {
 	Space             body.BodiesSpace
 	ProjectileManager contractscombat.ProjectileManager
 	VFX               vfx.Manager
+	FadeOverlay       vfx.Overlay
+	SolidColorOverlay vfx.Overlay
 	Font              *font.FontText
 
 	// Global frame counter
@@ -56,6 +58,28 @@ func (c *AppContextHolder) SetAppContext(appContext any) {
 
 func (c *AppContextHolder) AppContext() *AppContext {
 	return c.appContext
+}
+
+// ResetTransientState clears cross-scene runtime state — playing audio, active
+// dialogue, lingering VFX, and screen fades — so the next scene starts from a clean slate.
+// Normal phase progression carries this state intentionally; this is for jumps
+// that bypass it (e.g. the debug phase-jump overlay).
+func (c *AppContext) ResetTransientState() {
+	if c.AudioManager != nil {
+		c.AudioManager.StopAll()
+	}
+	if c.DialogueManager != nil {
+		c.DialogueManager.Stop()
+	}
+	if c.VFX != nil {
+		c.VFX.Clear()
+	}
+	if c.FadeOverlay != nil {
+		c.FadeOverlay.Reset()
+	}
+	if c.SolidColorOverlay != nil {
+		c.SolidColorOverlay.Reset()
+	}
 }
 
 func (c *AppContext) GoToCurrentPhaseScene(t navigation.Transition, freshInstance bool) {

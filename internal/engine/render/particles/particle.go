@@ -158,3 +158,8 @@ func (s *System) DrawDirect(screen *ebiten.Image, drawFn func(*ebiten.Image, *Pa
 func (s *System) Particles() []*Particle {
 	return s.particles
 }
+
+// Clear removes all active particles.
+func (s *System) Clear() {
+	s.particles = s.particles[:0]
+}

@@ -13,6 +13,8 @@ type Manager interface {
 	Update() error
 	Draw(screen *ebiten.Image)
 	IsSpeaking() bool
+	// Stop immediately ends any active dialogue and clears queued speech audio.
+	Stop()
 
 	// Speech registry
 	AddSpeech(s speech.Speech)
@@ -31,6 +33,7 @@ type Manager interface {
 
 	// Behaviour flags
 	SetSpeechSkipEnabled(enabled bool)
+	SetPlayerAdvanceEnabled(enabled bool)
 
 	// Display
 	ShowMessages(lines []string, position string, speed int)

@@ -149,65 +149,6 @@ func (m *mockPlatformerPlayer) recordSetNewStateFatal(s actors.ActorStateEnum) {
 
 // --- tests -----------------------------------------------------------------
 
-func TestPlatformerPhaseScene_CheckPlayerFallDeath_FiresWhenBelowCamera(t *testing.T) {
-	scene := platformerphasescene.NewForTest(platformerphasescene.TestOptions{
-		// Camera center (100, 100), screen height 200 → bottom Y = 200.
-		CameraCenterX: 100,
-		CameraCenterY: 100,
-		ScreenWidth:   320,
-		ScreenHeight:  200,
-		// Player top Y = 250 (player is below camera bottom).
-		PlayerY:    250,
-		DyingState: actors.Dying,
-		DeadState:  actors.Dead,
-	})
-
-	player := newMockPlatformerPlayer(0, 250*16)
-	player.state = actors.Idle
-	scene.SetPlayerForTest(player)
-	scene.SetSetNewStateFatalRecorder(player.recordSetNewStateFatal)
-
-	scene.CheckPlayerFallDeathForTest()
-
-	if !scene.DeathActiveForTest() {
-		t.Fatal("expected deathActive=true after player fell below camera bottom")
-	}
-	if player.setNewStateFatalCalls != 1 {
-		t.Fatalf("expected SetNewStateFatal called once, got %d", player.setNewStateFatalCalls)
-	}
-	if player.lastSetNewStateFatalArg != actors.Dying {
-		t.Fatalf("expected SetNewStateFatal(Dying), got %v", player.lastSetNewStateFatalArg)
-	}
-	if player.setImmobileTrueCalls < 1 {
-		t.Fatalf("expected SetImmobile(true) at least once, got %d", player.setImmobileTrueCalls)
-	}
-}
-
-func TestPlatformerPhaseScene_CheckPlayerFallDeath_NoOpWhenDeathActive(t *testing.T) {
-	scene := platformerphasescene.NewForTest(platformerphasescene.TestOptions{
-		CameraCenterX: 100,
-		CameraCenterY: 100,
-		ScreenWidth:   320,
-		ScreenHeight:  200,
-		PlayerY:       250,
-		DyingState:    actors.Dying,
-		DeadState:     actors.Dead,
-	})
-
-	player := newMockPlatformerPlayer(0, 250*16)
-	scene.SetPlayerForTest(player)
-	scene.SetSetNewStateFatalRecorder(player.recordSetNewStateFatal)
-	scene.SetDeathActiveForTest(true)
-
-	scene.CheckPlayerFallDeathForTest()
-	scene.CheckPlayerFallDeathForTest()
-
-	if player.setNewStateFatalCalls != 0 {
-		t.Fatalf("expected SetNewStateFatal NOT called when deathActive=true, got %d calls",
-			player.setNewStateFatalCalls)
-	}
-}
-
 func TestPlatformerPhaseScene_ScreenFlipperCallbacksToggleImmobility(t *testing.T) {
 	scene := platformerphasescene.NewForTest(platformerphasescene.TestOptions{
 		CameraCenterX: 100,

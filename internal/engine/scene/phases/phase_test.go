@@ -5,6 +5,7 @@ import (
 
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/navigation"
 	contractseq "github.com/boilerplate/ebiten-template/internal/engine/contracts/sequences"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 func TestManagerAdvanceToNextPhaseIntegration(t *testing.T) {
@@ -43,6 +44,10 @@ func (p *testPlayer) IsOver() bool {
 	return p.isOver
 }
 
+func (p *testPlayer) IsDebugPaused() bool {
+	return false
+}
+
 func (p *testPlayer) Play(s contractseq.Sequence) {
 	p.playing = true
 	p.isOver = false
@@ -61,6 +66,9 @@ func (p *testPlayer) PlaySequence(filePath string) {
 func (p *testPlayer) Update() {
 	p.updates++
 }
+
+func (p *testPlayer) Draw(_ *ebiten.Image)     {}
+func (p *testPlayer) DrawOver(_ *ebiten.Image) {}
 
 func TestSequenceGoalCompletesWhenPlayerStops(t *testing.T) {
 	p := &testPlayer{

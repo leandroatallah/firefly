@@ -131,6 +131,7 @@ func (m *mockVFXManager) SpawnPuff(typeKey string, x, y float64, count int, rand
 func (m *mockVFXManager) SpawnDirectionalPuff(_ string, _ float64, _ float64, _ bool, _ int, _ float64) {
 }
 func (m *mockVFXManager) TriggerScreenFlash() {}
+func (m *mockVFXManager) Clear()              {}
 
 // mockCollidable implements body.Collidable for testing.
 type mockCollidable struct {
