@@ -5,7 +5,6 @@ import (
 
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/body"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
-	bodyphysics "github.com/boilerplate/ebiten-template/internal/engine/physics/body"
 	"github.com/boilerplate/ebiten-template/internal/engine/utils/fp16"
 )
 
@@ -78,57 +77,61 @@ func clampAxisVelocity(velocity, limit int) int {
 // It adjusts the body's position if it goes beyond the edges of the play area.
 // It returns true if the body is touching or has gone past the bottom of the screen,
 // which can be interpreted as being on the ground for platformer.
-func clampToPlayArea(body body.MovableCollidable, space body.BodiesSpace) bool {
-	rect, ok := body.GetShape().(*bodyphysics.Rect)
-	if !ok {
+func clampToPlayArea(b body.MovableCollidable, space body.BodiesSpace) bool {
+	// Use the union of all collision shapes as the effective bounding box.
+	// This ensures clamping is based on the actual hitbox, not the sprite bounds.
+	collisionRects := b.CollisionPosition()
+	if len(collisionRects) == 0 {
 		return false
 	}
 
+	union := collisionRects[0]
+	for i := 1; i < len(collisionRects); i++ {
+		union = union.Union(collisionRects[i])
+	}
+
 	cfg := config.Get()
-	x, y := body.GetPositionMin()
-	newX, newY := x, y
+	bx, by := b.GetPositionMin()
 
-	// --- Horizontal clamping ---
-	minX := 0
-	maxX := cfg.ScreenWidth
+	// Offset from body origin to the collision bounding box top-left.
+	offsetX := union.Min.X - bx
+	offsetY := union.Min.Y - by
+
+	collW := union.Dx()
+	collH := union.Dy()
+	newX, newY := bx, by
+
 	provider := space.GetTilemapDimensionsProvider()
-	if provider != nil {
-		maxX = provider.GetTilemapWidth()
-	}
-
-	// Left edge
-	if x < minX {
-		newX = minX
-	}
-
-	// Right edge
-	if x+rect.Width() > maxX {
-		newX = maxX - rect.Width()
-	}
-
-	// --- Vertical clamping ---
-	minY := 0
+	maxX := cfg.ScreenWidth
 	maxY := cfg.ScreenHeight
 	if provider != nil {
+		maxX = provider.GetTilemapWidth()
 		maxY = provider.GetTilemapHeight()
 	}
 
-	// Top edge
-	if y < minY {
-		newY = minY
+	// --- Horizontal clamping ---
+	if union.Min.X < 0 {
+		newX = -offsetX
+	}
+	if union.Min.X+collW > maxX {
+		newX = maxX - collW - offsetX
 	}
 
-	// Bottom edge
+	// --- Vertical clamping ---
+	if union.Min.Y < 0 {
+		newY = -offsetY
+	}
+
 	isOnGround := false
-	if y+rect.Height() >= maxY {
-		if y+rect.Height() > maxY {
-			newY = maxY - rect.Height()
+	if union.Min.Y+collH >= maxY {
+		if union.Min.Y+collH > maxY {
+			newY = maxY - collH - offsetY
 		}
 		isOnGround = true
 	}
 
-	if newX != x || newY != y {
-		body.SetPosition(newX, newY)
+	if newX != bx || newY != by {
+		b.SetPosition(newX, newY)
 	}
 
 	return isOnGround
