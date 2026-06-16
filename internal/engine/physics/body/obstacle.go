@@ -52,8 +52,14 @@ func (o *ObstacleRect) SetID(id string) {
 func (o *ObstacleRect) Position() image.Rectangle {
 	return o.MovableBody.Position()
 }
+
+// SetPosition routes through CollidableBody (not MovableBody) so that registered
+// collision children are moved together with the body. CollidableBody.SetPosition16
+// computes the delta and propagates it to every entry in collisionList; routing
+// through MovableBody would update the shared *Body directly and leave collision
+// children behind at their original positions.
 func (o *ObstacleRect) SetPosition(x, y int) {
-	o.MovableBody.SetPosition(x, y)
+	o.CollidableBody.SetPosition(x, y)
 }
 func (o *ObstacleRect) GetPositionMin() (int, int) {
 	return o.MovableBody.GetPositionMin()
