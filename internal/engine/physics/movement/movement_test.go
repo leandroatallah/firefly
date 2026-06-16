@@ -24,6 +24,7 @@ func TestClampToPlayAreaWithTilemapDimensions(t *testing.T) {
 	rect := bodyphysics.NewRect(0, 0, 20, 20)
 	actor := bodyphysics.NewObstacleRect(rect)
 	actor.SetID("actor")
+	actor.AddCollisionBodies()
 	actor.SetPosition(-10, -10) // outside
 
 	onGround := clampToPlayArea(actor, sp)

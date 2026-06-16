@@ -58,6 +58,7 @@ func TestClampToPlayArea_Edges(t *testing.T) {
 			sp := space.NewSpace()
 			actor := bodyphysics.NewObstacleRect(bodyphysics.NewRect(0, 0, 10, 10))
 			actor.SetID("actor")
+			actor.AddCollisionBodies()
 			actor.SetPosition(tt.x, tt.y)
 
 			clampToPlayArea(actor, sp)
@@ -79,6 +80,7 @@ func TestClampToPlayArea_WithTilemapProvider(t *testing.T) {
 
 	actor := bodyphysics.NewObstacleRect(bodyphysics.NewRect(0, 0, 10, 10))
 	actor.SetID("actor")
+	actor.AddCollisionBodies()
 	actor.SetPosition(-10, -10)
 
 	clampToPlayArea(actor, sp)
@@ -104,6 +106,7 @@ func TestClampToPlayArea_OnGroundDetection(t *testing.T) {
 	sp := space.NewSpace()
 	actor := bodyphysics.NewObstacleRect(bodyphysics.NewRect(0, 0, 10, 10))
 	actor.SetID("actor")
+	actor.AddCollisionBodies()
 
 	// At bottom edge - should detect ground
 	actor.SetPosition(100, 230)
@@ -125,14 +128,18 @@ func TestClampToPlayArea_NonRectShape(t *testing.T) {
 
 	sp := space.NewSpace()
 
-	// Create a body with non-rect shape (using mock)
+	// A body with no collision shapes registered returns false (not grounded, no clamping).
 	actor := newMockMovableCollidable()
 	actor.SetPosition(-10, -10)
 
-	// Should return false for non-rect shapes
 	onGround := clampToPlayArea(actor, sp)
 	if onGround {
-		t.Error("expected onGround=false for non-rect shape")
+		t.Error("expected onGround=false when no collision shapes are registered")
+	}
+	// Position must be unchanged since there is nothing to clamp against.
+	pos := actor.Position().Min
+	if pos.X != -10 || pos.Y != -10 {
+		t.Errorf("expected position unchanged at (-10,-10); got (%d, %d)", pos.X, pos.Y)
 	}
 }
 
@@ -895,6 +902,7 @@ func TestBeatEmUpMovementModel_ClampToPlayAreaEngaged(t *testing.T) {
 	sp := space.NewSpace()
 	actor := bodyphysics.NewObstacleRect(bodyphysics.NewRect(0, 0, 10, 10))
 	actor.SetID("actor")
+	actor.AddCollisionBodies()
 	actor.SetPosition(-10, -10)
 	actor.SetMaxSpeed(10)
 	sp.AddBody(actor)
