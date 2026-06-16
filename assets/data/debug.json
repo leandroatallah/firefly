@@ -5,5 +5,9 @@
   "eight_dir_move": false,
 
   "beatemup_vel": false,
-  "beatemup_collisions": false
+  "beatemup_collisions": false,
+
+  "is_going_up": false,
+  "is_falling": false,
+  "is_walking": false
 }

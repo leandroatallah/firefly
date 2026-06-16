@@ -5,6 +5,7 @@ import (
 
 	"github.com/boilerplate/ebiten-template/internal/engine/contracts/animation"
 	"github.com/boilerplate/ebiten-template/internal/engine/data/config"
+	"github.com/boilerplate/ebiten-template/internal/engine/debug"
 	"github.com/boilerplate/ebiten-template/internal/engine/utils/fp16"
 )
 
@@ -171,30 +172,33 @@ func (b *MovableBody) SetDucking(ducking bool) {
 func (b *MovableBody) IsWalking() bool {
 	// A body cannot be walking if it is airborne.
 	if b.IsFalling() || b.IsGoingUp() {
+		debug.Watch("is_walking", b.ID(), false)
 		return false
 	}
 
 	threshold := config.Get().Physics.DownwardGravity
 	if b.vx16 > threshold || b.vx16 < -threshold {
+		debug.Watch("is_walking", b.ID(), true)
 		return true
 	}
 
+	debug.Watch("is_walking", b.ID(), false)
 	return false
 }
 
 func (b *MovableBody) IsGoingUp() bool {
 	// Check if velocity is negative (moving upward)
 	// Use a small threshold to avoid detecting tiny movements as going up
-	if b.vy16 < 0 {
-		return true
-	}
-
-	return false
+	v := b.vy16 < 0
+	debug.Watch("is_going_up", b.ID(), v)
+	return v
 }
 
 func (b *MovableBody) IsFalling() bool {
 	threshold := config.Get().Physics.DownwardGravity
-	return b.vy16 >= threshold
+	v := b.vy16 >= threshold
+	debug.Watch("is_falling", b.ID(), v)
+	return v
 }
 
 // Platform methods
