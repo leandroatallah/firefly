@@ -85,8 +85,9 @@ type DialogueResetCommand struct {
 }
 
 func (c *DialogueResetCommand) Init(appContext any) {
-	appContext.(*app.AppContext).DialogueManager.ClearSpeechAudioQueue()
-	appContext.(*app.AppContext).DialogueManager.Stop()
+	c.dialogueManager = appContext.(*app.AppContext).DialogueManager
+	c.dialogueManager.ClearSpeechAudioQueue()
+	c.dialogueManager.Stop()
 }
 
 func (c *DialogueResetCommand) Update() bool {

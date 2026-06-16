@@ -157,10 +157,9 @@ func TestManager_Draw(t *testing.T) {
 // typingSpeech is a Speech implementation that advances one character per
 // Update call, enabling deterministic typing-sound rotation tests.
 type typingSpeech struct {
-	id               string
-	visible          bool
-	spellingComplete bool
-	spelled          int
+	id      string
+	visible bool
+	spelled int
 }
 
 func (t *typingSpeech) ID() string                             { return t.id }

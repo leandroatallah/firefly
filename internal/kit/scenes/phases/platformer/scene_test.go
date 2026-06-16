@@ -22,13 +22,11 @@ import (
 // --- mock player satisfying platformer.PlatformerActorEntity ---------------
 
 type mockPlatformerPlayer struct {
-	x16, y16, w, h          int
-	state                   actors.ActorStateEnum
-	character               *actors.Character
-	setNewStateFatalCalls   int
-	lastSetNewStateFatalArg actors.ActorStateEnum
-	setImmobileTrueCalls    int
-	setImmobileFalseCalls   int
+	x16, y16, w, h        int
+	state                 actors.ActorStateEnum
+	character             *actors.Character
+	setImmobileTrueCalls  int
+	setImmobileFalseCalls int
 }
 
 func newMockPlatformerPlayer(x16, y16 int) *mockPlatformerPlayer {
@@ -141,11 +139,6 @@ func (m *mockPlatformerPlayer) SetAppContext(any)           {}
 // code can call (recorded for assertion).
 //
 // The Red-Phase test asserts on these counters via the helper accessors below.
-
-func (m *mockPlatformerPlayer) recordSetNewStateFatal(s actors.ActorStateEnum) {
-	m.setNewStateFatalCalls++
-	m.lastSetNewStateFatalArg = s
-}
 
 // --- tests -----------------------------------------------------------------
 
