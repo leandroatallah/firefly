@@ -188,16 +188,11 @@ func (s *Space) Query(rect image.Rectangle) []body.Collidable {
 		}
 
 		isOverlapping := false
-		// Check the main body position
-		if b.Position().Overlaps(rect) {
-			isOverlapping = true
-		} else {
-			// Check all collision shapes of the body
-			for _, collisionShape := range b.CollisionPosition() {
-				if collisionShape.Overlaps(rect) {
-					isOverlapping = true
-					break
-				}
+		// Check all collision shapes of the body
+		for _, collisionShape := range b.CollisionPosition() {
+			if collisionShape.Overlaps(rect) {
+				isOverlapping = true
+				break
 			}
 		}
 
